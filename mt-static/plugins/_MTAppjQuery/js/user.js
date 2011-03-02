@@ -59,6 +59,16 @@
 
 jQuery(function($){
     
+/*
+    $.MTAppIfUserDashboard(function(){
+        console.log('called!!');
+        $("#page-title").text('一流を目指せ！');
+        console.debug(this);
+    });
+*/
+    // テンプレートの１クリック再構築
+    $.MTApp1clickRebuild();
+    
     // デバッグモード
     $.MTAppDebug();
     
@@ -94,13 +104,13 @@ jQuery(function($){
     $.MTAppCustomize({
         basename: 'body',
         label: '旧本文',
-        hint: 'ここには本文を入れましょう！'
+        hint: '魂を込めて本文を書きましょう！'
     });
     $.MTAppCustomize({
         basename: 'more',
-        label: '旧続き',
-        hint: 'ここには続きを入れましょう！'
+        label: '旧続き'
     });
+    $("#editor-header").children('div:eq(1)').MTAppTooltip({text:'書ききれなければ追記しよう！'});
     $.MTAppCustomize({
         basename: 'tags',
         label: '旧タグ',
@@ -114,7 +124,7 @@ jQuery(function($){
     $.MTAppCustomize({
         basename: 'excerpt',
         label: '旧概要',
-        hint: 'ここには概要を入れましょう！',
+        hint: '心に響く概要がいいよう！',
         show_field:1
     });
 
@@ -184,7 +194,6 @@ jQuery(function($){
     });
 */
     
-    // 以下の２行は編集しない方が良いです
-    $('#page_loding').hide();
-    $('#container').css('visibility','visible');
+    // 以下の1行は編集しないでください
+    MTAppComplete();
 });

@@ -1,5 +1,6 @@
 package MTAppjQuery::Tmplset;
 use strict;
+use utf8;
 
 sub s_menu_org {
     my $out = <<'__MT__';
@@ -298,16 +299,22 @@ __MT__
     return $out;
 }
 
-sub fav_blogs_tag_org {
+sub fav_blogs_tab {
+    my ($type) = @_;
+    
     # Confirmed the varsion of 5.0, 5.01, 5.02.
-    my $out = '<li class="tab"><a href="#favorite-blog"><__trans phrase="Blogs"></a></li>';
-    return quotemeta($out);
-}
-sub fav_blogs_tag {
-    my $out = <<'__MT__';
-<li class="tab"><a href="#favorite-blog"><__trans phrase="Blogs"></a></li>
-<li class="tab"><a href="#favorite-structure"><__trans_section component="mt_app_jquery"><__trans phrase="structure"></__trans_section></a></li>
+    my $before = '<li class="tab"><a href="#favorite-blog"><__trans phrase="Blogs"></a></li>';
+    return quotemeta($before) if ($type eq 'before');
+
+    my $after = <<__MT__;
+    ${before}
+    <li class="tab">
+        <a href="#favorite-structure">
+            <__trans_section component="mt_app_jquery"><__trans phrase="structure"></__trans_section>
+        </a>
+    </li>
 __MT__
+    return $after;
 }
 
 sub fav_blogs_wdg_close_org {
@@ -483,5 +490,425 @@ sub fav_blogs_wdg_close {
 </div>
 </mtapp:widget>
 __MT__
+    return $out;
 }
+
+sub MTAppSuperSlideMenu {
+    my $out = <<'__MT__';
+(function($){
+    var websites = [], // 単純に配列でリストアップする
+        blogs = {}; // 親ウェブサイトIDをキー、その子ブログの配列を値とするオブジェクト
+
+    // ブログ一覧を出力する
+    for (var i = -1, n = mtapp_blogs_json.length; ++i < n;) {
+        var parent_id = "w" + mtapp_blogs_json[i].parent_id,
+            blog_id = mtapp_blogs_json[i].id;
+        if (blogs[parent_id]) {
+            blogs[parent_id] += 
+                "<li class='blog'>" + 
+                    "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:blog_id}) + "'>" + 
+                        mtapp_blogs_json[i].name + 
+                    "</a>" + 
+                    createBlogMenu(blog_id) + 
+                "</li>";
+        } else {
+            blogs[parent_id] = 
+                "<li class='blog'>" + 
+                    "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:blog_id}) + "'>" + 
+                        mtapp_blogs_json[i].name + 
+                    "</a>" + 
+                    createBlogMenu(blog_id) + 
+                "</li>";
+        }
+    }
+
+    // ウェブサイト一覧を出力する
+    for (var i = -1, n = mtapp_websites_json.length; ++i < n;) {
+        var website_id = mtapp_websites_json[i].id;
+        var currentClass = (website_id == <mt:if name="curr_website_id"><mt:var name="curr_website_id"><mt:else>0</mt:if>) ? " mtapp-slidemenu-current" : "";
+        var child_blogs = blogs["w" + website_id] ? blogs["w" + website_id] : "";
+        websites.push(
+            "<li class='website mtapp-superslide" + currentClass + "'>" + 
+                "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:website_id}) + "'>" + 
+                    mtapp_websites_json[i].name + 
+                "</a>" + 
+                createWebsiteMenu(website_id, child_blogs) + 
+            "</li>"
+        );
+    }
+
+    websites.sort();
+    $(function(){
+        $("#selector-nav").find("li.system-overview").append(createSystemMenu()).find("li").andSelf()
+            .hover(
+                function(){
+                    var self = $(this);
+                    var w = self.width();
+                    var bgColor = "#383C3C";
+                    self.css("background-color",bgColor).find("ul:first").css("left", w).show();
+                },
+                function(){
+                    var self = $(this);
+                    self.find("ul:first").hide();
+                    if (!self.hasClass("mtapp-slidemenu-current")) {
+                        self.css("background-color","transparent");
+                    }
+                }
+            );
+        $("#fav-website-list").addClass("super-slide-menu").html(websites.join(""))
+            .find("li")
+                .hover(
+                    function(){
+                        var self = $(this);
+                        var w = self.width();
+                        var bgColor = self.hasClass("blog") ? "#5C909B":"#839B5C";
+                        self.css("background-color",bgColor).find("ul:first").css("left", w).show();
+                    },
+                    function(){
+                        var self = $(this);
+                        self.find("ul:first").hide();
+                        if (!self.hasClass("mtapp-slidemenu-current")) {
+                            self.css("background-color","transparent");
+                        }
+                    }
+                );
+        $('#fav-blog-list, #create-blog-action').hide();
+    });
+    
+    // ウェブサイトの各種メニューを表示
+    function createWebsiteMenu(id, child_blogs){
+        return [
+        '<ul class="mtapp-slidemenu">',
+            '<li class="Blog"><a href="' + CMSScriptURI + '?__mode=list_blog&amp;blog_id=' + id + '"><__trans phrase="Blog"></a>',
+                '<ul>',
+                    child_blogs,
+                    '<li class="New"><a href="' + CMSScriptURI + '?__mode=view&amp;_type=blog&amp;blog_id=' + id + '"><__trans phrase="New"></a></li>',
+                '</ul>',
+            '</li>',
+            '<li class="Entries"><a href="' + CMSScriptURI + '?__mode=list_entry&amp;blog_id=' + id + '"><__trans phrase="Entries"></a>',
+                '<ul>',
+                    '<li class="Manage"><a href="' + CMSScriptURI + '?__mode=list_entry&amp;blog_id=' + id + '"><__trans phrase="Manage"></a></li>',
+                    '<li class="Tags"><a href="' + CMSScriptURI + '?__mode=list_tag&amp;blog_id=' + id + '&amp;filter_key=entry"><__trans phrase="Tags"></a></li>',
+                '</ul>',
+            '</li>',
+            '<li class="Pages"><a href="' + CMSScriptURI + '?__mode=list_page&amp;blog_id=' + id + '"><__trans phrase="Pages"></a>',
+                '<ul>',
+                    '<li class="Manage"><a href="' + CMSScriptURI + '?__mode=list_page&amp;blog_id=' + id + '"><__trans phrase="Manage"></a></li>',
+                    '<li class="New"><a href="' + CMSScriptURI + '?__mode=view&amp;_type=page&amp;blog_id=' + id + '"><__trans phrase="New"></a></li>',
+                    '<li class="Folders"><a href="' + CMSScriptURI + '?__mode=list_folder&amp;blog_id=' + id + '&amp;filter_key=page"><__trans phrase="Folders"></a></li>',
+                    '<li class="Tags"><a href="' + CMSScriptURI + '?__mode=list_tag&amp;blog_id=' + id + '&amp;filter_key=page"><__trans phrase="Tags"></a></li>',
+                '</ul>',
+            '</li>',
+            '<li class="Asset"><a href="' + CMSScriptURI + '?__mode=list_asset&amp;blog_id=' + id + '"><__trans phrase="Asset"></a>',
+                '<ul>',
+                    '<li class="Manage"><a href="' + CMSScriptURI + '?__mode=list_asset&amp;blog_id=' + id + '"><__trans phrase="Manage"></a></li>',
+                    '<li class="New"><a href="' + CMSScriptURI + '?__mode=start_upload&amp;blog_id=' + id + '"><__trans phrase="New"></a></li>',
+                    '<li class="Tags"><a href="' + CMSScriptURI + '?__mode=list_tag&amp;blog_id=' + id + '&amp;filter_key=asset"><__trans phrase="Tags"></a></li>',
+                '</ul>',
+            '</li>',
+            '<li class="Comment"><a href="' + CMSScriptURI + '?__mode=list_comment&amp;blog_id=' + id + '"><__trans phrase="Comment"></a>',
+                '<ul>',
+                    '<li class="Comment"><a href="' + CMSScriptURI + '?__mode=list_comment&amp;blog_id=' + id + '"><__trans phrase="Comment"></a></li>',
+                    '<li class="TrackBack"><a href="' + CMSScriptURI + '?__mode=list_pings&amp;blog_id=' + id + '"><__trans phrase="TrackBack"></a></li>',
+                '</ul>',
+            '</li>',
+            '<li class="User"><a href="' + CMSScriptURI + '?__mode=list_member&amp;blog_id=' + id + '"><__trans phrase="User"></a>',
+                '<ul>',
+                    '<li class="Manage"><a href="' + CMSScriptURI + '?__mode=list_member&amp;blog_id=' + id + '"><__trans phrase="Manage"></a></li>',
+                '</ul>',
+            '</li>',
+            '<li class="Design"><a href="' + CMSScriptURI + '?__mode=list_template&amp;blog_id=' + id + '"><__trans phrase="Design"></a>',
+                '<ul>',
+                    '<li class="Templates"><a href="' + CMSScriptURI + '?__mode=list_template&amp;blog_id=' + id + '"><__trans phrase="Templates"></a></li>',
+                    '<li class="Widgets"><a href="' + CMSScriptURI + '?__mode=list_widget&amp;blog_id=' + id + '"><__trans phrase="Widgets"></a></li>',
+                    '<li class="Styles"><a href="' + CMSScriptURI + '?__mode=stylecatcher_theme&amp;blog_id=' + id + '"><__trans phrase="Styles"></a></li>',
+                    '<li class="Themes"><a href="' + CMSScriptURI + '?__mode=list_theme&amp;blog_id=' + id + '"><__trans phrase="Themes"></a></li>',
+                '</ul>',
+            '</li>',
+            '<li class="Custom_Fields"><a href="' + CMSScriptURI + '?__mode=list_field&amp;blog_id=' + id + '"><__trans_section component="mt_app_jquery"><__trans phrase="Custom Fields"></__trans_section></a>',
+                '<ul>',
+                    '<li class="Manage"><a href="' + CMSScriptURI + '?__mode=list_field&amp;blog_id=' + id + '"><__trans phrase="Manage"></a></li>',
+                    '<li class="New"><a href="' + CMSScriptURI + '?__mode=view&amp;_type=field&amp;blog_id=' + id + '"><__trans phrase="New"></a></li>',
+                '</ul>',
+            '</li>',
+            '<li class="Settings"><a href="' + CMSScriptURI + '?__mode=cfg_prefs&amp;blog_id=' + id + '"><__trans phrase="Settings"></a>',
+                '<ul>',
+                    '<li class="General"><a href="' + CMSScriptURI + '?__mode=cfg_prefs&amp;blog_id=' + id + '"><__trans phrase="General"></a></li>',
+                    '<li class="Posts"><a href="' + CMSScriptURI + '?__mode=cfg_entry&amp;blog_id=' + id + '"><__trans phrase="Posts"></a></li>',
+                    '<li class="Feedback"><a href="' + CMSScriptURI + '?__mode=cfg_feedback&amp;blog_id=' + id + '"><__trans phrase="Feedback"></a></li>',
+                    '<li class="Registration"><a href="' + CMSScriptURI + '?__mode=cfg_registration&amp;blog_id=' + id + '"><__trans phrase="Registration"></a></li>',
+                    '<li class="Web_Services"><a href="' + CMSScriptURI + '?__mode=cfg_web_services&amp;blog_id=' + id + '"><__trans phrase="Web Services"></a></li>',
+                '</ul>',
+            '</li>',
+            '<li class="Tools"><a href="' + CMSScriptURI + '?__mode=search_replace&amp;blog_id=' + id + '"><__trans phrase="Tools"></a>',
+                '<ul>',
+                    '<li class="Search_Replace"><a href="' + CMSScriptURI + '?__mode=search_replace&amp;blog_id=' + id + '"><__trans phrase="Search &amp; Replace"></a></li>',
+                    '<li class="Plugins"><a href="' + CMSScriptURI + '?__mode=cfg_plugins&amp;blog_id=' + id + '"><__trans phrase="Plugins"></a></li>',
+                    '<li class="Export Theme"><a href="' + CMSScriptURI + '?__mode=export_theme&amp;blog_id=' + id + '"><__trans phrase="Export Theme"></a></li>',
+                    '<li class="Backup"><a href="' + CMSScriptURI + '?__mode=start_backup&amp;blog_id=' + id + '"><__trans phrase="Backup"></a></li>',
+                    '<li class="Activity_Log"><a href="' + CMSScriptURI + '?__mode=view_log&amp;blog_id=' + id + '"><__trans phrase="Activity Log"></a></li>',
+                '</ul>',
+            '</li>',
+        '</ul>'].join("");
+    };
+
+    // ブログの各種メニューを作成
+    function createBlogMenu(id){
+        return [
+            '<ul>',
+                '<li class="blog Entries"><a href="' + CMSScriptURI + '?__mode=list_entry&amp;blog_id=' + id + '"><__trans phrase="Entries"></a>',
+                    '<ul>',
+                        '<li class="blog Manage"><a href="' + CMSScriptURI + '?__mode=list_entry&amp;blog_id=' + id + '"><__trans phrase="Manage"></a></li>',
+                        '<li class="blog New"><a href="' + CMSScriptURI + '?__mode=view&amp;_type=entry&amp;blog_id=' + id + '"><__trans phrase="New"></a></li>',
+                        '<li class="blog Category"><a href="' + CMSScriptURI + '?__mode=list_category&amp;blog_id=' + id + '"><__trans phrase="Category"></a></li>',
+                        '<li class="blog Tags"><a href="' + CMSScriptURI + '?__mode=list_tag&amp;blog_id=' + id + '&amp;filter_key=entry"><__trans phrase="Tags"></a></li>',
+                    '</ul>',
+                '</li>',
+                '<li class="blog Pages"><a href="' + CMSScriptURI + '?__mode=list_page&amp;blog_id=' + id + '"><__trans phrase="Pages"></a>',
+                    '<ul>',
+                        '<li class="blog Manage"><a href="' + CMSScriptURI + '?__mode=list_page&amp;blog_id=' + id + '"><__trans phrase="Manage"></a></li>',
+                        '<li class="blog New"><a href="' + CMSScriptURI + '?__mode=view&amp;_type=page&amp;blog_id=' + id + '"><__trans phrase="New"></a></li>',
+                        '<li class="blog Folders"><a href="' + CMSScriptURI + '?__mode=list_folder&amp;blog_id=' + id + '&amp;filter_key=page"><__trans phrase="Folders"></a></li>',
+                        '<li class="blog Tags"><a href="' + CMSScriptURI + '?__mode=list_tag&amp;blog_id=' + id + '&amp;filter_key=page"><__trans phrase="Tags"></a></li>',
+                    '</ul>',
+                '</li>',
+                '<li class="blog Asset"><a href="' + CMSScriptURI + '?__mode=list_asset&amp;blog_id=' + id + '"><__trans phrase="Asset"></a>',
+                    '<ul>',
+                        '<li class="blog Manage"><a href="' + CMSScriptURI + '?__mode=list_asset&amp;blog_id=' + id + '"><__trans phrase="Manage"></a></li>',
+                        '<li class="blog New"><a href="' + CMSScriptURI + '?__mode=start_upload&amp;blog_id=' + id + '"><__trans phrase="New"></a></li>',
+                        '<li class="blog Tags"><a href="' + CMSScriptURI + '?__mode=list_tag&amp;blog_id=' + id + '&amp;filter_key=asset"><__trans phrase="Tags"></a></li>',
+                    '</ul>',
+                '</li>',
+                '<li class="blog Comment"><a href="' + CMSScriptURI + '?__mode=list_comment&amp;blog_id=' + id + '"><__trans phrase="Comment"></a>',
+                    '<ul>',
+                        '<li class="blog Comment"><a href="' + CMSScriptURI + '?__mode=list_comment&amp;blog_id=' + id + '"><__trans phrase="Comment"></a></li>',
+                        '<li class="blog TrackBack"><a href="' + CMSScriptURI + '?__mode=list_pings&amp;blog_id=' + id + '"><__trans phrase="TrackBack"></a></li>',
+                    '</ul>',
+                '</li>',
+                '<li class="blog User"><a href="' + CMSScriptURI + '?__mode=list_member&amp;blog_id=' + id + '"><__trans phrase="User"></a>',
+                    '<ul>',
+                        '<li class="blog Manage"><a href="' + CMSScriptURI + '?__mode=list_member&amp;blog_id=' + id + '"><__trans phrase="Manage"></a></li>',
+                    '</ul>',
+                '</li>',
+                '<li class="blog Design"><a href="' + CMSScriptURI + '?__mode=list_template&amp;blog_id=' + id + '"><__trans phrase="Design"></a>',
+                    '<ul>',
+                        '<li class="blog Templates"><a href="' + CMSScriptURI + '?__mode=list_template&amp;blog_id=' + id + '"><__trans phrase="Templates"></a></li>',
+                        '<li class="blog Widgets"><a href="' + CMSScriptURI + '?__mode=list_widget&amp;blog_id=' + id + '"><__trans phrase="Widgets"></a></li>',
+                        '<li class="blog Styles"><a href="' + CMSScriptURI + '?__mode=stylecatcher_theme&amp;blog_id=' + id + '"><__trans phrase="Styles"></a></li>',
+                        '<li class="blog Themes"><a href="' + CMSScriptURI + '?__mode=list_theme&amp;blog_id=' + id + '"><__trans phrase="Themes"></a></li>',
+                    '</ul>',
+                '</li>',
+                '<li class="blog Custom_Fields"><a href="' + CMSScriptURI + '?__mode=list_field&amp;blog_id=' + id + '"><__trans_section component="mt_app_jquery"><__trans phrase="Custom Fields"></__trans_section></a>',
+                    '<ul>',
+                        '<li class="blog Manage"><a href="' + CMSScriptURI + '?__mode=list_field&amp;blog_id=' + id + '"><__trans phrase="Manage"></a></li>',
+                        '<li class="blog New"><a href="' + CMSScriptURI + '?__mode=view&amp;_type=field&amp;blog_id=' + id + '"><__trans phrase="New"></a></li>',
+                    '</ul>',
+                '</li>',
+                '<li class="blog Settings"><a href="' + CMSScriptURI + '?__mode=cfg_prefs&amp;blog_id=' + id + '"><__trans phrase="Settings"></a>',
+                    '<ul>',
+                        '<li class="blog General"><a href="' + CMSScriptURI + '?__mode=cfg_prefs&amp;blog_id=' + id + '"><__trans phrase="General"></a></li>',
+                        '<li class="blog Community"><a href="' + CMSScriptURI + '?__mode=cfg_community_prefs&amp;blog_id=' + id + '"><__trans_section component="mt_app_jquery"><__trans phrase="Community"></__trans_section></a></li>',
+                        '<li class="blog Posts"><a href="' + CMSScriptURI + '?__mode=cfg_entry&amp;blog_id=' + id + '"><__trans phrase="Posts"></a></li>',
+                        '<li class="blog Feedback"><a href="' + CMSScriptURI + '?__mode=cfg_feedback&amp;blog_id=' + id + '"><__trans phrase="Feedback"></a></li>',
+                        '<li class="blog Registration"><a href="' + CMSScriptURI + '?__mode=cfg_registration&amp;blog_id=' + id + '"><__trans phrase="Registration"></a></li>',
+                        '<li class="blog Web_Services"><a href="' + CMSScriptURI + '?__mode=cfg_web_services&amp;blog_id=' + id + '"><__trans phrase="Web Services"></a></li>',
+                    '</ul>',
+                '</li>',
+                '<li class="blog Tools"><a href="' + CMSScriptURI + '?__mode=search_replace&amp;blog_id=' + id + '"><__trans phrase="Tools"></a>',
+                    '<ul>',
+                        '<li class="blog Search_Replace"><a href="' + CMSScriptURI + '?__mode=search_replace&amp;blog_id=' + id + '"><__trans phrase="Search &amp; Replace"></a></li>',
+                        '<li class="blog Plugins"><a href="' + CMSScriptURI + '?__mode=cfg_plugins&amp;blog_id=' + id + '"><__trans phrase="Plugins"></a></li>',
+                        '<li class="blog Import_Entries"><a href="' + CMSScriptURI + '?__mode=start_import&amp;blog_id=' + id + '"><__trans phrase="Import Entries"></a></li>',
+                        '<li class="blog Export_Entries"><a href="' + CMSScriptURI + '?__mode=start_export&amp;blog_id=' + id + '"><__trans phrase="Export Entries"></a></li>',
+                        '<li class="blog Export_Theme"><a href="' + CMSScriptURI + '?__mode=export_theme&amp;blog_id=' + id + '"><__trans phrase="Export Theme"></a></li>',
+                        '<li class="blog Backup"><a href="' + CMSScriptURI + '?__mode=start_backup&amp;blog_id=' + id + '"><__trans phrase="Backup"></a></li>',
+                        '<li class="blog Activity_Log"><a href="' + CMSScriptURI + '?__mode=view_log&amp;blog_id=' + id + '"><__trans phrase="Activity Log"></a></li>',
+                    '</ul>',
+                '</li>',
+            '</ul>'
+        ].join("");
+    };
+
+    // システムの各種メニューを作成
+    function createSystemMenu(){
+        return [
+            '<ul>',
+                '<li class="Websites"><a href="' + CMSScriptURI + '?__mode=list_website&amp;blog_id=0"><__trans phrase="Websites"></a>',
+                    '<ul>',
+                        '<li class="Manage"><a href="' + CMSScriptURI + '?__mode=list_website&amp;blog_id=0"><__trans phrase="Manage"></a></li>',
+                        '<li class="New"><a href="' + CMSScriptURI + '?__mode=view&amp;_type=website&amp;blog_id=0"><__trans phrase="New"></a></li>',
+                    '</ul>',
+                '</li>',
+                '<li class="User"><a href="' + CMSScriptURI + '?__mode=list_author&amp;blog_id=0"><__trans phrase="User"></a>',
+                    '<ul>',
+                        '<li class="Manage"><a href="' + CMSScriptURI + '?__mode=list_author&amp;blog_id=0"><__trans phrase="Manage"></a></li>',
+                        '<li class="New"><a href="' + CMSScriptURI + '?__mode=view&amp;_type=author&amp;blog_id=0"><__trans phrase="New"></a></li>',
+                    '</ul>',
+                '</li>',
+                '<li class="Design"><a href="' + CMSScriptURI + '?__mode=list_template&amp;blog_id=0"><__trans phrase="Design"></a>',
+                    '<ul>',
+                        '<li class="Templates"><a href="' + CMSScriptURI + '?__mode=list_template&amp;blog_id=0"><__trans phrase="Templates"></a></li>',
+                        '<li class="Widgets"><a href="' + CMSScriptURI + '?__mode=list_widget&amp;blog_id=0"><__trans phrase="Widgets"></a></li>',
+                        '<li class="Themes"><a href="' + CMSScriptURI + '?__mode=list_theme&amp;blog_id=0"><__trans phrase="Themes"></a></li>',
+                    '</ul>',
+                '</li>',
+                '<li class="Custom_Fields"><a href="' + CMSScriptURI + '?__mode=list_field&amp;blog_id=0"><__trans_section component="mt_app_jquery"><__trans phrase="Custom Fields"></__trans_section></a>',
+                    '<ul>',
+                        '<li class="Manage"><a href="' + CMSScriptURI + '?__mode=list_field&amp;blog_id=0"><__trans phrase="Manage"></a></li>',
+                        '<li class="New"><a href="' + CMSScriptURI + '?__mode=view&amp;_type=field&amp;blog_id=0"><__trans phrase="New"></a></li>',
+                    '</ul>',
+                '</li>',
+                '<li class="Settings"><a href="' + CMSScriptURI + '?__mode=cfg_system_general&amp;blog_id=0"><__trans phrase="Settings"></a>',
+                    '<ul>',
+                        '<li class="General"><a href="' + CMSScriptURI + '?__mode=cfg_system_general&amp;blog_id=0"><__trans phrase="General"></a></li>',
+                        '<li class="User"><a href="' + CMSScriptURI + '?__mode=cfg_system_users&amp;blog_id=0"><__trans phrase="User"></a></li>',
+                        '<li class="Roles"><a href="' + CMSScriptURI + '?__mode=list_role&amp;blog_id=0"><__trans phrase="Roles"></a></li>',
+                        '<li class="Permissions"><a href="' + CMSScriptURI + '?__mode=list_association&amp;blog_id=0"><__trans phrase="Permissions"></a></li>',
+                    '</ul>',
+                '</li>',
+                '<li class="Tools"><a href="' + CMSScriptURI + '?__mode=search_replace&amp;blog_id=0"><__trans phrase="Tools"></a>',
+                    '<ul>',
+                        '<li class="Search_Replace"><a href="' + CMSScriptURI + '?__mode=search_replace&amp;blog_id=0"><__trans phrase="Search &amp; Replace"></a></li>',
+                        '<li class="Plugins"><a href="' + CMSScriptURI + '?__mode=cfg_plugins&amp;blog_id=0"><__trans phrase="Plugins"></a></li>',
+                        '<li class="Backup"><a href="' + CMSScriptURI + '?__mode=start_backup&amp;blog_id=0"><__trans phrase="Backup"></a></li>',
+                        '<li class="Restore"><a href="' + CMSScriptURI + '?__mode=start_restore&amp;blog_id=0"><__trans phrase="Restore"></a></li>',
+                        '<li class="Activity_Log"><a href="' + CMSScriptURI + '?__mode=view_log&amp;blog_id=0"><__trans phrase="Activity Log"></a></li>',
+                        '<li class="System_Information"><a href="' + CMSScriptURI + '?__mode=tools&amp;blog_id=0"><__trans phrase="System Information"></a></li>',
+                    '</ul>',
+                '</li>',
+            '</ul>'
+        ].join("");
+    };
+
+    function digit(n){
+        return n < 10 ? "0" + n : n.toString();
+    }
+})(jQuery);
+__MT__
+    return $out;
+}
+
+sub uploadify_widget_innerHTML {
+    my $out = <<'__MT__';
+    <input id="uploadify" type="file" />
+    <div id="fileQueue"></div>
+    <div id="upload_files"></div>
+    <mt:setvarblock name="jq_js_include" append="1">
+//    //////////
+//    jQuery.fn.extend({
+//        printObj: function(obj, objStr) {
+//            var objName = jQuery('<p/>').text(objStr).css({'fontWeight': 'bold', 'fontSize': '120%'});
+//            var props = jQuery('<dl/>');
+//            for (var prop in obj){
+//                jQuery(props).append('<dt><em>' + prop + '</em></dt><dd>' + obj[prop] + '</dd>');
+//            }
+//            jQuery(this).append(objName).append(props);
+//        }
+//    });
+//    //////////
+    // http://d.hatena.ne.jp/okinaka/20090727/1248671860 [start]
+    jQuery.fn.extend({
+        insertAtCaret: function(v) {
+          var o = this.get(0);
+          o.focus();
+          if (jQuery.browser.msie) {
+            var r = document.selection.createRange();
+            r.text = v;
+            r.select();
+          } else {
+            var s = o.value;
+            var p = o.selectionStart;
+            var np = p + v.length;
+            o.value = s.substr(0, p) + v + s.substr(p);
+            o.setSelectionRange(np, np);
+          }
+        }
+    });
+    // http://d.hatena.ne.jp/okinaka/20090727/1248671860 [ end ]
+
+    var uploadifyOnError = function (event,queueID,fileObj,errorObj){
+        alert('<__trans_section component="mt_app_jquery"><__trans phrase="You can upload up to 1MB file."></__trans_section>');
+    }
+    var uploadifyOnComplete = function (event,queueID,fileObj){
+        var file_name = fileObj.name;
+        var file_ext  = file_name.match(/(\.)([a-zA-Z]+)$/);
+            file_ext  = file_ext[2].toLowerCase();
+        var file_path = '<mt:if name="upload_folder">/<mt:var name="upload_folder"></mt:if>/' + file_name;
+        var mime_type = '';
+        switch (file_ext) {
+            case 'png' : mime_type = 'image/png';  break;
+            case 'gif' : mime_type = 'image/gif';  break;
+            case 'jpg' : mime_type = 'image/jpeg'; break;
+            case 'jpeg': mime_type = 'image/jpeg'; break;
+        }
+        if (mime_type.match(/^image/)) {
+            jQuery('#editor-content-textarea').insertAtCaret('__IMAGES__' + "\n");
+            var img = jQuery('__IMAGES__').attr('id',queueID).addClass('uploadify_image').css({
+                    'width':'200px',
+                    'padding':'10px 0'
+                });
+            jQuery("#uploadify-widget").find('div.widget-content').append(img);
+        } else {
+            jQuery('#editor-content-textarea').insertAtCaret('__FILES__' + "\n");
+        }
+        var asset = [
+            queueID,
+            '<mt:var name="blog_id">',
+            'image',
+            '<mt:var name="author_id">',
+//                'asset_created_on',
+            file_ext,
+            file_name,
+            '%r' + file_path,
+            file_name,
+            mime_type,
+//                'asset_modified_on',
+            '%r' + file_path
+        ];
+        var asset_uploadify_value = jQuery.trim(jQuery('#asset_uploadify').val());
+        if (asset_uploadify_value != '') {
+            jQuery('#asset_uploadify').val(asset_uploadify_value + '|' + asset);
+        } else {
+            jQuery('#asset_uploadify').val(asset);
+        }
+        setCookie('asset_uploadify',jQuery('#asset_uploadify').val() , 1);
+        jQuery.MTAppMsg({
+            msg:  '記事を保存してください。',
+            type: 'success'
+        });
+
+    }
+    
+    jQuery("#uploadify").uploadify({
+        'uploader'   : '<mt:var name="static_plugin_path">uploadify/scripts/uploadify.swf',
+        'script'     : '<mt:var name="static_plugin_path">uploadify/scripts/uploadify.php',
+        'checkScript': '<mt:var name="static_plugin_path">uploadify/scripts/check.php',
+        'cancelImg'  : '<mt:var name="static_plugin_path">uploadify/cancel.png',
+        'folder'     : '<mt:var name="blog_path"><mt:if name="upload_folder">/<mt:var name="upload_folder"></mt:if>',
+        'sizeLimit'  : '1000000',
+        'buttonText' : '<__trans_section component="mt_app_jquery"><__trans phrase="Select files"></__trans_section>',
+        'queueID'    : 'fileQueue',
+        'auto'       : true,
+        'multi'      : true,
+        'onError'    : uploadifyOnError,
+        'onComplete' : uploadifyOnComplete,
+    });
+    jQuery(':submit').click(function(){
+        var asset_meta = '';
+        jQuery("img.uploadify_image").each(function(){
+            asset_meta += jQuery(this).attr('id') + ',';
+            asset_meta += jQuery(this).width() + ',';
+            asset_meta += jQuery(this).height();
+            asset_meta += '|';
+        });
+        jQuery("#asset_uploadify_meta").val(asset_meta.replace(/\|$/,''));
+        setCookie('asset_uploadify_meta',jQuery('#asset_uploadify_meta').val() , 1);
+    });
+    jQuery("#asset_uploadify_").val(getCookie('asset_uploadify'));
+    jQuery("#asset_uploadify_meta").val(getCookie('asset_uploadify_meta'));
+    </mt:setvarblock>    
+__MT__
+    return $out;
+}
+
 1;

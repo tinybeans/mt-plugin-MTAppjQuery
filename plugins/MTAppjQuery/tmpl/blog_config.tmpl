@@ -16,6 +16,7 @@
     </ul>
 </mtapp:setting>
 
+<mt:ignore>
 <mtapp:setting
     id="mtappjquery"
     show_label="0"
@@ -24,6 +25,7 @@
     	<li><input type="checkbox" value="1" name="mtappjquery" id="mtappjquery"<tmpl_if name=mtappjquery> checked="checked"</tmpl_if> />  <__trans phrase="Enable MTAppjQuery.js"> <strong><__trans phrase="(JavasScript unless you are familiar with the contents of the file it is recommended that you disable it.)"></strong></li>
     </ul>
 </mtapp:setting>
+</mt:ignore>
 
 <mtapp:setting
     id="userjs"
@@ -45,6 +47,68 @@
 
 <mtapp:setting
     id="jqplugin"
-    label="jQuery<__trans phrase="plugins">">
+    label="JavaScript<__trans phrase="free area">">
     <textarea name="jqplugin" id="jqplugin"><mt:var name="jqplugin"></textarea>
 </mtapp:setting>
+
+<mt:ignore><!-- Uploadify --></mt:ignore>
+<div id="uploadify-container" class="mtapp-hidden">
+<mtapp:settinggroup id="uploadify_setting" class="border" show="1">
+    <legend><__trans phrase="Uploadify"></legend>
+    <mtapp:setting
+    	id="active_uploadify"
+    	label="<__trans phrase="active Uploadify">">
+        <ul>
+        	<li><input type="checkbox" value="1" name="active_uploadify" id="active_uploadify"<tmpl_if name=active_uploadify> checked="checked"</tmpl_if> /></li>
+        </ul>
+    </mtapp:setting>
+    <mtapp:setting
+    	id="upload_folder"
+    	label="<__trans phrase="Upload folder">"
+    	hint="<__trans phrase="The path to the folder you would like to save the files to. Do not end the path with a ‘/’.">"
+    	show_hint="1">
+        <ul>
+        	<li><input type="text" value="<mt:var name="upload_folder" encode_html="1">" name="upload_folder" id="upload_folder" /></li>
+        </ul>
+        <script type="text/javascript">
+        /* <![CDATA[ */
+        (function($){
+            $("#upload_folder").blur(function(){
+                var value = $(this).val().replace(/^\/|\/$/g,"");
+                $(this).val(value);
+            });
+        })(jQuery);
+        /* ]]> */
+        </script>
+    </mtapp:setting>
+    <mtapp:setting
+    	id="img_elm"
+    	label="<__trans phrase="img element"><br />(.png .jpg .jpeg .gif)"
+    	hint="<__trans phrase="You can write that File name is __filename__, File path is __filepath__.">"
+    	show_hint="1">
+        <ul>
+        	<li><input type="text" value="<mt:var name="img_elm" encode_html="1">" name="img_elm" id="img_elm" /></li>
+        </ul>
+    </mtapp:setting>
+    <mtapp:setting
+    	id="file_elm"
+    	label="<__trans phrase="a element">"
+    	hint="<__trans phrase="You can write that File name is __filename__, File path is __filepath__.">"
+    	show_hint="1">
+        <ul>
+        	<li><input type="text" value="<mt:var name="file_elm" encode_html="1">" name="file_elm" id="file_elm" /></li>
+        </ul>
+    </mtapp:setting>
+</mtapp:settinggroup>
+<script type="text/javascript">
+// <![CDATA[
+jQuery("#jqplugin")
+    .focus(function(){
+        jQuery(this).animate({height: "450px"});
+    })
+    .blur(function(){
+        jQuery(this).animate({height: "100px"});
+    });
+// ]]>
+</script>
+<!-- / mtapp-hidden --></div>
