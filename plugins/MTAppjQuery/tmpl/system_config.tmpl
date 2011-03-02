@@ -1,0 +1,41 @@
+<mtapp:setting
+    id="no_usercss"
+    show_label="0"
+    label="Stop user.css">
+    <ul>
+    	<li><input type="checkbox" value="1" name="no_usercss" id="no_usercss"<tmpl_if name=no_usercss> checked="checked"</tmpl_if> /> <__trans phrase="To stop using user.css"></li>
+    </ul>
+</mtapp:setting>
+
+<mtapp:setting
+    id="no_mtappjquery"
+    show_label="0"
+    label="Stop MTAppjQery.js">
+    <ul>
+    	<li><input type="checkbox" value="1" name="no_mtappjquery" id="no_mtappjquery"<tmpl_if name=no_mtappjquery> checked="checked"</tmpl_if> /> <__trans phrase="To stop using MTAppjQuery.js"> <strong><__trans phrase="(JavasScript unless you are familiar with the contents of the file it is recommended that you disable it.)"></strong></li>
+    </ul>
+</mtapp:setting>
+
+<mtapp:setting
+    id="no_userjs"
+    show_label="0"
+    label="Stop user.js">
+    <ul>
+    	<li><input type="checkbox" value="1" name="no_userjs" id="no_userjs"<tmpl_if name=no_userjs> checked="checked"</tmpl_if> /> <__trans phrase="To stop using user.js"> <strong><__trans phrase="(JavasScript unless you are familiar with the contents of the file it is recommended that you disable it.)"></strong></li>
+    </ul>
+</mtapp:setting>
+
+<mtapp:setting
+    id="no_slidemenu"
+    show_label="0"
+    label="Stop Slide Menu">
+    <ul>
+    	<li><input type="checkbox" value="1" name="no_slidemenu" id="no_slidemenu"<tmpl_if name=no_slidemenu> checked="checked"</tmpl_if> /> <__trans phrase="To stop using Slide Menu"></li>
+    </ul>
+</mtapp:setting>
+
+<mtapp:setting
+    id="sys_jqplugin"
+    label="jQuery<__trans phrase="plugins">">
+    <textarea name="sys_jqplugin" id="sys_jqplugin"><mt:var name="sys_jqplugin"></textarea>
+</mtapp:setting>

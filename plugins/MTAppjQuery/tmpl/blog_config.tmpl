@@ -1,0 +1,50 @@
+<mtapp:setting
+    id="active"
+    show_label="0"
+    label="<__trans phrase="active">">
+    <ul>
+    	<li><input type="checkbox" value="1" name="active" id="active"<tmpl_if name=active> checked="checked"</tmpl_if> /> <__trans phrase="Enable plugin"></li>
+    </ul>
+</mtapp:setting>
+
+<mtapp:setting
+    id="usercss"
+    show_label="0"
+    label="user.css">
+    <ul>
+    	<li><input type="checkbox" value="1" name="usercss" id="usercss"<tmpl_if name=usercss> checked="checked"</tmpl_if> /> <__trans phrase="Enable user.css"></li>
+    </ul>
+</mtapp:setting>
+
+<mtapp:setting
+    id="mtappjquery"
+    show_label="0"
+    label="MTAppjQuery.js">
+    <ul>
+    	<li><input type="checkbox" value="1" name="mtappjquery" id="mtappjquery"<tmpl_if name=mtappjquery> checked="checked"</tmpl_if> />  <__trans phrase="Enable MTAppjQuery.js"> <strong><__trans phrase="(JavasScript unless you are familiar with the contents of the file it is recommended that you disable it.)"></strong></li>
+    </ul>
+</mtapp:setting>
+
+<mtapp:setting
+    id="userjs"
+    show_label="0"
+    label="user.js">
+    <ul>
+    	<li><input type="checkbox" value="1" name="userjs" id="userjs"<tmpl_if name=userjs> checked="checked"</tmpl_if> /> <__trans phrase="Enable user.js"> <strong><__trans phrase="(JavasScript unless you are familiar with the contents of the file it is recommended that you disable it.)"></strong></li>
+    </ul>
+</mtapp:setting>
+
+<mtapp:setting
+    id="slidemenu"
+    show_label="0"
+    label="Slide Menu">
+    <ul>
+    	<li><input type="checkbox" value="1" name="slidemenu" id="slidemenu"<tmpl_if name=slidemenu> checked="checked"</tmpl_if> /> <__trans phrase="Enable Slide Menu"></li>
+    </ul>
+</mtapp:setting>
+
+<mtapp:setting
+    id="jqplugin"
+    label="jQuery<__trans phrase="plugins">">
+    <textarea name="jqplugin" id="jqplugin"><mt:var name="jqplugin"></textarea>
+</mtapp:setting>
