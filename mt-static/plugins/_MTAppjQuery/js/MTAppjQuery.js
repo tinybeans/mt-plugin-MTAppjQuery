@@ -802,12 +802,18 @@
             pageTitle = (pageTitle != '') ? '// ' +  $.trim(pageTitle) + '<br />': '';
         var a_ = '<a class="mtapp-if-page" href="#" title="if($(\'body#',
             _a = '</a>';
+        var mtappVarsStr = [];
+        for (var key in mtappVars) {
+            mtappVarsStr.push('&nbsp;&nbsp;&nbsp;&nbsp;' + key + ': ' + mtappVars[key]);
+        }
+        
         var pageInfo = [
-            '<span class="mtapp-debug-pageinfo">',
+            '<span class="mtapp-debug-pageinfo" style="font-family: monospace;">',
                 '[このページの情報] <br />',
                 '<span>',
                     'body#'+ bodyID + '.' + bodyClass + '<br />',
                     'var blogID = '+ blogID + ', authorID = '+ authorID + '<br />',
+                    'var mtappVars = { <br />' + mtappVarsStr.join(',<br />') + '<br />};',
                 '</span>',
                 '[次の条件に限定する if 文を生成]<br />',
                 '<span>',
