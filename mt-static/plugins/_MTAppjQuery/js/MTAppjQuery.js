@@ -12,17 +12,14 @@
 (function($){
 
     // -------------------------------------------------
-    //  $.MTAppIfScreen(); 2011-01-05 fix
+    //  $.MTAppIfScreen(); 2011-03-17
     // -------------------------------------------------
     $.MTAppIfScreen = function(options){
         var op = $.extend({}, $.MTAppIfScreen.defaults, options);
-        var regTitle = new RegExp (op.title,"g"),
-            // mtappScopeType = user, system, website, blog
-            regType = new RegExp (mtappScopeType, "g");
-        var checkID = function(checkVar, globalVar){
-//            console.log(checkVar + "," + globalVar);
-            if (typeof checkVar == 'string') {
-                checkVar = checkVar.replace(/ *, */g,",").split(",");
+
+        function checkID(checkVar, globalVar){
+            if (typeof checkVar === 'string') {
+                checkVar = checkVar.replace(/ *, */g,',').split(',');
                 for (var i = -1, n = checkVar.length; ++i < n;) {
                     if (checkVar[i] == globalVar) return true; 
                 }
@@ -61,9 +58,8 @@
             console.log('bool.field_id : ' + bool.field_id);
 */
 
-        if ( 
-            regTitle.test(mtappTitle)
-            && regType.test(op.type)
+        if (mtappVars.html_title.indexOf(op.title) != -1
+            && op.type.indexOf(mtappVars.scope_type) != -1
             && bool.blog_id
             && bool.entry_id
             && bool.page_id
@@ -81,9 +77,9 @@
         return;
     };
     $.MTAppIfScreen.defaults = {
-        title:  ".", // titleタグの値の「 | Movable Type Proの手前部分」
-        type:   "user system website blog", // 4つのいずれかを指定。複数の場合はスペースかカンマで区切る
-        blog_id: null, // 複数の場合は、カンマ区切りの文字列で指定
+        title:  '.', // titleタグの値の「 | Movable Type Pro」の手前部分
+        type:   'user,system,website,blog', // 4つのいずれかを指定。複数の場合はカンマで区切る
+        blog_id: null, // 複数の場合はカンマ区切りで区切る
         entry_id: null,
         page_id: null,
         category_id: null,
