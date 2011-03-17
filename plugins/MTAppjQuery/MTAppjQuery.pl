@@ -8,7 +8,7 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
     id          => 'mt_app_jquery',
     key         => __PACKAGE__,
     name        => 'MTAppjQuery',
-    description => '<__trans phrase="jQuery to customize the interface to add.">',
+    description => 'For MT5.1 - <__trans phrase="jQuery to customize the interface to add.">',
     version     => $VERSION,
     author_name => 'Tomohiro Okuwaki',
     author_link => 'http://www.tinybeans.net/blog/',
