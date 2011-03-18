@@ -305,8 +305,8 @@
     $.fn.MTAppshowHint = function(options){
         var op = $.extend({}, $.fn.MTAppshowHint.defaults, options);
         var $self = this,
-            target = op.target,
-            balloonId = 'balloon-' + op.id,
+            target = $(op.target),
+            balloonId = 'balloon-' + op.targetId,
             balloon = [
             '<div id="' + balloonId + '" class="balloon">',
                 '<div class="balloon-content">',
@@ -341,9 +341,8 @@
         );
     };
     $.fn.MTAppshowHint.defaults = {
-        target: $('body'),
-        id: '',
-        class: '',
+        target: 'body',
+        targetId: '',
         text: ''
     };
     // end - $(foo).MTAppshowHint();
