@@ -58,7 +58,8 @@
 */
 
 jQuery(function($){
-    
+    // スクロールしても表示される右サイドバー
+    $.MTAppNoScrollRightSidebar();
 /*
     $.MTAppIfUserDashboard(function(){
         console.log('called!!');

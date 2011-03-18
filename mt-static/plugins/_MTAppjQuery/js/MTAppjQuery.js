@@ -93,6 +93,22 @@
         onInit: function(){ return true; } // 実行したい内容を無名関数内に書く
     };
     // end - $.MTAppIfScreen()
+
+    // -------------------------------------------------
+    //  $.MTAppNoScrollRightSidebar();
+    // -------------------------------------------------
+    $.MTAppNoScrollRightSidebar = function(){
+        $('#content-body')
+            .noScroll('#related-content', 'right')
+            .find('div.widget-header')
+                .css({cursor:'pointer'})
+                .click(function(){
+                    $(this).next().slideToggle();
+                });
+    }
+
+    // end - $.MTAppNoScrollRightSidebar()
+
     
     /*
      * jqueryMultiCheckbox.js
@@ -962,9 +978,30 @@
             return this.each(function(){
                 $(this).html(prefix + html + suffix + $(this).html());
             });
+        },
+        noScroll: function (selector, horizontal){
+            var self = $(this).css('position', 'relative'),
+                target = self.find(selector).css({'position': 'absolute', 'z-index':99});
+                if (horizontal) {
+                    target.css(horizontal, 0);
+                }
+
+            $(window).scroll(function(){
+                var thisTop = $(document).scrollTop() - self.offset().top + 10;
+                if (thisTop < 0) {
+                    thisTop = 0;
+                }
+                target.stop().animate(
+                    {top: thisTop + 'px'},
+                    'fast',
+                    'swing'
+                );
+            });
+            return self;
         }
     });
     // end - Utility
+
 })(jQuery);
 
 /*
