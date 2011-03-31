@@ -496,7 +496,7 @@
             default:
                 if (opW) {
                     $field = $('#entry-' + opB + '-widget');
-                    $label = $field.find('h3.widget-label span');
+                    $label = $field.find('h2 span');
                 } else {
                     $field = $('#' + opB + '-field');
                     $label = $('#' + opB + '-label');
