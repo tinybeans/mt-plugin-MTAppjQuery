@@ -743,11 +743,11 @@
         // ウェブサイトテンプレートの管理以外なら何もしない
         if($('body#list-template').length == 0) return;
         
-        // 「すべて再構築」ボタンとテーブルに再構築アイコンを設置        
+        // 「すべて再構築」ボタンとテーブルに再構築アイコンを設置
         $("#index-listing, #archive-listing").each(function(){
             var self = $(this),
                 type = {
-                    "name": self.find('div.listing-header h3').text(),
+                    "name": self.find('div.listing-header h2').text(),
                     "id"  : self.attr('id')
                 },
                 // 公開ボタンを変数に入れておく
@@ -757,14 +757,12 @@
             self
                 .find('div.actions-bar')
                     .find('span:eq(0)')
-                        .prepend('<button class="mtapp-1click-rebuild"></button>')
+                        .prepend('<button class="button mtapp-1click-rebuild" title="' + type.name + 'をすべて再構築">すべて再構築</button>')
                         .find('button.mtapp-1click-rebuild')
-                            .text('すべて再構築')
-                            .attr({'title': type.name + 'をすべて再構築'})
                             .click(function(){
                                 $(this)
                                     .closest('div.actions-bar')
-                                    .next('table')
+                                    .siblings('table')
                                         .find('input:checkbox').attr('checked','checked');
                                 publish.click();
                                 return false;
@@ -773,18 +771,18 @@
             self
                 .find('#' + type.id + '-table')
                     .find('th.cb')
-                        .after('<th class="rebuild">再構築</th>')
+                        .after('<th class="col head rebuild">再構築</th>')
                     .end()
                     .find('tbody')
                         .find('td.cb')
-                            .after('<td class="rebuild"><a href="#" class="mtapp-rebuild-icon">再構築</a></td>')
+                            .after('<td class="rebuild"><img class="mtapp-rebuild-icon" src="' + mtappVars.static_plugin_path + 'images/rebuild-mini.png" width="13" height="13" /></td>')
                         .end()
-                        .find('a.mtapp-rebuild-icon')
+                        .find('img.mtapp-rebuild-icon')
                             .each(function(){
                                 var tmplName = $(this).closest('td').next().find('a').text();
                                 $(this).attr('title',tmplName + ' を再構築する');
                             })
-                            .MTAppTooltip()
+                            //.MTAppTooltip()
                             .click(function(){
                                 $(this)
                                     .closest('td.rebuild')
@@ -792,7 +790,6 @@
                                             .find('input:checkbox')
                                                 .attr('checked','checked');
                                 publish.click();
-                                $(this).blur();
                                 return false;
                             });
         });
