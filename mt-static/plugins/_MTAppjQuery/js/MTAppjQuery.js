@@ -101,10 +101,11 @@
         $('#content-body')
             .noScroll('#related-content', 'right')
             .find('div.widget-header')
-                .css({cursor:'pointer'})
-                .click(function(){
-                    $(this).next().slideToggle();
-                });
+                .find('span')
+                    .css({cursor:'pointer'})
+                    .click(function(){
+                        $(this).parents('.widget-header').next().slideToggle();
+                    });
     }
 
     // end - $.MTAppNoScrollRightSidebar()
