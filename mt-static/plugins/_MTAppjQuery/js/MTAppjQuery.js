@@ -460,6 +460,7 @@
             opB = opC ? 'customfield_' + op.basename : op.basename,
             $field,
             $label,
+            $tab,
             $hover,
             $editImg = $('<img/>')
                 .addClass('mtapp-inline-edit')
@@ -481,11 +482,13 @@
         switch (opB) {
             case 'body':
                 $field = $('#text-field');
+                $tab   = $field.find('#editor-header div.tab:eq(0)');
                 $label = $field.find('#editor-header label:eq(0) a');
                 $hover = $label;
                 break;
             case 'more': 
                 $field = $('#text-field');
+                $tab   = $field.find('#editor-header div.tab:eq(1)');
                 $label = $field.find('#editor-header label:eq(1) a');
                 $hover = $label;
                 break;
@@ -523,8 +526,21 @@
         // フィールドの表示・非表示
         if (opS == 'show') {
             $field.removeClass('hidden');
-        } else if (!opS) {
+        } else if (opB != 'body' && opB != 'more' && (opS == 0 || opS == 'hide')) {
             $field.addClass('hidden');
+        } else if ((opB == 'body' || opB == 'more') && (opS == 0 || opS == 'hide')) {
+            $tab.addClass('hidden');
+        }
+
+        // テキストフィールドの表示・非表示
+        if ((opB == 'body' || opB == 'more') && (op.show_parent == 0 || op.show_parent == 'hide')) {
+            $field.css({
+                position: 'absolute',
+                top: '-9999px',
+                left: '-9999px',
+                width: '1px',
+                height: '1px'
+            });
         }
 
         // 非編集モード
@@ -539,7 +555,8 @@
         label:      '', // 変更後のラベル名
         addclass:   '', // 追加するクラス名
         hint:       '', // ヒントに表示させたいメッセージ
-        show_field:  1, // 1: デフォルトのまま, 0: 非表示, 'show': 強制表示
+        show_field:  1, // 1: デフォルトのまま, 0: 非表示, 'show': 強制表示, 'hide': 強制表示(= 0)
+        show_parent: 1, // 1: デフォルトのまま, 0: 非表示, 'show': 強制表示, 'hide': 強制表示(= 0) (*)basename が body か more のみ。
         custom:      0, // 1: カスタムフィールド
         widget:      0, // 1: ウィジェット
         edit:        0  // 1: 非編集モード
