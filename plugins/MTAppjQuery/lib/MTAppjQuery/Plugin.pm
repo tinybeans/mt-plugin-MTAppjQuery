@@ -68,7 +68,7 @@ sub cb_tmpl_source_header {
         
     ### ローディング画像、再構築アイコン、ツールチップ用ボックスをページに追加する
     my $target = '<div id="container"';
-    my $preset = <<__MT__;
+    my $preset = <<__MTML__;
     <mt:setvarblock name="html_body_footer" append="1">
     <img id="mtapp-loading"
          src="${static_path}images/indicator.gif"
@@ -80,7 +80,7 @@ sub cb_tmpl_source_header {
     <div id="mtapp-tooltip" style="display: none;"></div>
     </mt:setvarblock>
     ${target}
-__MT__
+__MTML__
     $$tmpl_ref =~ s/$target/$preset/g;
 
     ### スライドメニューをセットする
@@ -128,7 +128,7 @@ __MT__
 # doLog("blogs_json : " . $blogs_json);
     
         my $MTAppSuperSlideMenu = MTAppjQuery::Tmplset::MTAppSuperSlideMenu;
-        $super_slide_menu_js = <<__MT__;
+        $super_slide_menu_js = <<__MTML__;
         <script type="text/javascript">
         /* <![CDATA[ */
         var mtapp_websites_json = [${websites_json}];
@@ -138,20 +138,20 @@ __MT__
         <script type="text/javascript">
         ${MTAppSuperSlideMenu}
         </script>
-__MT__
+__MTML__
     }
 
     ### user.css をセットする
     if ($op_no_usercss != 1 && ($op_usercss == 1 or $blog_id == 0)) {
-        $user_css = <<__MT__;
+        $user_css = <<__MTML__;
     <mt:setvarblock name="html_head" append="1">
     <link rel="stylesheet" href="${static_plugin_path}css/user.css" type="text/css" />
     </mt:setvarblock>
-__MT__
+__MTML__
     }
 
     ### ブログIDなどの変数を定義する
-	$set_blog_id = <<__MT__;
+	$set_blog_id = <<__MTML__;
     <script type="text/javascript">
     /* <![CDATA[ */
     // 後方互換（非推奨）
@@ -183,7 +183,7 @@ __MT__
     }
     /* ]]> */
     </script>
-__MT__
+__MTML__
 
     ### JavaScriptフリーエリアの内容をセットする
     if ($blog_id == 0) {
@@ -194,14 +194,14 @@ __MT__
 
     ### user.jsをセット
     if ($op_no_userjs != 1 && ($op_userjs == 1 or $blog_id == 0)) {
-		$user_js = <<__MT__;
+		$user_js = <<__MTML__;
     <script type="text/javascript" src="${static_plugin_path}js/user.js"></script>
-__MT__
+__MTML__
 	}
 
     ### 各情報をheadにセットする
     my $html_head = '<mt:var name="html_head">';
-	my $add_html_head = <<__MT__;
+	my $add_html_head = <<__MTML__;
     <link rel="stylesheet" href="${static_plugin_path}css/MTAppjQuery.css" type="text/css" />
     $user_css
     <mt:setvarblock name="js_include" append="1">
@@ -215,7 +215,7 @@ __MT__
     $super_slide_menu_js
     </mt:setvarblock>
     $html_head
-__MT__
+__MTML__
 
 	$$tmpl_ref =~ s/$html_head/$add_html_head/g;
 }
@@ -223,7 +223,7 @@ __MT__
 sub cb_tmpl_source_footer {
 	my ($cb, $app, $tmpl_ref) = @_;
     my $target = '</body>';
-    my $replace = <<__MT__;
+    my $replace = <<__MTML__;
     <script type="text/javascript">
     /* <![CDATA[ */
     <mt:var name="mtapp_js_include">
@@ -236,7 +236,7 @@ sub cb_tmpl_source_footer {
     </script>
     <mt:var name="mtapp_end_body">
     $target
-__MT__
+__MTML__
 	$$tmpl_ref =~ s!$target!$replace!;
 }
 
@@ -300,11 +300,11 @@ sub cb_tmpl_param_edit_entry {
     $param->{blog_path} = $blog_path;
     $param->{upload_folder} = $p->get_setting('upload_folder', $blog_id);
     $param->{static_plugin_path} = $static_plugin_path;
-    $param->{uploadify_source} = <<__MT__;
+    $param->{uploadify_source} = <<__MTML__;
     <link href="${static_plugin_path}uploadify/css/uploadify.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="${static_plugin_path}uploadify/scripts/swfobject.js"></script>
     <script type="text/javascript" src="${static_plugin_path}uploadify/scripts/jquery.uploadify.v2.1.0.js"></script>
-__MT__
+__MTML__
     
     ### Add uploadify-widget
     my $host_node = $tmpl->getElementById('entry-status-widget');
@@ -329,9 +329,9 @@ __MT__
             label_class => 'top_label',
         }
     );
-    my $inner_html = <<__MT__;
+    my $inner_html = <<__MTML__;
     <input type="text" name="asset_uploadify" id="asset_uploadify" value="<mt:var name="asset_uploadify">" class="full-width" mt:watch-change="1" />
-__MT__
+__MTML__
     $new_node->innerHTML($inner_html);
 # 最後にコメント外す
     $new_node->setAttribute('class','hidden');
@@ -345,9 +345,9 @@ __MT__
             label_class => 'top_label',
         }
     );
-    my $inner_html = <<__MT__;
+    my $inner_html = <<__MTML__;
     <input type="text" name="asset_uploadify_meta" id="asset_uploadify_meta" value="<mt:var name="asset_uploadify_meta">" class="full-width" mt:watch-change="1" />
-__MT__
+__MTML__
     $new_node->innerHTML($inner_html);
 # 最後にコメント外す
     $new_node->setAttribute('class','hidden');
