@@ -282,6 +282,16 @@ a.mtapp-rebuild-icon {
     overflow: hidden;
 }
 */
+/* ----------------------------------------
+   __固定右サイドバー
+---------------------------------------- */
+div.no-scroll-right-sidebar .widget {
+    margin-bottom: 0;
+}
+div.no-scroll-right-sidebar .widget-content {
+    display: none;
+}
+
 
 /* ----------------------------------------
    __デバッグモード

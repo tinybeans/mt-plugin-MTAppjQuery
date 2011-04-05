@@ -97,15 +97,32 @@
     // -------------------------------------------------
     //  $.MTAppNoScrollRightSidebar();
     // -------------------------------------------------
-    $.MTAppNoScrollRightSidebar = function(){
+    $.MTAppNoScrollRightSidebar = function(open_type){
+        var type = (open_type == 'close') ? 'no-scroll-right-sidebar' : '';
         $('#content-body')
             .noScroll('#related-content', 'right')
-            .find('div.widget-header')
-                .find('span')
-                    .css({cursor:'pointer'})
-                    .click(function(){
-                        $(this).parents('.widget-header').next().slideToggle();
-                    });
+            .addClass(type);
+        var span = $('#related-content')
+                .children()
+                    .addClass('widget-wrapper')
+                    .find('div.widget-header')
+                        .find('span')
+                            .css({cursor:'pointer'});
+        if (open_type == 'close') {
+            span.click(function(){
+                $(this)
+                    .closest('div.widget-wrapper')
+                        .siblings()
+                            .find('div.widget-content').slideUp()
+                            .end()
+                        .end()
+                    .find('div.widget-content').slideToggle();
+            });
+        } else {
+            span.click(function(){
+                $(this).parents('div.widget-header').next().slideToggle();
+            });
+        }
     }
 
     // end - $.MTAppNoScrollRightSidebar()
@@ -1000,7 +1017,6 @@
                 if (horizontal) {
                     target.css(horizontal, 0);
                 }
-
             $(window).scroll(function(){
                 var thisTop = $(document).scrollTop() - self.offset().top + 10;
                 if (thisTop < 0) {
