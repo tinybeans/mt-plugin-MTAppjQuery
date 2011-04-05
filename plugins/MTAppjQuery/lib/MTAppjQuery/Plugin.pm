@@ -210,7 +210,7 @@ __MTML__
     <script type="text/javascript" src="${static_plugin_path}js/MTAppjQuery.js"></script>
     $js_freearea
     </mt:setvarblock>
-    <mt:setvarblock name="mtapp_js_include">
+    <mt:setvarblock name="mtapp_footer_js">
     $user_js
     $super_slide_menu_js
     </mt:setvarblock>
@@ -224,11 +224,11 @@ sub cb_tmpl_source_footer {
 	my ($cb, $app, $tmpl_ref) = @_;
     my $target = '</body>';
     my $replace = <<__MTML__;
+    <mt:var name="mtapp_footer_js">
     <script type="text/javascript">
     /* <![CDATA[ */
-    <mt:var name="mtapp_js_include">
     jQuery(function(){
-        <mt:var name="mtapp_jq_js_include">
+        <mt:var name="mtapp_footer_jq">
         jQuery('#mtapp-loading').hide();
         jQuery('#container').css('visibility','visible');
     });
