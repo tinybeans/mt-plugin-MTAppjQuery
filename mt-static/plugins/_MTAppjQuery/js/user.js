@@ -194,7 +194,4 @@ jQuery(function($){
         }
     });
 */
-    
-    // 以下の1行は編集しないでください
-    MTAppComplete();
 });
