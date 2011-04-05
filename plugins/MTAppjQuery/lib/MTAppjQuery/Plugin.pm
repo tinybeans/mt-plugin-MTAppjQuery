@@ -154,10 +154,6 @@ __MT__
 	$set_blog_id = <<__MT__;
     <script type="text/javascript">
     /* <![CDATA[ */
-    function MTAppComplete(){
-        jQuery('#mtapp-loading').addClass('mtapp-hidden');
-        jQuery('#container').css('visibility','visible');
-    }
     // 後方互換（非推奨）
     var blogID = ${blog_id},
         authorID = <mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if>,
@@ -201,20 +197,7 @@ __MT__
 		$user_js = <<__MT__;
     <script type="text/javascript" src="${static_plugin_path}js/user.js"></script>
 __MT__
-	} else {
-        $user_js = <<__MT__;
-    <mt:setvarblock name="js_include" append="1">
-    <script type="text/javascript">
-    /* <![CDATA[ */
-    jQuery(function(){
-        jQuery('#mtapp-loading').hide();
-        jQuery('#container').css('visibility','visible');
-    });
-    /* ]]> */
-    </script>
-    </mt:setvarblock>
-__MT__
-    }
+	}
 
     ### 各情報をheadにセットする
     my $html_head = '<mt:var name="html_head">';
@@ -226,6 +209,8 @@ __MT__
     <mt:var name="uploadify_source">
     <script type="text/javascript" src="${static_plugin_path}js/MTAppjQuery.js"></script>
     $js_freearea
+    </mt:setvarblock>
+    <mt:setvarblock name="mtapp_js_include">
     $user_js
     $super_slide_menu_js
     </mt:setvarblock>
@@ -238,7 +223,20 @@ __MT__
 sub cb_tmpl_source_footer {
 	my ($cb, $app, $tmpl_ref) = @_;
     my $target = '</body>';
-    my $replace = '<mt:var name="append_body"></body>';
+    my $replace = <<__MT__;
+    <script type="text/javascript">
+    /* <![CDATA[ */
+    <mt:var name="mtapp_js_include">
+    jQuery(function(){
+        <mt:var name="mtapp_jq_js_include">
+        jQuery('#mtapp-loading').hide();
+        jQuery('#container').css('visibility','visible');
+    });
+    /* ]]> */
+    </script>
+    <mt:var name="mtapp_end_body">
+    $target
+__MT__
 	$$tmpl_ref =~ s!$target!$replace!;
 }
 

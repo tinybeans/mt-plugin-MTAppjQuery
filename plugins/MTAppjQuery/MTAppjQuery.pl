@@ -48,14 +48,13 @@ sub init_registry {
     $plugin->registry({
         callbacks => {
             'template_source.header' => {
-                handler => '$mt_app_jquery::MTAppjQuery::Plugin::cb_tmpl_source_header',# ここから
+                handler => '$mt_app_jquery::MTAppjQuery::Plugin::cb_tmpl_source_header',
                 priority => 10,
             },
-            # footerに挿入する場合
-            # 'template_source.footer' => {
-            #     handler => '$mt_app_jquery::MTAppjQuery::Plugin::cb_tmpl_source_footer',
-            #     priority => 10,
-            # },
+            'template_source.footer' => {
+                handler => '$mt_app_jquery::MTAppjQuery::Plugin::cb_tmpl_source_footer',
+                priority => 10,
+            },
             'template_source.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Plugin::cb_tmpl_source_fav_blogs',
             # 'template_param.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Plugin::cb_tmpl_param_fav_blogs',
     		'template_param.edit_entry' => '$mt_app_jquery::MTAppjQuery::Plugin::cb_tmpl_param_edit_entry',
