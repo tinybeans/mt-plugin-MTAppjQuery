@@ -100,9 +100,9 @@
     $.MTAppNoScrollRightSidebar = function(open_type){
         var type = (open_type == 'close') ? 'no-scroll-right-sidebar' : '';
         $('#content-body')
-            .noScroll('#related-content', 'right')
-            .addClass(type);
+            .noScroll('#related-content', 'right');
         var span = $('#related-content')
+                .addClass(type)
                 .children()
                     .addClass('widget-wrapper')
                     .find('div.widget-header')
