@@ -1051,32 +1051,32 @@
         return this.each(function() {
             var id = $(this).attr('id');
             var $elm = $('#'+id);
+            var val = ($elm.val() != '') ? $elm.val() : '...';
+            var $btn = '<button id="mt-set-' + id + '" class="mt-edit-field-button button">' + opts.edit + '</button>';
             if (opts.always) {
                 $elm
-                    .before('<span class="'+id+'-text"></span>')
-                    .after('<button id="mt-set-'+id+'" class="mt-edit-field-button">'+opts.edit+'</button>')
+                    .before('<span class="' + id + '-text">' + val + '</span>')
+                    .after($btn)
                     .hide();
-                $('span.'+id+'-text').text($elm.val());
             } else {
-                if ($elm.val() && !$elm.hasClass('show-input')) {
+                if (val && !$elm.hasClass('show-input')) {
                     $elm
-                        .before('<span class="'+id+'-text"></span>')
-                        .after('<button id="mt-set-'+id+'" class="mt-edit-field-button">'+opts.edit+'</button>')
+                        .before('<span class="' + id + '-text">' + val + '</span>')
+                        .after($btn)
                         .hide();
-                    $('span.'+id+'-text').text($elm.val());
                 }
-                if (!$elm.val() && $elm.hasClass('hide-input')) {
+                if (!val && $elm.hasClass('hide-input')) {
                     $elm
-                        .before('<span class="'+id+'-text"></span>')
-                        .after('<button id="mt-set-'+id+'" class="mt-edit-field-button">'+opts.edit+'</button>')
+                        .before('<span class="' + id + '-text">...</span>')
+                        .after($btn)
                         .hide();
                 }
             }
-            $('button#mt-set-'+id).click(function() {
-                $(this).hide();
-                $('span.'+id+'-text').hide();
-                $('#'+id).show();
-                $('p#'+id+'-warning').show();
+            $('button#mt-set-' + id).click(function() {
+                $(this).hide()
+                    .prev().show()
+                    .prev().hide();
+                $('p#' + id + '-warning').show();
                 return false;
             });
         });
