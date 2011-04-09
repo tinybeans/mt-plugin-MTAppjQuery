@@ -66,17 +66,13 @@ sub cb_tmpl_source_header {
 
 	my ($user_css, $set_blog_id, $js_freearea, $user_js, $super_slide_menu_js);
         
-    ### ローディング画像、再構築アイコン、ツールチップ用ボックスをページに追加する
+    ### ローディング画像、ツールチップ用ボックスをページに追加する
     my $target = '<div id="container"';
     my $preset = <<__MTML__;
     <mt:setvarblock name="html_body_footer" append="1">
     <img id="mtapp-loading"
          src="${static_path}images/indicator.gif"
          alt="<__trans_section component="mt_app_jquery"><__trans phrase="Page Loading"></__trans_section>" />
-    <img id="mtapp-rebuild-icon"
-         class="mtapp-hidden"
-         src="${static_plugin_path}images/rebuild-mini.png"
-         alt="<__trans_section component="mt_app_jquery"><__trans phrase="Rebuild"></__trans_section>" />
     <div id="mtapp-tooltip" style="display: none;"></div>
     </mt:setvarblock>
     ${target}
