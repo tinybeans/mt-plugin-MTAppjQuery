@@ -806,7 +806,7 @@
             self
                 .find('#' + type.id + '-table')
                     .find('th.cb')
-                        .after('<th class="col head rebuild">再構築</th>')
+                        .after('<th class="col head rebuild"><span class="col-label">再構築</span></th>')
                     .end()
                     .find('tbody')
                         .find('td.cb')
