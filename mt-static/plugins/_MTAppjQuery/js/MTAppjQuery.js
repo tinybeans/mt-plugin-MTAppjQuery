@@ -238,6 +238,7 @@
                             checked.push(value);
                             $.data(self, 'mcb-lists', checked);
                             $self.val(checked.join(','));
+                            return false;
                         }
                     });
             }
