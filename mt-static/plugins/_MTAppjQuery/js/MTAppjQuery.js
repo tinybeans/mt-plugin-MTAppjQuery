@@ -312,7 +312,7 @@
         insert:   'before', // "before" or "after" 元のテキストエリアの前に挿入するか後ろに挿入するか
         custom:   0,
         add:      0, // ユーザーが追加できるようにする場合は 1
-        skin:     'tags', // タグ選択デザインを適用する場合は'tags'
+        skin:     "", // タグ選択デザインを適用する場合は'tags'
         sort:     "", // "ascend"（昇順）,"descend"（降順）
         debug:    0
     };
