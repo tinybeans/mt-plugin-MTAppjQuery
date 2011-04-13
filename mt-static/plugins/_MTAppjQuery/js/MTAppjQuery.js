@@ -190,9 +190,10 @@ function getPageHeight() {
         }
         var checked = new Array();
         if (value) {
-            checked = value.split(',').map(function(s) {
-                return $.trim(s);
-            });
+            checked = value.split(',');
+            for (var i = 0, n = checked.length; i < n; i++) {
+                checked[i] = $.trim(checked[i]);
+            }
         }
         var clickEv = function(){
             var value = self.val();
@@ -220,10 +221,9 @@ function getPageHeight() {
         var container = $('<span/>').addClass('multicheckbox_container');
         if (title != 'object') {
             var checks = new Array();
-            checks = title.split(',').map(function(s) {
-                return $.trim(s);
-            });
-            for (var j=0; j<checks.length; j++) {
+            checks = title.split(',');
+            for (var j = 0, n = checks.length; j < n; j++) {
+                checks[j] = $.trim(checks[j]);
                 var check = $('<input/>').attr({'type':'checkbox','value':checks[j]});
                 if (checked.length > 0) {
                     for (var k=0; k<checked.length; k++) {
