@@ -343,3 +343,9 @@ fieldset#uploadify_setting legend {
     font-size: 120%;
     font-weight: bold;
 }
+/* ----------------------------------------
+   __バリデーション
+---------------------------------------- */
+.err {
+    background: #F6BFBC !important;
+}
