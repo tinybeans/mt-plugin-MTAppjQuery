@@ -297,9 +297,9 @@ sub cb_tmpl_param_edit_entry {
     $param->{upload_folder} = $p->get_setting('upload_folder', $blog_id);
     $param->{static_plugin_path} = $static_plugin_path;
     $param->{uploadify_source} = <<__MTML__;
-    <link href="${static_plugin_path}uploadify/css/uploadify.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="${static_plugin_path}uploadify/scripts/swfobject.js"></script>
-    <script type="text/javascript" src="${static_plugin_path}uploadify/scripts/jquery.uploadify.v2.1.0.js"></script>
+    <link href="${static_plugin_path}lib/uploadify/css/uploadify.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="${static_plugin_path}lib/uploadify/scripts/swfobject.js"></script>
+    <script type="text/javascript" src="${static_plugin_path}lib/uploadify/scripts/jquery.uploadify.v2.1.0.js"></script>
 __MTML__
     
     ### Add uploadify-widget
