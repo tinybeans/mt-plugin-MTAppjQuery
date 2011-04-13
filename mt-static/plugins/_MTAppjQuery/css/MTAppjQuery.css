@@ -91,43 +91,46 @@ textarea#sys_jqplugin {
 /* ----------------------------------------
    __マルチチェックボックス
 ---------------------------------------- */
-/*
 span.mcb-container {
     display: block;
 }
-*/
 span.mcb-container .mcb-label {
-    line-height: 1.7;
+    line-height: 1.5;
 }
-span.mcb-container .mcb-label .mcb {
+span.mcb-container .mcb-label .mcb-checkbox {
     margin: 0 3px 0 5px;
 }
-span.mcb-tags .mcb-label {
+/* span.mcb-skin-tags */
+span.mcb-skin-tags .mcb-label,
+span.mcb-container .mcb-add-item {
     display: inline-block;
     margin-right: 5px;
-    padding: 0 10px;
-    -moz-border-radius:10px 10px 10px 10px;
-    -webkit-border-radius:10px 10px 10px 10px;
+    margin-bottom: 5px;
+    padding: 2px 4px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
     background-color: #E5E5E5;
     color: #000000;
     cursor: pointer;
 }
-span.mcb-tags .mcb-label-checked {
+span.mcb-skin-tags .mcb-label-checked {
     background-color: #658F9A;
     color: #FFFFFF;
-    font-weight: bold;
+    font-weight: normal;
 }
-span.mcb-tags .mcb-label .mcb {
+span.mcb-skin-tags .mcb-checkbox {
     display: none;
 }
-span.mcb-container .mcb-add-input {
+span.mcb-container .mcb-add-item {
     width: 120px;
-    margin-left: 10px;
-    padding: 0 0 2px 12px;
+    padding-left: 12px;
     border: 1px solid #E5E5E5;
     background: url(../images/create.gif) no-repeat 2px 50%;
+    font-size: 13px;
+    line-height: 1.5;
+    cursor: default;
 }
-span.mcb-tags .mcb-add-input {
+span.mcb-skin-tags .mcb-add-item {
     margin-left: 0;
 }
 /* ----------------------------------------

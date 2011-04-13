@@ -151,7 +151,7 @@
             var $self = $(this),
                 self = $self.get(0);
 
-            var container_class = op.tags ? 'mcb-container mcb-tags' : 'mcb-container';
+            var container_class = op.skin ? 'mcb-container mcb-skin-tags' : 'mcb-container';
             $self[op.insert]('<span class="' + container_class+ '">test</span>');
             var $container = (op.insert == 'before') ? $self.prev(): $self.next();
 
@@ -197,7 +197,7 @@
                 }
             }
             if (op.add) {
-                label_html.push('<input class="mcb-add-item" type="text" value="+" />');
+                label_html.push('<input class="mcb-add-item" type="text" value="" />');
             }
             $container.html(label_html.join(''));
 
@@ -218,12 +218,6 @@
             // ユーザーが項目を追加できるようにする
             if (op.add) {
                 $container.find('input.mcb-add-item')
-                    .focus(function(){
-                        if ($(this).val() == '+') $(this).val('');
-                    })
-                    .blur(function(){
-                        if ($(this).val() == '') $(this).val('+');
-                    })
                     .keydown(function(e){
                         var keycode = e.which || e.keyCode;
                         if (keycode == 13) {
@@ -295,7 +289,7 @@
         label: '', // カンマ区切りの文字列か{'key1':'value1','key2':'value2'}のハッシュ
         insert: 'before', // 'before' or 'after'
         add: false, // ユーザーがチェックボックスを追加できるようにする場合はtrue
-        tags: false, // タグデザインを適用する場合はtrue
+        skin: false, // タグデザインを適用する場合は'tags'
         sort: '' // 'ascend'（昇順）,'descend'（降順）
     };
     // end - jqueryMultiCheckbox.js
@@ -310,15 +304,15 @@
         
         var fieldID = (op.custom != 1) ? '#' + op.basename : '#customfield_' + op.basename;
         var optionShow = (op.debug == 0) ? 'hide' : 'show';
-        $(fieldID).multicheckbox({show:optionShow,insert:op.insert,add:op.add,tags:op.tags,label:op.label,sort:op.sort});
+        $(fieldID).multicheckbox({show:optionShow,insert:op.insert,add:op.add,skin:op.skin,label:op.label,sort:op.sort});
     };
     $.MTAppMultiCheckbox.defaults = {
         basename: '',
         label:    '',
         insert:   'before', // "before" or "after" 元のテキストエリアの前に挿入するか後ろに挿入するか
         custom:   0,
-        add:      false, // ユーザーが追加できるようにする場合はtrue
-        tags:     false, // タグ選択デザインを適用する場合はtrue
+        add:      0, // ユーザーが追加できるようにする場合は 1
+        skin:     'tags', // タグ選択デザインを適用する場合は'tags'
         sort:     "", // "ascend"（昇順）,"descend"（降順）
         debug:    0
     };
