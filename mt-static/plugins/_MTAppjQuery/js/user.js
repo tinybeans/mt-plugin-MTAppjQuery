@@ -93,7 +93,11 @@ jQuery(function($){
         basename: 'tags',
         label:    'Moveble Type,TypePad,MTOS,VOX',
         custom:   0,
-        debug:    0
+        insert:   'before', // "before" or "after" 元のテキストエリアの前に挿入するか後ろに挿入するか
+        add:      1, // ユーザーが追加できるようにする場合は 1
+        skin:     "tags", // タグ選択デザインを適用する場合は'tags'
+        sort:     "ascend", // "ascend"（昇順）,"descend"（降順）
+        debug:    1
     });
     
     // デフォルトフィールド
