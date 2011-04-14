@@ -61,6 +61,7 @@ sub cb_tmpl_source_header {
 	my $op_userjs         = $p->get_setting('userjs', $blog_id)    || 1;
 	my $op_slidemenu      = $p->get_setting('slidemenu', $blog_id) || 1;
 	my $op_jsfreearea     = $p->get_setting('jqplugin', $blog_id)  || '';
+	my $op_jqselectable   = $p->get_setting('jqselectable', $blog_id) || 0;
 
 	return if ($blog_id > 0 && $op_active == 0);
 
@@ -195,6 +196,15 @@ __MTML__
 __MTML__
 	}
 
+    ### jQselectableプラグインを利用する
+    my $jqselectable = '';
+    if ($op_jqselectable) {
+       $jqselectable = <<__MTML__;
+    <link type="text/css" rel="stylesheet" href="${static_plugin_path}lib/jQselectable/skin/selectable/style.css" />
+    <script type="text/javascript" src="${static_plugin_path}lib/jQselectable/js/jQselectable.js"></script>
+__MTML__
+    }
+
     ### 各情報をheadにセットする
     my $html_head = '<mt:var name="html_head">';
 	my $add_html_head = <<__MTML__;
@@ -202,6 +212,7 @@ __MTML__
     $user_css
     <mt:setvarblock name="js_include" append="1">
     $set_blog_id
+    $jqselectable
     <mt:var name="uploadify_source">
     <script type="text/javascript" src="${static_plugin_path}js/MTAppjQuery.js"></script>
     $js_freearea

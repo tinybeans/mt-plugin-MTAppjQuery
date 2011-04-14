@@ -33,6 +33,7 @@ use vars qw ( %Lexicon );
 	'Enable Slide Menu' => 'スライドメニューを有効にする',
 	'plugins' => 'プラグイン',
 	'free area' => '自由入力欄',
+	'Enable jQselectable.js' => 'jQselectable.jsを有効にする',
 	'invalid' => '無効化設定',
     '(JavasScript unless you are familiar with the contents of the file it is recommended that you disable it.)' => '（JavasScriptファイルの内容を理解している場合以外は無効にしないことをお勧めします。）',
 

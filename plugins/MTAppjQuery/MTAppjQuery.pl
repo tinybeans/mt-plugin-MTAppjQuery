@@ -29,6 +29,8 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             ['userjs',        {Default => 1,  Scope => 'blog'}],
             ['slidemenu',     {Default => 1,  Scope => 'blog'}],
             ['jqplugin',      {Default => '', Scope => 'blog'}],
+
+            ['jqselectable',  {Default => 0,  Scope => 'blog'}],
 #             ['mtappjquery',   {Default => 1,  Scope => 'blog'}],
 
             # Uploadify

@@ -51,6 +51,15 @@
     <textarea name="jqplugin" id="jqplugin"><mt:var name="jqplugin"></textarea>
 </mtapp:setting>
 
+<mtapp:setting
+    id="jqselectable"
+    show_label="0"
+    label="jQselectable.js">
+    <ul>
+    	<li><input type="checkbox" value="1" name="jqselectable" id="jqselectable"<tmpl_if name="jqselectable"> checked="checked"</tmpl_if> /> <__trans phrase="Enable jQselectable.js"></li>
+    </ul>
+</mtapp:setting>
+
 <mt:ignore><!-- Uploadify --></mt:ignore>
 <div id="uploadify-container" class="mtapp-hidden">
 <mtapp:settinggroup id="uploadify_setting" class="border" show="1">
