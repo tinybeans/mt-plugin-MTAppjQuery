@@ -209,7 +209,13 @@
                 checked[i] = $.trim(checked[i]);
             }
 
-            $container.find('input:checkbox').val(checked).click(checkboxClick);
+            $container
+                .find('input:checkbox').val(checked).click(checkboxClick)
+                .end()
+                .find('input:checked')
+                    .each(function(){
+                        $(this).parent().addClass('mcb-label-checked');
+                    });
 
             $self[op.show]();
 
