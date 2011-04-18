@@ -633,6 +633,36 @@
     };
     // end - $.MTAppMsg
 
+    // ---------------------------------------------------------------------
+    //  $.MTAppDialogMsg();
+    //
+    //  Description:
+    //
+    //    ダイアログメッセージを表示する。（jquery.ui）
+    //
+    //  Usage:
+    //
+    //    $.MTAppDialogMsg(msg_title, msg_content);
+    //
+    //    title (Number): ダイアログのタイトル（必須）
+    //    content (String): ダイアログのコンテンツ（必須）
+    // ---------------------------------------------------------------------
+
+    $.MTAppDialogMsg = function(msg_title, msg_content){
+        msg_title = msg_title ? msg_title: 'メッセージ';
+        msg_content = msg_content ?msg_content: 'エラーが発生しました。';
+        $('#mtapp-dialog-msg').dialog({
+            autoOpen: false,
+            modal: true,
+            title: msg_title
+        });
+        $('#mtapp-dialog-msg')
+            .attr('title', msg_title)
+            .html(msg_content)
+            .dialog('open');
+    };
+
+
     // -------------------------------------------------
     //  $.MTAppSlideMenu
     // -------------------------------------------------

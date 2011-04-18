@@ -210,6 +210,7 @@ __MTML__
 	my $add_html_head = <<__MTML__;
     <link rel="stylesheet" href="${static_plugin_path}css/MTAppjQuery.css" type="text/css" />
     $user_css
+
     <mt:setvarblock name="js_include" append="1">
     $set_blog_id
     $jqselectable
@@ -217,10 +218,16 @@ __MTML__
     <script type="text/javascript" src="${static_plugin_path}js/MTAppjQuery.js"></script>
     $js_freearea
     </mt:setvarblock>
+
+    <mt:setvarblock name="mtapp_prepend_footer_js">
+    <div id="mtapp-dialog-msg"></div>
+    </mt:setvarblock>
+
     <mt:setvarblock name="mtapp_footer_js">
     $user_js
     $super_slide_menu_js
     </mt:setvarblock>
+
     $html_head
 __MTML__
 
@@ -231,14 +238,15 @@ sub cb_tmpl_source_footer {
 	my ($cb, $app, $tmpl_ref) = @_;
     my $target = '</body>';
     my $replace = <<__MTML__;
+    <mt:var name="mtapp_prepend_footer_js">
     <mt:var name="mtapp_footer_js">
     <script type="text/javascript">
     /* <![CDATA[ */
-    jQuery(function(){
+    (function(\$){
         <mt:var name="mtapp_footer_jq">
         jQuery('#mtapp-loading').hide();
         jQuery('#container').css('visibility','visible');
-    });
+    })(jQuery);
     /* ]]> */
     </script>
     <mt:var name="mtapp_end_body">
