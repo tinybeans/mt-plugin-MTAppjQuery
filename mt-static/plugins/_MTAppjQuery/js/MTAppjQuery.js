@@ -1009,6 +1009,36 @@
         id: 0
     };
 
+    // ---------------------------------------------------------------------
+    //  $.fn.MTAppCheckCategoryCount();
+    //
+    //  Description:
+    //
+    //    必要な数のカテゴリが選択されているかチェックする。
+    //    チェックされていなければ false を返す。
+    //
+    //  Usage:
+    //
+    //    $(selector).MTAppCheckCategoryCount(required_number, msg);
+    //
+    //    required_number(Number): 選択する必要があるカテゴリの数（必須）
+    //    msg(String): エラー時に表示させるダイアログメッセージ
+    // ---------------------------------------------------------------------
+
+    $.fn.MTAppCheckCategoryCount = function(required_number, msg){
+        var error_msg = msg ? msg : '必要な数のカテゴリが選択されていません';
+        this.click(function(){
+            var checked_count = ($('#category-selector:visible').length > 0) ?
+                                $('#category-selector-list').find('input:checkbox:checked').length:
+                                mtappVars.selected_category.length;
+            if (required_number <= checked_count) {
+                return true;
+            } else {
+                $.MTAppDialogMsg('エラー', error_msg);
+                return false;
+            }
+        });
+    };
 
     // -------------------------------------------------
     //  Utility
