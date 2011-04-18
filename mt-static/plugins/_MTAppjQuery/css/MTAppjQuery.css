@@ -121,6 +121,9 @@ span.mcb-skin-tags .mcb-label-checked {
 span.mcb-skin-tags .mcb-checkbox {
     display: none;
 }
+span.mcb-skin-tags .mcb-add-item {
+    margin-left: 0;
+}
 span.mcb-container .mcb-add-item {
     width: 120px;
     padding-left: 12px;
@@ -129,9 +132,6 @@ span.mcb-container .mcb-add-item {
     font-size: 13px;
     line-height: 1.5;
     cursor: default;
-}
-span.mcb-skin-tags .mcb-add-item {
-    margin-left: 0;
 }
 /* ----------------------------------------
    __ローディング
