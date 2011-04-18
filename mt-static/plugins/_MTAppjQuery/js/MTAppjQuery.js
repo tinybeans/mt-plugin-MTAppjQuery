@@ -1062,13 +1062,6 @@
                 return true;
             }
         },        
-        MTAppInsertHtml: function (html, prefix, suffix){
-            prefix = prefix || '';
-            suffix = suffix || '';
-            return this.each(function(){
-                $(this).html(prefix + html + suffix + $(this).html());
-            });
-        },
         noScroll: function (selector, horizontal){
             var self = $(this).css('position', 'relative'),
                 target = self.find(selector).css({'position': 'absolute', 'z-index':99});
@@ -1087,7 +1080,21 @@
                 );
             });
             return self;
+        },
+        MTAppInsertHtml: function (html, prefix, suffix){
+            prefix = prefix || '';
+            suffix = suffix || '';
+            return this.each(function(){
+                $(this).html(prefix + html + suffix + $(this).html());
+            });
         }
+    });
+
+    $.extend({
+        digit: function (num) {
+            return num < 10 ? '0' + num: num;
+    }
+
     });
     // end - Utility
 
