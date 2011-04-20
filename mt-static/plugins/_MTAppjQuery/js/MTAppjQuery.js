@@ -677,8 +677,8 @@
     //
     //    $.MTAppDialogMsg(msg_title, msg_content);
     //
-    //    title (Number): ダイアログのタイトル（必須）
-    //    content (String): ダイアログのコンテンツ（必須）
+    //    msg_title // ダイアログのタイトル  (Number, 必須)
+    //    msg_content //ダイアログのコンテンツ (String、必須)
     // ---------------------------------------------------------------------
 
     $.MTAppDialogMsg = function(msg_title, msg_content){
