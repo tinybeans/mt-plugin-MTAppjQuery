@@ -165,6 +165,7 @@ __MTML__
     // 推奨
     var mtappVars = {
         "author_id" : <mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if>,
+        "user_name" : "<mt:var name="author_name" escape="html">",
         "curr_website_id" : <mt:if name="curr_website_id"><mt:var name="curr_website_id"><mt:else>0</mt:if>,
         "blog_id" : ${blog_id},
         "entry_id" : ${entry_id},
@@ -175,9 +176,10 @@ __MTML__
         "static_plugin_path" : "${static_plugin_path}",
         "html_title" : "<mt:if name="html_title"><mt:var name="html_title"><mt:else><mt:var name="page_title"></mt:if>",
         "scope_type" : "<mt:var name="scope_type">",
-        "selected_category" : <mt:if name="selected_category_loop"><mt:var name="selected_category_loop" to_json="1"><mt:else>[]</mt:if>,
+        "selected_category" : <mt:if name="selected_category_loop"><mt:var name="selected_category_loop" to_json="1" regex_replace='/"/g',''><mt:else>[]</mt:if>,
         "main_category_id" : <mt:if name="category_id"><mt:var name="category_id"><mt:else>0</mt:if>,
-        "screen_id" : "<mt:var name="screen_id">"
+        "screen_id" : "<mt:var name="screen_id">",
+        "body_class" : [<mt:setvarblock name="mtapp_body_class">"<mt:var name="screen_type" default="main-screen"> <mt:if name="scope_type" eq="user">user system<mt:else><mt:var name="scope_type"></mt:if><mt:if name="screen_class"> <mt:var name="screen_class"></mt:if><mt:if name="top_nav_loop"> has-menu-nav</mt:if><mt:if name="related_content"> has-related-content</mt:if><mt:if name="edit_screen"> edit-screen</mt:if><mt:if name="new_object"> create-new</mt:if><mt:if name="loaded_revision"> loaded-revision</mt:if><mt:if name="mt_beta"> mt-beta</mt:if>"</mt:setvarblock><mt:var name="mtapp_body_class" regex_replace='/ +/g',' ' regex_replace='/ /g','","'>]
     }
     /* ]]> */
     </script>
