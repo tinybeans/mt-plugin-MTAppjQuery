@@ -611,24 +611,44 @@
     $.MTAppMsg = function(options){
         var op = $.extend({}, $.MTAppMsg.defaults, options);
 
-        var closeBtn = $('<span class="mt-close-msg close-link clickable icon-remove icon16 action-icon">閉じる</span>');
-        var myMsg = $('<div class="msg msg-' + op.type + '"><p class="msg-text">' + op.msg + '</p></div>');
+        var myMsg = [
+            '<div class="msg msg-' + op.type + '">',
+                '<p class="msg-text">',
+                    op.msg,
+                '</p>',
+                '<span class="mt-close-msg close-link clickable icon-remove icon16 action-icon">閉じる</span>',
+            '</div>'
+        ];
 
-        if (op.type != 'error') {
-            myMsg.append(closeBtn);
+        if (op.parent) {
+            myMsg[1] = '';
+            myMsg[3] = '';
         }
 
-        if ($('#msg-block').length == 0) {
+        if (op.type == 'error') {
+            myMsg[4] = '';
+        }
+
+        var msgBlock = $('#msg-block');
+
+        if (msgBlock.length == 0) {
             $('#page-title').after('<div id="msg-block"></div>');
         }
 
-        $('#msg-block').append(myMsg);
+        var $myMsg = $(myMsg.join(''));
+
+        msgBlock.append($myMsg);
         
-        if (op.timeout > 0) setTimeout(function(){myMsg.fadeOut();}, op.timeout);
+        if (op.timeout > 0) {
+            setTimeout(function(){
+                $myMsg.fadeOut();
+            }, op.timeout);
+        }
     };
     $.MTAppMsg.defaults = {
         msg:  '', // 表示するメッセージ
         type: '', // 'info' or 'success' or 'error'
+        parent: false, // p.msg-text で包含しない場合
         timeout: 0 // 一定時間経過後に非表示にする場合にミリ秒を指定。0は非表示にしない。
     };
     // end - $.MTAppMsg
