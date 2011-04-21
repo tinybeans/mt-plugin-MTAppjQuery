@@ -44,25 +44,27 @@ sub cb_tmpl_source_header {
     my $ping_id     = $_type eq 'ping' ? $id : 0;
     my $user_id     = $_type eq 'author' ? $id : 0; # ログイン中のユーザーは author_id だよ
     my $field_id    = $_type eq 'field' ? $id : 0;
+doLog('$blog_id = '.$blog_id.' のページが読み込まれました。');
 
     ### 各種パスを取得する（スラッシュで終わる）
     my $static_path        = $app->static_path;
     my $static_plugin_path = $static_path . $p->envelope . '/';
 
 	### プラグインの設定の値を取得する
-	my $op_no_usercss     = $p->get_setting('no_usercss', 0)     || 0;
-	my $op_no_userjs      = $p->get_setting('no_userjs', 0)      || 0;
-	my $op_no_slidemenu   = $p->get_setting('no_slidemenu', 0)   || 0;
-	my $op_superslidemenu = $p->get_setting('superslidemenu', 0) || 0;
-	my $op_sys_jsfreearea = $p->get_setting('sys_jqplugin', 0)   || '';
-	
-	my $op_active         = $p->get_setting('active', $blog_id)    || 1;
-	my $op_usercss        = $p->get_setting('usercss', $blog_id)   || 1;
-	my $op_userjs         = $p->get_setting('userjs', $blog_id)    || 1;
-	my $op_slidemenu      = $p->get_setting('slidemenu', $blog_id) || 1;
-	my $op_jsfreearea     = $p->get_setting('jqplugin', $blog_id)  || '';
-	my $op_jqselectable   = $p->get_setting('jqselectable', $blog_id) || 0;
-
+	# システム設定
+	my $op_no_usercss     = $p->get_config_value('no_usercss', 'system');
+	my $op_no_userjs      = $p->get_config_value('no_userjs', 'system');
+	my $op_no_slidemenu   = $p->get_config_value('no_slidemenu', 'system');
+	my $op_superslidemenu = $p->get_config_value('superslidemenu', 'system');
+	my $op_sys_jsfreearea = $p->get_config_value('sys_jqplugin', 'system');
+    # ブログ設定
+	my $op_active         = $p->get_config_value('active', 'blog:'.$blog_id);
+	return unless $op_active;
+	my $op_usercss        = $p->get_config_value('usercss', 'blog:'.$blog_id);
+	my $op_userjs         = $p->get_config_value('userjs', 'blog:'.$blog_id);
+	my $op_slidemenu      = $p->get_config_value('slidemenu', 'blog:'.$blog_id);
+	my $op_jsfreearea     = $p->get_config_value('jqplugin', 'blog:'.$blog_id);
+	my $op_jqselectable   = $p->get_config_value('jqselectable', 'blog:'.$blog_id);
 	return if ($blog_id > 0 && $op_active == 0);
 
 	my ($user_css, $set_blog_id, $js_freearea, $user_js, $super_slide_menu_js);
@@ -303,20 +305,20 @@ sub cb_tmpl_param_edit_entry {
 
     ### $p->
     my $p = MT->component('mt_app_jquery');
-    my $active_uploadify = $p->get_setting('active_uploadify', $blog_id);
-    my $no_uploadify     = $p->get_setting('no_uploadify', 0);
+    my $active_uploadify = $p->get_config_value('active_uploadify', 'blog:'.$blog_id);
+    my $no_uploadify     = $p->get_config_value('no_uploadify', 'system');
     if ($active_uploadify == 0 || $no_uploadify == 1) {
         return;
     }
-    my $img  = &_config_replace($p->get_setting('img_elm', $blog_id));
-    my $file = &_config_replace($p->get_setting('file_elm', $blog_id));
+    my $img  = &_config_replace($p->get_config_value('img_elm', 'blog:'.$blog_id));
+    my $file = &_config_replace($p->get_config_value('file_elm', 'blog:'.$blog_id));
     
     ### Variable
     my $static_plugin_path = $static_path . $p->{envelope} . '/';
     
     ### SetVar(param)
     $param->{blog_path} = $blog_path;
-    $param->{upload_folder} = $p->get_setting('upload_folder', $blog_id);
+    $param->{upload_folder} = $p->get_config_value('upload_folder', 'blog:'.$blog_id);
     $param->{static_plugin_path} = $static_plugin_path;
     $param->{uploadify_source} = <<__MTML__;
     <link href="${static_plugin_path}lib/uploadify/css/uploadify.css" rel="stylesheet" type="text/css" />
@@ -394,8 +396,8 @@ sub cb_cms_post_save_entry {
 
     ### $p-> ($plugin->)
     my $p = MT->component('mt_app_jquery');
-    my $active_uploadify = $p->get_setting('active_uploadify', $blog_id);
-    my $no_uploadify     = $p->get_setting('no_uploadify', 0);
+    my $active_uploadify = $p->get_config_value('active_uploadify', 'blog:'.$blog_id);
+    my $no_uploadify     = $p->get_config_value('no_uploadify', 'system');
     return if ($active_uploadify == 0 || $no_uploadify == 1);
 
     my $asset_uploadify = $q->param('asset_uploadify');

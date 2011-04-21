@@ -66,17 +66,4 @@ sub init_registry {
     });
 }
 
-sub get_setting {
-    my $plugin = shift;
-    my ($key, $blog_id) = @_;
-    my $scope;
-    if ($blog_id > 0) {
-        $scope = 'blog:'. $blog_id;
-    } else {
-        $scope = 'system';
-    }
-    my $value = $plugin->get_config_value($key, $scope);
-    return $value;
-}
-
 1;
