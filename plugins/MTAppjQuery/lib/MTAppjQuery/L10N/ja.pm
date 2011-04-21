@@ -17,10 +17,10 @@ use vars qw ( %Lexicon );
 # Tmplset.pm
 	'structure' => '構造',
 # system_config.tmpl
-    'To stop using user.css' => 'user.cssの利用を停止する',
-    'To stop using MTAppjQuery.js' => 'MTAppjQuery.jsの利用を停止する',
-    'To stop using user.js' => 'user.jsの利用を停止する',
-    'To stop using Slide Menu' => 'スライドメニューの利用を停止する',
+    'To stop using user.css' => 'すべてのウェブサイト・ブログのuser.cssの利用を停止する',
+    'To stop using MTAppjQuery.js' => 'すべてのウェブサイト・ブログのMTAppjQuery.jsの利用を停止する',
+    'To stop using user.js' => 'すべてのウェブサイト・ブログのuser.jsの利用を停止する',
+    'To stop using Slide Menu' => 'すべてのウェブサイト・ブログのスライドメニューの利用を停止する',
     'Enable Super Slide Menu' => 'スパースライドメニューを有効にする',
     '(JavasScript unless you are familiar with the contents of the file it is recommended that you disable it.)' => '（JavasScriptファイルの内容を理解している場合以外は無効にしないことをお勧めします。）',
 # blog_config.tmpl
