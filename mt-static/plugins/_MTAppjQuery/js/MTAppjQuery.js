@@ -463,7 +463,26 @@
 
     // -------------------------------------------------
     //  $.MTAppCustomize();
-    // -------------------------------------------------
+    //
+    //  Description:
+    //
+    //    主にブログ記事・ウェブページの編集画面の各フィールドをカスタマイズする。
+    //
+    //  Usage:
+    //
+    //    $.MTAppCustomize.defaults({
+    //        basename:   '', // 各フォーム要素のベースネーム
+    //        label:      '', // 変更後のラベル名
+    //        addclass:   '', // 追加するクラス名
+    //        hint:       '', // ヒントに表示させたいメッセージ
+    //        show_field:  1, // 1: デフォルトのまま, 0: 非表示, 'show': 強制表示, 'hide': 強制表示(= 0)
+    //        show_parent: 1, // 1: デフォルトのまま, 0: 非表示, 'show': 強制表示, 'hide': 強制表示(= 0)
+    //                        // (注) show_parent は、basename が body か more のみ。
+    //        custom:      0, // 1: カスタムフィールド
+    //        widget:      0, // 1: ウィジェット
+    //        edit:        0  // 1: 非編集モード
+    //    });
+    // ---------------------------------------------------------------------
     $.MTAppCustomize = function(options){
         var op = $.extend({}, $.MTAppCustomize.defaults, options);        
         var opL = op.label,
@@ -566,12 +585,13 @@
         return $field;
     };
     $.MTAppCustomize.defaults = {
-        basename:   '', // ベースネーム（ドキュメント参照）
+        basename:   '', // 各フォーム要素のベースネーム
         label:      '', // 変更後のラベル名
         addclass:   '', // 追加するクラス名
         hint:       '', // ヒントに表示させたいメッセージ
         show_field:  1, // 1: デフォルトのまま, 0: 非表示, 'show': 強制表示, 'hide': 強制表示(= 0)
-        show_parent: 1, // 1: デフォルトのまま, 0: 非表示, 'show': 強制表示, 'hide': 強制表示(= 0) (*)basename が body か more のみ。
+        show_parent: 1, // 1: デフォルトのまま, 0: 非表示, 'show': 強制表示, 'hide': 強制表示(= 0)
+                        // (注) show_parent は、basename が body か more のみ。
         custom:      0, // 1: カスタムフィールド
         widget:      0, // 1: ウィジェット
         edit:        0  // 1: 非編集モード
