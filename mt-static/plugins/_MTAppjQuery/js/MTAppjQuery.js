@@ -945,7 +945,7 @@
             '<p id="mtapp-debug-pageinfo-content" class="msg-text">',
                 'body'+ bodyID + '.' + bodyClass + '<br />',
                 'var mtappVars = { <br />' + mtappVarsStr.join(',<br />') + '<br />};',
-            '</p>',
+            '</p>'
         ];
         $.MTAppMsg({
             msg: pageInfo.join(''),
