@@ -670,7 +670,7 @@
 
         var $myMsg = $(myMsg.join(''));
 
-        msgBlock.append($myMsg);
+        $('#msg-block').append($myMsg);
         
         if (op.timeout > 0) {
             setTimeout(function(){
