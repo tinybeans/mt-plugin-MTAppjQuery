@@ -299,12 +299,17 @@ div.no-scroll-right-sidebar .widget-content {
 /* ----------------------------------------
    __デバッグモード
 ---------------------------------------- */
-.mtapp-debug-pageinfo {
-    line-height: 1.3;
-}
-.mtapp-debug-pageinfo span {
-    display: block;
-    padding: 5px 1em;
+#mtapp-debug-pageinfo-content {
+    display: none;
+    margin-right: 20px;
+    padding: 15px;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow-x: scroll;
+    background-color: #F3F3F3;
+    border: 1px solid #C0C6C9;
 }
 .mtapp-debug-block,
 .mtapp-debug-inline {

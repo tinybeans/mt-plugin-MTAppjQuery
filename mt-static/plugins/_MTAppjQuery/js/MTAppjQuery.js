@@ -920,44 +920,41 @@
 
         // 共通
         // bodyのID
-        var bodyID = $('body').attr('id'),
-            bodyClass = $('body').attr('class').replace(/ +/g,'.');
-        var pageTitle = $('#page-title').text(),
-            pageTitle = (pageTitle != '') ? '// ' +  $.trim(pageTitle) + '<br />': '';
-        var a_ = '<a class="mtapp-if-page" href="#" title="if($(\'body#',
-            _a = '</a>';
+        var body = $('body'),
+            bodyID = body.attr('id'),
+            bodyID = (bodyID != '') ? '#' + bodyID: '',
+            bodyClass = body.attr('class').replace(/ +/g,'.');
+
         var mtappVarsStr = [];
         for (var key in mtappVars) {
-            mtappVarsStr.push('&nbsp;&nbsp;&nbsp;&nbsp;' + key + ': ' + mtappVars[key]);
+            var value = '';
+            if (typeof mtappVars[key] == 'string') {
+                value = '"' + mtappVars[key] + '"';
+            } else if ($.isArray(mtappVars[key])) {
+                value = (typeof mtappVars[key][0] == 'string') ?
+                        '["'+ mtappVars[key].join('", "') +'"]':
+                        '['+ mtappVars[key].join(', ') +']';
+            } else {
+                value = mtappVars[key];
+            }
+            mtappVarsStr.push('&nbsp;&nbsp;&nbsp;&nbsp;' + key + ': ' + value);
         }
         
         var pageInfo = [
-            '<span class="mtapp-debug-pageinfo" style="font-family: monospace;">',
-                '[このページの情報] <br />',
-                '<span>',
-                    'body#'+ bodyID + '.' + bodyClass + '<br />',
-                    'var blogID = '+ blogID + ', authorID = '+ authorID + '<br />',
-                    'var mtappVars = { <br />' + mtappVarsStr.join(',<br />') + '<br />};',
-                '</span>',
-                '[次の条件に限定する if 文を生成]<br />',
-                '<span>',
-                    a_ + bodyID +'\').length){}">ページ限定' + _a + ' / ',
-                    a_ + bodyID +'\').length && blogID == '+ blogID +'){}">ブログとページ限定' + _a + ' / ',
-                    a_ + bodyID +'\').length && blogID == '+ blogID +' && authorID == '+ authorID +'){}">ブログとページとユーザー限定' + _a,
-                '</span>',
-            '</span>',
+            '<p id="mtapp-debug-pageinfo-title" class="msg-text"><a href="javascript: void(0);">このページの情報</a></p>',
+            '<p id="mtapp-debug-pageinfo-content" class="msg-text">',
+                'body'+ bodyID + '.' + bodyClass + '<br />',
+                'var mtappVars = { <br />' + mtappVarsStr.join(',<br />') + '<br />};',
+            '</p>',
         ];
         $.MTAppMsg({
             msg: pageInfo.join(''),
-            type: 'info'
+            type: 'info',
+            parent: true
         });
-        $('a.mtapp-if-page').click(function(e){
-            e.preventDefault();
-            $.MTAppMsg({
-                msg: pageTitle + $(this).attr('title'),
-                type: 'success'
-            });
-        });   
+        $('#mtapp-debug-pageinfo-title').click(function(){
+            $('#mtapp-debug-pageinfo-content').slideToggle();
+        });
 
         // ブログ一覧
         if ($('body#list-blog').length) {
