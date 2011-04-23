@@ -1,63 +1,4 @@
-/*
- **************************************************
- * About vars
- **************************************************
- *
- * blogID = ウェブサイト・ブログの場合はそれぞれのブログID、それ以外は0
- * authorID = 著者ID
- *
- **************************************************
- * About $.MTAppCustomize();
- **************************************************
- *
- * $.MTAppCustomize({
- *     basename:   'title/body/more/tags/keywords/excerpt/status/publishing/category/feedback/assets
- *                  or Customfield's basename',
- *     label:      '変更後のラベル',
- *     hint:       'マウスオーバーしたときに表示されるヒント',
- *     show_field: 1 フィールドを非表示にする場合は 0,
- *     custom:     0 カスタムフィールドの場合のみ 1,
- *     widget:     0 ウィジェットの場合のみ 1
- * });
- *
- **************************************************
- * About $.MTAppMultiCheckbox();
- **************************************************
- *
- * $.MTAppMultiCheckbox({
- *     basename: 'tags',
- *     label:    'Moveble Type,TypePad,MTOS,VOX',
- *     custom:   0,
- *     debug:    0
- * });
- *
- **************************************************
- * About $.MTAppFieldSort();
- **************************************************
- * $.MTAppFieldSort({
- *     sort: 'title,text,tags,excerpt,keywords'またはカスタムフィールドのbasenameを並び順にカンマ区切りで書く
- *     insertID: '並べ替えるフィールドを包含する要素のid属性'
- * });
- *
- **************************************************
- * About $.MTAppMsg();
- **************************************************
- * $.MTAppPageTitle({
- *     msg:  '表示させるメッセージ',
- *     type: 'info/success/error'
- * });
- *
- **************************************************
- * About $.MTAppInCats();
- **************************************************
- * $.MTAppInCats({
- *     categories: '1,2,3', 適用したいカテゴリID。複数の場合はカンマ区切り。
- *     code      : function(){ そのカテゴリに適用したい動作を書く }
- * });
- *
-*/
-
-jQuery(function($){
+(function($){
     // スクロールしても表示される右サイドバー
     $.MTAppNoScrollRightSidebar();
 /*
@@ -198,4 +139,4 @@ jQuery(function($){
         }
     });
 */
-});
+})(jQuery);
