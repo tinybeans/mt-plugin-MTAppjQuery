@@ -390,7 +390,7 @@
     //    $.MTAppCustomize.defaults({
     //        basename:   '', // 各フォーム要素のベースネーム
     //        label:      '', // 変更後のラベル名
-    //        addclass:   '', // 追加するクラス名
+    //        add_class:   '', // 追加するクラス名
     //        hint:       '', // ヒントに表示させたいメッセージ
     //        show_field:  1, // 1: デフォルトのまま, 0: 非表示, 'show': 強制表示, 'hide': 強制表示(= 0)
     //        show_parent: 1, // 1: デフォルトのまま, 0: 非表示, 'show': 強制表示, 'hide': 強制表示(= 0)
@@ -461,8 +461,8 @@
         }
 
         // フィールドにクラス名を追加しよう
-        if (op.addclass != '') {
-            $field.addClass(op.addclass);
+        if (op.add_class != '') {
+            $field.addClass(op.add_class);
         }
         
         // ラベルの変更
