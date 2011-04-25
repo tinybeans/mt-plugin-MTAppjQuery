@@ -249,7 +249,8 @@ div#menu-bar div#selector-nav div.selector ul#fav-website-list.super-slide-menu 
    __エディタのインラインエディットアイコン
 ---------------------------------------- */
 .mtapp-inline-edit {
-    vertical-align: top;
+    margin-left: 3px;
+    vertical-align: middle;
     cursor: pointer;
 }
 /* ----------------------------------------
