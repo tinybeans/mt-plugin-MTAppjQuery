@@ -13,11 +13,19 @@
 
     // -------------------------------------------------
     //  $.MTAppNoScrollRightSidebar();
+    //
+    //  Description:
+    //    右サイドバーのウィジェットをスクロールに追随するようにする。
+    //
+    //  Usage:
+    //    $.MTAppNoScrollRightSidebar(open_type);
+    //
+    //  Param:
+    //    open_type: {Boolean} true=ウィジェットを閉じた状態にする。
     // -------------------------------------------------
     $.MTAppNoScrollRightSidebar = function(open_type){
-        var type = (open_type == 'close') ? 'no-scroll-right-sidebar' : '';
-        $('#content-body')
-            .noScroll('#related-content', 'right');
+        var type = (open_type) ? 'no-scroll-right-sidebar' : '';
+        $('#content-body').noScroll('#related-content', 'right');
         var span = $('#related-content')
                 .addClass(type)
                 .children()
@@ -25,7 +33,7 @@
                     .find('div.widget-header')
                         .find('span')
                             .css({cursor:'pointer'});
-        if (open_type == 'close') {
+        if (open_type) {
             span.click(function(){
                 $(this)
                     .closest('div.widget-wrapper')
@@ -41,7 +49,6 @@
             });
         }
     }
-
     // end - $.MTAppNoScrollRightSidebar()
 
 
