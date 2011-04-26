@@ -276,7 +276,7 @@
         ];
 
         var $balloon = $(balloon.join('')).hide().find('.balloon-content').text(op.text).end();
-        target.before($balloon);
+        target.prepend($balloon);
         var height = '-' + ($balloon.height() + 10) + 'px';
         $balloon.css('margin-top',height);
         

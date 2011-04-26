@@ -46,7 +46,7 @@ textarea#sys_jqplugin {
     z-index: 99;
 }
 #related-content .balloon {
-    max-width: 240px;
+    max-width: 258px;
 }
 .balloon-content {
     position: relative;
