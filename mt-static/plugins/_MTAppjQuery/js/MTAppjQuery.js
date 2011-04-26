@@ -244,54 +244,60 @@
 
 
     // -------------------------------------------------
-    //  $(foo).MTAppshowHint(); 2011-01-07 fix
-    // -------------------------------------------------
+    //  $(foo).MTAppshowHint();
     //
     //  $(foo).MTAppshowHint({
     //      'text' : 'ヒントに表示させたいテキスト'
     //  });
     //
+    //  Usage:
+    //    $(foo).MTAppshowHint(options);
+    //
+    //  Options:
+    //      text: {String} ヒントの吹き出しに表示させるテキスト
+    // -------------------------------------------------
     $.fn.MTAppshowHint = function(options){
         var op = $.extend({}, $.fn.MTAppshowHint.defaults, options);
-        var $self = this,
-            target = $(op.target),
-            balloonId = 'balloon-' + op.targetId,
-            balloon = [
-            '<div id="' + balloonId + '" class="balloon">',
-                '<div class="balloon-content">',
-                '</div>',
-                '<div class="balloon-arrow">',
-                    '<div class="line10"/>',
-                    '<div class="line9"/>',
-                    '<div class="line8"/>',
-                    '<div class="line7"/>',
-                    '<div class="line6"/>',
-                    '<div class="line5"/>',
-                    '<div class="line4"/>',
-                    '<div class="line3"/>',
-                    '<div class="line2"/>',
-                    '<div class="line1"/>',
-                '</div>',
-            '</div>'
-        ];
+        return this.each(function(idx){
+            var balloon = [
+                    '<div class="balloon" style="visibility: hidden;">',
+                        '<div class="balloon-content">',
+                        '</div>',
+                        '<div class="balloon-arrow">',
+                            '<div class="line10"/>',
+                            '<div class="line9"/>',
+                            '<div class="line8"/>',
+                            '<div class="line7"/>',
+                            '<div class="line6"/>',
+                            '<div class="line5"/>',
+                            '<div class="line4"/>',
+                            '<div class="line3"/>',
+                            '<div class="line2"/>',
+                            '<div class="line1"/>',
+                        '</div>',
+                    '</div>'
+                ];
 
-        var $balloon = $(balloon.join('')).hide().find('.balloon-content').text(op.text).end();
-        target.prepend($balloon);
-        var height = '-' + ($balloon.height() + 10) + 'px';
-        $balloon.css('margin-top',height);
-        
-        $self.hover(
-            function(){
-                $balloon.show();
-            },
-            function(){
-                $balloon.hide();
-            }
-        );
+            var $balloon =
+                    $(this).prepend(balloon.join(''))
+                        .find('div.balloon')
+                            .find('div.balloon-content').text(op.text)
+                        .end(),
+                height = '-' + ($balloon.outerHeight() + 10) + 'px';
+
+            $balloon.css('margin-top', height);
+
+            $(this).hover(
+                function(){
+                    $balloon.css('visibility','visible');
+                },
+                function(){
+                    $balloon.css('visibility','hidden');
+                }
+            );
+        });
     };
     $.fn.MTAppshowHint.defaults = {
-        target: 'body',
-        targetId: '',
         text: ''
     };
     // end - $(foo).MTAppshowHint();
