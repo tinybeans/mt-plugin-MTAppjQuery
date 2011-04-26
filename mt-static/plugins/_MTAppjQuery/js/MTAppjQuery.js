@@ -227,18 +227,18 @@
         var op = $.extend({}, $.MTAppMultiCheckbox.defaults, options);
         
         var fieldID = (op.custom != 1) ? '#' + op.basename : '#customfield_' + op.basename;
-        var optionShow = (op.debug == 0) ? 'hide' : 'show';
+        var optionShow = (op.debug) ? 'show' : 'hide';
         $(fieldID).multicheckbox({show:optionShow,insert:op.insert,add:op.add,skin:op.skin,label:op.label,sort:op.sort});
     };
     $.MTAppMultiCheckbox.defaults = {
-        basename: '',
-        label:    '',
+        basename: '',       // 各フォーム要素のベースネーム
+        label:    '',       // カンマ区切りの文字列か{'key1':'value1','key2':'value2'}のハッシュ
         insert:   'before', // "before" or "after" 元のテキストエリアの前に挿入するか後ろに挿入するか
-        custom:   0,
-        add:      0, // ユーザーが追加できるようにする場合は 1
-        skin:     "", // タグ選択デザインを適用する場合は'tags'
-        sort:     "", // "ascend"（昇順）,"descend"（降順）
-        debug:    0
+        custom:    0,       // 1: カスタムフィールド
+        add:       0,       // ユーザーが追加できるようにする場合は 1
+        skin:     "",       // タグ選択デザインを適用する場合は'tags'
+        sort:     "",       // "ascend"（昇順）,"descend"（降順）
+        debug:     0        // 元のテキストフィールドを非表示にする(1)か表示しないか(0)
     };
     // end - $.MTAppMultiCheckbox()
 
