@@ -1016,34 +1016,69 @@
     //    チェックされていなければ false を返す。
     //
     //  Usage:
+    //    $(selector).MTAppCheckCategoryCount(options);
     //
-    //    $(selector).MTAppCheckCategoryCount({
-    //        required: 0, // 選択が必要なカテゴリの数
-    //        title: 'エラー', // エラーメッセージのタイトル
-    //        content: '必要な数のカテゴリが選択されていません。' // エラーメッセージのコンテンツ
-    //    });
-    //
+    //  Options:
+    //    required_count: {Number} 必須選択の数
+    //    required_ids: {String} 必須カテゴリIDをカンマ区切り
+    //    title: {String} ダイアログボックスのタイトル
+    //    content: {String} ダイアログボックスの本文
     // ---------------------------------------------------------------------
 
     $.fn.MTAppCheckCategoryCount = function(options){
         var op = $.extend({}, $.fn.MTAppCheckCategoryCount.defaults, options);
-        this.click(function(){
-            var checked_count = ($('#category-selector:visible').length > 0) ?
-                                $('#category-selector-list').find('input:checkbox:checked').length:
-                                mtappVars.selected_category.length;
-            if (op.required <= checked_count) {
-                return true;
+        return this.click(function(){
+
+            var cat_selector = $('#category-selector'),
+                cat_selector_list = $('#category-selector-list'),
+                match_count = 0;
+            if (op.required_ids != '') {
+                var ids = ',' + op.required_ids + ',',
+                    ids_array = op.required_ids.split(','),
+                    ids_count = ids_array.length;
+                if (cat_selector.is(':visible')) {
+                    cat_selector_list.find('input:checkbox:checked').each(function(){
+                        var name = $(this).attr('name').replace(/add_category_id_/,''),
+                            reg = new RegExp(name, 'g');
+                        if (reg.exec(ids)) {
+                            match_count++;
+                        }
+                    });
+                } else {
+                    for (var i = 0, n = mtappVars.selected_category.length; i < n; i++) {
+                        var reg = new RegExp(mtappVars.selected_category[i], 'g');
+                        if (reg.exec(ids)) {
+                            match_count++;
+                        }
+                    }
+                }
+                if (ids_count == match_count) {
+                    return true;
+                } else {
+                    $.MTAppDialogMsg(op.title, op.content);
+                    return false;
+                }
             } else {
-                $.MTAppDialogMsg(op.title, op.content);
-                return false;
+                var checked_count = (cat_selector.is(':visible')) ?
+                                    cat_selector_list.find('input:checkbox:checked').length:
+                                    mtappVars.selected_category.length;
+                if (op.required_count <= checked_count) {
+                    return true;
+                } else {
+                    $.MTAppDialogMsg(op.title, op.content);
+                    return false;
+                }
             }
         });
     };
     $.fn.MTAppCheckCategoryCount.defaults = {
-        required: 0,
+        required_count: 0,
+        required_ids: '',
         title: 'エラー',
         content: '必要な数のカテゴリが選択されていません。'
     };
+    // end - $.fn.MTAppCheckCategoryCount()
+
 
     // -------------------------------------------------
     //  Utility
