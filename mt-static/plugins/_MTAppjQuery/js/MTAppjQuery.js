@@ -729,46 +729,58 @@
     };
     // end - $.MTAppSlideMenu
 
+
     // -------------------------------------------------
-    //  $.MTAppInCats()
+    //  $.MTAppInCats();
+    //
+    //  Description:
+    //    カテゴリごとに条件分岐させる。
+    //
+    //  Usage:
+    //    $.MTAppInCats(options);
+    //
+    //  Options:
+    //    categories: {String} カテゴリIDを指定。複数の場合はカンマ区切り
+    //    code: {Function} 実行したいスクリプトを無名関数内に記述
     // -------------------------------------------------
     $.MTAppInCats = function(options){
         var op = $.extend({}, $.MTAppInCats.defaults, options);
 
-        // 選択されているカテゴリIDを取得
-        $('#category-list').find('li').each(function(){
-            var catID = $(this).attr('mt:id')
-            catsSelected.push(catID);
-        });
-
         // オプションで指定したカテゴリIDを取得
-        var cats = new Array();
+        var cats = [];
         cats = op.categories.split(',');
+        for (var i = 0, n = cats.length; i < n; i++) {
+            cats[i] = Number($.trim(cats[i]));
+        }
 
-        if (catsSelected.length) {
+        var selected_category_length = mtappVars.selected_category.length;
+
+        if (selected_category_length > 0) {
             // 選択されているカテゴリとオプションで指定したカテゴリが一致したらメソッドを実行
-            for (var i=0; i<cats.length; i++) {
-                if ($.inArray(cats[i], catsSelected) >= 0) {
+            for (var i = 0; i < selected_category_length; i++) {
+                if ($.inArray(mtappVars.selected_category[i], cats) >= 0) {
                     op.code();
+                    return mtappVars.selected_category[i];
                 }
             }
         }
-        $('#category-selector-list').find(':checkbox').live('click',function(){
-            var catID = $(this).attr('name').replace(/add_category_id_/,'');
-            if ($.inArray(catID, cats) >= 0) {
-                if ($(this).is(':checked')) {
-                    op.code();
-                } else {
-                    // window.location.reload();
-                }
+
+        $('#category-selector-list').find('input:checkbox').live('click', function(){
+            var cat_id = Number($(this).attr('name').replace(/add_category_id_/,''));
+            if ($(this).is(':checked') && $.inArray(cat_id, cats) >= 0) {
+                op.code();
+                return cat_id;
+            } else {
+                // window.location.reload();
             }
         });
     };
     $.MTAppInCats.defaults = {
         categories: '',
-        code      : function(){}
+        code: function(){}
     };
-    // end - $.MTAppInCats()
+    // end - $.MTAppInCats();
+
 
     // -------------------------------------------------
     //  $.MTAppFullscreen()
