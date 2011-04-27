@@ -298,13 +298,11 @@
                             '<div class="line1"/>',
                         '</div>',
                     '</div>'
-                ];
-
-            var $balloon =
-                    $(this).prepend(balloon.join(''))
-                        .find('div.balloon')
-                            .find('div.balloon-content').text(op.text)
-                        .end(),
+                ],
+                $balloon = $(this).prepend(balloon.join(''))
+                                  .find('div.balloon')
+                                      .find('div.balloon-content').text(op.text)
+                                      .end(),
                 height = '-' + ($balloon.outerHeight() + 10) + 'px';
 
             $balloon.css('margin-top', height);
