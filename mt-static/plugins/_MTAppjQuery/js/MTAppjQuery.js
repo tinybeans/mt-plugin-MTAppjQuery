@@ -588,18 +588,19 @@
 
 
     // -------------------------------------------------
-    //  $.MTAppMsg
+    //  $.MTAppMsg();
     //
     //  Description:
     //    画面上部にMTデフォルトの形式のメッセージを表示する。
     //
     //  Usage:
-    //    $.MTAppMsg({
-    //        msg:  '', // 表示するメッセージ (String, 必須)
-    //        type: '', // 'info' or 'success' or 'error' (String, 必須)
-    //        parent: false, // p.msg-text で包含しない場合 (Boolean)
-    //        timeout: 0 // 一定時間経過後に非表示にする場合にミリ秒を指定。0は非表示にしない。(Number)
-    //    });
+    //    $.MTAppMsg(options);
+    //
+    //  Options:
+    //    msg: {String} 表示するメッセージ
+    //    type: {String} 'info' or 'success' or 'error'
+    //    parent: {Boolean} p.msg-text で包含しない場合(false)
+    //    timeout: {Number} 一定時間経過後に非表示にする場合にミリ秒を指定。0は非表示にしない。
     // ---------------------------------------------------------------------
     $.MTAppMsg = function(options){
         var op = $.extend({}, $.MTAppMsg.defaults, options);
@@ -639,12 +640,13 @@
         }
     };
     $.MTAppMsg.defaults = {
-        msg:  '', // 表示するメッセージ (String, 必須)
-        type: '', // 'info' or 'success' or 'error' (String, 必須)
-        parent: false, // p.msg-text で包含しない場合 (Boolean)
-        timeout: 0 // 一定時間経過後に非表示にする場合にミリ秒を指定。0は非表示にしない。(Number)
+        msg: '',
+        type: '',
+        parent: false,
+        timeout: 0
     };
     // end - $.MTAppMsg
+
 
     // ---------------------------------------------------------------------
     //  $.MTAppDialogMsg();
