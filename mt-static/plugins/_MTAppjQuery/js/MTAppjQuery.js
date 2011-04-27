@@ -6,8 +6,8 @@
  * Since:   2010-06-22
  * Update:  2011-01-21
  * for version: 0.2
- * Comment: 
- * 
+ * Comment:
+ *
  */
 (function($){
 
@@ -225,6 +225,7 @@
     };
     // end - jqueryMultiCheckbox.js
 
+
     // -------------------------------------------------
     //  $.MTAppMultiCheckbox();
     //
@@ -276,7 +277,7 @@
     //    $(foo).MTAppshowHint(options);
     //
     //  Options:
-    //      text: {String} ヒントの吹き出しに表示させるテキスト
+    //    text: {String} ヒントの吹き出しに表示させるテキスト
     // -------------------------------------------------
     $.fn.MTAppshowHint = function(options){
         var op = $.extend({}, $.fn.MTAppshowHint.defaults, options);
@@ -330,12 +331,12 @@
     //    指定した要素にマウスオーバーするとカーソルに追随するツールチップを表示する。
     //
     //  Usage:
-    //  　　$(foo).MTAppTooltip(options);
-    //     ツールチップを表示させたい要素にMTAppTooltip()を実行する。
-    //     textオプション、title属性、alt属性の値の優先順位でツールチップで表示する。
+    //  　$(foo).MTAppTooltip(options);
+    //    ツールチップを表示させたい要素にMTAppTooltip()を実行する。
+    //    textオプション、title属性、alt属性の値の優先順位でツールチップで表示する。
     //
     //  Options:
-    //      text: {String} ツールチップに表示させる文字列
+    //    text: {String} ツールチップに表示させる文字列
     // -------------------------------------------------
     $.fn.MTAppTooltip = function(options){
         var op = $.extend({}, $.fn.MTAppTooltip.defaults, options);
@@ -384,6 +385,7 @@
     };
     // end - $(foo).MTAppTooltip();
 
+
     // -------------------------------------------------
     //  $.MTAppSetting();
     // -------------------------------------------------
@@ -396,7 +398,7 @@
         bar: null
     };
 */
-    
+
     // -------------------------------------------------
     //  $.MTAppSettingGroup();
     // -------------------------------------------------
@@ -572,11 +574,9 @@
     //  $.MTAppMsg
     //
     //  Description:
-    //
     //    画面上部にMTデフォルトの形式のメッセージを表示する。
     //
     //  Usage:
-    //
     //    $.MTAppMsg({
     //        msg:  '', // 表示するメッセージ (String, 必須)
     //        type: '', // 'info' or 'success' or 'error' (String, 必須)
@@ -614,7 +614,7 @@
         var $myMsg = $(myMsg.join(''));
 
         $('#msg-block').append($myMsg);
-        
+
         if (op.timeout > 0) {
             setTimeout(function(){
                 $myMsg.fadeOut();
@@ -715,12 +715,12 @@
             var catID = $(this).attr('mt:id')
             catsSelected.push(catID);
         });
-        
+
         // オプションで指定したカテゴリIDを取得
         var cats = new Array();
         cats = op.categories.split(',');
 
-        if (catsSelected.length) {    
+        if (catsSelected.length) {
             // 選択されているカテゴリとオプションで指定したカテゴリが一致したらメソッドを実行
             for (var i=0; i<cats.length; i++) {
                 if ($.inArray(cats[i], catsSelected) >= 0) {
@@ -801,7 +801,7 @@
 
         // ウェブサイトテンプレートの管理以外なら何もしない
         if($('body#list-template').length == 0) return;
-        
+
         // 「すべて再構築」ボタンとテーブルに再構築アイコンを設置
         $("#index-listing, #archive-listing").each(function(){
             var self = $(this),
@@ -854,7 +854,7 @@
         });
     };
     // end - $.MTApp1clickRebuild()
-    
+
     // -------------------------------------------------
     //  $.MTAppDebug()
     // -------------------------------------------------
@@ -882,7 +882,7 @@
             }
             mtappVarsStr.push('&nbsp;&nbsp;&nbsp;&nbsp;' + key + ': ' + value);
         }
-        
+
         var pageInfo = [
             '<p id="mtapp-debug-pageinfo-title" class="msg-text"><a href="javascript: void(0);">このページの情報</a></p>',
             '<p id="mtapp-debug-pageinfo-content" class="msg-text">',
@@ -918,7 +918,7 @@
                 }
             });
         }
-        
+
         // ブログ記事新規作成・更新
         if ($('body#edit-entry').length || $('body#edit-page').length) {
             if ( window.console && window.console.log ) {
@@ -1081,9 +1081,9 @@
     $.fn.extend({
         hasClasses: function (selector) {
             if (typeof selector == 'string') {
-                selector = /^\./.test(selector) 
+                selector = /^\./.test(selector)
                     ? selector.replace(/^\./,'').split('.')
-                    : selector.replace(/^ | $/g,'').split(' '); 
+                    : selector.replace(/^ | $/g,'').split(' ');
             }
             for (var i = -1,j = 0, n = selector.length; ++i < n;) {
                 if (this.hasClass(selector[i])) j++;
@@ -1096,7 +1096,7 @@
             } else {
                 return true;
             }
-        },        
+        },
         noScroll: function (selector, horizontal){
             var self = $(this).css('position', 'relative'),
                 target = self.find(selector).css({'position': 'absolute', 'z-index':99});
@@ -1194,7 +1194,7 @@ function getPageScroll() {
         xScroll = document.documentElement.scrollLeft;
     } else if (document.body) {// all other Explorers
         yScroll = document.body.scrollTop;
-        xScroll = document.body.scrollLeft; 
+        xScroll = document.body.scrollLeft;
     }
     return new Array(xScroll,yScroll);
 }
@@ -1208,7 +1208,7 @@ function getPageHeight() {
         windowHeight = document.documentElement.clientHeight;
     } else if (document.body) { // other Explorers
         windowHeight = document.body.clientHeight;
-    } 
+    }
     return windowHeight;
 }
 function setCookie(key, val, days){
