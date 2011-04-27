@@ -324,19 +324,24 @@
 
 
     // -------------------------------------------------
-    //  $(foo).MTAppTooltip(); 2011-01-07 fix
-    // -------------------------------------------------
-    //
-    //  ツールチップを表示させたい要素にMTAppTooltip()を実行する
-    //  title属性、なければalt属性の値をツールチップで表示する
-    //  
     //  $(foo).MTAppTooltip();
     //
+    //  Description:
+    //    指定した要素にマウスオーバーするとカーソルに追随するツールチップを表示する。
+    //
+    //  Usage:
+    //  　　$(foo).MTAppTooltip(options);
+    //     ツールチップを表示させたい要素にMTAppTooltip()を実行する。
+    //     textオプション、title属性、alt属性の値の優先順位でツールチップで表示する。
+    //
+    //  Options:
+    //      text: {String} ツールチップに表示させる文字列
+    // -------------------------------------------------
     $.fn.MTAppTooltip = function(options){
         var op = $.extend({}, $.fn.MTAppTooltip.defaults, options);
-    
+
         return this.each(function(){
-        
+
             var self = $(this),
                 tooltip = $('#mtapp-tooltip'),
                 target, tipText;
@@ -347,7 +352,7 @@
                 target = this.title ? 'title' : 'alt',
                 tipText = self.attr(target);
             }
-            
+
             self.hover(function(e){
                 if (op.text == '') {
                     self.attr(target,'');
