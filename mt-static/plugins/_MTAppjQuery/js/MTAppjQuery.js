@@ -413,26 +413,24 @@
     //  $.MTAppCustomize();
     //
     //  Description:
-    //
     //    主にブログ記事・ウェブページの編集画面の各フィールドをカスタマイズする。
     //
     //  Usage:
+    //    $.MTAppCustomize(options);
     //
-    //    $.MTAppCustomize.defaults({
-    //        basename:   '', // 各フォーム要素のベースネーム
-    //        label:      '', // 変更後のラベル名
-    //        add_class:   '', // 追加するクラス名
-    //        hint:       '', // ヒントに表示させたいメッセージ
-    //        show_field:  1, // 1: デフォルトのまま, 0: 非表示, 'show': 強制表示, 'hide': 強制表示(= 0)
-    //        show_parent: 1, // 1: デフォルトのまま, 0: 非表示, 'show': 強制表示, 'hide': 強制表示(= 0)
-    //                        // (注) show_parent は、basename が body か more のみ。
-    //        custom:      0, // 1: カスタムフィールド
-    //        widget:      0, // 1: ウィジェット
-    //        edit:        0  // 1: 非編集モード
-    //    });
+    //  Options:
+    //    basename: {String} 各フォーム要素のベースネーム
+    //    label: {String} 変更後のラベル名
+    //    add_class: {String} 追加するクラス名
+    //    hint: {String} ヒントに表示させたいメッセージ
+    //    show_field: {String}  強制表示('show')、強制表示('hide')
+    //    show_parent: {String}  強制表示('hide') (注:show_parent は、basename が body か more のみ）
+    //    custom: {Boolean} カスタムフィールドの場合 true
+    //    widget: {Boolean} ウィジェットの場合 true
+    //    edit: {Boolean} 非編集モードにする場合 true
     // ---------------------------------------------------------------------
     $.MTAppCustomize = function(options){
-        var op = $.extend({}, $.MTAppCustomize.defaults, options);        
+        var op = $.extend({}, $.MTAppCustomize.defaults, options);
         var opL = op.label,
             opH = op.hint,
             opS = op.show_field,
@@ -468,7 +466,7 @@
                 $label = $field.find('#editor-header label:eq(0) a');
                 $hover = $label;
                 break;
-            case 'more': 
+            case 'more':
                 $field = $('#text-field');
                 $tab   = $field.find('#editor-header div.tab:eq(1)');
                 $label = $field.find('#editor-header label:eq(1) a');
@@ -495,27 +493,22 @@
         if (op.add_class != '') {
             $field.addClass(op.add_class);
         }
-        
+
         // ラベルの変更
         if (opL != '') {
             $label.text(opL);
             if (opB == 'title') $field.find('div.field-header').show();
         }
 
-        // ヒントの表示
-        if (opH) $hover.MTAppshowHint({ target: $field, id: opB, text: opH });
-
         // フィールドの表示・非表示
         if (opS == 'show') {
             $field.removeClass('hidden');
-        } else if (opB != 'body' && opB != 'more' && (opS == 0 || opS == 'hide')) {
+        } else if (opB != 'body' && opB != 'more' && opS == 'hide') {
             $field.addClass('hidden');
-        } else if ((opB == 'body' || opB == 'more') && (opS == 0 || opS == 'hide')) {
-            $tab.addClass('hidden');
         }
 
         // テキストフィールドの表示・非表示
-        if ((opB == 'body' || opB == 'more') && (op.show_parent == 0 || op.show_parent == 'hide')) {
+        if ((opB == 'body' || opB == 'more') && op.show_parent == 'hide') {
             $field.css({
                 position: 'absolute',
                 top: '-9999px',
@@ -525,6 +518,9 @@
             });
         }
 
+        // ヒントの表示
+        if (opH) $field.MTAppshowHint({ text: opH });
+
         // 非編集モード
         if (opE && $field.find('div.field-content').length) {
             $label.after($editImg);
@@ -533,16 +529,15 @@
         return $field;
     };
     $.MTAppCustomize.defaults = {
-        basename:   '', // 各フォーム要素のベースネーム
-        label:      '', // 変更後のラベル名
-        addclass:   '', // 追加するクラス名
-        hint:       '', // ヒントに表示させたいメッセージ
-        show_field:  1, // 1: デフォルトのまま, 0: 非表示, 'show': 強制表示, 'hide': 強制表示(= 0)
-        show_parent: 1, // 1: デフォルトのまま, 0: 非表示, 'show': 強制表示, 'hide': 強制表示(= 0)
-                        // (注) show_parent は、basename が body か more のみ。
-        custom:      0, // 1: カスタムフィールド
-        widget:      0, // 1: ウィジェット
-        edit:        0  // 1: 非編集モード
+        basename: '',
+        label: '',
+        addclass: '',
+        hint: '',
+        show_field: '',
+        show_parent: '',
+        custom: false,
+        widget: false,
+        edit: false
     };
     // end - $.MTAppCustomize()
 
