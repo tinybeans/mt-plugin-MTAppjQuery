@@ -645,37 +645,43 @@
         parent: false,
         timeout: 0
     };
-    // end - $.MTAppMsg
+    // end - $.MTAppMsg();
 
 
     // ---------------------------------------------------------------------
     //  $.MTAppDialogMsg();
     //
     //  Description:
-    //
     //    ダイアログメッセージを表示する。（jquery.ui）
     //
     //  Usage:
+    //    $.MTAppDialogMsg(options);
     //
-    //    $.MTAppDialogMsg(msg_title, msg_content);
-    //
-    //    msg_title // ダイアログのタイトル  (Number, 必須)
-    //    msg_content //ダイアログのコンテンツ (String、必須)
+    //  Options:
+    //    title: {String} ダイアログのタイトル
+    //    content: {String} ダイアログのコンテンツ
+    //    hide_effect: {String} 閉じる時のエフェクト 'explode', 'slide', 'drop'など
     // ---------------------------------------------------------------------
 
-    $.MTAppDialogMsg = function(msg_title, msg_content){
-        msg_title = msg_title ? msg_title: 'メッセージ';
-        msg_content = msg_content ?msg_content: 'エラーが発生しました。';
-        $('#mtapp-dialog-msg').dialog({
-            autoOpen: false,
-            modal: true,
-            title: msg_title
-        });
+    $.MTAppDialogMsg = function(options){
+        var op = $.extend({}, $.MTAppDialogMsg.defaults, options);
+
         $('#mtapp-dialog-msg')
-            .attr('title', msg_title)
-            .html(msg_content)
-            .dialog('open');
+            .html(op.content)
+            .dialog({
+                autoOpen: false,
+                modal: true,
+                title: op.title,
+                hide: op.hide_effect
+            });
+        $('#mtapp-dialog-msg').dialog('open');
     };
+    $.MTAppDialogMsg.defaults = {
+        title: 'メッセージ',
+        content: 'エラーが発生しました。',
+        hide_effect: ''
+    };
+    // end - $.MTAppDialogMsg();
 
 
     // -------------------------------------------------
