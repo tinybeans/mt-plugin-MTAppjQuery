@@ -543,18 +543,33 @@
     };
     // end - $.MTAppCustomize()
 
+
     // -------------------------------------------------
-    //  $.MTAppFieldSort
+    //  $.MTAppFieldSort();
+    //
+    //  Description:
+    //    フィールドを並べ替える。カスタムフィールドは対応、ウィジェットは未対応。
+    //
+    //  Usage:
+    //    $.MTAppFieldSort(options);
+    //
+    //  Options:
+    //    sort: {String} 上からの並び順通りにbasenameをカンマ区切りで並べる。カスタムフィールドはbasenameの先頭にはc:を付与。
+    //    insert_id: {String} フィールドを包含する要素のid属性の値
     // -------------------------------------------------
     $.MTAppFieldSort = function(options){
         var op = $.extend({}, $.MTAppFieldSort.defaults, options);
 
-        var field = op.sort.split(',');
+        var field = op.sort.split(','),
+            firld_length = field.length;
+        if (firld_length == 0) return;
+        for (var i = 0; i < firld_length; i++) {
+            field[i] = $.trim(field[i]);
+        }
         field.reverse();
-        
-        if (field.length == 0) return;
-        var ID = '#' + op.insertID;
-        for (var i = -1, n = field.length; ++i < n;) {
+
+        var ID = op.insert_id ? '#' + op.insert_id: '#' + op.insertID;
+        for (var i = 0; i < firld_length; i++) {
             if (field[i].match(/^c:/)) {
                 var fieldID = '#customfield_' + field[i].replace(/^c:/,'') + '-field';
                 $(fieldID).prependTo(ID);
@@ -565,10 +580,12 @@
         }
     };
     $.MTAppFieldSort.defaults = {
-        sort    : 'title,text,tags,excerpt,keywords',
-        insertID: 'main-content-inner'
+        sort: 'title,text,tags,excerpt,keywords',
+        insert_id: 'sortable',
+        insertID: 'sortable' // 後方互換（非推奨）
     };
     // end - $.MTAppFieldSort
+
 
     // -------------------------------------------------
     //  $.MTAppMsg
