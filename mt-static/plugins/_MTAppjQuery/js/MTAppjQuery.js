@@ -599,7 +599,7 @@
     //  Options:
     //    msg: {String} 表示するメッセージ
     //    type: {String} 'info' or 'success' or 'error'
-    //    parent: {Boolean} p.msg-text で包含しない場合(false)
+    //    parent: {Boolean} p.msg-text で包含しない場合(true)
     //    timeout: {Number} 一定時間経過後に非表示にする場合にミリ秒を指定。0は非表示にしない。
     // ---------------------------------------------------------------------
     $.MTAppMsg = function(options){
