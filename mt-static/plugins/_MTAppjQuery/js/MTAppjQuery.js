@@ -831,13 +831,20 @@
     };
     // end - $.MTAppFullscreen()
 
+
     // -------------------------------------------------
-    //  $.MTApp1clickRebuild()
+    //  $.MTApp1clickRebuild();
+    //
+    //  Description:
+    //    テンプレートの管理画面でワンクリックで再構築できるようになる。
+    //
+    //  Usage:
+    //    $.MTApp1clickRebuild();
     // -------------------------------------------------
     $.MTApp1clickRebuild = function(options){
 
         // ウェブサイトテンプレートの管理以外なら何もしない
-        if($('body#list-template').length == 0) return;
+        if (mtappVars.screen_id != 'list-template') return;
 
         // 「すべて再構築」ボタンとテーブルに再構築アイコンを設置
         $("#index-listing, #archive-listing").each(function(){
@@ -847,22 +854,21 @@
                     "id"  : self.attr('id')
                 },
                 // 公開ボタンを変数に入れておく
-                publish = self.find('div.actions-bar button:eq(0)');
+                publish = self.find('div.button-actions:eq(0) button:eq(0)');
 
             // インデックス、アーカイブテンプレートのすべて再構築ボタンを設置
             self
-                .find('div.actions-bar')
-                    .find('span:eq(0)')
-                        .prepend('<button class="button mtapp-1click-rebuild" title="' + type.name + 'をすべて再構築">すべて再構築</button>')
-                        .find('button.mtapp-1click-rebuild')
-                            .click(function(){
-                                $(this)
-                                    .closest('div.actions-bar')
-                                    .siblings('table')
-                                        .find('input:checkbox').attr('checked','checked');
-                                publish.click();
-                                return false;
-                            });
+                .find('div.button-actions')
+                    .prepend('<button class="button mtapp-1click-rebuild" title="' + type.name + 'をすべて再構築">すべて再構築</button>')
+                    .find('button.mtapp-1click-rebuild')
+                        .click(function(){
+                            $(this)
+                                .closest('div.actions-bar')
+                                .siblings('table')
+                                    .find('input:checkbox').attr('checked','checked');
+                            publish.click();
+                            return false;
+                        });
             // 再構築アイコンをテーブルに挿入
             self
                 .find('#' + type.id + '-table')
@@ -891,6 +897,7 @@
         });
     };
     // end - $.MTApp1clickRebuild()
+
 
     // -------------------------------------------------
     //  $.MTAppDebug()
