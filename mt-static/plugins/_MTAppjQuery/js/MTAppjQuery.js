@@ -1058,7 +1058,7 @@
     //    $(selector).MTAppCheckCategoryCount(options);
     //
     //  Options:
-    //    required_count: {Number} 必須選択の数
+    //    required_count: {Number} 必須選択の数(required_idsが優先される)
     //    required_ids: {String} 必須カテゴリIDをカンマ区切り
     //    title: {String} ダイアログボックスのタイトル
     //    content: {String} ダイアログボックスの本文
