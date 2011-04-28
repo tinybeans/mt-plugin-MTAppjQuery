@@ -244,7 +244,7 @@
     //    add: {boolean} ユーザーが項目を追加できるようにする(true)
     //    skin: {String} タグデザインを適用する('tags')
     //    sort: {String} 昇順('ascend')、降順('descend')
-    //    debug: {boolean} 元のテキストフィールドを非表示にする(true)か表示しないか(false)
+    //    debug: {boolean} 元のテキストフィールドを表示にする(true)か表示しないか(false)
     // -------------------------------------------------
     $.MTAppMultiCheckbox = function(options){
         var op = $.extend({}, $.MTAppMultiCheckbox.defaults, options);
