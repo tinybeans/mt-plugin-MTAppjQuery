@@ -678,7 +678,7 @@
     };
     $.MTAppDialogMsg.defaults = {
         title: 'メッセージ',
-        content: 'エラーが発生しました。',
+        content: 'Movable Typeへようこそ！',
         hide_effect: ''
     };
     // end - $.MTAppDialogMsg();
