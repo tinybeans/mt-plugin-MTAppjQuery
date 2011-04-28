@@ -269,9 +269,9 @@
     // -------------------------------------------------
     //  $(foo).MTAppshowHint();
     //
-    //  $(foo).MTAppshowHint({
-    //      'text' : 'ヒントに表示させたいテキスト'
-    //  });
+    //  Description:
+    //    要素にマウスオーバーしたときに、要素上部に吹き出しスタイルでテキストを表示する。
+    //    吹き出しは$(foo)内にprependされる。
     //
     //  Usage:
     //    $(foo).MTAppshowHint(options);
