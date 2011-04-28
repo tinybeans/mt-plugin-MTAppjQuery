@@ -1120,17 +1120,91 @@
 
 
     // -------------------------------------------------
-    //  Utility
+    //  $(foo).MTAppInlineEdit();
+    //
+    //  Description:
+    //    input:text, textareaをインラインエディットモードにする。
+    //
+    //  Usage:
+    //    $(foo).MTAppInlineEdit(options);
+    //
+    //  Options:
+    //    edit: {String} インラインエディットモードを切り替えるボタンのテキスト
+    //    always: {Boolean} 常にインラインエディットモードにする場合(true)
+    // -------------------------------------------------
+    $.fn.MTAppInlineEdit = function(options) {
+        var op = $.extend({}, $.fn.MTAppInlineEdit.defaults, options);
+        return this.each(function(){
+            var self = $(this),
+                val = self.val(),
+                $btn = $('<button class="mt-edit-field-button button">' + op.edit + '</button>').click(function(){
+                    $(this).hide()
+                        .prev().show()
+                            .prev().hide();
+                    return false;
+                });
+            if (op.always) {
+                val = (val != '') ? val: '...';
+                self.before('<span>' + val + '</span>')
+                    .after($btn)
+                    .hide();
+            } else if (val != '') {
+                self.before('<span>' + val + '</span>')
+                    .after($btn)
+                    .hide();
+            }
+        });
+    };
+    $.fn.MTAppInlineEdit.defaults = {
+        edit: '編集',
+        always: false
+    };
+    // end - $(foo).MTAppInlineEdit();
+
+
+    // -------------------------------------------------
+    //  Utilities
+    //
+    //  $(foo).hasClasses(classes);
+    //
+    //    Description:
+    //      classesで指定したクラス名が設定されている場合はtrueを返す。
+    //    Param:
+    //      classes: {String} カンマ区切りの文字列
+    //
+    //  $(foo).notClasses(classes);
+    //
+    //    Description:
+    //      classesで指定したクラス名が設定されていない場合はtrueを返す。
+    //    Param:
+    //      classes: {String} カンマ区切りの文字列
+    //
+    //  $(foo).noScroll(selector, horizontal);
+    //
+    //    Description:
+    //      $(foo)の子要素である$(selector)をスクロールに追随させる。
+    //    Param:
+    //      selector: {String} jQueryセレクタ
+    //      horizontal: {String} $(selector)のpositionプロパティに{horizontal: 0}を付与
+    //
+    //
+    //  $.digit(num, space);
+    //
+    //    Description:
+    //      numが一桁の場合は、頭に0または半角スペースを付与
+    //    Param:
+    //      num: {Number} 数字
+    //      space: {Boolean} 半角スペースを付与する場合(true)
     // -------------------------------------------------
     $.fn.extend({
-        hasClasses: function (selector) {
-            if (typeof selector == 'string') {
-                selector = /^\./.test(selector)
-                    ? selector.replace(/^\./,'').split('.')
-                    : selector.replace(/^ | $/g,'').split(' ');
+        hasClasses: function (classes) {
+            if (typeof classes == 'string') {
+                classes = /^\./.test(classes)
+                    ? classes.replace(/^\./,'').split('.')
+                    : classes.replace(/^ | $/g,'').split(' ');
             }
-            for (var i = -1,j = 0, n = selector.length; ++i < n;) {
-                if (this.hasClass(selector[i])) j++;
+            for (var i = -1,j = 0, n = classes.length; ++i < n;) {
+                if (this.hasClass(classes[i])) j++;
             }
             return n === j;
         },
@@ -1159,72 +1233,18 @@
                 );
             });
             return self;
-        },
-        MTAppInsertHtml: function (html, prefix, suffix){
-            prefix = prefix || '';
-            suffix = suffix || '';
-            return this.each(function(){
-                $(this).html(prefix + html + suffix + $(this).html());
-            });
         }
     });
 
     $.extend({
-        digit: function (num) {
-            return num < 10 ? '0' + num: num;
+        digit: function (num, space) {
+            var prefix = (space) ? ' ' : '0';
+            return (num < 10) ? prefix + num: num;
     }
 
     });
     // end - Utility
 
-})(jQuery);
-
-/*
- * mtEditInput
- * modified by tinybeans
- * Usage:
- *   jQuery('.mt-edit-field').mtEditInput({ edit: '<__trans phrase="Edit">'});
- *
- */
-(function($){
-    $.fn.MTAppInlineEdit = function(options) {
-        var defaults = {
-            save: 'Save'
-        };
-        var opts = $.extend(defaults, options);
-        return this.each(function() {
-            var id = $(this).attr('id');
-            var $elm = $('#'+id);
-            var val = ($elm.val() != '') ? $elm.val() : '...';
-            var $btn = '<button id="mt-set-' + id + '" class="mt-edit-field-button button">' + opts.edit + '</button>';
-            if (opts.always) {
-                $elm
-                    .before('<span class="' + id + '-text">' + val + '</span>')
-                    .after($btn)
-                    .hide();
-            } else {
-                if (val && !$elm.hasClass('show-input')) {
-                    $elm
-                        .before('<span class="' + id + '-text">' + val + '</span>')
-                        .after($btn)
-                        .hide();
-                }
-                if (!val && $elm.hasClass('hide-input')) {
-                    $elm
-                        .before('<span class="' + id + '-text">...</span>')
-                        .after($btn)
-                        .hide();
-                }
-            }
-            $('button#mt-set-' + id).click(function() {
-                $(this).hide()
-                    .prev().show()
-                    .prev().hide();
-                $('p#' + id + '-warning').show();
-                return false;
-            });
-        });
-    };
 })(jQuery);
 
 // getPageScroll() by quirksmode.com
