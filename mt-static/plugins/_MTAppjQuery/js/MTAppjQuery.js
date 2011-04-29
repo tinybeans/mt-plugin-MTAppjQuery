@@ -336,7 +336,7 @@
     //    textオプション、title属性、alt属性の値の優先順位でツールチップで表示する。
     //
     //  Options:
-    //    text: {String} ツールチップに表示させる文字列
+    //    text: {String} ツールチップに表示させるテキスト
     // -------------------------------------------------
     $.fn.MTAppTooltip = function(options){
         var op = $.extend({}, $.fn.MTAppTooltip.defaults, options);
@@ -381,7 +381,7 @@
         });
     };
     $.fn.MTAppTooltip.defaults = {
-        text: ""
+        text: ''
     };
     // end - $(foo).MTAppTooltip();
 
