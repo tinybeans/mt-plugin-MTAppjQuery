@@ -425,7 +425,7 @@
     //    label: {String} 変更後のラベル名
     //    add_class: {String} 追加するクラス名
     //    hint: {String} ヒントに表示させたいメッセージ
-    //    show_field: {String}  強制表示('show')、強制表示('hide')
+    //    show_field: {String}  強制表示('show')、強制表示('hide')(注:basename が body か more の場合はタブの表示制御）
     //    show_parent: {String}  強制表示('hide') (注:show_parent は、basename が body か more のみ）
     //    custom: {Boolean} カスタムフィールドの場合 true
     //    widget: {Boolean} ウィジェットの場合 true
@@ -508,8 +508,10 @@
         // フィールドの表示・非表示
         if (opS == 'show') {
             $field.removeClass('hidden');
-        } else if (opB != 'body' && opB != 'more' && opS == 'hide') {
+        } else if (opS == 'hide' && opB != 'body' && opB != 'more') {
             $field.addClass('hidden');
+        } else if (opS == 'hide' && (opB == 'body' || opB == 'more')) {
+            $label.closest('div.tab').addClass('hidden');
         }
 
         // テキストフィールドの表示・非表示
