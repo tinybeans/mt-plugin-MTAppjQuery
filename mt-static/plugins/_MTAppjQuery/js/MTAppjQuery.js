@@ -577,11 +577,10 @@
         for (var i = 0; i < firld_length; i++) {
             if (field[i].match(/^c:/)) {
                 var fieldID = '#customfield_' + field[i].replace(/^c:/,'') + '-field';
-                $(fieldID).prependTo(ID);
             } else {
                 var fieldID = '#' + field[i] + '-field';
-                $(fieldID).prependTo(ID);
             }
+            $(fieldID).prependTo(ID).removeClass('hidden');
         }
     };
     $.MTAppFieldSort.defaults = {
