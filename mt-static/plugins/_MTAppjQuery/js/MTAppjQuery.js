@@ -499,7 +499,10 @@
         // ラベルの変更
         if (opL != '') {
             $label.text(opL);
-            if (opB == 'title') $field.find('div.field-header').show();
+            if (opB == 'title') {
+                $field.find('div.field-header').show().end()
+                      .find('#title').attr('placeholder', opL);
+            }
         }
 
         // フィールドの表示・非表示
