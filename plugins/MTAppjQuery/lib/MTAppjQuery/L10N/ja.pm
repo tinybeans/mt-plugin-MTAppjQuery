@@ -14,6 +14,8 @@ use vars qw ( %Lexicon );
 # 	'Select files' => 'ファイルを選択',
 	'You can upload up to 1MB file.' => 'アップロードできるファイルサイズは1MBまでです。',
 	'Failed to save the item.' => 'アイテムの保存に失敗しました。',
+	'JavaScript free area of system' => 'システムのJavaScript自由入力欄',
+	'JavaScript free area of website or blog' => 'ウェブサイト・ブログのJavaScript自由入力欄',
 # Tmplset.pm
 	'structure' => '構造',
 # system_config.tmpl

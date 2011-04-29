@@ -21,14 +21,14 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             ['no_userjs',     {Default => 0,  Scope => 'system'}],
             ['no_slidemenu',  {Default => 0,  Scope => 'system'}],
             ['superslidemenu',{Default => 0,  Scope => 'system'}],
-            ['sys_jqplugin',  {Default => '', Scope => 'system'}],
+            ['sys_jqplugin',  {Default => '<!-- <__trans phrase="JavaScript free area of system"> -->', Scope => 'system'}],
 #             ['no_mtappjquery',{Default => 0,  Scope => 'system'}],
 
             ['active',        {Default => 1,  Scope => 'blog'}],
             ['usercss',       {Default => 1,  Scope => 'blog'}],
             ['userjs',        {Default => 1,  Scope => 'blog'}],
             ['slidemenu',     {Default => 1,  Scope => 'blog'}],
-            ['jqplugin',      {Default => '', Scope => 'blog'}],
+            ['jqplugin',      {Default => '<!-- <__trans phrase="JavaScript free area of website or blog"> -->', Scope => 'blog'}],
 
             ['jqselectable',  {Default => 0,  Scope => 'blog'}],
 #             ['mtappjquery',   {Default => 1,  Scope => 'blog'}],
