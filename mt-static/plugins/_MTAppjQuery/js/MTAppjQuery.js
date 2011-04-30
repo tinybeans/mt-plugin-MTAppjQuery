@@ -1098,7 +1098,10 @@
                 if (ids_count == match_count) {
                     return true;
                 } else {
-                    $.MTAppDialogMsg(op.title, op.content);
+                    $.MTAppDialogMsg({
+                        title: op.title,
+                        content: op.content
+                    });
                     return false;
                 }
             } else {
@@ -1108,7 +1111,10 @@
                 if (op.required_count <= checked_count) {
                     return true;
                 } else {
-                    $.MTAppDialogMsg(op.title, op.content);
+                    $.MTAppDialogMsg({
+                        title: op.title,
+                        content: op.content
+                    });
                     return false;
                 }
             }
