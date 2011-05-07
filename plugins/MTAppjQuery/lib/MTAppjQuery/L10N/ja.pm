@@ -5,7 +5,7 @@ use vars qw ( %Lexicon );
 
 %Lexicon = (
 # MTAppjQuery.pl
-	'jQuery to customize the interface to add.' => '管理画面をカスタマイズするためのjQueryを追加します。',
+	'Customize the management screen of MT5.1 to use jQuery.' => 'MT5.1の管理画面をjQueryを使ってカスタマイズします。',
 # Plugin.pm
 	'Page Loading' => 'ページをロード中',
 	'Custom Fields' => 'カスタムフィールド',
