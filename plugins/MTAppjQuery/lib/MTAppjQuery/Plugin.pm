@@ -158,14 +158,15 @@ __MTML__
 __MTML__
     }
 
+
     ### ブログIDなどの変数を定義する
     $set_blog_id = <<__MTML__;
     <mt:ignore> screen_id を設定する</mt:ignore>
-    <mt:if name="screen_id">
-        <mt:var name="screen_id">
-    <mt:elseif name="template_filename" like="list_">
-        <mt:setvarblock name="screen_id">list-<mt:var name="object_type"></mt:setvarblock>
-    </mt:if>
+    <mt:unless name="screen_id">
+        <mt:if name="template_filename" like="list_">
+            <mt:setvarblock name="screen_id">list-<mt:var name="object_type"></mt:setvarblock>
+        </mt:if>
+    </mt:unless>
 
     <script type="text/javascript">
     /* <![CDATA[ */
