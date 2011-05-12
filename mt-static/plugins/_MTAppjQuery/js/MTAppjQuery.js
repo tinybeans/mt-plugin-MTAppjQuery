@@ -102,7 +102,7 @@
                     }
                 } else {
                     for (var key in op.label) {
-                        label_html.push(mcb_label(key, key));
+                        label_html.push(mcb_label(key, op.label[key]));
                     }
                 }
             } else {
