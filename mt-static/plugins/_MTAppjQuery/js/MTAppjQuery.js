@@ -877,11 +877,11 @@
             self
                 .find('#' + type.id + '-table')
                     .find('th.cb')
-                        .after('<th class="col head rebuild"><span class="col-label">再構築</span></th>')
+                        .insertListingColum('after', 'th', '再構築', 'rebuild')
                     .end()
                     .find('tbody')
                         .find('td.cb')
-                            .after('<td class="rebuild"><img class="mtapp-rebuild-icon" src="' + mtappVars.static_plugin_path + 'images/rebuild-mini.png" width="13" height="13" /></td>')
+                            .insertListingColum('after', 'td', '<img class="mtapp-rebuild-icon" src="' + mtappVars.static_plugin_path + 'images/rebuild-mini.png" width="13" height="13" />', 'rebuild')
                         .end()
                         .find('img.mtapp-rebuild-icon')
                             .each(function(){
@@ -1208,6 +1208,18 @@
                 );
             });
             return self;
+        },
+        insertListingColum: function(position, element, html, classname){
+            return this.each(function(){
+                var elem = '';
+                classname = classname ? ' ' + classname : '';
+                if (element == 'th') {
+                    elem = '<th class="col head' + classname + '"><span class="col-label">' + html + '</span></th>';
+                } else if (element == 'td') {
+                    elem = '<td class="col' + classname + '">' + html + '</td>';
+                }
+                $(this)[position](elem);
+            });
         }
     });
 
