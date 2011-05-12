@@ -44,31 +44,39 @@ sub cb_tmpl_source_header {
     my $ping_id     = $_type eq 'ping' ? $id : 0;
     my $user_id     = $_type eq 'author' ? $id : 0; # ログイン中のユーザーは author_id だよ
     my $field_id    = $_type eq 'field' ? $id : 0;
-doLog('$blog_id = '.$blog_id.' のページが読み込まれました。');
 
     ### 各種パスを取得する（スラッシュで終わる）
     my $static_path        = $app->static_path;
     my $static_plugin_path = $static_path . $p->envelope . '/';
 
-	### プラグインの設定の値を取得する
-	# システム設定
-	my $op_no_usercss     = $p->get_config_value('no_usercss', 'system');
-	my $op_no_userjs      = $p->get_config_value('no_userjs', 'system');
-	my $op_no_slidemenu   = $p->get_config_value('no_slidemenu', 'system');
-	my $op_superslidemenu = $p->get_config_value('superslidemenu', 'system');
-	my $op_sys_jsfreearea = $p->get_config_value('sys_jqplugin', 'system');
-    # ブログ設定
-	my $op_active         = $p->get_config_value('active', 'blog:'.$blog_id);
-	return unless $op_active;
-	my $op_usercss        = $p->get_config_value('usercss', 'blog:'.$blog_id);
-	my $op_userjs         = $p->get_config_value('userjs', 'blog:'.$blog_id);
-	my $op_slidemenu      = $p->get_config_value('slidemenu', 'blog:'.$blog_id);
-	my $op_jsfreearea     = $p->get_config_value('jqplugin', 'blog:'.$blog_id);
-	my $op_jqselectable   = $p->get_config_value('jqselectable', 'blog:'.$blog_id);
-	return if ($blog_id > 0 && $op_active == 0);
+    ### プラグインの設定の値を取得する
+    my $scope = (!$blog_id) ? 'system' : 'blog:'.$blog_id;
+    my $op_active         = $p->get_config_value('active', $scope);
+    return unless $op_active;
+    my $op_usercss        = $p->get_config_value('usercss', $scope);
+    my $op_userjs         = $p->get_config_value('userjs', $scope);
+    my $op_slidemenu      = $p->get_config_value('slidemenu', $scope);
+    my $op_superslidemenu = $p->get_config_value('superslidemenu', $scope);
+    my $op_freearea       = $p->get_config_value('jqplugin', $scope);
+    my $op_jqselectable   = $p->get_config_value('jqselectable', $scope);
 
-	my ($user_css, $set_blog_id, $js_freearea, $user_js, $super_slide_menu_js);
-        
+## debug
+my $debug_msg = "blog_id = ${blog_id} のページ";
+my $debug_code = <<__DEBUG__;
+scope : $scope
+op_active : $op_active
+op_usercss : $op_usercss
+op_userjs : $op_userjs
+op_slidemenu : $op_slidemenu
+op_superslidemenu : $op_superslidemenu
+op_jsfreearea : $op_freearea
+op_jqselectable : $op_jqselectable
+__DEBUG__
+doLog($debug_msg, $debug_code);
+## debug
+
+    my ($user_css, $set_blog_id, $user_js, $super_slide_menu_js);
+
     ### ローディング画像、ツールチップ用ボックスをページに追加する
     my $target = '<div id="container"';
     my $preset = <<__MTML__;
@@ -83,7 +91,7 @@ __MTML__
     $$tmpl_ref =~ s/$target/$preset/g;
 
     ### スライドメニューをセットする
-    if ($op_no_slidemenu != 1 && $op_superslidemenu == 0 && ($op_slidemenu == 1 or $blog_id == 0)) {
+    if ($op_slidemenu && !$op_superslidemenu) {
         my $s_menu_org = MTAppjQuery::Tmplset::s_menu_org;
         my $w_menu_org = MTAppjQuery::Tmplset::w_menu_org;
         my $b_menu_org = MTAppjQuery::Tmplset::b_menu_org;
@@ -96,7 +104,7 @@ __MTML__
     }
     
     ### スーパースライドメニューをセットする
-    if ($op_superslidemenu == 1) {
+    if ($op_superslidemenu) {
         ### websiteとblogのjsonを生成
         my (@websites, @websites_json, @blogs, @blogs_json, $websites_json, $blogs_json);
         push @websites, MT::Website->load(undef, {unique => 1});
@@ -141,7 +149,7 @@ __MTML__
     }
 
     ### user.css をセットする
-    if ($op_no_usercss != 1 && ($op_usercss == 1 or $blog_id == 0)) {
+    if ($op_usercss) {
         $user_css = <<__MTML__;
     <mt:setvarblock name="html_head" append="1">
     <link rel="stylesheet" href="${static_plugin_path}css/user.css" type="text/css" />
@@ -188,25 +196,19 @@ __MTML__
         "selected_category" : <mt:if name="selected_category_loop"><mt:var name="selected_category_loop" to_json="1" regex_replace='/"/g',''><mt:else>[]</mt:if>,
         "main_category_id" : <mt:if name="category_id"><mt:var name="category_id"><mt:else>0</mt:if>,
         "screen_id" : "<mt:var name="screen_id">",
-        "body_class" : [<mt:setvarblock name="mtapp_body_class">"<mt:var name="screen_type" default="main-screen"> <mt:if name="scope_type" eq="user">user system<mt:else><mt:var name="scope_type"></mt:if><mt:if name="screen_class"> <mt:var name="screen_class"></mt:if><mt:if name="top_nav_loop"> has-menu-nav</mt:if><mt:if name="related_content"> has-related-content</mt:if><mt:if name="edit_screen"> edit-screen</mt:if><mt:if name="new_object"> create-new</mt:if><mt:if name="loaded_revision"> loaded-revision</mt:if><mt:if name="mt_beta"> mt-beta</mt:if>"</mt:setvarblock><mt:var name="mtapp_body_class" regex_replace='/ +/g',' ' regex_replace='/ /g','","'>]
+        "body_class" : [<mt:setvarblock name="mtapp_body_class">"<mt:var name="screen_type" default="main-screen"> <mt:if name="scope_type" eq="user">user system<mt:else><mt:var name="scope_type"></mt:if><mt:if name="screen_class"> <mt:var name="screen_class"></mt:if><mt:if name="top_nav_loop"> has-menu-nav</mt:if><mt:if name="related_content"> has-related-content</mt:if><mt:if name="edit_screen"> edit-screen</mt:if><mt:if name="new_object"> create-new</mt:if><mt:if name="loaded_revision"> loaded-revision</mt:if><mt:if name="mt_beta"> mt-beta</mt:if>"</mt:setvarblock><mt:var name="mtapp_body_class" regex_replace='/ +/g',' ' regex_replace='/ /g','","'>],
+        "template_filename" : '<mt:var name="template_filename">'
     }
     /* ]]> */
     </script>
 __MTML__
 
-    ### JavaScriptフリーエリアの内容をセットする
-    if ($blog_id == 0) {
-        $js_freearea = $op_sys_jsfreearea;
-    } else {
-        $js_freearea = $op_jsfreearea || $op_sys_jsfreearea;
-    }
-
     ### user.jsをセット
-    if ($op_no_userjs != 1 && ($op_userjs == 1 or $blog_id == 0)) {
-		$user_js = <<__MTML__;
+    if ($op_userjs) {
+        $user_js = <<__MTML__;
     <script type="text/javascript" src="${static_plugin_path}js/user.js"></script>
 __MTML__
-	}
+  }
 
     ### jQselectableプラグインを利用する
     my $jqselectable = '';
@@ -228,7 +230,7 @@ __MTML__
     $jqselectable
     <mt:var name="uploadify_source">
     <script type="text/javascript" src="${static_plugin_path}js/MTAppjQuery.js"></script>
-    $js_freearea
+    $op_freearea
     </mt:setvarblock>
 
     <mt:setvarblock name="mtapp_prepend_footer_js">

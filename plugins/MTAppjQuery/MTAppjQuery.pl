@@ -14,24 +14,28 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
     author_link => 'http://www.tinybeans.net/blog/',
     plugin_link => 'http://www.tinybeans.net/blog/download/mt-plugin/mtapp-jquery.html',
     l10n_class  => 'MTAppjQuery::L10N',
-    blog_config_template => 'blog_config.tmpl',
-    system_config_template => 'system_config.tmpl',
+    blog_config_template => 'config.tmpl',
+    system_config_template => 'config.tmpl',
     settings    => new MT::PluginSettings([
-            ['no_usercss',    {Default => 0,  Scope => 'system'}],
-            ['no_userjs',     {Default => 0,  Scope => 'system'}],
-            ['no_slidemenu',  {Default => 0,  Scope => 'system'}],
+            # Set system scope
+            ['active',        {Default => 1,  Scope => 'system'}],
+            ['usercss',       {Default => 1,  Scope => 'system'}],
+            ['userjs',        {Default => 1,  Scope => 'system'}],
+            ['slidemenu',     {Default => 1,  Scope => 'system'}],
             ['superslidemenu',{Default => 0,  Scope => 'system'}],
-            ['sys_jqplugin',  {Default => '<!-- <__trans phrase="JavaScript free area of system"> -->', Scope => 'system'}],
-#             ['no_mtappjquery',{Default => 0,  Scope => 'system'}],
+            ['jqplugin',      {Default => '<!-- <__trans phrase="JavaScript free area of system"> -->', Scope => 'system'}],
 
+            ['jqselectable',  {Default => 0,  Scope => 'system'}],
+
+            # Set blog scope
             ['active',        {Default => 1,  Scope => 'blog'}],
             ['usercss',       {Default => 1,  Scope => 'blog'}],
             ['userjs',        {Default => 1,  Scope => 'blog'}],
             ['slidemenu',     {Default => 1,  Scope => 'blog'}],
+            ['superslidemenu',{Default => 0,  Scope => 'blog'}],
             ['jqplugin',      {Default => '<!-- <__trans phrase="JavaScript free area of website or blog"> -->', Scope => 'blog'}],
 
             ['jqselectable',  {Default => 0,  Scope => 'blog'}],
-#             ['mtappjquery',   {Default => 1,  Scope => 'blog'}],
 
             # Uploadify
         	['no_uploadify',    {Default => 1, Scope => 'system'}],
