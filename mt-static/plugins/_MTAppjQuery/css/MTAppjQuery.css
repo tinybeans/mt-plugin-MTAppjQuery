@@ -17,6 +17,18 @@
 .mtapp-hidden {
     display: none;
 }
+
+.mtapp-2colum-l { float: left;  width: 49%; }
+.mtapp-2colum-r { float: right; width: 49%; }
+
+.mtapp-3colum-l { float: left;  width: 33%; margin-right: 1% !important; }
+.mtapp-3colum-c { float: left;  width: 32%; }
+.mtapp-3colum-r { float: right; width: 33%; }
+
+.mtapp-clear-l  { clear: left;  }
+.mtapp-clear-r  { clear: right; }
+.mtapp-clear-b  { clear: both;  }
+
 /* ----------------------------------------
    __管理画面のスタイル
 ---------------------------------------- */
