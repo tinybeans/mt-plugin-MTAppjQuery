@@ -791,7 +791,7 @@
     // -------------------------------------------------
     $.MTAppFullscreen = function(){
         // Get the action bar buttons
-        var actionBtns = new Array();
+        var actionBtns = [];
         $('#entry-publishing-widget .widget-content .actions-bar button').each(function(i){
             actionBtns[i] = $(this).clone(true).addClass('cloneBtns');
         });
@@ -947,68 +947,33 @@
             $('#mtapp-debug-pageinfo-content').slideToggle();
         });
 
-        // ブログ一覧
-        if ($('body#list-blog').length) {
-            $('#blog-listing-table tbody tr').each(function(){
-                var id = $(this).find('td.cb input:checkbox').val();
-                $(this).find('td.name').MTAppInsertHtml(id,'[',']');
-            });
-        }
-
         // ブログ記事一覧
         // IDを表示、下書きの背景を変更
-        if ($('body#list-entry').length) {
-            $('#entry-listing-table tbody tr').each(function(){
-                var id = $(this).find('td.cb input:checkbox').val();
-                $(this).find('td.title').MTAppInsertHtml(id,'[',']');
-                if($(this).find('td.status-draft').length){
+        if ($('#entry-listing-form').length) {
+            $('#entry-table tbody tr').each(function(){
+                if ($(this).find('td.title').find('span.draft').length) {
                     $(this).css({'background':'#FFCBD0'});
                 }
             });
         }
 
-        // ブログ記事新規作成・更新
-        if ($('body#edit-entry').length || $('body#edit-page').length) {
-            if ( window.console && window.console.log ) {
-                $('input, textarea').live('click', function(){
-                    window.console.log($(this).attr('id'));
-                });
-            }
-        }
-
         // カテゴリ一覧
-        // IDを表示
-        if ($('body#list-category').length) {
-            $('#category-listing-table tbody tr').each(function(){
-                var id = $(this).attr('id').replace(/category-/,'');
-                $(this).find('td.category div').MTAppInsertHtml(id,'[',']');
-            });
-        }
-
         // タグ一覧
         // IDを表示
         if ($('body#list-tag').length) {
             $('#tag-listing-table tbody tr').each(function(){
                 var id = $(this).attr('id').replace(/tag-/,'');
-                $(this).find('td.name').MTAppInsertHtml(id,'[',']');
+                $(this).find('td.name').prepend(id,'[',']');
             });
         }
-
+// タグ、コメント、トラックバック、メンバー、テンプレート、ウィジェット、カスタムフィールド
         // ウェブページ一覧
-        // IDを表示
-        if ($('body#list-page').length) {
-            $('#page-listing-table tbody tr').each(function(){
-                var id = $(this).find('td.cb input:checkbox').val();
-                $(this).find('td.title').MTAppInsertHtml(id,'[',']');
-            });
-        }
-
         // フォルダ一覧
         // IDを表示
         if ($('body#list-folder').length) {
             $('#folder-listing-table tbody tr').each(function(){
                 var id = $(this).find('td.cb input:checkbox').val();
-                $(this).find('td:eq(2)').MTAppInsertHtml(id,'[',']');
+                $(this).find('td:eq(2)').prepend(id,'[',']');
             });
         }
         // テンプレート一覧
@@ -1016,7 +981,7 @@
         if ($('body#list-template').length) {
             $('#main-content-inner tr').each(function(){
                 var id = $(this).find('td.cb input:checkbox').val();
-                $(this).find('td.template-name').MTAppInsertHtml(id,'[',']');
+                $(this).find('td.template-name').prepend(id,'[',']');
             });
         }
     };

@@ -14,9 +14,10 @@ use MTAppjQuery::Tmplset;
 use MT::Log;
 use Data::Dumper;
 sub doLog {
-    my ($msg) = @_;     return unless defined($msg);
+    my ($msg, $code) = @_;     return unless defined($msg);
     my $log = MT::Log->new;
-    $log->message($msg) ;
+    $log->message($msg);
+    $log->metadata($code);
     $log->save or die $log->errstr;
 }
 #
@@ -24,7 +25,7 @@ sub doLog {
 ###
 
 sub cb_tmpl_source_header {
-	my ($cb, $app, $tmpl_ref) = @_;
+    my ($cb, $app, $tmpl_ref) = @_;
 # my $q = $app->param;
 # doLog('$app->param! : '.Dumper($q));
     my $p = MT->component('mt_app_jquery');
@@ -221,7 +222,7 @@ __MTML__
 
     ### 各情報をheadにセットする
     my $html_head = '<mt:var name="html_head">';
-	my $add_html_head = <<__MTML__;
+    my $add_html_head = <<__MTML__;
     <link rel="stylesheet" href="${static_plugin_path}css/MTAppjQuery.css" type="text/css" />
     $user_css
 
@@ -245,11 +246,11 @@ __MTML__
     $html_head
 __MTML__
 
-	$$tmpl_ref =~ s/$html_head/$add_html_head/g;
+    $$tmpl_ref =~ s/$html_head/$add_html_head/g;
 }
 
 sub cb_tmpl_source_footer {
-	my ($cb, $app, $tmpl_ref) = @_;
+    my ($cb, $app, $tmpl_ref) = @_;
     my $target = '</body>';
     my $replace = <<__MTML__;
     <mt:var name="mtapp_prepend_footer_js">
@@ -266,18 +267,18 @@ sub cb_tmpl_source_footer {
     <mt:var name="mtapp_end_body">
     $target
 __MTML__
-	$$tmpl_ref =~ s!$target!$replace!;
+    $$tmpl_ref =~ s!$target!$replace!;
 }
 
 sub cb_tmpl_source_fav_blogs {
-	my ($cb, $app, $tmpl_ref) = @_;
+    my ($cb, $app, $tmpl_ref) = @_;
 
 # my $user = $app->user;
 # my $perms = $user->permissions( 12 );
 # doLog('$user : '.Dumper($user->__meta));
 
-	### class="parent-website-n"を付与
-	my $classname = 'class="blog-content"';
+    ### class="parent-website-n"を付与
+    my $classname = 'class="blog-content"';
     my $new_classname = 'class="blog-content parent-website-<mt:if name="blog_id"><mt:var name="website_id"><mt:else>0</mt:if>"';
     $$tmpl_ref =~ s!$classname!$new_classname!g;
 
