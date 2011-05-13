@@ -18,14 +18,7 @@ use vars qw ( %Lexicon );
 	'Free area of website or blog' => 'ウェブサイト・ブログメニュー用のフリーエリア',
 # Tmplset.pm
 	'structure' => '構造',
-# system_config.tmpl
-    'To stop using user.css' => 'すべてのウェブサイト・ブログのuser.cssの利用を停止する',
-    'To stop using MTAppjQuery.js' => 'すべてのウェブサイト・ブログのMTAppjQuery.jsの利用を停止する',
-    'To stop using user.js' => 'すべてのウェブサイト・ブログのuser.jsの利用を停止する',
-    'To stop using Slide Menu' => 'すべてのウェブサイト・ブログのスライドメニューの利用を停止する',
-    'Enable Super Slide Menu' => 'スパースライドメニューを有効にする',
-    '(JavasScript unless you are familiar with the contents of the file it is recommended that you disable it.)' => '（JavasScriptファイルの内容を理解している場合以外は無効にしないことをお勧めします。）',
-# blog_config.tmpl
+# config.tmpl
 	'active' => '有効にする',
 	'Enable plugin' => 'プラグインを有効にする',
 	'Enable user.css' => 'user.cssを有効にする',

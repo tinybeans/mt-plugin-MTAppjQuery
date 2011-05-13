@@ -29,7 +29,7 @@ sub cb_tmpl_source_header {
 # my $q = $app->param;
 # doLog('$app->param! : '.Dumper($q));
     my $p = MT->component('mt_app_jquery');
-    
+
     ### 各種IDを取得する
     my $_type       = $app->param('_type') || 'type';
     my $id          = $app->param('id') || 0;
@@ -129,38 +129,38 @@ __MTML__
         $$tmpl_ref =~ s!$w_menu_org!$w_menu!g;
         $$tmpl_ref =~ s!$b_menu_org!$b_menu!g;
     }
-    
+
     ### スーパースライドメニューをセットする
     if ($op_superslidemenu) {
         ### websiteとblogのjsonを生成
         my (@websites, @websites_json, @blogs, @blogs_json, $websites_json, $blogs_json);
         push @websites, MT::Website->load(undef, {unique => 1});
         push @blogs, MT::Blog->load(undef, {unique => 1});
-    
+
         foreach my $website (@websites) {
-            my @theme_thumb = $website->theme 
+            my @theme_thumb = $website->theme
                 ? $website->theme->thumbnail( size => 'small' )
-                : MT::Theme->default_theme_thumbnail( size => 'small' ); 
+                : MT::Theme->default_theme_thumbnail( size => 'small' );
             my $websites_hash = $website->column_values;
             my %website_data = %$websites_hash;
             $website_data{'theme_thumb'} = $theme_thumb[0];
             push @websites_json, MT::Util::to_json(\%website_data);
         }
         $websites_json = join ",", @websites_json;
-    
+
         foreach my $blog (@blogs) {
-            my @theme_thumb = $blog->theme 
+            my @theme_thumb = $blog->theme
                 ? $blog->theme->thumbnail( size => 'small' )
-                : MT::Theme->default_theme_thumbnail( size => 'small' ); 
+                : MT::Theme->default_theme_thumbnail( size => 'small' );
             my $blogs_hash = $blog->column_values;
             my %blog_data = %$blogs_hash;
             $blog_data{'theme_thumb'} = $theme_thumb[0];
             push @blogs_json, MT::Util::to_json(\%blog_data);
         }
         $blogs_json = join ",", @blogs_json;
-    
+
 # doLog("blogs_json : " . $blogs_json);
-    
+
         my $MTAppSuperSlideMenu = MTAppjQuery::Tmplset::MTAppSuperSlideMenu;
         $super_slide_menu_js = <<__MTML__;
         <script type="text/javascript">
@@ -349,10 +349,10 @@ sub cb_tmpl_param_edit_entry {
     }
     my $img  = &_config_replace($p->get_config_value('img_elm', 'blog:'.$blog_id));
     my $file = &_config_replace($p->get_config_value('file_elm', 'blog:'.$blog_id));
-    
+
     ### Variable
     my $static_plugin_path = $static_path . $p->{envelope} . '/';
-    
+
     ### SetVar(param)
     $param->{blog_path} = $blog_path;
     $param->{upload_folder} = $p->get_config_value('upload_folder', 'blog:'.$blog_id);
@@ -362,7 +362,7 @@ sub cb_tmpl_param_edit_entry {
     <script type="text/javascript" src="${static_plugin_path}lib/uploadify/scripts/swfobject.js"></script>
     <script type="text/javascript" src="${static_plugin_path}lib/uploadify/scripts/jquery.uploadify.v2.1.0.js"></script>
 __MTML__
-    
+
     ### Add uploadify-widget
     my $host_node = $tmpl->getElementById('entry-status-widget');
     my $new_node = $tmpl->createElement('app:widget',
@@ -520,9 +520,9 @@ sub _config_replace {
 sub _parse {
     # http://d.hatena.ne.jp/perlcodesample/touch/20080621/1214058703
     my ($text, $headers) = @_;
-    
+
     my @lines = split('\|', $text);
-    
+
     my $items_hash_list = [];
     foreach my $line (@lines){
         my @items = split(',', $line);
