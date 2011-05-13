@@ -24,6 +24,7 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             ['slidemenu',     {Default => 1,  Scope => 'system'}],
             ['superslidemenu',{Default => 0,  Scope => 'system'}],
             ['jqplugin',      {Default => '<!-- <__trans phrase="JavaScript free area of system"> -->', Scope => 'system'}],
+            ['jquery_ready',  {Default => 0,  Scope => 'system'}],
 
             ['jqselectable',  {Default => 0,  Scope => 'system'}],
 
@@ -34,6 +35,7 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             ['slidemenu',     {Default => 1,  Scope => 'blog'}],
             ['superslidemenu',{Default => 0,  Scope => 'blog'}],
             ['jqplugin',      {Default => '<!-- <__trans phrase="JavaScript free area of website or blog"> -->', Scope => 'blog'}],
+            ['jquery_ready',  {Default => 0,  Scope => 'blog'}],
 
             ['jqselectable',  {Default => 0,  Scope => 'blog'}],
 

@@ -59,6 +59,7 @@ sub cb_tmpl_source_header {
     my $op_slidemenu      = $p->get_config_value('slidemenu', $scope);
     my $op_superslidemenu = $p->get_config_value('superslidemenu', $scope);
     my $op_freearea       = $p->get_config_value('jqplugin', $scope);
+    my $op_jquery_ready   = $p->get_config_value('jquery_ready', $scope);
     my $op_jqselectable   = $p->get_config_value('jqselectable', $scope);
 
 ## debug
@@ -90,6 +91,31 @@ doLog($debug_msg, $debug_code);
     ${target}
 __MTML__
     $$tmpl_ref =~ s/$target/$preset/g;
+
+    ### jQueryの読み込み直後に実行できるjquery_ready.jsをセットする
+    if ($op_jquery_ready) {
+        my $load_jquery_min =
+        '<script type="text/javascript" src="<$mt:var name="static_uri"$>jquery/jquery.min.js?v=<mt:var name="mt_version_id" escape="URL">"></script>';
+        my $load_jquery =
+        '<script type="text/javascript" src="<$mt:var name="static_uri"$>jquery/jquery.js?v=<mt:var name="mt_version_id" escape="URL">"></script>';
+
+        my $jquery_ready_min = <<__MTML__;
+    $load_jquery_min
+    <script type="text/javascript" src="${static_plugin_path}js/jquery_ready.js"></script>
+__MTML__
+
+        my $jquery_ready = <<__MTML__;
+    $load_jquery
+    <script type="text/javascript" src="${static_plugin_path}js/jquery_ready.js"></script>
+__MTML__
+
+        $load_jquery_min = quotemeta($load_jquery_min);
+        $load_jquery = quotemeta($load_jquery);
+
+        $$tmpl_ref =~ s!$load_jquery_min!$jquery_ready_min!g;
+        $$tmpl_ref =~ s!$load_jquery!$jquery_ready!g;
+    }
+
 
     ### スライドメニューをセットする
     if ($op_slidemenu && !$op_superslidemenu) {
