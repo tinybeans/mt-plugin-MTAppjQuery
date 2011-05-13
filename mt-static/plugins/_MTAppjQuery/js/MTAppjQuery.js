@@ -781,7 +781,7 @@
     };
     $.MTAppInCats.defaults = {
         categories: '',
-        code: function(){}
+        code: function(){ return; }
     };
     // end - $.MTAppInCats();
 
