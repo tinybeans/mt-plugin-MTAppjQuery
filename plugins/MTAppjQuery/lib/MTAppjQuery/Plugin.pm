@@ -342,11 +342,9 @@ sub cb_tmpl_param_edit_entry {
 
     ### $p->
     my $p = MT->component('mt_app_jquery');
-    my $active_uploadify = $p->get_config_value('active_uploadify', 'blog:'.$blog_id);
-    my $no_uploadify     = $p->get_config_value('no_uploadify', 'system');
-    if ($active_uploadify == 0 || $no_uploadify == 1) {
-        return;
-    }
+    my $scope = (!$blog_id) ? 'system' : 'blog:'.$blog_id;
+    my $active_uploadify = $p->get_config_value('active_uploadify', $scope);
+    return unless $active_uploadify;
     my $img  = &_config_replace($p->get_config_value('img_elm', 'blog:'.$blog_id));
     my $file = &_config_replace($p->get_config_value('file_elm', 'blog:'.$blog_id));
 
@@ -391,7 +389,7 @@ __MTML__
 __MTML__
     $new_node->innerHTML($inner_html);
 # 最後にコメント外す
-    $new_node->setAttribute('class','hidden');
+#     $new_node->setAttribute('class','hidden');
     $tmpl->insertAfter($new_node, $host_node);
 
     ### Add asset_uploadify_meta
@@ -407,7 +405,7 @@ __MTML__
 __MTML__
     $new_node->innerHTML($inner_html);
 # 最後にコメント外す
-    $new_node->setAttribute('class','hidden');
+#     $new_node->setAttribute('class','hidden');
     $tmpl->insertAfter($new_node, $host_node);
 
 # doLog('End cb_tmpl_param_edit_entry!');
@@ -421,21 +419,22 @@ sub cb_cms_post_save_entry {
     require MT::ObjectAsset;
 # doLog('Start cb_cms_post_save_entry!');
 # doLog('========= $obj [start] ==========');
-# doLog(Dumper($obj));
+doLog(Dumper($obj));
 # doLog('========= $obj [ end ] ==========');
     ### $app->
     my $blog_id = $app->param('blog_id') || 0;
+doLog('blog_id from param: '.$app->param('blog_id'));
     my $q = $app->param;
 
     ### $obj->
     my $entry_id = $obj->id;
-# doLog('$entry_id : '.$entry_id);
+doLog('entry_id : '.$entry_id);
 
     ### $p-> ($plugin->)
     my $p = MT->component('mt_app_jquery');
-    my $active_uploadify = $p->get_config_value('active_uploadify', 'blog:'.$blog_id);
-    my $no_uploadify     = $p->get_config_value('no_uploadify', 'system');
-    return if ($active_uploadify == 0 || $no_uploadify == 1);
+    my $scope = (!$blog_id) ? 'system' : 'blog:'.$blog_id;
+    my $active_uploadify = $p->get_config_value('active_uploadify', $scope);
+    return unless $active_uploadify;
 
     my $asset_uploadify = $q->param('asset_uploadify');
     my $asset_uploadify_meta = $q->param('asset_uploadify_meta');

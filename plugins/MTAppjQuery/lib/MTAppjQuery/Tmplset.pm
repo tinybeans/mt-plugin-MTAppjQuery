@@ -880,10 +880,10 @@ sub uploadify_widget_innerHTML {
     }
     
     jQuery("#uploadify").uploadify({
-        'uploader'   : '<mt:var name="static_plugin_path">uploadify/scripts/uploadify.swf',
-        'script'     : '<mt:var name="static_plugin_path">uploadify/scripts/uploadify.php',
-        'checkScript': '<mt:var name="static_plugin_path">uploadify/scripts/check.php',
-        'cancelImg'  : '<mt:var name="static_plugin_path">uploadify/cancel.png',
+        'uploader'   : '<mt:var name="static_plugin_path">lib/uploadify/scripts/uploadify.swf',
+        'script'     : '<mt:var name="static_plugin_path">lib/uploadify/scripts/uploadify.php',
+        'checkScript': '<mt:var name="static_plugin_path">lib/uploadify/scripts/check.php',
+        'cancelImg'  : '<mt:var name="static_plugin_path">lib/uploadify/cancel.png',
         'folder'     : '<mt:var name="blog_path"><mt:if name="upload_folder">/<mt:var name="upload_folder"></mt:if>',
         'sizeLimit'  : '1000000',
         'buttonText' : '<__trans_section component="mt_app_jquery"><__trans phrase="Select files"></__trans_section>',

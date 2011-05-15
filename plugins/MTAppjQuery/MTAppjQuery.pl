@@ -40,13 +40,10 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             ['jqselectable',  {Default => 0,  Scope => 'blog'}],
 
             # Uploadify
-        	['no_uploadify',    {Default => 1, Scope => 'system'}],
-        	['active_uploadify',{Default => 1, Scope => 'blog'}],
-        	['upload_folder',   {Default => '', Scope => 'blog'}],
-        	['img_elm',         {Default => '<img src="__filepath__" alt="__filename__" />', Scope => 'blog'}],
-        	['img_elm',         {Default => '<img src="__filepath__" alt="__filename__" />', Scope => 'system'}],
-        	['file_elm',        {Default => '<a href="__filepath__">__filename__</a>', Scope => 'blog'}],
-        	['file_elm',        {Default => '<a href="__filepath__">__filename__</a>', Scope => 'system'}],
+            ['active_uploadify',{Default => 0,  Scope => 'blog'}],
+            ['upload_folder',   {Default => '', Scope => 'blog'}],
+            ['img_elm',         {Default => '<img src="__filepath__" alt="__filename__" />', Scope => 'blog'}],
+            ['file_elm',        {Default => '<a href="__filepath__">__filename__</a>', Scope => 'blog'}],
     ]),
 });
 MT->add_plugin($plugin);
