@@ -345,15 +345,15 @@ sub cb_tmpl_param_edit_entry {
     my $scope = (!$blog_id) ? 'system' : 'blog:'.$blog_id;
     my $active_uploadify = $p->get_config_value('active_uploadify', $scope);
     return unless $active_uploadify;
-    my $img  = &_config_replace($p->get_config_value('img_elm', 'blog:'.$blog_id));
-    my $file = &_config_replace($p->get_config_value('file_elm', 'blog:'.$blog_id));
+    my $img  = &_config_replace($p->get_config_value('img_elm', $scope));
+    my $file = &_config_replace($p->get_config_value('file_elm', $scope));
 
     ### Variable
     my $static_plugin_path = $static_path . $p->{envelope} . '/';
 
     ### SetVar(param)
     $param->{blog_path} = $blog_path;
-    $param->{upload_folder} = $p->get_config_value('upload_folder', 'blog:'.$blog_id);
+    $param->{upload_folder} = $p->get_config_value('upload_folder', $scope);
     $param->{static_plugin_path} = $static_plugin_path;
     $param->{uploadify_source} = <<__MTML__;
     <link href="${static_plugin_path}lib/uploadify/css/uploadify.css" rel="stylesheet" type="text/css" />
