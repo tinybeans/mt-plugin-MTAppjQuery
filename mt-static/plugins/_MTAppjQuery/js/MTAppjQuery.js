@@ -905,6 +905,12 @@
 
     // -------------------------------------------------
     //  $.MTAppDebug()
+    //
+    //  Description:
+    //    ページの情報や各種一覧でIDを表示する。
+    //
+    //  Usage:
+    //    $.MTAppDebug();
     // -------------------------------------------------
     $.MTAppDebug = function(options){
         // var op = $.extend({}, $.MTAppDebug.defaults, options);
