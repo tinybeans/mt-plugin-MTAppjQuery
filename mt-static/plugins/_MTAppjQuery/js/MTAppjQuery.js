@@ -909,8 +909,7 @@
     $.MTAppDebug = function(options){
         // var op = $.extend({}, $.MTAppDebug.defaults, options);
 
-        // 共通
-        // bodyのID
+        // Show the page information
         var body = $('body'),
             bodyID = body.attr('id'),
             bodyID = (bodyID != '') ? '#' + bodyID: '',
@@ -947,43 +946,50 @@
             $('#mtapp-debug-pageinfo-content').slideToggle();
         });
 
-        // ブログ記事一覧
-        // IDを表示、下書きの背景を変更
-        if ($('#entry-listing-form').length) {
-            $('#entry-table tbody tr').each(function(){
-                if ($(this).find('td.title').find('span.draft').length) {
-                    $(this).css({'background':'#FFCBD0'});
-                }
+        // [ブログ記事の管理]
+        if (mtappVars.screen_id == 'list-entry') {
+            //  下書きの背景を変更
+            $(window).bind('listReady', function(){
+                $('#entry-table').find('span.draft').closest('tr').css({'background':'#FFCBD0'});
             });
         }
 
-        // カテゴリ一覧
-        // タグ一覧
-        // IDを表示
-        if ($('body#list-tag').length) {
-            $('#tag-listing-table tbody tr').each(function(){
-                var id = $(this).attr('id').replace(/tag-/,'');
-                $(this).find('td.name').prepend(id,'[',']');
+        // [カテゴリの管理] [フォルダの管理]
+        if (mtappVars.template_filename == 'list_category') {
+            // IDを表示
+            $(window).bind('listReady', function(){
+                $('#root').find('div').each(function(){
+                    var id = $(this).attr('id');
+                    $(this).MTAppshowHint({text: 'ID: ' + id});
+                });
             });
         }
-// タグ、コメント、トラックバック、メンバー、テンプレート、ウィジェット、カスタムフィールド
-        // ウェブページ一覧
-        // フォルダ一覧
-        // IDを表示
-        if ($('body#list-folder').length) {
-            $('#folder-listing-table tbody tr').each(function(){
-                var id = $(this).find('td.cb input:checkbox').val();
-                $(this).find('td:eq(2)').prepend(id,'[',']');
+
+        // [テンプレートの管理] [ウィジェットの管理]
+        if (mtappVars.template_filename == 'list_template' || mtappVars.template_filename == 'list_widget') {
+            $('table.listing-table')
+                .find('th.cb').each(function(){
+                    $(this).insertListingColum('after', 'th', 'ID', 'id num');
+                }).end()
+                .find('td.cb').each(function(){
+                    var id = $(this).find('input:checkbox').val();
+                    $(this).insertListingColum('after', 'td', id, 'id num');
+                });
+        }
+
+        // list_common.tmplのリスト画面で表示オプションにIDがないページ
+        if (mtappVars.template_filename == 'list_common' && !$('#disp_cols label:contains("ID")').length) {
+            // IDを表示
+            $(window).bind('listReady', function(){
+                $('table.listing-table').find('tr').each(function(){
+                    var id = $(this).attr('id');
+                    $(this)
+                        .find('th.cb').insertListingColum('after', 'th', 'ID', 'id num').end()
+                        .find('td.cb').insertListingColum('after', 'td', id, 'id num');
+                });
             });
         }
-        // テンプレート一覧
-        // IDを表示
-        if ($('body#list-template').length) {
-            $('#main-content-inner tr').each(function(){
-                var id = $(this).find('td.cb input:checkbox').val();
-                $(this).find('td.template-name').prepend(id,'[',']');
-            });
-        }
+
     };
 /*
     $.MTAppDebug.defaults = {
