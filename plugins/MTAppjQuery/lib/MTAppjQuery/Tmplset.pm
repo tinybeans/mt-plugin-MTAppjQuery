@@ -794,38 +794,6 @@ sub uploadify_widget_innerHTML {
     <div id="fileQueue"></div>
     <div id="upload_files"></div>
     <mt:setvarblock name="jq_js_include" append="1">
-//    //////////
-//    jQuery.fn.extend({
-//        printObj: function(obj, objStr) {
-//            var objName = jQuery('<p/>').text(objStr).css({'fontWeight': 'bold', 'fontSize': '120%'});
-//            var props = jQuery('<dl/>');
-//            for (var prop in obj){
-//                jQuery(props).append('<dt><em>' + prop + '</em></dt><dd>' + obj[prop] + '</dd>');
-//            }
-//            jQuery(this).append(objName).append(props);
-//        }
-//    });
-//    //////////
-    // http://d.hatena.ne.jp/okinaka/20090727/1248671860 [start]
-    jQuery.fn.extend({
-        insertAtCaret: function(v) {
-          var o = this.get(0);
-          o.focus();
-          if (jQuery.browser.msie) {
-            var r = document.selection.createRange();
-            r.text = v;
-            r.select();
-          } else {
-            var s = o.value;
-            var p = o.selectionStart;
-            var np = p + v.length;
-            o.value = s.substr(0, p) + v + s.substr(p);
-            o.setSelectionRange(np, np);
-          }
-        }
-    });
-    // http://d.hatena.ne.jp/okinaka/20090727/1248671860 [ end ]
-
     var uploadifyOnError = function (event,queueID,fileObj,errorObj){
         alert('<__trans_section component="mt_app_jquery"><__trans phrase="You can upload up to 1MB file."></__trans_section>');
     }

@@ -1256,6 +1256,23 @@
                 }
                 $(this)[position](elem);
             });
+        },
+        insertAtCaret: function(text) {
+            return this.each(function(){
+                var self = $(this)[0];
+                self.focus();
+                if ($.browser.msie) {
+                    var range = document.selection.createRange();
+                    range.text = text;
+                    range.select();
+                } else {
+                    var val = self.value,
+                        beforeCaret = self.selectionStart,
+                        afterCaret = beforeCaret + text.length;
+                    self.value = val.substr(0, beforeCaret) + text + val.substr(beforeCaret);
+                    self.setSelectionRange(afterCaret, afterCaret);
+                }
+            });
         }
     });
 
