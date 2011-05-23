@@ -1174,6 +1174,36 @@
 
 
     // -------------------------------------------------
+    //  $(foo).MTAppTabSpace();
+    //
+    //  Description:
+    //    ブログ記事編集画面の複数ファイルアップロード機能（ベータ版）を有効にする。
+    //
+    //  Usage:
+    //    $(foo).MTAppTabSpace(options);
+    //
+    //  Options:
+    //    text: {String} タブキーが押されたときに入力される文字列。初期値は半角スペース4つ。
+    // -------------------------------------------------
+    $.fn.MTAppTabSpace = function(options) {
+        var op = $.extend({}, $.fn.MTAppTabSpace.defaults, options);
+        return this.each(function(){
+            $(this).keydown(function(e){
+                var keycode = e.which || e.keyCode;
+                if (keycode == 9) {
+                    $(this).insertAtCaret(op.text);
+                    return false;
+                }
+            });
+        });
+    };
+    $.fn.MTAppTabSpace.defaults = {
+        text: '    '
+    };
+    // end - $(foo).MTAppInlineEdit();
+
+
+    // -------------------------------------------------
     //  Utilities
     //
     //  $(foo).hasClasses(classes);
