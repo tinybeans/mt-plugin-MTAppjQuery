@@ -34,6 +34,7 @@ sub cb_tmpl_source_header {
     my $_type       = $app->param('_type') || 'type';
     my $id          = $app->param('id') || 0;
     my $blog_id     = $app->param('blog_id') || 0;
+    my $author_id   = $app->user->id;
     # オブジェクトのタイプを判別して各オブジェクトのIDを取得する
     my $entry_id    = $_type eq 'entry' ? $id : 0;
     my $page_id     = $_type eq 'page' ? $id : 0;
@@ -131,48 +132,108 @@ __MTML__
     }
 
     ### スーパースライドメニューをセットする
+    my $website_json = '';
+    my $blog_json = '';
+    my $perms_json = '';
     if ($op_superslidemenu) {
+        my @website = MT::Website->load;
+        my @blog = MT::Blog->load;
+
+        require MT::Permission;
+        my @perms = MT::Permission->load({author_id => $author_id})
+            or die "Author has no permissions for blog";
+
+        my (@website_json, @blog_json, @perms_json);
+#         my $user = $app->user;
+#         my $author_id = $user->id;
+#         my $perms = $user->permissions;
+#         doLog($author_id);
+
+        # websiteの内容をJSONに書き出す
+        foreach my $website (@website) {
+            my %website_date = (
+                'id' => $website->id,
+                'name' => $website->name,
+                'parent_id' => $website->parent_id,
+            );
+            push @website_json, MT::Util::to_json(\%website_date);
+        }
+        $website_json = join ",", @website_json;
+        doLog($website_json);
+
+        # blogの内容をJSONに書き出す
+        foreach my $blog (@blog) {
+            my %blog_date = (
+                'id' => $blog->id,
+                'name' => $blog->name,
+                'parent_id' => $blog->parent_id,
+            );
+            push @blog_json, MT::Util::to_json(\%blog_date);
+        }
+        $blog_json = join ",", @blog_json;
+        doLog($blog_json);
+
+        # permissionの内容をJSONに書き出す
+        foreach my $perms (@perms) {
+            my %perms_date = (
+                'blog_id' => $perms->blog_id,
+                'author_id' => $perms->author_id,
+                'permissions' => $perms->permissions,
+            );
+            push @perms_json, MT::Util::to_json(\%perms_date);
+        }
+        $perms_json = join ",", @perms_json;
+        doLog($perms_json);
+
+#         require MT::Permission;
+#         my $blog_perms = MT::Permission->load({ blog_id => $blog_id, author_id => $author_id})
+#             or die "Author has no permissions for blog";
+#         my $out = $blog_perms->can_edit_notifications
+#             or die "Author cannot post to blog";
+#         doLog('can_edit_notifications : ' . $out);
+
+
         ### websiteとblogのjsonを生成
-        my (@websites, @websites_json, @blogs, @blogs_json, $websites_json, $blogs_json);
-        push @websites, MT::Website->load(undef, {unique => 1});
-        push @blogs, MT::Blog->load(undef, {unique => 1});
-
-        foreach my $website (@websites) {
-            my @theme_thumb = $website->theme
-                ? $website->theme->thumbnail( size => 'small' )
-                : MT::Theme->default_theme_thumbnail( size => 'small' );
-            my $websites_hash = $website->column_values;
-            my %website_data = %$websites_hash;
-            $website_data{'theme_thumb'} = $theme_thumb[0];
-            push @websites_json, MT::Util::to_json(\%website_data);
-        }
-        $websites_json = join ",", @websites_json;
-
-        foreach my $blog (@blogs) {
-            my @theme_thumb = $blog->theme
-                ? $blog->theme->thumbnail( size => 'small' )
-                : MT::Theme->default_theme_thumbnail( size => 'small' );
-            my $blogs_hash = $blog->column_values;
-            my %blog_data = %$blogs_hash;
-            $blog_data{'theme_thumb'} = $theme_thumb[0];
-            push @blogs_json, MT::Util::to_json(\%blog_data);
-        }
-        $blogs_json = join ",", @blogs_json;
-
-# doLog("blogs_json : " . $blogs_json);
-
-        my $MTAppSuperSlideMenu = MTAppjQuery::Tmplset::MTAppSuperSlideMenu;
-        $super_slide_menu_js = <<__MTML__;
-        <script type="text/javascript">
-        /* <![CDATA[ */
-        var mtapp_websites_json = [${websites_json}];
-        var mtapp_blogs_json = [${blogs_json}];
-        /* ]]> */
-        </script>
-        <script type="text/javascript">
-        ${MTAppSuperSlideMenu}
-        </script>
-__MTML__
+#         my (@websites, @websites_json, @blogs, @blogs_json, $websites_json, $blogs_json);
+#         push @websites, MT::Website->load(undef, {unique => 1});
+#         push @blogs, MT::Blog->load(undef, {unique => 1});
+# 
+#         foreach my $website (@websites) {
+#             my @theme_thumb = $website->theme
+#                 ? $website->theme->thumbnail( size => 'small' )
+#                 : MT::Theme->default_theme_thumbnail( size => 'small' );
+#             my $websites_hash = $website->column_values;
+#             my %website_data = %$websites_hash;
+#             $website_data{'theme_thumb'} = $theme_thumb[0];
+#             push @websites_json, MT::Util::to_json(\%website_data);
+#         }
+#         $websites_json = join ",", @websites_json;
+# 
+#         foreach my $blog (@blogs) {
+#             my @theme_thumb = $blog->theme
+#                 ? $blog->theme->thumbnail( size => 'small' )
+#                 : MT::Theme->default_theme_thumbnail( size => 'small' );
+#             my $blogs_hash = $blog->column_values;
+#             my %blog_data = %$blogs_hash;
+#             $blog_data{'theme_thumb'} = $theme_thumb[0];
+#             push @blogs_json, MT::Util::to_json(\%blog_data);
+#         }
+#         $blogs_json = join ",", @blogs_json;
+# 
+# # doLog("blogs_json : " . $blogs_json);
+# 
+#         my $MTAppSuperSlideMenu = MTAppjQuery::Tmplset::MTAppSuperSlideMenu;
+#         $super_slide_menu_js = <<__MTML__;
+#         <script type="text/javascript">
+#         /* <![CDATA[ */
+#         var mtapp_websites_json = [${websites_json}];
+#         var mtapp_blogs_json = [${blogs_json}];
+#         /* ]]> */
+#         </script>
+#         <script type="text/javascript">
+#         ${MTAppSuperSlideMenu}
+#         </script>
+# __MTML__
     }
 
     ### user.css をセットする
@@ -225,7 +286,10 @@ __MTML__
         "main_category_id" : <mt:if name="category_id"><mt:var name="category_id"><mt:else>0</mt:if>,
         "screen_id" : "<mt:var name="screen_id">",
         "body_class" : [<mt:setvarblock name="mtapp_body_class">"<mt:var name="screen_type" default="main-screen"> <mt:if name="scope_type" eq="user">user system<mt:else><mt:var name="scope_type"></mt:if><mt:if name="screen_class"> <mt:var name="screen_class"></mt:if><mt:if name="top_nav_loop"> has-menu-nav</mt:if><mt:if name="related_content"> has-related-content</mt:if><mt:if name="edit_screen"> edit-screen</mt:if><mt:if name="new_object"> create-new</mt:if><mt:if name="loaded_revision"> loaded-revision</mt:if><mt:if name="mt_beta"> mt-beta</mt:if>"</mt:setvarblock><mt:var name="mtapp_body_class" regex_replace='/ +/g',' ' regex_replace='/ /g','","'>],
-        "template_filename" : '<mt:var name="template_filename">'
+        "template_filename" : '<mt:var name="template_filename">',
+        "website_json" : [${website_json}],
+        "blog_json" : [${blog_json}],
+        "perms_json" : [${perms_json}]
     }
     /* ]]> */
     </script>
