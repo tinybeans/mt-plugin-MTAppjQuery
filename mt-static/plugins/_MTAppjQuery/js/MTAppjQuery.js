@@ -85,7 +85,7 @@
                 var checked_attr = bool_checked ? ' checked="checked"': '';
                 return [
                     '<label class="mcb-label' + checked_class + '">',
-                        '<input class="mcb-checkbox" type="checkbox" name="' + value + '" value="' + value + '"' + checked_attr + ' />',
+                        '<input class="mcb-checkbox" type="checkbox" value="' + value + '"' + checked_attr + ' />',
                         label,
                     '</label>'
                 ].join('');
