@@ -86,33 +86,6 @@ doLog($debug_msg, $debug_code);
 __MTML__
     $$tmpl_ref =~ s!(<div id="container")!$preset$1!g;
 
-    my ($user_css, $set_blog_id, $user_js, $super_slide_menu_js);
-
-    ### jQueryの読み込み直後に実行できるjquery_ready.jsをセットする
-    if ($op_jquery_ready) {
-        my $load_jquery_min =
-        '<script type="text/javascript" src="<$mt:var name="static_uri"$>jquery/jquery.min.js?v=<mt:var name="mt_version_id" escape="URL">"></script>';
-        my $load_jquery =
-        '<script type="text/javascript" src="<$mt:var name="static_uri"$>jquery/jquery.js?v=<mt:var name="mt_version_id" escape="URL">"></script>';
-
-        my $jquery_ready_min = <<__MTML__;
-    $load_jquery_min
-    <script type="text/javascript" src="${static_plugin_path}js/jquery_ready.js"></script>
-__MTML__
-
-        my $jquery_ready = <<__MTML__;
-    $load_jquery
-    <script type="text/javascript" src="${static_plugin_path}js/jquery_ready.js"></script>
-__MTML__
-
-        $load_jquery_min = quotemeta($load_jquery_min);
-        $load_jquery = quotemeta($load_jquery);
-
-        $$tmpl_ref =~ s!$load_jquery_min!$jquery_ready_min!g;
-        $$tmpl_ref =~ s!$load_jquery!$jquery_ready!g;
-    }
-
-
     ### スライドメニューをセットする
     if ($op_slidemenu && !$op_superslidemenu) {
         my $s_menu_org = MTAppjQuery::Tmplset::s_menu_org;
@@ -125,6 +98,8 @@ __MTML__
         $$tmpl_ref =~ s!$w_menu_org!$w_menu!g;
         $$tmpl_ref =~ s!$b_menu_org!$b_menu!g;
     }
+
+    my ($user_css, $user_js, $super_slide_menu_js);
 
     ### スーパースライドメニューをセットする
     my $website_json = '';
@@ -231,19 +206,8 @@ __MTML__
 # __MTML__
     }
 
-    ### user.css をセットする
-    if ($op_usercss) {
-        $user_css = <<__MTML__;
-    <mt:setvarblock name="html_head" append="1">
-    <link rel="stylesheet" href="${static_plugin_path}css/user.css" type="text/css" />
-    </mt:setvarblock>
-__MTML__
-    }
-
-
-    ### ブログIDなどの変数を定義する
-    $set_blog_id = <<__MTML__;
-    <mt:ignore> screen_id を設定する</mt:ignore>
+    ### jQueryの読み込み前後にmtappVarsとjquery_ready.jsをセットする
+    my $mtapp_vars = <<__MTML__;
     <mt:unless name="screen_id">
         <mt:if name="template_filename" like="list_">
             <mt:setvarblock name="screen_id">list-<mt:var name="object_type"></mt:setvarblock>
@@ -290,6 +254,20 @@ __MTML__
     </script>
 __MTML__
 
+    my $target = '<script type="text/javascript" src="<\$mt:var name="static_uri"\$>jquery/jquery\.(min\.)*js\?v=<mt:var name="mt_version_id" escape="URL">"></script>';
+    my $jquery_ready = $op_jquery_ready ? qq(<script type="text/javascript" src="${static_plugin_path}js/jquery_ready.js"></script>) : '';
+
+    $$tmpl_ref =~ s!($target)!$mtapp_vars  $1\n  $jquery_ready!g;
+
+    ### user.css をセットする
+    if ($op_usercss) {
+        $user_css = <<__MTML__;
+    <mt:setvarblock name="html_head" append="1">
+    <link rel="stylesheet" href="${static_plugin_path}css/user.css" type="text/css" />
+    </mt:setvarblock>
+__MTML__
+    }
+
     ### user.jsをセット
     if ($op_userjs) {
         $user_js = <<__MTML__;
@@ -313,7 +291,6 @@ __MTML__
     $user_css
 
     <mt:setvarblock name="js_include" append="1">
-    $set_blog_id
     $jqselectable
     <mt:var name="uploadify_source">
     <script type="text/javascript" src="${static_plugin_path}js/MTAppjQuery.js"></script>
