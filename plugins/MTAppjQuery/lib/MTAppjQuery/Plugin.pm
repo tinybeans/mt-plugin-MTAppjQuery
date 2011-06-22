@@ -30,7 +30,7 @@ sub cb_tmpl_source_header {
 # doLog('$app->param! : '.Dumper($q));
     my $p = MT->component('mt_app_jquery');
 
-    ### 各種IDを取得する
+    ### 各種情報を取得する
     my $_type       = $app->param('_type') || 'type';
     my $id          = $app->param('id') || 0;
     my $blog_id     = $app->param('blog_id') || 0;
@@ -440,15 +440,15 @@ __MTML__
     $tmpl->insertAfter($new_node, $host_node);
 
     ### Add asset_uploadify
-    my $host_node = $tmpl->getElementById('keywords');
-    my $new_node = $tmpl->createElement('app:Setting',
+    $host_node = $tmpl->getElementById('keywords');
+    $new_node = $tmpl->createElement('app:Setting',
         {
             id    => 'asset_uploadify',
             label => '<__trans_section component="mt_app_jquery"><__trans phrase="A multiple file upload"></__trans_section>',
             label_class => 'top_label',
         }
     );
-    my $inner_html = <<__MTML__;
+    $inner_html = <<__MTML__;
     <input type="text" name="asset_uploadify" id="asset_uploadify" value="<mt:var name="asset_uploadify">" class="full-width" mt:watch-change="1" />
 __MTML__
     $new_node->innerHTML($inner_html);
@@ -457,14 +457,14 @@ __MTML__
     $tmpl->insertAfter($new_node, $host_node);
 
     ### Add asset_uploadify_meta
-    my $new_node = $tmpl->createElement('app:Setting',
+    $new_node = $tmpl->createElement('app:Setting',
         {
             id    => 'asset_uploadify_meta',
             label => '<__trans_section component="mt_app_jquery"><__trans phrase="A multiple file upload meta"></__trans_section>',
             label_class => 'top_label',
         }
     );
-    my $inner_html = <<__MTML__;
+    $inner_html = <<__MTML__;
     <input type="text" name="asset_uploadify_meta" id="asset_uploadify_meta" value="<mt:var name="asset_uploadify_meta">" class="full-width" mt:watch-change="1" />
 __MTML__
     $new_node->innerHTML($inner_html);
