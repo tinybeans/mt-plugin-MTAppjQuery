@@ -26,8 +26,7 @@ sub doLog {
 
 sub cb_tmpl_source_header {
     my ($cb, $app, $tmpl_ref) = @_;
-# my $q = $app->param;
-# doLog('$app->param! : '.Dumper($q));
+    my $version = MT->version_id;
     my $p = MT->component('mt_app_jquery');
 
     ### 各種情報を取得する
