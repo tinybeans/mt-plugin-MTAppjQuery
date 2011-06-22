@@ -78,20 +78,16 @@ __DEBUG__
 doLog($debug_msg, $debug_code);
 ## debug
 
-    my ($user_css, $set_blog_id, $user_js, $super_slide_menu_js);
-
     ### ローディング画像、ツールチップ用ボックスをページに追加する
-    my $target = '<div id="container"';
     my $preset = <<__MTML__;
+    <img id="mtapp-loading" src="${static_path}images/indicator.gif" alt="Loading..." />
     <mt:setvarblock name="html_body_footer" append="1">
-    <img id="mtapp-loading"
-         src="${static_path}images/indicator.gif"
-         alt="<__trans_section component="mt_app_jquery"><__trans phrase="Page Loading"></__trans_section>" />
     <div id="mtapp-tooltip" style="display: none;"></div>
     </mt:setvarblock>
-    ${target}
 __MTML__
-    $$tmpl_ref =~ s/$target/$preset/g;
+    $$tmpl_ref =~ s!(<div id="container")!$preset$1!g;
+
+    my ($user_css, $set_blog_id, $user_js, $super_slide_menu_js);
 
     ### jQueryの読み込み直後に実行できるjquery_ready.jsをセットする
     if ($op_jquery_ready) {
