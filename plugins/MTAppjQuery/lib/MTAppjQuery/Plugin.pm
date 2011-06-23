@@ -229,23 +229,21 @@ __MTML__
 
 sub cb_tmpl_source_footer {
     my ($cb, $app, $tmpl_ref) = @_;
-    my $target = '</body>';
-    my $replace = <<__MTML__;
+    my $replace = <<'__MTML__';
     <mt:var name="mtapp_prepend_footer_js">
     <mt:var name="mtapp_footer_js">
     <script type="text/javascript">
     /* <![CDATA[ */
-    (function(\$){
+    (function($){
         <mt:var name="mtapp_footer_jq">
-        jQuery('#mtapp-loading').hide();
-        jQuery('#container').css('visibility','visible');
+        $('#mtapp-loading').hide();
+        $('#container').css('visibility','visible');
     })(jQuery);
     /* ]]> */
     </script>
     <mt:var name="mtapp_end_body">
-    $target
 __MTML__
-    $$tmpl_ref =~ s!$target!$replace!;
+    $$tmpl_ref =~ s!(</body>)!$replace$1!;
 }
 
 sub cb_tmpl_source_fav_blogs {
