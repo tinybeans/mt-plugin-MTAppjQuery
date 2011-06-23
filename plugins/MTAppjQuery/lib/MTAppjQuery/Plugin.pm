@@ -86,7 +86,7 @@ doLog($debug_msg, $debug_code);
 __MTML__
     $$tmpl_ref =~ s!(<div id="container")!$preset$1!g;
 
-    ### スライドメニューをセットする
+    ### スライドメニューをセットする（MT5.1未対応、対応予定あり）
     if ($op_slidemenu && !$op_superslidemenu) {
         my $s_menu_org = MTAppjQuery::Tmplset::s_menu_org;
         my $w_menu_org = MTAppjQuery::Tmplset::w_menu_org;
@@ -101,7 +101,7 @@ __MTML__
 
     my ($user_css, $user_js, $super_slide_menu_js);
 
-    ### スーパースライドメニューをセットする
+    ### スーパースライドメニューをセットする（MT5.1未対応、対応予定あり）
     my $website_json = '';
     my $blog_json = '';
     my $perms_json = '';
@@ -114,10 +114,6 @@ __MTML__
             or die "Author has no permissions for blog";
 
         my (@website_json, @blog_json, @perms_json);
-#         my $user = $app->user;
-#         my $author_id = $user->id;
-#         my $perms = $user->permissions;
-#         doLog($author_id);
 
         # websiteの内容をJSONに書き出す
         foreach my $website (@website) {
@@ -129,7 +125,6 @@ __MTML__
             push @website_json, MT::Util::to_json(\%website_date);
         }
         $website_json = join ",", @website_json;
-        doLog($website_json);
 
         # blogの内容をJSONに書き出す
         foreach my $blog (@blog) {
@@ -141,7 +136,6 @@ __MTML__
             push @blog_json, MT::Util::to_json(\%blog_date);
         }
         $blog_json = join ",", @blog_json;
-        doLog($blog_json);
 
         # permissionの内容をJSONに書き出す
         foreach my $perms (@perms) {
@@ -153,57 +147,6 @@ __MTML__
             push @perms_json, MT::Util::to_json(\%perms_date);
         }
         $perms_json = join ",", @perms_json;
-        doLog($perms_json);
-
-#         require MT::Permission;
-#         my $blog_perms = MT::Permission->load({ blog_id => $blog_id, author_id => $author_id})
-#             or die "Author has no permissions for blog";
-#         my $out = $blog_perms->can_edit_notifications
-#             or die "Author cannot post to blog";
-#         doLog('can_edit_notifications : ' . $out);
-
-
-        ### websiteとblogのjsonを生成
-#         my (@websites, @websites_json, @blogs, @blogs_json, $websites_json, $blogs_json);
-#         push @websites, MT::Website->load(undef, {unique => 1});
-#         push @blogs, MT::Blog->load(undef, {unique => 1});
-# 
-#         foreach my $website (@websites) {
-#             my @theme_thumb = $website->theme
-#                 ? $website->theme->thumbnail( size => 'small' )
-#                 : MT::Theme->default_theme_thumbnail( size => 'small' );
-#             my $websites_hash = $website->column_values;
-#             my %website_data = %$websites_hash;
-#             $website_data{'theme_thumb'} = $theme_thumb[0];
-#             push @websites_json, MT::Util::to_json(\%website_data);
-#         }
-#         $websites_json = join ",", @websites_json;
-# 
-#         foreach my $blog (@blogs) {
-#             my @theme_thumb = $blog->theme
-#                 ? $blog->theme->thumbnail( size => 'small' )
-#                 : MT::Theme->default_theme_thumbnail( size => 'small' );
-#             my $blogs_hash = $blog->column_values;
-#             my %blog_data = %$blogs_hash;
-#             $blog_data{'theme_thumb'} = $theme_thumb[0];
-#             push @blogs_json, MT::Util::to_json(\%blog_data);
-#         }
-#         $blogs_json = join ",", @blogs_json;
-# 
-# # doLog("blogs_json : " . $blogs_json);
-# 
-#         my $MTAppSuperSlideMenu = MTAppjQuery::Tmplset::MTAppSuperSlideMenu;
-#         $super_slide_menu_js = <<__MTML__;
-#         <script type="text/javascript">
-#         /* <![CDATA[ */
-#         var mtapp_websites_json = [${websites_json}];
-#         var mtapp_blogs_json = [${blogs_json}];
-#         /* ]]> */
-#         </script>
-#         <script type="text/javascript">
-#         ${MTAppSuperSlideMenu}
-#         </script>
-# __MTML__
     }
 
     ### jQueryの読み込み前後にmtappVarsとjquery_ready.jsをセットする
