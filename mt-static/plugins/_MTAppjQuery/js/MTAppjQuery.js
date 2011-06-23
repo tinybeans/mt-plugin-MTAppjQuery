@@ -1177,7 +1177,7 @@
     //  $(foo).MTAppTabSpace();
     //
     //  Description:
-    //    ブログ記事編集画面の複数ファイルアップロード機能（ベータ版）を有効にする。
+    //    textareaでタブキーが押されたときに、スペースなどの文字列を挿入する
     //
     //  Usage:
     //    $(foo).MTAppTabSpace(options);
