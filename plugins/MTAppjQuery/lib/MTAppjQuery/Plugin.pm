@@ -249,10 +249,6 @@ __MTML__
 sub cb_tmpl_source_fav_blogs {
     my ($cb, $app, $tmpl_ref) = @_;
 
-# my $user = $app->user;
-# my $perms = $user->permissions( 12 );
-# doLog('$user : '.Dumper($user->__meta));
-
     ### class="parent-website-n"を付与
     my $classname = 'class="blog-content"';
     my $new_classname = 'class="blog-content parent-website-<mt:if name="blog_id"><mt:var name="website_id"><mt:else>0</mt:if>"';
@@ -337,8 +333,7 @@ __MTML__
     <input type="text" name="asset_uploadify" id="asset_uploadify" value="<mt:var name="asset_uploadify">" class="full-width" mt:watch-change="1" />
 __MTML__
     $new_node->innerHTML($inner_html);
-# 最後にコメント外す
-#     $new_node->setAttribute('class','hidden');
+    $new_node->setAttribute('class','hidden');
     $tmpl->insertAfter($new_node, $host_node);
 
     ### Add asset_uploadify_meta
@@ -353,12 +348,8 @@ __MTML__
     <input type="text" name="asset_uploadify_meta" id="asset_uploadify_meta" value="<mt:var name="asset_uploadify_meta">" class="full-width" mt:watch-change="1" />
 __MTML__
     $new_node->innerHTML($inner_html);
-# 最後にコメント外す
-#     $new_node->setAttribute('class','hidden');
+    $new_node->setAttribute('class','hidden');
     $tmpl->insertAfter($new_node, $host_node);
-
-# doLog('End cb_tmpl_param_edit_entry!');
-
 }
 
 sub cb_cms_post_save_entry {
@@ -366,18 +357,13 @@ sub cb_cms_post_save_entry {
 
     require MT::Asset;
     require MT::ObjectAsset;
-# doLog('Start cb_cms_post_save_entry!');
-# doLog('========= $obj [start] ==========');
-doLog(Dumper($obj));
-# doLog('========= $obj [ end ] ==========');
+
     ### $app->
     my $blog_id = $app->param('blog_id') || 0;
-doLog('blog_id from param: '.$app->param('blog_id'));
     my $q = $app->param;
 
     ### $obj->
     my $entry_id = $obj->id;
-doLog('entry_id : '.$entry_id);
 
     ### $p-> ($plugin->)
     my $p = MT->component('mt_app_jquery');
@@ -407,12 +393,8 @@ doLog('entry_id : '.$entry_id);
     my $assets = _parse($asset_uploadify, $headers);
     my $assets_meta = _parse($asset_uploadify_meta, $headers_meta);
 
-# doLog('ループ前の$assets : '.Dumper($assets));
-# doLog('ループ前の$assets_meta : '.Dumper($assets_meta));
-
     foreach my $asset (@$assets) {
         my $obj = MT::Asset::Image->new;
-# doLog('ループ中の$assets : '.Dumper($asset));
         $obj->blog_id($blog_id);
         $obj->label($asset->{asset_label});
         $obj->url($asset->{asset_url});
@@ -424,7 +406,6 @@ doLog('entry_id : '.$entry_id);
         $obj->created_by($asset->{asset_created_by});
         foreach my $asset_meta (@$assets_meta) {
             if ($asset_meta->{queue_id} == $asset->{queue_id}) {
-# doLog('ループ中の$assets_meta : '.Dumper($asset_meta));
                 $obj->image_width($asset_meta->{image_width});
                 $obj->image_height($asset_meta->{image_height});
             }
@@ -444,7 +425,6 @@ doLog('entry_id : '.$entry_id);
             }
         }
     }
-# doLog('@curt_post_assets_id : '.Dumper(@curt_post_assets_id));
 
     foreach my $asset_id (@curt_post_assets_id) {
         my $obj_asset = MT::ObjectAsset->new;
@@ -452,10 +432,8 @@ doLog('entry_id : '.$entry_id);
         $obj_asset->asset_id($asset_id);
         $obj_asset->object_ds('entry');
         $obj_asset->object_id($entry_id);
-# doLog('===== $obj_asset->save 直前 =====');
         $obj_asset->save or die 'Failed to save the objectasset.';
     }
-# doLog('End cb_cms_post_save_entry!');
 }
 
 sub _config_replace {

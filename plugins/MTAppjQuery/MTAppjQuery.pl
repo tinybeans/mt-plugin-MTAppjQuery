@@ -64,6 +64,7 @@ sub init_registry {
             # 'template_param.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Plugin::cb_tmpl_param_fav_blogs',
             'MT::App::CMS::template_param.edit_entry' => '$mt_app_jquery::MTAppjQuery::Plugin::cb_tmpl_param_edit_entry',
             'MT::App::CMS::cms_post_save.entry' => '$mt_app_jquery::MTAppjQuery::Plugin::cb_cms_post_save_entry',
+            'MT::App::CMS::cms_post_save.page' => '$mt_app_jquery::MTAppjQuery::Plugin::cb_cms_post_save_entry',
         },
     });
 }

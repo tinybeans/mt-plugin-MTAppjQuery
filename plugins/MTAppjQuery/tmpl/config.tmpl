@@ -116,6 +116,7 @@
                 <li><input type="text" value="<mt:var name="img_elm" encode_html="1">" name="img_elm" id="img_elm" /></li>
             </ul>
         </mtapp:setting>
+<mt:Ignore>
         <mtapp:setting
             id="file_elm"
             label="<__trans phrase="a element">"
@@ -125,11 +126,13 @@
                 <li><input type="text" value="<mt:var name="file_elm" encode_html="1">" name="file_elm" id="file_elm" /></li>
             </ul>
         </mtapp:setting>
+</mt:Ignore>
     </mtapp:settinggroup>
 
     <script type="text/javascript">
     // <![CDATA[
     jQuery("#jqplugin")
+        .css({'font-size':'13px'})
         .focus(function(){
             jQuery(this).animate({height: "450px"});
         })
