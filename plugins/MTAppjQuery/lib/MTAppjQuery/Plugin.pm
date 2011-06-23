@@ -62,21 +62,6 @@ sub cb_tmpl_source_header {
     my $op_jquery_ready   = $p->get_config_value('jquery_ready', $scope);
     my $op_jqselectable   = $p->get_config_value('jqselectable', $scope);
 
-## debug
-my $debug_msg = "blog_id = ${blog_id} のページ";
-my $debug_code = <<__DEBUG__;
-scope : $scope
-op_active : $op_active
-op_usercss : $op_usercss
-op_userjs : $op_userjs
-op_slidemenu : $op_slidemenu
-op_superslidemenu : $op_superslidemenu
-op_jsfreearea : $op_freearea
-op_jqselectable : $op_jqselectable
-__DEBUG__
-doLog($debug_msg, $debug_code);
-## debug
-
     ### ローディング画像、ツールチップ用ボックスをページに追加する
     my $preset = <<__MTML__;
     <img id="mtapp-loading" src="${static_path}images/indicator.gif" alt="Loading..." />
@@ -98,8 +83,6 @@ __MTML__
         $$tmpl_ref =~ s!$w_menu_org!$w_menu!g;
         $$tmpl_ref =~ s!$b_menu_org!$b_menu!g;
     }
-
-    my ($user_css, $user_js, $super_slide_menu_js);
 
     ### スーパースライドメニューをセットする（MT5.1未対応、対応予定あり）
     my $website_json = '';
@@ -203,33 +186,25 @@ __MTML__
     $$tmpl_ref =~ s!($target)!$mtapp_vars  $1\n  $jquery_ready!g;
 
     ### user.css をセットする
-    if ($op_usercss) {
-        $user_css = <<__MTML__;
+    my $user_css = ! $op_usercss ? '' : <<__MTML__;
     <mt:setvarblock name="html_head" append="1">
     <link rel="stylesheet" href="${static_plugin_path}css/user.css" type="text/css" />
     </mt:setvarblock>
 __MTML__
-    }
 
     ### user.jsをセット
-    if ($op_userjs) {
-        $user_js = <<__MTML__;
+    my $user_js = ! $op_userjs ? '' : <<__MTML__;
     <script type="text/javascript" src="${static_plugin_path}js/user.js"></script>
 __MTML__
-  }
 
     ### jQselectableプラグインを利用する
-    my $jqselectable = '';
-    if ($op_jqselectable) {
-       $jqselectable = <<__MTML__;
+    my $jqselectable = ! $op_jqselectable ? '' : <<__MTML__;
     <link type="text/css" rel="stylesheet" href="${static_plugin_path}lib/jQselectable/skin/selectable/style.css" />
     <script type="text/javascript" src="${static_plugin_path}lib/jQselectable/js/jQselectable.js"></script>
 __MTML__
-    }
 
     ### 各情報をheadにセットする
-    my $html_head = '<mt:var name="html_head">';
-    my $add_html_head = <<__MTML__;
+    my $prepend_html_head = <<__MTML__;
     <link rel="stylesheet" href="${static_plugin_path}css/MTAppjQuery.css" type="text/css" />
     $user_css
 
@@ -246,13 +221,10 @@ __MTML__
 
     <mt:setvarblock name="mtapp_footer_js">
     $user_js
-    $super_slide_menu_js
     </mt:setvarblock>
-
-    $html_head
 __MTML__
 
-    $$tmpl_ref =~ s/$html_head/$add_html_head/g;
+    $$tmpl_ref =~ s/(<mt:var name="html_head">)/$prepend_html_head$1/g;
 }
 
 sub cb_tmpl_source_footer {
