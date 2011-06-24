@@ -1255,6 +1255,64 @@
     };
     // end - $(foo).MTAppRemoveVal();
 
+
+    // -------------------------------------------------
+    //  $(foo).MTAppNumChecker();
+    //
+    //  Description:
+    //    円不要、カンマ不要、全角数字を半角に変換など
+    //
+    //  Usage:
+    //    $(foo).MTAppNumChecker(options);
+    //
+    //  Options:
+    //    min: {Number} 最小値
+    //    max: {Number} 最大値
+    //    min_msg: {String} 最小値よりも小さかったときのアラートメッセージ
+    //    max_msg: {String} 最大値よりも大きかったときのアラートメッセージ
+    // -------------------------------------------------
+    $.fn.MTAppNumChecker = function(options) {
+        var op = $.extend({}, $.fn.MTAppNumChecker.defaults, options);
+        return this.each(function(){
+            $(this)
+                .after('<span class="mun_msg" style="display:none;color:red;font-weight:bold;"></span>')
+                .keyup(function(){
+                    var self = $(this);
+                    var text = self.val();
+                    text = $.trim(text);
+                    text = text
+                        .replace(/０/g, '0')
+                        .replace(/１/g, '1')
+                        .replace(/２/g, '2')
+                        .replace(/３/g, '3')
+                        .replace(/４/g, '4')
+                        .replace(/５/g, '5')
+                        .replace(/６/g, '6')
+                        .replace(/７/g, '7')
+                        .replace(/８/g, '8')
+                        .replace(/９/g, '9');
+                    self.val(text.replace(/^0|[^0-9]/g, ''));
+                    var span = $(this).next();
+                    var num = Number(text.replace(/^0|[^0-9]/g, ''));
+                    if (num < op.min) {
+                        span.text(op.min_msg).show();
+                    } else if (num > op.max) {
+                        span.text(op.max_msg).show();
+                    } else {
+                        span.text('').hide();
+                    }
+                })
+        });
+    };
+    $.fn.MTAppNumChecker.defaults = {
+        min: 0,
+        max: 10000000000000000000,
+        min_msg: '値が小さすぎます。',
+        max_msg: '値が大きすぎます。'
+    };
+    // end - $(foo).MTAppNumChecker();
+
+
     // -------------------------------------------------
     //  $.MTAppRemoveVal();
     //
