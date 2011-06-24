@@ -1260,7 +1260,7 @@
     //  $(foo).MTAppNumChecker();
     //
     //  Description:
-    //    円不要、カンマ不要、全角数字を半角に変換など
+    //    全角数字を半角に変換、半角数字以外の文字を削除、最小値・最大値の設定など
     //
     //  Usage:
     //    $(foo).MTAppNumChecker(options);
@@ -1312,34 +1312,6 @@
     };
     // end - $(foo).MTAppNumChecker();
 
-
-    // -------------------------------------------------
-    //  $.MTAppRemoveVal();
-    //
-    //  Description:
-    //    ブログ記事・ウェブページ編集画面のメインカラムのinput:text, textareaにクリアボタンを付ける。
-    //
-    //  Usage:
-    //    $.MTAppRemoveVal();
-    // -------------------------------------------------
-    $.MTAppRemoveVal = function(options) {
-        if (mtappVars.screen_id == 'edit-entry' || mtappVars.screen_id == 'edit-page') {
-            $('#sortable div.field-content').find('input:text,textarea').filter(':visible').each(function(){
-                var self = $(this),
-                    self_width = self.outerWidth(),
-                    self_height = self.outerHeight(),
-                    pos_left = self_width - 18,
-                    pos_top = (self_height - 16) / 2 + 16;
-                self.css({'padding-right':'16px'})
-                    .after('<span class="remove-val" style="left:' + pos_left + 'px; top: -' + pos_top + 'px;">クリア</span>')
-                    .next('span.remove-val')
-                        .click(function(){
-                            self.val('');
-                        });
-            });
-        }
-    };
-    // end - $.MTAppRemoveVal();
 
     // -------------------------------------------------
     //  Utilities
