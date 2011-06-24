@@ -1292,7 +1292,7 @@
                         .replace(/８/g, '8')
                         .replace(/９/g, '9');
                     self.val(text.replace(/^0|[^0-9]/g, ''));
-                    var span = $(this).next();
+                    var span = $(this).nextAll('span.mun_msg');
                     var num = Number(text.replace(/^0|[^0-9]/g, ''));
                     if (num < op.min) {
                         span.text(op.min_msg).show();
