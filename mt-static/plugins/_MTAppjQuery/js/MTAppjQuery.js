@@ -1200,8 +1200,60 @@
     $.fn.MTAppTabSpace.defaults = {
         text: '    '
     };
-    // end - $(foo).MTAppInlineEdit();
+    // end - $(foo).MTAppTabSpace();
 
+
+    // -------------------------------------------------
+    //  $.MTAppRemoveVal();
+    //
+    //  Description:
+    //    ブログ記事・ウェブページ編集画面のメインカラムのinput:text, textareaにクリアボタンを付ける。
+    //
+    //  Usage:
+    //    $.MTAppRemoveVal();
+    // -------------------------------------------------
+    $.MTAppRemoveVal = function(options) {
+        if (mtappVars.screen_id == 'edit-entry' || mtappVars.screen_id == 'edit-page') {
+            $('#sortable div.field-content').find('input:text,textarea').filter(':visible').each(function(){
+                var self = $(this),
+                    self_width = self.outerWidth(),
+                    self_height = self.outerHeight(),
+                    pos_left = self_width - 18,
+                    pos_top = (self_height - 16) / 2 + 16;
+                self.after('<span class="remove-val" style="left:' + pos_left + 'px; top: -' + pos_top + 'px;">クリア</span>')
+                    .next('span.remove-val')
+                        .click(function(){
+                            self.val('');
+                        });
+            });
+        }
+    };
+    // end - $.MTAppRemoveVal();
+
+    // -------------------------------------------------
+    //  $(foo).MTAppRemoveVal();
+    //
+    //  Description:
+    //    指定したinput:textにクリアボタンを付ける。
+    //
+    //  Usage:
+    //    $(foo).MTAppRemoveVal();
+    // -------------------------------------------------
+    $.fn.MTAppRemoveVal = function(options) {
+        return this.each(function(){
+            var self = $(this),
+                self_width = self.outerWidth(),
+                self_height = self.outerHeight(),
+                pos_left = self_width - 18,
+                pos_top = (self_height - 16) / 2 + 16;
+            self.after('<span class="remove-val" style="left:' + pos_left + 'px; top: -' + pos_top + 'px;">クリア</span>')
+                .next('span.remove-val')
+                    .click(function(){
+                        self.val('');
+                    });
+        });
+    };
+    // end - $(foo).MTAppRemoveVal();
 
     // -------------------------------------------------
     //  $.MTAppRemoveVal();
