@@ -1200,7 +1200,7 @@
     $.fn.MTAppTabSpace.defaults = {
         text: '    '
     };
-    // end - $(foo).MTAppInlineEdit();
+    // end - $(foo).MTAppTabSpace();
 
 
     // -------------------------------------------------
