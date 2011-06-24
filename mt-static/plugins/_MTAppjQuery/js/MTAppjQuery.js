@@ -1314,6 +1314,59 @@
 
 
     // -------------------------------------------------
+    //  $(foo).MTAppTaxAssist();
+    //
+    //  Description:
+    //    入力された数値から税込み価格、税抜き価格を算出する
+    //
+    //  Usage:
+    //    $(foo).MTAppTaxAssist(options);
+    //
+    //  Options:
+    //    rate: {Number} 消費税率
+    //    fraction: {String} 端数処理 => floor（切り捨て）、ceil（切り上げ）、round（四捨五入）
+    // -------------------------------------------------
+    $.fn.MTAppTaxAssist = function(options) {
+        var op = $.extend({}, $.fn.MTAppTaxAssist.defaults, options);
+        var tax_button = [
+            '<span class="taxes_included button" title="金額から税込み価格を計算する">税込み</span>',
+            '<span class="after_taxes button" title="金額から税抜き価格を計算する">税抜き</span>'
+        ];
+        return this.each(function(){
+            var self = $(this);
+            $(this)
+                .after(tax_button.join(''))
+                .next()
+                    .click(function(){
+                        var val = Number(self.val()) * 1.05;
+                        self.val(fraction(val));
+                    })
+                .next()
+                    .click(function(){
+                        var val = Number(self.val()) / 1.05;
+                        self.val(fraction(val));
+                    });
+        });
+        function fraction(num){
+            if (op.fraction == 'floor') {
+                return Math.floor(num);
+            } else if (op.fraction == 'ceil') {
+                return Math.ceil(num);
+            } else if (op.fraction == 'round') {
+                return Math.round(num);
+            } else {
+                return num;
+            }
+        }
+    };
+    $.fn.MTAppTaxAssist.defaults = {
+        rate: 0.05,
+        fraction: 'floor' // floor（切り捨て）、ceil（切り上げ）、round（四捨五入）
+    };
+    // end - $(foo).MTAppTaxAssist();
+
+
+    // -------------------------------------------------
     //  Utilities
     //
     //  $(foo).hasClasses(classes);
