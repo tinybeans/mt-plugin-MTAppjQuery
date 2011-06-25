@@ -1367,6 +1367,53 @@
 
 
     // -------------------------------------------------
+    //  $(foo).MTAppDateAssist();
+    //
+    //  Description:
+    //    今日、明日、明後日をワンクリックで入力する
+    //
+    //  Usage:
+    //    $(foo).MTAppDateAssist();
+    // -------------------------------------------------
+    $.fn.MTAppDateAssist = function(options) {
+        var op = $.extend({}, $.fn.MTAppDateAssist.defaults, options);
+        var d = new Date(),
+            ms = d.getTime();
+
+        var buttons = [
+            '<span class="day_0 button">今日</span>',
+            '<span class="day_1 button">明日</span>',
+            '<span class="dai_2 button">明後日</span>'
+        ];
+
+        return this.each(function(){
+            var self = $(this);
+            self.closest('.field-content')
+                .append(buttons.join(''))
+                .find('.day_0')
+                    .click(function(){
+                        self.val(getDateItem(ms));
+                    })
+                    .next()
+                        .click(function(){
+                            self.val(getDateItem(ms + 86400000));
+                        })
+                    .next()
+                        .click(function(){
+                            self.val(getDateItem(ms + 172800000));
+                        });
+        });
+        function getDateItem(ms){
+            var d = new Date();
+            d.setTime(ms);
+            return d.getFullYear() + '-' + $.digit(d.getMonth() + 1) + '-' + $.digit(d.getDate());
+        }
+    };
+    $.fn.MTAppDateAssist.defaults = {};
+    // end - $(foo).MTAppDateAssist();
+
+
+    // -------------------------------------------------
     //  Utilities
     //
     //  $(foo).hasClasses(classes);
