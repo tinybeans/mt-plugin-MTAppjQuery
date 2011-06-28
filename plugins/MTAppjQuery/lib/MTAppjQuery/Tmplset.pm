@@ -865,8 +865,8 @@ sub uploadify_widget_innerHTML {
         var asset_meta = '';
         jQuery("img.uploadify_image").each(function(){
             asset_meta += jQuery(this).attr('id') + ',';
-            asset_meta += jQuery(this).width() + ',';
-            asset_meta += jQuery(this).height();
+            asset_meta += '0,';
+            asset_meta += '0';
             asset_meta += '|';
         });
         jQuery("#asset_uploadify_meta").val(asset_meta.replace(/\|$/,''));
