@@ -310,7 +310,7 @@ __MTML__
     my $host_node = $tmpl->getElementById('entry-status-widget');
     my $new_node = $tmpl->createElement('app:widget',
         {
-            id    => 'uploadify-widget',
+            id    => 'entry-uploadify-widget',
             label => '<__trans_section component="mt_app_jquery"><__trans phrase="A multiple file upload"></__trans_section>',
         }
     );

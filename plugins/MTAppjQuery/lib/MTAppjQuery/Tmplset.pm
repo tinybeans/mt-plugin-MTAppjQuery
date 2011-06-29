@@ -815,7 +815,7 @@ sub uploadify_widget_innerHTML {
                     'width':'200px',
                     'padding':'10px 0'
                 });
-            jQuery("#uploadify-widget").find('div.widget-content').append(img);
+            jQuery("#entry-uploadify-widget").find('div.widget-content').append(img);
         } else {
             jQuery('#editor-content-textarea').insertAtCaret('__FILES__' + "\n");
         }
