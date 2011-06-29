@@ -53,7 +53,7 @@ THE SOFTWARE.
 }
 
 /* modified by Tomohiro Okuwaki */
-#uploadify-widget .widget-content {
+#entry-uploadify-widget .widget-content {
     text-align: center;
 }
 #fileQueue {
