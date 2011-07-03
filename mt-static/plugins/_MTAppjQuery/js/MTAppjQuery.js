@@ -1416,6 +1416,106 @@
 
 
     // -------------------------------------------------
+    //  $.MTAppSortableBatchEdit();
+    //
+    //  Description:
+    //    ブログ記事・ウェブページ一括編集画面をソート可能にして、日付を自動変更する
+    //
+    //  Usage:
+    //    $.MTAppSortableBatchEdit(options);
+    //
+    //  Options:
+    //    target: 自動変更する日付の種類を指定。公開日'created_on'または更新日'modified_on'
+    //    date_change: 日付の自動変更を無効にする（並び替えのみ有効にする）
+    // -------------------------------------------------
+    $.MTAppSortableBatchEdit = function(options){
+        var op = $.extend({}, $.MTAppSortableBatchEdit.defaults, options);
+
+        if (mtappVars.screen_id.indexOf('batch-edit-') < 0) return;
+        $('#' + mtappVars.screen_id.replace(/batch-edit-/,'') + '-listing-table')
+            .find('tr')
+                .css({'cursor':'move'})
+            .end()
+            .find('tbody')
+                .sortable({
+                    items: 'tr',
+                    cursor: 'move',
+                    placeholder: 'mtapp-state-highlight',
+                    start: function(ev, ui){
+                        $(ui.placeholder).height($(ui.item).height());
+                    },
+                    sort: function(ev, ui){
+                        ui.item.css({
+                            'background-color': '#F6F1E1',
+                            'border': '1px solid #CACACA'
+                        });
+                    },
+                    stop: function(ev, ui){
+                        ui.item.css({
+                            'background-color': 'inherit',
+                            'border': 'none'
+                        });
+                    },
+                    update: function(ev, ui){
+                        if (! op.date_change) return;
+                        if (op.target == 'created_on' || op.target == 'modified_on') {
+                            // 公開日か更新日か
+                            var n = op.target == 'created_on' ? 0 : 1;
+                            var input = ui.item.find('td.datetime:eq(' + n + ') input:text');
+                            var curr_dateitem = input.val(),
+                                next_dateitem = ui.item.next().find('td.datetime:eq(' + n + ') input:text').val(),
+                                prev_dateitem = ui.item.prev().find('td.datetime:eq(' + n + ') input:text').val();
+                            var curr_date = getDateObj(curr_dateitem),
+                                next_date = getDateObj(next_dateitem),
+                                prev_date = getDateObj(prev_dateitem);
+                            var curr_getTime = curr_date ? curr_date.getTime() : 0,
+                                next_getTime = next_date ? next_date.getTime() : 0,
+                                prev_getTime = prev_date ? prev_date.getTime() : 0;
+
+                            var new_getTime = 0;
+                            if (next_getTime && prev_getTime) {
+                                new_getTime = Math.floor( (prev_getTime + next_getTime) / 2 );
+                            } else if (next_getTime == 0 || prev_getTime == 0) {
+                                new_getTime = (next_getTime + prev_getTime) * 2 - curr_getTime;
+                            }
+
+                            curr_date.setTime(new_getTime);
+                            var ymd = [
+                                    curr_date.getFullYear(),
+                                    $.digit(curr_date.getMonth() + 1),
+                                    $.digit(curr_date.getDate())
+                                ],
+                                hms = [
+                                    $.digit(curr_date.getHours()),
+                                    $.digit(curr_date.getMinutes()),
+                                    $.digit(curr_date.getSeconds())
+                                ];
+                            input.val(ymd.join('-') + ' ' + hms.join(':'));
+                        }
+                    }
+                });
+
+        function getDateObj(dateitem){
+            if (! dateitem) return null;
+            var _d = dateitem.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
+            var d = new Date();
+            d.setFullYear(_d[1]);
+            d.setMonth(_d[2] - 1);
+            d.setDate(_d[3]);
+            d.setHours(_d[4]);
+            d.setMinutes(_d[5]);
+            d.setSeconds(_d[6]);
+            return d;
+        }
+    };
+    $.MTAppSortableBatchEdit.defaults = {
+        target: 'created_on', // created_on, modified_on
+        date_change: true
+    };
+    // end - $.MTAppSortableBatchEdit();
+
+
+    // -------------------------------------------------
     //  Utilities
     //
     //  $(foo).hasClasses(classes);
