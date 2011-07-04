@@ -53,18 +53,18 @@ sub init_registry {
     $plugin->registry({
         callbacks => {
             'MT::App::CMS::template_source.header' => {
-                handler => '$mt_app_jquery::MTAppjQuery::Callbacks::cb_tmpl_source_header',
+                handler => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_header',
                 priority => 10,
             },
             'MT::App::CMS::template_source.footer' => {
-                handler => '$mt_app_jquery::MTAppjQuery::Callbacks::cb_tmpl_source_footer',
+                handler => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_footer',
                 priority => 10,
             },
-            'MT::App::CMS::template_source.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Callbacks::cb_tmpl_source_fav_blogs',
-            # 'template_param.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Callbacks::cb_tmpl_param_fav_blogs',
-            'MT::App::CMS::template_param.edit_entry' => '$mt_app_jquery::MTAppjQuery::Callbacks::cb_tmpl_param_edit_entry',
-            'MT::App::CMS::cms_post_save.entry' => '$mt_app_jquery::MTAppjQuery::Callbacks::cb_cms_post_save_entry',
-            'MT::App::CMS::cms_post_save.page' => '$mt_app_jquery::MTAppjQuery::Callbacks::cb_cms_post_save_entry',
+            'MT::App::CMS::template_source.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_favorite_blogs',
+            # 'template_param.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_favorite_blogs',
+            'MT::App::CMS::template_param.edit_entry' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_edit_entry',
+            'MT::App::CMS::cms_post_save.entry' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_entry',
+            'MT::App::CMS::cms_post_save.page' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_entry',
         },
     });
 }

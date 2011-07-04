@@ -1,4 +1,4 @@
-package MTAppjQuery::Plugin;
+package MTAppjQuery::Callbacks;
 use strict;
 use utf8;
 use MT::Website;
@@ -24,7 +24,7 @@ sub doLog {
 ##
 ###
 
-sub cb_tmpl_source_header {
+sub template_source_header {
     my ($cb, $app, $tmpl_ref) = @_;
     my $version = MT->version_id;
     my $p = MT->component('mt_app_jquery');
@@ -227,7 +227,7 @@ __MTML__
     $$tmpl_ref =~ s/(<mt:var name="html_head">)/$prepend_html_head$1/g;
 }
 
-sub cb_tmpl_source_footer {
+sub template_source_footer {
     my ($cb, $app, $tmpl_ref) = @_;
     my $replace = <<'__MTML__';
     <mt:var name="mtapp_prepend_footer_js">
@@ -246,7 +246,7 @@ __MTML__
     $$tmpl_ref =~ s!(</body>)!$replace$1!;
 }
 
-sub cb_tmpl_source_fav_blogs {
+sub template_source_favorite_blogs {
     my ($cb, $app, $tmpl_ref) = @_;
 
     ### class="parent-website-n"を付与
@@ -266,12 +266,12 @@ sub cb_tmpl_source_fav_blogs {
 
 }
 
-# sub cb_tmpl_param_fav_blogs {
+# sub template_param_favorite_blogs {
 #     my ($cb, $app, $param, $tmpl) = @_;
 #     $param->{'blogs_json'} = ('あ','い','う');
 # }
 
-sub cb_tmpl_param_edit_entry {
+sub template_param_edit_entry {
     my ($cb, $app, $param, $tmpl) = @_;
 # doLog(Dumper($param));
     ### $app->
@@ -352,7 +352,7 @@ __MTML__
     $tmpl->insertAfter($new_node, $host_node);
 }
 
-sub cb_cms_post_save_entry {
+sub cms_post_save_entry {
     my ($cb, $app, $obj, $orig_obj) = @_;
 
     require MT::Asset;
