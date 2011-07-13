@@ -277,6 +277,10 @@ sub template_param_edit_entry {
     ### $app->
     my $host        = $app->{__host};
     my $static_path = $app->static_path;
+    my $blog = $app->blog;
+    my $user = $app->user;
+
+    return if (! &is_user_can($blog, $user, 'upload'));
 
     ### $param->
     my $blog_id   = $param->{blog_id} || 0;
@@ -443,8 +447,8 @@ sub _config_replace {
     return $str;
 }
 
+# http://d.hatena.ne.jp/perlcodesample/touch/20080621/1214058703
 sub _parse {
-    # http://d.hatena.ne.jp/perlcodesample/touch/20080621/1214058703
     my ($text, $headers) = @_;
 
     my @lines = split('\|', $text);
@@ -457,6 +461,25 @@ sub _parse {
         push @{ $items_hash_list },{ %items_hash };
     }
     wantarray ? return @{ $items_hash_list } : return $items_hash_list;
+}
+
+# Thank you very much!!
+# From alfasado/mt-plugin-multi-uploader - GitHub
+# https://github.com/alfasado/mt-plugin-multi-uploader/blob/master/plugins/MultiUploader/lib/MultiUploader/Util.pm
+sub is_user_can {
+    my ( $blog, $user, $permission ) = @_;
+    $permission = 'can_' . $permission;
+    my $perm = $user->is_superuser;
+    unless ( $perm ) {
+        if ( $blog ) {
+            my $admin = 'can_administer_blog';
+            $perm = $user->permissions( $blog->id )->$admin;
+            $perm = $user->permissions( $blog->id )->$permission unless $perm;
+        } else {
+            $perm = $user->permissions()->$permission;
+        }
+    }
+    return $perm;
 }
 
 1;
