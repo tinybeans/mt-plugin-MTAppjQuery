@@ -359,11 +359,16 @@ __MTML__
 sub cms_post_save_entry {
     my ($cb, $app, $obj, $orig_obj) = @_;
 
+    my $blog = $app->blog;
+    my $user = $app->user;
+
+    return if (! &is_user_can($blog, $user, 'upload'));
+
     require MT::Asset;
     require MT::ObjectAsset;
 
     ### $app->
-    my $blog_id = $app->param('blog_id') || 0;
+    my $blog_id = $blog->id || 0;
     my $q = $app->param;
 
     ### $obj->
