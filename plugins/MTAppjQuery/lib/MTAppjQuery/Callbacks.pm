@@ -307,7 +307,6 @@ sub template_param_edit_entry {
     $param->{uploadify_source} = <<__MTML__;
     <link href="${static_plugin_path}lib/uploadify/css/uploadify.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="${static_plugin_path}lib/uploadify/scripts/swfobject.js"></script>
-    <script type="text/javascript" src="${static_plugin_path}lib/uploadify/scripts/jquery.uploadify.v2.1.0.js"></script>
 __MTML__
 
     ### Add uploadify-widget
@@ -318,7 +317,15 @@ __MTML__
             label => '<__trans_section component="mt_app_jquery"><__trans phrase="A multiple file upload"></__trans_section>',
         }
     );
+
     my $inner_html = MTAppjQuery::Tmplset::uploadify_widget_innerHTML;
+    if ( my $allow_exts = "'" . $app->config('AssetFileExtensions') . "'") {
+        $inner_html =~ s!__FILEEXT__!$allow_exts!g;
+    doLog(Dumper($allow_exts));
+
+    } else {
+        $inner_html =~ s!__FILEEXT__!null!g;
+    }
     $inner_html =~ s!__IMAGES__!$img!g;
     $inner_html =~ s!__FILES__!$file!g;
     $new_node->innerHTML($inner_html);

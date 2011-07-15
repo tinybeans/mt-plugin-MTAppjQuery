@@ -25,13 +25,13 @@ THE SOFTWARE.
 */
 $fileArray = array();
 foreach ($_POST as $key => $value) {
-	if ($key != 'folder') {
-		if (file_exists($_SERVER['DOCUMENT_ROOT'] . $_POST['folder'] . '/' . $value)) {
-			$fileArray[$key] = $value;
-		} else {
-			$fileArray['checkfile'] = 'no_exist';
-		}
-	}
+    if ($key != 'folder') {
+        if (file_exists($_SERVER['DOCUMENT_ROOT'] . $_POST['folder'] . '/' . $value)) {
+            $fileArray[$key] = array($value, 1);
+        } else {
+            $fileArray[$key] = array($value, 0);
+        }
+    }
 }
 echo json_encode($fileArray);
 ?>
