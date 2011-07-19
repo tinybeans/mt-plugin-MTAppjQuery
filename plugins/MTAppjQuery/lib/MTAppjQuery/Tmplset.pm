@@ -921,16 +921,20 @@ sub uploadify_widget_innerHTML {
                                 queue = '#' + event.data.queueID;
                             }
                             // modified by Tomohiro Okuwaki [start]
+                            var _id = {
+                                'id'      : jQuery(this).attr('id') + ID,
+                                'selector': "'#" + jQuery(this).attr('id') + "'"
+                            };
                             var innerHtml = [
-                                '<div id="' + jQuery(this).attr('id') + ID + '" class="uploadifyQueueItem">',
+                                '<div id="' + _id['id'] + '" class="uploadifyQueueItem">',
                                     '<div class="cancel">',
-                                        '<a href="javascript:jQuery(\'#\'' + jQuery(this).attr('id') + ').uploadifyCancel(' + ID + ')">',
+                                        '<a href="javascript:jQuery(' + _id['selector'] + ').uploadifyCancel(\'' + ID + '\')">',
                                             '<img src="' + settings.cancelImg + '" border="0" />',
                                         '</a>',
                                     '</div>',
                                     '<span class="fileName">' + fileName + ' (' + byteSize + suffix + ')</span><span class="percentage"></span>',
                                     '<div class="uploadifyProgress">',
-                                        '<div id="' + jQuery(this).attr('id') + ID + 'ProgressBar" class="uploadifyProgressBar"><!--Progress Bar--></div>',
+                                        '<div id="' + _id['id'] + 'ProgressBar" class="uploadifyProgressBar"><!--Progress Bar--></div>',
                                     '</div>',
                                 '</div>'
                             ];
@@ -967,28 +971,16 @@ sub uploadify_widget_innerHTML {
                             var eventID = '#' + jQuery(event.target).attr('id') + 'Uploader';
                             for(var key in data) {
                                 // modified by Tomohiro Okuwaki [start]
-                                var extension = false;
-                                var exist = true;
-                                if (settings.fileExt) {
-                                    var exts = settings.fileExt.split(',');
-                                    for (var i = 0,n = exts.length; i < n; i++) {
-                                        var reg = new RegExp('\.' + jQuery.trim(exts[i]) + '$', '');
-
-                                        if (data[key][0].match(reg)) {
-                                            extension = true;
-                                            break;
-                                        }
-                                    }
-                                    if (! extension) {
-                                        alert(data[key] + 'はアップロードが許可されていないファイルです。');
-                                        jQuery(eventID)[0].cancelFileUpload(key, true,true);
-                                        exist = false;
-                                    }
+                                if (data[key]['ext'] == 'deny') {
+                                    alert(data[key]['name'] + 'はアップロードが許可されていないファイルです。');
+                                    jQuery(eventID)[0].cancelFileUpload(key, true,true);
+                                    continue;
                                 }
-                                if (exist && data[key][1] > 0 && event.data.action(event, checkScript, fileQueueObj, folder, single) !== false) {
-                                    var replaceFile = confirm(data[key][0] + " はすでに存在します。上書きしてよろしいですか？");
+                                if (data[key]['exist'] == 1) {
+                                    var replaceFile = confirm(data[key]['name'] + " はすでに存在します。上書きしてよろしいですか？");
                                     if (!replaceFile) {
-                                        jQuery(eventID)[0].cancelFileUpload(key, true,true);
+                                        jQuery(eventID)[0].cancelFileUpload(key, true, true);
+                                        continue;
                                     }
                                 }
                                 // modified by Tomohiro Okuwaki [ end ]
@@ -1101,20 +1093,107 @@ sub uploadify_widget_innerHTML {
         var file_path = '<mt:if name="upload_folder">/<mt:var name="upload_folder"></mt:if>/' + file_name;
         var mime_type = '';
         switch (file_ext) {
-            case 'png' : mime_type = 'image/png';  break;
-            case 'gif' : mime_type = 'image/gif';  break;
-            case 'jpg' : mime_type = 'image/jpeg'; break;
-            case 'jpeg': mime_type = 'image/jpeg'; break;
+            case 'css'    : mime_type = 'text/css'; break;
+            case 'html'   : mime_type = 'text/html'; break;
+            case 'mtml'   : mime_type = 'text/html'; break;
+            case 'xhtml'  : mime_type = 'application/xhtml+xml'; break;
+            case 'htm'    : mime_type = 'text/html'; break;
+            case 'txt'    : mime_type = 'text/plain'; break;
+            case 'rtx'    : mime_type = 'text/richtext'; break;
+            case 'tsv'    : mime_type = 'text/tab-separated-values'; break;
+            case 'csv'    : mime_type = 'text/csv'; break;
+            case 'hdml'   : mime_type = 'text/x-hdml; charset=Shift_JIS'; break;
+            case 'xml'    : mime_type = 'application/xml'; break;
+            case 'atom'   : mime_type = 'application/atom+xml'; break;
+            case 'rss'    : mime_type = 'application/rss+xml'; break;
+            case 'rdf'    : mime_type = 'application/rdf+xml'; break;
+            case 'xsl'    : mime_type = 'text/xsl'; break;
+            case 'mpeg'   : mime_type = 'video/mpeg'; break;
+            case 'mpg'    : mime_type = 'video/mpeg'; break;
+            case 'mpe'    : mime_type = 'video/mpeg'; break;
+            case 'qt'     : mime_type = 'video/quicktime'; break;
+            case 'avi'    : mime_type = 'video/x-msvideo'; break;
+            case 'movie'  : mime_type = 'video/x-sgi-movie'; break;
+            case 'mov'    : mime_type = 'video/quicktime'; break;
+            case 'ice'    : mime_type = 'x-conference/x-cooltalk'; break;
+            case 'svr'    : mime_type = 'x-world/x-svr'; break;
+            case 'vrml'   : mime_type = 'x-world/x-vrml'; break;
+            case 'wrl'    : mime_type = 'x-world/x-vrml'; break;
+            case 'vrt'    : mime_type = 'x-world/x-vrt'; break;
+            case 'spl'    : mime_type = 'application/futuresplash'; break;
+            case 'js'     : mime_type = 'application/javascript'; break;
+            case 'json'   : mime_type = 'application/json'; break;
+            case 'hqx'    : mime_type = 'application/mac-binhex40'; break;
+            case 'doc'    : mime_type = 'application/msword'; break;
+            case 'pdf'    : mime_type = 'application/pdf'; break;
+            case 'ai'     : mime_type = 'application/postscript'; break;
+            case 'eps'    : mime_type = 'application/postscript'; break;
+            case 'ps'     : mime_type = 'application/postscript'; break;
+            case 'rtf'    : mime_type = 'application/rtf'; break;
+            case 'ppt'    : mime_type = 'application/vnd.ms-powerpoint'; break;
+            case 'xls'    : mime_type = 'application/vnd.ms-excel'; break;
+            case 'dcr'    : mime_type = 'application/x-director'; break;
+            case 'dir'    : mime_type = 'application/x-director'; break;
+            case 'dxr'    : mime_type = 'application/x-director'; break;
+            case 'dvi'    : mime_type = 'application/x-dvi'; break;
+            case 'gtar'   : mime_type = 'application/x-gtar'; break;
+            case 'gzip'   : mime_type = 'application/x-gzip'; break;
+            case 'latex'  : mime_type = 'application/x-latex'; break;
+            case 'lzh'    : mime_type = 'application/x-lha'; break;
+            case 'swf'    : mime_type = 'application/x-shockwave-flash'; break;
+            case 'sit'    : mime_type = 'application/x-stuffit'; break;
+            case 'tar'    : mime_type = 'application/x-tar'; break;
+            case 'tcl'    : mime_type = 'application/x-tcl'; break;
+            case 'tex'    : mime_type = 'application/x-texinfo'; break;
+            case 'texinfo': mime_type = 'application/x-texinfo'; break;
+            case 'texi'   : mime_type = 'application/x-texi'; break;
+            case 'src'    : mime_type = 'application/x-wais-source'; break;
+            case 'zip'    : mime_type = 'application/zip'; break;
+            case 'au'     : mime_type = 'audio/basic'; break;
+            case 'snd'    : mime_type = 'audio/basic'; break;
+            case 'midi'   : mime_type = 'audio/midi'; break;
+            case 'mid'    : mime_type = 'audio/midi'; break;
+            case 'kar'    : mime_type = 'audio/midi'; break;
+            case 'mpga'   : mime_type = 'audio/mpeg'; break;
+            case 'mp2'    : mime_type = 'audio/mpeg'; break;
+            case 'mp3'    : mime_type = 'audio/mpeg'; break;
+            case 'ra'     : mime_type = 'audio/x-pn-realaudio'; break;
+            case 'ram'    : mime_type = 'audio/x-pn-realaudio'; break;
+            case 'rm'     : mime_type = 'audio/x-pn-realaudio'; break;
+            case 'rpm'    : mime_type = 'audio/x-pn-realaudio-plugin'; break;
+            case 'wav'    : mime_type = 'audio/x-wav'; break;
+            case 'png'    : mime_type = 'image/png'; break;
+            case 'gif'    : mime_type = 'image/gif'; break;
+            case 'jpg'    : mime_type = 'image/jpeg'; break;
+            case 'jpeg'   : mime_type = 'image/jpeg'; break;
+            case 'jpe'    : mime_type = 'image/jpeg'; break;
+            case 'bmp'    : mime_type = 'image/x-ms-bmp'; break;
+            case 'tiff'   : mime_type = 'image/tiff'; break;
+            case 'tif'    : mime_type = 'image/tiff'; break;
+            case 'ico'    : mime_type = 'image/vnd.microsoft.icon'; break;
+            case 'pnm'    : mime_type = 'image/x-portable-anymap'; break;
+            case 'ras'    : mime_type = 'image/x-cmu-raster'; break;
+            case 'pnm'    : mime_type = 'image/x-portable-anymap'; break;
+            case 'pbm'    : mime_type = 'image/x-portable-bitmap'; break;
+            case 'pgm'    : mime_type = 'image/x-portable-graymap'; break;
+            case 'ppm'    : mime_type = 'image/x-portable-pixmap'; break;
+            case 'rgb'    : mime_type = 'image/x-rgb'; break;
+            case 'xbm'    : mime_type = 'image/x-xbitmap'; break;
+            case 'xpm'    : mime_type = 'image/x-pixmap'; break;
+            case 'xwd'    : mime_type = 'image/x-xwindowdump'; break;
+
         }
         if (mime_type.match(/^image/)) {
-            jQuery('#editor-content-textarea').insertAtCaret('__IMAGES__' + "\n");
+            // jQuery('#editor-content-textarea:visible').insertAtCaret('__IMAGES__' + "\n");
+            jQuery('textarea.last_focus').insertAtCaret('__IMAGES__' + "\n");
             var img = jQuery('__IMAGES__').attr('id',queueID).addClass('uploadify_image').css({
                     'width':'200px',
                     'padding':'10px 0'
                 });
             jQuery("#entry-uploadify-widget").find('div.widget-content').append(img);
         } else {
-            jQuery('#editor-content-textarea').insertAtCaret('__FILES__' + "\n");
+            // jQuery('#editor-content-textarea:visible').insertAtCaret('__FILES__' + "\n");
+            jQuery('textarea.last_focus').insertAtCaret('__FILES__' + "\n");
         }
         var asset = [
             queueID,
@@ -1143,14 +1222,16 @@ sub uploadify_widget_innerHTML {
         });
 
     }
-    
+    jQuery('textarea').blur(function(){
+        jQuery('textarea.last_focus').removeClass('last_focus');
+        jQuery(this).addClass('last_focus');
+    });
     jQuery("#uploadify").uploadify({
         'uploader'   : '<mt:var name="static_plugin_path">lib/uploadify/scripts/uploadify.swf',
         'script'     : '<mt:var name="static_plugin_path">lib/uploadify/scripts/uploadify.php',
         'checkScript': '<mt:var name="static_plugin_path">lib/uploadify/scripts/check.php',
         'cancelImg'  : '<mt:var name="static_plugin_path">lib/uploadify/cancel.png',
         'folder'     : '<mt:var name="blog_path"><mt:if name="upload_folder">/<mt:var name="upload_folder"></mt:if>',
-        'fileExt'    : __FILEEXT__,
         'sizeLimit'  : '1000000',
         'buttonText' : '<__trans_section component="mt_app_jquery"><__trans phrase="Select files"></__trans_section>',
         'queueID'    : 'fileQueue',

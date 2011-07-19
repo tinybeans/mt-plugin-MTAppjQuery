@@ -319,13 +319,6 @@ __MTML__
     );
 
     my $inner_html = MTAppjQuery::Tmplset::uploadify_widget_innerHTML;
-    if ( my $allow_exts = "'" . $app->config('AssetFileExtensions') . "'") {
-        $inner_html =~ s!__FILEEXT__!$allow_exts!g;
-    doLog(Dumper($allow_exts));
-
-    } else {
-        $inner_html =~ s!__FILEEXT__!null!g;
-    }
     $inner_html =~ s!__IMAGES__!$img!g;
     $inner_html =~ s!__FILES__!$file!g;
     $new_node->innerHTML($inner_html);
