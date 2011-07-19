@@ -1516,6 +1516,69 @@
 
 
     // -------------------------------------------------
+    //  $(foo).MTAppNbspGUI();
+    //
+    //  Description:
+    //    「1項目ごとに改行してください」をGUIで実現する
+    //
+    //  Usage:
+    //    $(foo).MTAppNbspGUI(options);
+    //
+    //  Options:
+    //    wrapper_class: {Array} ['main-class', 'sub-class']
+    //    input_class: {Array} ['main-class', 'sub-class']
+    //    add_class: {Array} ['main-class', 'sub-class']
+    //
+    // -------------------------------------------------
+    $.fn.MTAppNbspGUI = function(options) {
+        var op = $.extend({}, $.fn.MTAppNbspGUI.defaults, options);
+        return this.each(function(){
+            var self = $(this);
+            var self_id = self.attr('id')
+            var self_value = self.val().split('\n');
+
+            var input = [];
+            for (var i = 0, n = self_value.length; i < n; i++) {
+                input.push(item(self_value[i]));
+            }
+            self.after(input.join(''));
+
+            $('span.' + op.add_class[0]).live('click', function(){
+                $(this).parent().after(item(''));
+            });
+
+            $('input.' + op.input_class[0]).live('blur', function(){
+                var text = [];
+                $('input.' + op.input_class[0]).each(function(){
+                    if ($(this).val() != '') {
+                        text.push($(this).val());
+                    } else {
+                        $(this).parent().remove();
+                    }
+                });
+                self.val(text.join("\n"));
+            });
+
+            function item (val) {
+                return [
+                    '<span class="' + op.wrapper_class.join(' ') + '">',
+                        '<input type="text" class="' + op.input_class.join(' ') + '" value="' + val + '" />',
+                        '<span class="' + op.add_class.join(' ') + '">追加</span>',
+                    '</span>'
+                ].join('');
+            }
+
+        });
+    };
+    $.fn.MTAppNbspGUI.defaults = {
+        wrapper_class: ['mtapp-nbsp-gui-item'],
+        input_class: ['mtapp-nbsp-gui-input','text','full'],
+        add_class: ['mtapp-nbsp-gui-add']
+    };
+    // end - $(foo).MTAppNbspGUI();
+
+
+    // -------------------------------------------------
     //  Utilities
     //
     //  $(foo).hasClasses(classes);
