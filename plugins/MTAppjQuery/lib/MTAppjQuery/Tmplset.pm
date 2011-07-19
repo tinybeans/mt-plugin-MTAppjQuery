@@ -1186,11 +1186,17 @@ sub uploadify_widget_innerHTML {
         if (mime_type.match(/^image/)) {
             // jQuery('#editor-content-textarea:visible').insertAtCaret('__IMAGES__' + "\n");
             jQuery('textarea.last_focus').insertAtCaret('__IMAGES__' + "\n");
-            var img = jQuery('__IMAGES__').attr('id',queueID).addClass('uploadify_image').css({
-                    'width':'200px',
-                    'padding':'10px 0'
-                });
-            jQuery("#entry-uploadify-widget").find('div.widget-content').append(img);
+            var img = jQuery('__IMAGES__').attr('id',queueID).addClass('mtapp-uploadify-thumb');
+            var cancel = jQuery('<img class="mtapp-uploadify-cancel" src="' + settings.cancelImg + '" border="0" />').click(function(){
+                var thumb = jQuery(this).prev();
+                var thumb_id = thumb.attr('id');
+                var asset_uploadify = jQuery('#asset_uploadify').val();
+                var reg = new RegExp(thumb_id + '[^\|]+', 'g');
+                jQuery('#asset_uploadify').val(asset_uploadify.replace(reg,'').replace(/\|+/,'|').replace(/^\||\|$/,''));
+                thumb.remove();
+                jQuery(this).remove();
+            });
+            jQuery("#entry-uploadify-widget").find('div.widget-content').append(img, cancel);
         } else {
             // jQuery('#editor-content-textarea:visible').insertAtCaret('__FILES__' + "\n");
             jQuery('textarea.last_focus').insertAtCaret('__FILES__' + "\n");

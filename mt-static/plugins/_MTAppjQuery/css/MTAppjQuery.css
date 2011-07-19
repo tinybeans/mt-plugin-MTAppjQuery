@@ -38,6 +38,21 @@ textarea#sys_jqplugin {
     height: 100px;
 }
 /* ----------------------------------------
+   __Uploadify - マルチファイルアップロード
+---------------------------------------- */
+.mtapp-uploadify-thumb {
+    width: 200px;
+    padding: 10px 0;
+}
+.mtapp-uploadify-cancel {
+    position: relative;
+    left: -16px;
+    padding-top: 10px;
+    vertical-align: top;
+    cursor: pointer;
+}
+
+/* ----------------------------------------
    __ヒントのツールチップ
 ---------------------------------------- */
 #mtapp-tooltip {
