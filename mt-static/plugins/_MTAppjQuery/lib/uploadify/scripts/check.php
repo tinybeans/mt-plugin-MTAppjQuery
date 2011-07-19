@@ -23,15 +23,56 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+
+/* Path to mt : Movable Typeがインストールされているディレクトリのパス */
+$mt_dir = '/Applications/MAMP/htdocs/cms/mtbook/';
+
+if (isset($mt_dir)) {
+    require_once($mt_dir . 'php/mt.php');
+    $mt = MT::get_instance(NULL, $mt_dir . 'mt-config.cgi');
+    $AssetFileExtensions_conf = $mt->config('AssetFileExtensions');
+    $DeniedAssetFileExtensions_conf = $mt->config('DeniedAssetFileExtensions');
+    $AssetFileExtensions = explode(',', preg_replace('/\s/', '', $AssetFileExtensions_conf));
+    $DeniedAssetFileExtensions = explode(',', preg_replace('/\s/', '', $DeniedAssetFileExtensions_conf));
+}
+
 $fileArray = array();
+
 foreach ($_POST as $key => $value) {
-	if ($key != 'folder') {
-		if (file_exists($_SERVER['DOCUMENT_ROOT'] . $_POST['folder'] . '/' . $value)) {
-			$fileArray[$key] = $value;
-		} else {
-			$fileArray['checkfile'] = 'no_exist';
-		}
-	}
+    if ($key != 'folder') {
+        $fileArray[$key] = array();
+
+        preg_match('/\.([a-z]+)$/', $value, $match);
+        $extension = $match[1];
+        $check_ext = 'allow';
+
+        /* Check the extensions */
+        if (isset($mt_dir)) {
+
+            if (isset($AssetFileExtensions_conf) and in_array($extension, $AssetFileExtensions)) {
+                $check_ext = 'allow';
+            } elseif (isset($AssetFileExtensions_conf)) {
+                $check_ext = 'deny';
+            }
+
+            if (isset($DeniedAssetFileExtensions_conf) and in_array($extension, $DeniedAssetFileExtensions)) {
+                $check_ext = 'deny';
+            } elseif (isset($DeniedAssetFileExtensions_conf)) {
+                $check_ext = 'allow';
+            }
+        }
+
+        $fileArray[$key]['ext'] = $check_ext;
+
+        /* Check exist */
+        if (file_exists($_SERVER['DOCUMENT_ROOT'] . $_POST['folder'] . '/' . $value)) {
+            $fileArray[$key]['name'] = $value;
+            $fileArray[$key]['exist'] = 1;
+        } else {
+            $fileArray[$key]['name'] = $value;
+            $fileArray[$key]['exist'] = 0;
+        }
+    }
 }
 echo json_encode($fileArray);
 ?>
