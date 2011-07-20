@@ -1533,7 +1533,7 @@
     $.fn.MTAppNbspGUI = function(options) {
         var op = $.extend({}, $.fn.MTAppNbspGUI.defaults, options);
         return this.each(function(){
-            var self = $(this);
+            var self = $(this).hide();
             var self_id = self.attr('id')
             var self_value = self.val().split('\n');
 
@@ -1549,10 +1549,12 @@
 
             $('input.' + op.input_class[0]).live('blur', function(){
                 var text = [];
-                $('input.' + op.input_class[0]).each(function(){
+                var inputs = $('input.' + op.input_class[0]);
+                var inputs_count = inputs.length;
+                inputs.each(function(){
                     if ($(this).val() != '') {
                         text.push($(this).val());
-                    } else {
+                    } else if (inputs_count > 1) {
                         $(this).parent().remove();
                     }
                 });
