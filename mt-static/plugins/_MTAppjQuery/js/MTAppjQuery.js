@@ -632,7 +632,7 @@
         var msgBlock = $('#msg-block');
 
         if (msgBlock.length == 0) {
-            $('#page-title').after('<div id="msg-block"></div>');
+            $('#content-header').append('<div id="msg-block"></div>');
         }
 
         var $myMsg = $(myMsg.join(''));
