@@ -30,9 +30,13 @@ sub template_source_header {
     my $p = MT->component('mt_app_jquery');
 
     ### 各種情報を取得する
-    my $_type       = $app->param('_type') || 'type';
-    my $id          = $app->param('id') || 0;
-    my $blog_id     = $app->param('blog_id') || 0;
+    my $_type   = $app->param('_type');
+    my $id      = $app->param('id') || 0;
+    my $blog_id = $app->param('blog_id') || 0;
+    return unless ($_type =~ /^\w+$/);
+    return unless ($id =~ /^\d+$/);
+    return unless ($blog_id =~ /^\d+$/);
+
     my $author_id   = $app->user->id;
     # オブジェクトのタイプを判別して各オブジェクトのIDを取得する
     my $entry_id    = $_type eq 'entry' ? $id : 0;
@@ -369,7 +373,6 @@ sub cms_post_save_entry {
 
     ### $app->
     my $blog_id = $blog->id || 0;
-    my $q = $app->param;
 
     ### $obj->
     my $entry_id = $obj->id;
@@ -380,8 +383,8 @@ sub cms_post_save_entry {
     my $active_uploadify = $p->get_config_value('active_uploadify', $scope);
     return unless $active_uploadify;
 
-    my $asset_uploadify = $q->param('asset_uploadify');
-    my $asset_uploadify_meta = $q->param('asset_uploadify_meta');
+    my $asset_uploadify = $app->param('asset_uploadify');
+    my $asset_uploadify_meta = $app->param('asset_uploadify_meta');
 
     my $headers = [
         'queue_id',
@@ -404,19 +407,19 @@ sub cms_post_save_entry {
 
     foreach my $asset (@$assets) {
         my $obj = MT::Asset::Image->new;
-        $obj->blog_id($blog_id);
-        $obj->label($asset->{asset_label});
-        $obj->url($asset->{asset_url});
-        $obj->file_path($asset->{asset_file_path});
-        $obj->file_name($asset->{asset_file_name});
-        $obj->file_ext($asset->{asset_file_ext});
-        $obj->mime_type($asset->{asset_mime_type});
-        $obj->class($asset->{asset_class});
-        $obj->created_by($asset->{asset_created_by});
+        $obj->blog_id($blog_id) or return;
+        $obj->label($asset->{asset_label}) or return;
+        $obj->url($asset->{asset_url}) or return;
+        $obj->file_path($asset->{asset_file_path}) or return;
+        $obj->file_name($asset->{asset_file_name}) or return;
+        $obj->file_ext($asset->{asset_file_ext}) or return;
+        $obj->mime_type($asset->{asset_mime_type}) or return;
+        $obj->class($asset->{asset_class}) or return;
+        $obj->created_by($asset->{asset_created_by}) or return;
         foreach my $asset_meta (@$assets_meta) {
             if ($asset_meta->{queue_id} == $asset->{queue_id}) {
-                $obj->image_width($asset_meta->{image_width});
-                $obj->image_height($asset_meta->{image_height});
+                $obj->image_width($asset_meta->{image_width}) or return;
+                $obj->image_height($asset_meta->{image_height}) or return;
             }
         }
         $obj->save or die 'Failed to save the item.';
