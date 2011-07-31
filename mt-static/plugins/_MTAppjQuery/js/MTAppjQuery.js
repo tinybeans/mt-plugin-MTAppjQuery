@@ -913,9 +913,12 @@
     //
     //  Usage:
     //    $.MTAppDebug();
+    //
+    //  Options:
+    //    id: {Boolean} IDをテーブルに表示する場合はtrue
     // -------------------------------------------------
     $.MTAppDebug = function(options){
-        // var op = $.extend({}, $.MTAppDebug.defaults, options);
+        var op = $.extend({}, $.MTAppDebug.defaults, options);
 
         // Show the page information
         var body = $('body'),
@@ -974,7 +977,7 @@
         }
 
         // [テンプレートの管理] [ウィジェットの管理]
-        if (mtappVars.template_filename == 'list_template' || mtappVars.template_filename == 'list_widget') {
+        if (op.id && mtappVars.template_filename == 'list_template' || mtappVars.template_filename == 'list_widget') {
             $('table.listing-table')
                 .find('th.cb').each(function(){
                     $(this).insertListingColum('after', 'th', 'ID', 'id num');
@@ -986,7 +989,7 @@
         }
 
         // list_common.tmplのリスト画面で表示オプションにIDがないページ
-        if (mtappVars.template_filename == 'list_common' && !$('#disp_cols label:contains("ID")').length) {
+        if (op.id && mtappVars.template_filename == 'list_common' && !$('#disp_cols label:contains("ID")').length) {
             // IDを表示
             $(window).bind('listReady', function(){
                 $('table.listing-table').find('tr').each(function(){
@@ -999,12 +1002,9 @@
         }
 
     };
-/*
     $.MTAppDebug.defaults = {
-        foo: null,
-        bar: null
+        id: false
     };
-*/
     // end - $.MTAppDebug()
 
     // -------------------------------------------------
