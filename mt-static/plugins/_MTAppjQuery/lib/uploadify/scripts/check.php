@@ -25,7 +25,7 @@ THE SOFTWARE.
 */
 
 /* Path to mt : Movable Typeがインストールされているディレクトリのパス */
-$mt_dir = '/Applications/MAMP/htdocs/cms/mtbook/';
+$mt_dir = '';
 
 if (isset($mt_dir)) {
     require_once($mt_dir . 'php/mt.php');
