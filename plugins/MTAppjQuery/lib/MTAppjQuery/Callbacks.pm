@@ -88,7 +88,7 @@ __MTML__
         $$tmpl_ref =~ s!$b_menu_org!$b_menu!g;
     }
 
-    ### スーパースライドメニューをセットする（MT5.1未対応、対応予定あり）
+    ### スーパースライドメニューをセットする（MT5.1未対応、対応予定未定）
     my $website_json = '';
     my $blog_json = '';
     my $perms_json = '';

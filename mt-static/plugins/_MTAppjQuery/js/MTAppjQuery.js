@@ -1581,6 +1581,75 @@
 
 
     // -------------------------------------------------
+    //  $.MTAppDuplicate();
+    //
+    //  Description:
+    //    ブログ記事またはウェブページを複製する
+    //
+    //  Usage:
+    //    $.MTAppDuplicate();
+    //
+    //  Options:
+    //
+    // -------------------------------------------------
+    $.MTAppDuplicate = function(options) {
+        var op = $.extend({}, $.MTAppDuplicate.defaults, options);
+
+        var dupl_btn = [
+            '<div class="delete-action">',
+                '<a id="mtapp_duplicate_button" href="javascript:void(0)" title="複製">複製</a>',
+            '</div>'
+        ];
+        var dupl_ops = (op.change_blog) ? [
+            '<div class="field field-top-label" id="duplicate_options-field">',
+                '<div class="field-header">',
+                    '<label>ブログの変更</label>',
+                '</div>',
+                '<div class="field-content">',
+                    '<select class="full" id="duplicate_blog_id">',
+                        '<option value="2">First Blog</option>',
+                        '<option value="3">Second Blog</option>',
+                    '</select>',
+                '</div>',
+            '</div>'
+        ]: [''];
+
+        $('#entry-publishing-widget')
+            .find('div.delete-action')
+                .before(dupl_btn.join('') + dupl_ops.join(''));
+
+        $('#mtapp_duplicate_button').click(function(){
+            var $this = $(this);
+            $('#entry_form').find('input:hidden').each(function(){
+                var n = $(this).attr('name');
+                switch (n) {
+                    case 'id':
+                        $(this).after('<input type="hidden" name="author_id" value="1" />').remove();
+                        break;
+                    case 'blog_id':
+                        var v = (op.change_blog) ? $('#duplicate_blog_id').val(): $(this).val();
+                        $(this).val(v);
+                        break;
+                    case 'return_args':
+                        var v = $(this).val().replace(/&amp;id=[0-9]+|&id=[0-9]+/,'');
+                        $(this).val(v);
+                        break;
+                    case 'status':
+                        var v = 1;
+                        $(this).val(v);
+                        break;
+                }
+            });
+            $this.parent().prev().find('button.primary').click();
+        });
+    };
+    $.MTAppDuplicate.defaults = {
+        change_blog: false
+    };
+    // end - $.MTAppDuplicate();
+
+
+    // -------------------------------------------------
     //  Utilities
     //
     //  $(foo).hasClasses(classes);
