@@ -1590,6 +1590,7 @@
     //    $.MTAppDuplicate();
     //
     //  Options:
+    //    change_blog: {Boolean} ブログの変更を可能にする（true）、不可にする（false）
     //
     // -------------------------------------------------
     $.MTAppDuplicate = function(options) {
@@ -1600,6 +1601,16 @@
                 '<a id="mtapp_duplicate_button" href="javascript:void(0)" title="複製">複製</a>',
             '</div>'
         ];
+        var dupl_blogs = [];
+        if (mtappVars.json_can_create_post_blogs) {
+            var blog_id = mtappVars.blog_id;
+            for (var i = 0, n = mtappVars.json_can_create_post_blogs.length; i < n; i++) {
+                var id = mtappVars.json_can_create_post_blogs[i]['id'];
+                var name = mtappVars.json_can_create_post_blogs[i]['name'];
+                var selected = (id == blog_id) ? ' selected="selected"': ''
+                dupl_blogs.push('<option' + selected + ' value="' + id + '">' + name + '</option>');
+            }
+        }
         var dupl_ops = (op.change_blog) ? [
             '<div class="field field-top-label" id="duplicate_options-field">',
                 '<div class="field-header">',
@@ -1607,8 +1618,7 @@
                 '</div>',
                 '<div class="field-content">',
                     '<select class="full" id="duplicate_blog_id">',
-                        '<option value="2">First Blog</option>',
-                        '<option value="3">Second Blog</option>',
+                        dupl_blogs.join(''),
                     '</select>',
                 '</div>',
             '</div>'

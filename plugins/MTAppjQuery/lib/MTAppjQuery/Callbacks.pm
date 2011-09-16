@@ -176,9 +176,11 @@ __MTML__
         "screen_id" : "<mt:var name="screen_id">",
         "body_class" : [<mt:setvarblock name="mtapp_body_class">"<mt:var name="screen_type" default="main-screen"> <mt:if name="scope_type" eq="user">user system<mt:else><mt:var name="scope_type"></mt:if><mt:if name="screen_class"> <mt:var name="screen_class"></mt:if><mt:if name="top_nav_loop"> has-menu-nav</mt:if><mt:if name="related_content"> has-related-content</mt:if><mt:if name="edit_screen"> edit-screen</mt:if><mt:if name="new_object"> create-new</mt:if><mt:if name="loaded_revision"> loaded-revision</mt:if><mt:if name="mt_beta"> mt-beta</mt:if>"</mt:setvarblock><mt:var name="mtapp_body_class" regex_replace='/ +/g',' ' regex_replace='/ /g','","'>],
         "template_filename" : '<mt:var name="template_filename">',
+        "json_can_create_post_blogs": [<mt:var name="json_can_create_post_blogs">]<mt:ignore>,
         "website_json" : [${website_json}],
         "blog_json" : [${blog_json}],
         "perms_json" : [${perms_json}]
+        </mt:ignore>
     }
     /* ]]> */
     </script>
@@ -284,80 +286,100 @@ sub template_param_edit_entry {
     my $blog = $app->blog;
     my $user = $app->user;
 
-    return if (! &is_user_can($blog, $user, 'upload'));
+my $unko = 1;
+    if ($unko) {
+        my @blog = MT::Blog->load;
+        my @blog_json;
 
-    ### $param->
-    my $blog_id   = $param->{blog_id} || 0;
-    my $blog_url  = $param->{blog_url} || '';
-    my $blog_path = $blog_url;
-       $blog_path =~ s!^$host|\/$!!g;
+        # blogの内容をJSONに書き出す
+        foreach my $blog (@blog) {
+            next if (! &is_user_can($blog, $user, 'create_post'));
+            my %blog_date = (
+                'id' => $blog->id,
+                'name' => $blog->name,
+            );
+            push @blog_json, MT::Util::to_json(\%blog_date);
+        }
+        $param->{json_can_create_post_blogs} = join ",", @blog_json;
+doLog(join ",", @blog_json);
+#         $blog_json = join ",", @blog_json;
+    }
+
+    if (&is_user_can($blog, $user, 'upload')) {
+        ### $param->
+        my $blog_id   = $param->{blog_id} || 0;
+        my $blog_url  = $param->{blog_url} || '';
+        my $blog_path = $blog_url;
+           $blog_path =~ s!^$host|\/$!!g;
 # doLog('$blog_path : '.$blog_path.'  $blog_url : '.$blog_url);
 
-    ### $p->
-    my $p = MT->component('mt_app_jquery');
-    my $scope = (!$blog_id) ? 'system' : 'blog:'.$blog_id;
-    my $active_uploadify = $p->get_config_value('active_uploadify', $scope);
-    return unless $active_uploadify;
-    my $img  = &_config_replace($p->get_config_value('img_elm', $scope));
-    my $file = &_config_replace($p->get_config_value('file_elm', $scope));
+        ### $p->
+        my $p = MT->component('mt_app_jquery');
+        my $scope = (!$blog_id) ? 'system' : 'blog:'.$blog_id;
+        my $active_uploadify = $p->get_config_value('active_uploadify', $scope);
+        return unless $active_uploadify;
+        my $img  = &_config_replace($p->get_config_value('img_elm', $scope));
+        my $file = &_config_replace($p->get_config_value('file_elm', $scope));
 
-    ### Variable
-    my $static_plugin_path = $static_path . $p->{envelope} . '/';
+        ### Variable
+        my $static_plugin_path = $static_path . $p->{envelope} . '/';
 
-    ### SetVar(param)
-    $param->{blog_path} = $blog_path;
-    $param->{upload_folder} = $p->get_config_value('upload_folder', $scope);
-    $param->{static_plugin_path} = $static_plugin_path;
-    $param->{uploadify_source} = <<__MTML__;
-    <link href="${static_plugin_path}lib/uploadify/css/uploadify.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="${static_plugin_path}lib/uploadify/scripts/swfobject.js"></script>
+        ### SetVar(param)
+        $param->{blog_path} = $blog_path;
+        $param->{upload_folder} = $p->get_config_value('upload_folder', $scope);
+        $param->{static_plugin_path} = $static_plugin_path;
+        $param->{uploadify_source} = <<__MTML__;
+        <link href="${static_plugin_path}lib/uploadify/css/uploadify.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="${static_plugin_path}lib/uploadify/scripts/swfobject.js"></script>
 __MTML__
 
-    ### Add uploadify-widget
-    my $host_node = $tmpl->getElementById('entry-status-widget');
-    my $new_node = $tmpl->createElement('app:widget',
-        {
-            id    => 'entry-uploadify-widget',
-            label => '<__trans_section component="mt_app_jquery"><__trans phrase="A multiple file upload"></__trans_section>',
-        }
-    );
+        ### Add uploadify-widget
+        my $host_node = $tmpl->getElementById('entry-status-widget');
+        my $new_node = $tmpl->createElement('app:widget',
+            {
+                id    => 'entry-uploadify-widget',
+                label => '<__trans_section component="mt_app_jquery"><__trans phrase="A multiple file upload"></__trans_section>',
+            }
+        );
 
-    my $inner_html = MTAppjQuery::Tmplset::uploadify_widget_innerHTML;
-    $inner_html =~ s!__IMAGES__!$img!g;
-    $inner_html =~ s!__FILES__!$file!g;
-    $new_node->innerHTML($inner_html);
-    $tmpl->insertAfter($new_node, $host_node);
+        my $inner_html = MTAppjQuery::Tmplset::uploadify_widget_innerHTML;
+        $inner_html =~ s!__IMAGES__!$img!g;
+        $inner_html =~ s!__FILES__!$file!g;
+        $new_node->innerHTML($inner_html);
+        $tmpl->insertAfter($new_node, $host_node);
 
-    ### Add asset_uploadify
-    $host_node = $tmpl->getElementById('keywords');
-    $new_node = $tmpl->createElement('app:Setting',
-        {
-            id    => 'asset_uploadify',
-            label => '<__trans_section component="mt_app_jquery"><__trans phrase="A multiple file upload"></__trans_section>',
-            label_class => 'top_label',
-        }
-    );
-    $inner_html = <<__MTML__;
-    <input type="text" name="asset_uploadify" id="asset_uploadify" value="<mt:var name="asset_uploadify">" class="full-width" mt:watch-change="1" />
+        ### Add asset_uploadify
+        $host_node = $tmpl->getElementById('keywords');
+        $new_node = $tmpl->createElement('app:Setting',
+            {
+                id    => 'asset_uploadify',
+                label => '<__trans_section component="mt_app_jquery"><__trans phrase="A multiple file upload"></__trans_section>',
+                label_class => 'top_label',
+            }
+        );
+        $inner_html = <<__MTML__;
+        <input type="text" name="asset_uploadify" id="asset_uploadify" value="<mt:var name="asset_uploadify">" class="full-width" mt:watch-change="1" />
 __MTML__
-    $new_node->innerHTML($inner_html);
-    $new_node->setAttribute('class','hidden');
-    $tmpl->insertAfter($new_node, $host_node);
+        $new_node->innerHTML($inner_html);
+        $new_node->setAttribute('class','hidden');
+        $tmpl->insertAfter($new_node, $host_node);
 
-    ### Add asset_uploadify_meta
-    $new_node = $tmpl->createElement('app:Setting',
-        {
-            id    => 'asset_uploadify_meta',
-            label => '<__trans_section component="mt_app_jquery"><__trans phrase="A multiple file upload meta"></__trans_section>',
-            label_class => 'top_label',
-        }
-    );
-    $inner_html = <<__MTML__;
-    <input type="text" name="asset_uploadify_meta" id="asset_uploadify_meta" value="<mt:var name="asset_uploadify_meta">" class="full-width" mt:watch-change="1" />
+        ### Add asset_uploadify_meta
+        $new_node = $tmpl->createElement('app:Setting',
+            {
+                id    => 'asset_uploadify_meta',
+                label => '<__trans_section component="mt_app_jquery"><__trans phrase="A multiple file upload meta"></__trans_section>',
+                label_class => 'top_label',
+            }
+        );
+        $inner_html = <<__MTML__;
+        <input type="text" name="asset_uploadify_meta" id="asset_uploadify_meta" value="<mt:var name="asset_uploadify_meta">" class="full-width" mt:watch-change="1" />
 __MTML__
-    $new_node->innerHTML($inner_html);
-    $new_node->setAttribute('class','hidden');
-    $tmpl->insertAfter($new_node, $host_node);
+        $new_node->innerHTML($inner_html);
+        $new_node->setAttribute('class','hidden');
+        $tmpl->insertAfter($new_node, $host_node);
+    };
+
 }
 
 sub cms_post_save_entry {
