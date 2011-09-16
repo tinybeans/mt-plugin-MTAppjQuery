@@ -286,24 +286,20 @@ sub template_param_edit_entry {
     my $blog = $app->blog;
     my $user = $app->user;
 
-my $unko = 1;
-    if ($unko) {
-        my @blog = MT::Blog->load;
-        my @blog_json;
+    ### 新規作成権限のあるブログ一覧を出力
+    my @blog = MT::Blog->load;
+    my @blog_json;
 
-        # blogの内容をJSONに書き出す
-        foreach my $blog (@blog) {
-            next if (! &is_user_can($blog, $user, 'create_post'));
-            my %blog_date = (
-                'id' => $blog->id,
-                'name' => $blog->name,
-            );
-            push @blog_json, MT::Util::to_json(\%blog_date);
-        }
-        $param->{json_can_create_post_blogs} = join ",", @blog_json;
-doLog(join ",", @blog_json);
-#         $blog_json = join ",", @blog_json;
+    # blogの内容をJSONに書き出す
+    foreach my $blog (@blog) {
+        next if (! &is_user_can($blog, $user, 'create_post'));
+        my %blog_date = (
+            'id' => $blog->id,
+            'name' => $blog->name,
+        );
+        push @blog_json, MT::Util::to_json(\%blog_date);
     }
+    $param->{json_can_create_post_blogs} = join ",", @blog_json;
 
     if (&is_user_can($blog, $user, 'upload')) {
         ### $param->
