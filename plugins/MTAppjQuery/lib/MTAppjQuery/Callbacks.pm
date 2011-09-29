@@ -28,14 +28,14 @@ sub template_source_header {
     my ($cb, $app, $tmpl_ref) = @_;
     my $version = MT->version_id;
     my $p = MT->component('mt_app_jquery');
+    my $blog = $app->blog;
 
     ### 各種情報を取得する
-    my $_type   = $app->param('_type');
+    my $_type   = $app->param('_type') || '_type';
     my $id      = $app->param('id') || 0;
-    my $blog_id = $app->param('blog_id') || 0;
-    return unless ($_type =~ /^\w+$/);
-    return unless ($id =~ /^\d+$/);
-    return unless ($blog_id =~ /^\d+$/);
+    my $blog_id = (defined $blog) ? $blog->id : 0;
+    return unless ($_type =~ m/^\w+$/);
+    return unless ($id =~ m/^\d+$/);
 
     my $author_id   = $app->user->id;
     # オブジェクトのタイプを判別して各オブジェクトのIDを取得する

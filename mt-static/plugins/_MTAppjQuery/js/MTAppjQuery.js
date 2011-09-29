@@ -4,13 +4,14 @@
  * Copyright (c) 2010 Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-06-22
- * Update:  2011-01-21
- * for version: 0.2
+ * Update:  2011-09-29
+ * for version: 0.2x
  * Comment:
  *
  */
 (function($){
 
+    if (! mtappVars) return;
     // -------------------------------------------------
     //  $.MTAppNoScrollRightSidebar();
     //
@@ -476,7 +477,7 @@
                 break;
             case 'assets':
                 $field = $('#assets-field');
-                $label = $field.find('h3.widget-label span');
+                $label = $field.find('h2 span');
                 $hover = $field;
                 break;
             default:
