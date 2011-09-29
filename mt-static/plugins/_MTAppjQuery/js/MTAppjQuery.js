@@ -1517,6 +1517,43 @@
 
 
     // -------------------------------------------------
+    //  $.MTAppBatchEditCategory();
+    //
+    //  Description:
+    //    ブログ記事・ウェブページ一括編集画面をソート可能にして、日付を自動変更する
+    //
+    //  Usage:
+    //    $.MTAppBatchEditCategory();
+    //
+    //  Options:
+    //    text: {String} ボタンに表示するテキスト
+    // -------------------------------------------------
+    $.MTAppBatchEditCategory = function(options){
+        var op = $.extend({}, $.MTAppBatchEditCategory.defaults, options);
+
+        if (mtappVars.screen_id.indexOf('batch-edit-') < 0) return;
+        var text = (mtappVars.screen_id == 'batch-edit-entry') ? 'カテゴリ' + op.text: 'フォルダ' + op.text;
+        var $select = $('td.category').find('select');
+        var $select_clone = $select.eq(0).clone().attr('id', 'mtapp_clone_select').css('margin-right','5px');
+        var $btn = $('<button class="button" title="' + text + '">' + text + '</button>').click(function(){
+            var value = $('#mtapp_clone_select').val();
+            $select.each(function(){
+                $(this).val(value);
+            });
+            return false;
+        });
+        $('#actions-bar-top')
+            .find('button.primary')
+                .after($btn)
+                .after($select_clone);
+    };
+    $.MTAppBatchEditCategory.defaults = {
+        text: 'をまとめて変更'
+    };
+    // end - $.MTAppBatchEditCategory();
+
+
+    // -------------------------------------------------
     //  $(foo).MTAppNbspGUI();
     //
     //  Description:
