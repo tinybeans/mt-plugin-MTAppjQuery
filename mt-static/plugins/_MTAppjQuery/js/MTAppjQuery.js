@@ -576,7 +576,7 @@
         }
         field.reverse();
 
-        var ID = op.insert_id ? '#' + op.insert_id: '#' + op.insertID;
+        var ID = (op.insert_id !== 'sortable') ? '#' + op.insert_id: '#' + op.insertID;
         for (var i = 0; i < firld_length; i++) {
             if (field[i].match(/^c:/)) {
                 var fieldID = '#customfield_' + field[i].replace(/^c:/,'') + '-field';
