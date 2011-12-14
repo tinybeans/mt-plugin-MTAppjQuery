@@ -405,6 +405,9 @@ div.field span.remove-val {
 table.listing-table tbody tr.keyboard-selected {
     background-color: #CEE4AE;
 }
+table.listing-table tbody tr.hover-selected {
+    background-color: #FEE47F;
+}
 /* ----------------------------------------
    __MTAppNbspGUI
 ---------------------------------------- */
