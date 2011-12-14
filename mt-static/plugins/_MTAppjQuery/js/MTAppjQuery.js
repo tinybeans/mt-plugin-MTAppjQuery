@@ -337,15 +337,19 @@
                 var winS = $(window).scrollTop();
                 var winH = $(window).height();
                 var sTop = 0;
-                switch (direction) {
-                    case 'down':
-                        sTop = winS + winH - height;
-                        if (pos.top < winS + winH - height) return;
-                        break;
-                    case 'up':
-                        sTop = winS - winH + height;
-                        if (pos.top > winS) return;
-                        break;
+                if (height > winH) {
+                    sTop = pos.top;
+                } else {
+                    switch (direction) {
+                        case 'down':
+                            sTop = winS + winH - height;
+                            if (pos.top < winS + winH - height) return;
+                            break;
+                        case 'up':
+                            sTop = winS - winH + height;
+                            if (pos.top > winS) return;
+                            break;
+                    }
                 }
                 speed = speed || 200;
                 $('html,body').animate({
