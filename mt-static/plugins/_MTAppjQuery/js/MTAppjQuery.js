@@ -327,12 +327,10 @@
             });
             $('table.listing-table tr').hover(
                 function(){
-                    $(this).addClass('selected');
+                    $(this).addClass('hover-selected');
                 },
                 function(){
-                    if (!$(this).find(':checkbox').is(':checked')) {
-                        $(this).removeClass('selected');
-                    }
+                    $(this).removeClass('hover-selected');
                 });
 
             function autoScroll(pos, height, direction, speed) {
