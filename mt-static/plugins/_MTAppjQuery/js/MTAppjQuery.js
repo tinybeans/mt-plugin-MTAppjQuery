@@ -4,7 +4,7 @@
  * Copyright (c) 2010 Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-06-22
- * Update:  2011-09-29
+ * Update:  2011-12-14
  * for version: 0.2x
  * Comment:
  *
@@ -265,6 +265,102 @@
         debug: false
     };
     // end - $.MTAppMultiCheckbox()
+
+
+    // -------------------------------------------------
+    //  $.MTAppKeyboardShortcut();
+    //
+    //  Description:
+    //    一覧画面でj, k, xのキーボード・ショートカットが使える。
+    //
+    //  Usage:
+    //    $.MTAppKeyboardShortcut();
+    //
+    // -------------------------------------------------
+    $.MTAppKeyboardShortcut = function(){
+        if (mtappVars.screen_id === 'list-template') return;
+        $(window).bind('listReady', function(){
+            var keyOn = true;
+            var keyIdx = null;
+            var tr = $('table.listing-table tbody tr');
+            var trCount = tr.length;
+            if (trCount < 1) return;
+            $(':text')
+                .focus(function(){
+                    keyOn = false;
+                })
+                .blur(function(){
+                    keyOn = true;
+                });
+            $('body').keyup(function(e){
+                if (!keyOn) return;
+                var key = e.which;
+                if (keyIdx == null) {
+                    keyIdx = 0;
+                    tr.eq(keyIdx).addClass('keyboard-selected');
+                    autoScroll(tr.eq(keyIdx).offset());
+                    return;
+                }
+                switch (key) {
+                    case 74://j
+                        tr.eq(keyIdx).removeClass('keyboard-selected');
+                        keyIdx++;
+                        if (keyIdx >= trCount) {
+                            keyIdx = trCount - 1;
+                        }
+                        autoScroll(tr.eq(keyIdx).offset(), tr.eq(keyIdx).height(), 'down');
+                        tr.eq(keyIdx).addClass('keyboard-selected');
+                        break;
+                    case 75://k
+                        tr.eq(keyIdx).removeClass('keyboard-selected');
+                        keyIdx--;
+                        if (keyIdx < 1) {
+                            keyIdx = 0;
+                        }
+                        autoScroll(tr.eq(keyIdx).offset(), tr.eq(keyIdx).height(), 'up');
+                        tr.eq(keyIdx).addClass('keyboard-selected');
+                        break;
+                    case 88://x
+                        tr.eq(keyIdx).toggleClass('selected').find(':checkbox').click();
+                        break;
+                }
+            });
+            $('table.listing-table tr').hover(
+                function(){
+                    $(this).addClass('selected');
+                },
+                function(){
+                    if (!$(this).find(':checkbox').is(':checked')) {
+                        $(this).removeClass('selected');
+                    }
+                });
+
+            function autoScroll(pos, height, direction, speed) {
+                var winS = $(window).scrollTop();
+                var winH = $(window).height();
+                var sTop = 0;
+                switch (direction) {
+                    case 'down':
+                        sTop = winS + winH - height;
+                        if (pos.top < winS + winH - height) return;
+                        break;
+                    case 'up':
+                        sTop = winS - winH + height;
+                        if (pos.top > winS) return;
+                        break;
+                }
+                speed = speed || 200;
+                $('html,body').animate({
+                    scrollTop: sTop,
+                    scrollLeft: pos.left
+                },{
+                    easing: "linear",
+                    duration: speed
+                });
+            }
+        });
+    };
+    // end - $.MTAppKeyboardShortcut()
 
 
     // -------------------------------------------------

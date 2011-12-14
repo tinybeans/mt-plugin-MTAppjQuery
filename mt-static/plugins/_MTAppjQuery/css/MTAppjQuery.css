@@ -400,6 +400,12 @@ div.field span.remove-val {
     filter: alpha(opacity=70);
 }
 /* ----------------------------------------
+   __キーボードショートカット
+---------------------------------------- */
+table.listing-table tbody tr.keyboard-selected {
+    background-color: #CEE4AE;
+}
+/* ----------------------------------------
    __MTAppNbspGUI
 ---------------------------------------- */
 span.mtapp-nbsp-gui-item {
