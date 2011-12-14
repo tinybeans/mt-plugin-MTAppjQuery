@@ -292,7 +292,7 @@
                 .blur(function(){
                     keyOn = true;
                 });
-            $('body').keyup(function(e){
+            $(window).keyup(function(e){
                 if (!keyOn) return;
                 var key = e.which;
                 if (keyIdx == null) {
