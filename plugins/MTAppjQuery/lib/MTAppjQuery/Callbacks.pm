@@ -152,7 +152,7 @@ __MTML__
         ${_type}ID = ${id},
         blogURL = '<mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if>',
         mtappURL = '${static_plugin_path}',
-        mtappTitle = '<mt:if name="html_title"><mt:var name="html_title"><mt:else><mt:var name="page_title"></mt:if>',
+        mtappTitle = '<mt:if name="html_title"><mt:var name="html_title" encode_js="1"><mt:else><mt:var name="page_title" encode_js="1"></mt:if>',
         mtappScopeType = '<mt:var name="scope_type">',
         catsSelected = <mt:if name="selected_category_loop"><mt:var name="selected_category_loop" to_json="1"><mt:else>[]</mt:if>,
         mainCatSelected = <mt:if name="category_id"><mt:var name="category_id"><mt:else>''</mt:if>;
@@ -160,7 +160,7 @@ __MTML__
     // 推奨
     var mtappVars = {
         "author_id" : <mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if>,
-        "user_name" : "<mt:var name="author_name" escape="html">",
+        "user_name" : "<mt:var name="author_name" encode_js="1">",
         "curr_website_id" : <mt:if name="curr_website_id"><mt:var name="curr_website_id"><mt:else>0</mt:if>,
         "blog_id" : ${blog_id},
         "entry_id" : ${entry_id},
@@ -169,7 +169,7 @@ __MTML__
         "template_id" : ${template_id},
         "blog_url" : "<mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if>",
         "static_plugin_path" : "${static_plugin_path}",
-        "html_title" : "<mt:if name="html_title"><mt:var name="html_title"><mt:else><mt:var name="page_title"></mt:if>",
+        "html_title" : "<mt:if name="html_title"><mt:var name="html_title" encode_js="1"><mt:else><mt:var name="page_title" encode_js="1"></mt:if>",
         "scope_type" : "<mt:var name="scope_type">",
         "selected_category" : <mt:if name="selected_category_loop"><mt:var name="selected_category_loop" to_json="1" regex_replace='/"/g',''><mt:else>[]</mt:if>,
         "main_category_id" : <mt:if name="category_id"><mt:var name="category_id"><mt:else>0</mt:if>,
