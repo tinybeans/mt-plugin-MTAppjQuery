@@ -11,7 +11,7 @@
  */
 (function($){
 
-    if (! mtappVars) return;
+    if (typeof mtappVars !== 'object') return;
     // -------------------------------------------------
     //  $.MTAppNoScrollRightSidebar();
     //
