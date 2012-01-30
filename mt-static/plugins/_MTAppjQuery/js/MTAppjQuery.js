@@ -1129,6 +1129,74 @@
     };
 
     // ---------------------------------------------------------------------
+    //  $.fn.MTAppFancyListing();
+    //
+    //  Description:
+    //    iframeで指定したファイルを読み込みます。
+    //    jQueryプラグインのFancybox(http://fancybox.net/)が必要です。
+    //    またあらかじめ読み込む一覧をインデックステンプレートで作成しておく必要があります。
+    //
+    //  Usage:
+    //    $(selector).MTAppFancyListing(options);
+    //
+    //  Options:
+    //    file_url: {String} iframeに読み込むサイト内のページ
+    //    text: {String} ボタンに表示するテキスト
+    //    fancybox_setting: {Object} fancyboxに渡すオブジェクト
+    // ---------------------------------------------------------------------
+
+    $.fn.MTAppFancyListing = function(options){
+        var op = $.extend({}, $.fn.MTAppFancyListing.defaults, options);
+        var path =  mtappVars.static_plugin_path ;
+        var head = [
+            '<link rel="stylesheet" href="' + path + 'lib/fancybox/jquery.fancybox-1.3.4.css" />',
+            '<script type="text/javascript" src="' + path + 'lib/fancybox/jquery.fancybox-1.3.4.pack.js"></script>'
+        ];
+        if (typeof this.fancybox != 'function') {
+            $('head').append(head.join(''));
+        }
+        return this.each(function(i){
+            var self = $(this);
+            var id = 'fancy_listing_' + i;
+            var spanId = 'fancy_listing_span_' + i;
+            self.hide()
+                .after('<a id="' + id + '" class="button" href="' + op.file_url + '">' + op.text + '</a>')
+                .after('<span id="' + spanId + '" style="display:none;margin-right:5px;"></span>');
+            if (op.fancybox_setting === null) {
+                $('#' + id).fancybox({
+                    'width'         : '70%',
+                    'height'        : '90%',
+                    'autoScale'     : false,
+                    'transitionIn'  : 'none',
+                    'transitionOut' : 'none',
+                    'type'          : 'iframe',
+                    'onCleanup'     : function(){
+                        var $iframe = $('#fancybox-frame').contents();
+                        if ($iframe.find('#cancel_check').is(':checked')) {
+                            return true;
+                        } else {
+                            var v = $iframe.find('input:radio:checked').val();
+                            if (!v) {
+                                v = '';
+                            }
+                            self.val(v).next().text(v).show();
+                        }
+                        return true;
+                    }
+                });
+            } else {
+                $('#' + id).fancybox(op.fancybox_setting);
+            }
+        });
+    };
+    $.fn.MTAppFancyListing.defaults = {
+        file_url: '/',
+        text: '一覧から選択',
+        fancybox_setting: null
+    };
+    // end - $.fn.MTAppFancyListing()
+
+    // ---------------------------------------------------------------------
     //  $.fn.MTAppCheckCategoryCount();
     //
     //  Description:
