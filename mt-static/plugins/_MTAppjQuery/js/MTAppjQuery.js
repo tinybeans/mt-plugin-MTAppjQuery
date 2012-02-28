@@ -666,22 +666,14 @@
     $.MTAppFieldSort = function(options){
         var op = $.extend({}, $.MTAppFieldSort.defaults, options);
 
-        var field = op.sort.split(','),
-            firld_length = field.length;
-        if (firld_length == 0) return;
-        for (var i = 0; i < firld_length; i++) {
-            field[i] = $.trim(field[i]);
-        }
-        field.reverse();
-
-        var ID = (op.insert_id !== 'sortable') ? '#' + op.insert_id: '#' + op.insertID;
-        for (var i = 0; i < firld_length; i++) {
-            if (field[i].match(/^c:/)) {
-                var fieldID = '#customfield_' + field[i].replace(/^c:/,'') + '-field';
-            } else {
-                var fieldID = '#' + field[i] + '-field';
-            }
-            $(fieldID).prependTo(ID).removeClass('hidden');
+        var field = op.sort.split(',').reverse();
+        var l = field.length;
+        if (l == 0) return;
+        var containerId = (op.insert_id !== 'sortable') ? op.insert_id: op.insertID;
+        var container = document.getElementById(containerId);
+        for (var i = 0; i < l; i++) {
+            var id = $.trim(field[i]).replace(/^c:/,'customfield_') + '-field';
+            container.insertBefore(document.getElementById(id), container.firstChild);
         }
     };
     $.MTAppFieldSort.defaults = {
