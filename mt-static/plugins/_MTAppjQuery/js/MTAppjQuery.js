@@ -1129,11 +1129,12 @@
     //    またあらかじめ読み込む一覧をインデックステンプレートで作成しておく必要があります。
     //
     //  Usage:
-    //    $(selector).MTAppFancyListing(options);
+    //    $('input:text').MTAppFancyListing(options);
     //
     //  Options:
     //    file_url: {String} iframeに読み込むサイト内のページ
     //    text: {String} ボタンに表示するテキスト
+    //    type: {String} button（ボタンを表示） or input（input:textをクリックで起動）
     //    fancybox_setting: {Object} fancyboxに渡すオブジェクト
     // ---------------------------------------------------------------------
 
@@ -1149,13 +1150,27 @@
         }
         return this.each(function(i){
             var self = $(this);
+            var selfVal = self.val() ? self.val(): '';
             var id = 'fancy_listing_' + i;
             var spanId = 'fancy_listing_span_' + i;
-            self.hide()
-                .after('<a id="' + id + '" class="button" href="' + op.file_url + '">' + op.text + '</a>')
-                .after('<span id="' + spanId + '" style="display:none;margin-right:5px;"></span>');
+            var hidden = !selfVal ? ' hidden': '';
+            self.after('<a id="' + id + '" class="button" href="' + op.file_url + '">' + op.text + '</a>')
+                .after('<span id="' + spanId + '" style="margin-right:5px;" class="' + hidden + '">' + selfVal + '</span>');
+            var $fancyBtn = $('#' + id);
+            switch (op.type) {
+                case 'button':
+                    self.hide();
+                    break;
+                case 'input':
+                    $fancyBtn.hide();
+                    $('#' + spanId).hide();
+                    self.focus(function(){
+                        $fancyBtn.click();
+                    });
+                    break;
+            }
             if (op.fancybox_setting === null) {
-                $('#' + id).fancybox({
+                $fancyBtn.fancybox({
                     'width'         : '70%',
                     'height'        : '90%',
                     'autoScale'     : false,
@@ -1167,11 +1182,8 @@
                         if ($iframe.find('#cancel_check').is(':checked')) {
                             return true;
                         } else {
-                            var v = $iframe.find('input:radio:checked').val();
-                            if (!v) {
-                                v = '';
-                            }
-                            self.val(v).next().text(v).show();
+                            var v = $iframe.find('input:radio:checked').val() ? $iframe.find('input:radio:checked').val(): '';
+                            self.focus().val(v).next().text(v).removeClass('hidden');
                         }
                         return true;
                     }
@@ -1184,6 +1196,7 @@
     $.fn.MTAppFancyListing.defaults = {
         file_url: '/',
         text: '一覧から選択',
+        type: 'button', // button or input
         fancybox_setting: null
     };
     // end - $.fn.MTAppFancyListing()
