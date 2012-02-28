@@ -159,6 +159,7 @@ __MTML__
 
     // 推奨
     var mtappVars = {
+        "type" : "${_type}",
         "author_id" : <mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if>,
         "user_name" : "<mt:var name="author_name" encode_js="1">",
         "curr_website_id" : <mt:if name="curr_website_id"><mt:var name="curr_website_id"><mt:else>0</mt:if>,
