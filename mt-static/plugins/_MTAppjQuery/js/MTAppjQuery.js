@@ -1215,15 +1215,20 @@
             var fieldSort = [];
             $('#main-content')
                 .find('div.field:visible').each(function(){
-                    var basename = $(this).attr('id').replace(/-field$/,'').replace(/^customfield_/,'c:');
+                    var basename = $(this).attr('id').replace(/-field$/,'');
                     fieldSort.push(basename);
                     $(this).before('<input type="text" value="' + basename + '" />');
                 })
                 .end()
                 .prepend($.MTAppMakeField({
-                    label: '現在の並び順（MTAppFieldSort用）',
-                    content: '<textarea class="text high">' + fieldSort.join(',') + '</textarea>'
-                }));
+                    label: '現在の並び順（MTAppFieldSort用）<a href="#" id="mtapp-customfield-c" class="button">「c:」に置換</a>',
+                    content: '<textarea id="mtapp-fieldsort" class="text high">' + fieldSort.join(',') + '</textarea>'
+                }))
+                .find('#mtapp-customfield-c').click(function(){
+                    var v = $('#mtapp-fieldsort').val().replace(/customfield_/g,'c:');
+                    $('#mtapp-fieldsort').val(v);
+                    return false;
+                });
         });
 
         // [ブログ記事の管理]
