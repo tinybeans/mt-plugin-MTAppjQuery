@@ -2030,6 +2030,78 @@
 
 
     // -------------------------------------------------
+    //  $.MTAppMakeField();
+    //
+    //  Description:
+    //    メインカラムのフィールドを生成します。
+    //
+    //  Usage:
+    //    $.MTAppMakeField(options);
+    //
+    //  Options:
+    //    label: {String} ラベル部分のテキスト、HTML
+    //    content: {String} コンテンツ部分のテキスト、HTML
+    //
+    // -------------------------------------------------
+    $.MTAppMakeField = function(options) {
+        var op = $.extend({}, $.MTAppMakeField.defaults, options);
+        return [
+            '<div class="field field-top-label">',
+                '<div><label>' + op.label + '</label></div>',
+                '<div class="field-content">',
+                op.content,
+                '</div>',
+            '</div>'
+        ].join('');
+    };
+    $.MTAppMakeField.defaults = {
+        label: '',
+        content: ''
+    };
+    // end - $.MTAppMakeField();
+
+
+    // -------------------------------------------------
+    //  $.MTAppMakeWidget();
+    //
+    //  Description:
+    //    右サイトバーのウィジェットを生成します。
+    //
+    //  Usage:
+    //    $.MTAppMakeWidget(options);
+    //
+    //  Options:
+    //    label: {String} ラベル部分のテキスト、HTML
+    //    content: {String} コンテンツ部分のテキスト、HTML
+    //    action: {String} アクション部分のテキスト、HTML
+    //    footer: {String} フッター部分のテキスト、HTML
+    //
+    // -------------------------------------------------
+    $.MTAppMakeWidget = function(options) {
+        var op = $.extend({}, $.MTAppMakeWidget.defaults, options);
+        return [
+            '<div class="widget">',
+                '<div class="widget-header">',
+                    '<div class="widget-action">' + op.action + '</div>',
+                    '<div class="widget-label">',
+                        '<h2><span>' + op.label + '</span></h2>',
+                    '</div>',
+                '</div>',
+                '<div class="widget-content">' + op.content + '</div>',
+                '<div class="widget-footer">' + op.footer + '</div>',
+            '</div>'
+        ].join('');
+    };
+    $.MTAppMakeWidget.defaults = {
+        label: '',
+        content: '',
+        action: '',
+        footer: ''
+    };
+    // end - $.MTAppMakeWidget();
+
+
+    // -------------------------------------------------
     //  Utilities
     //
     //  $(foo).hasClasses(classes);
@@ -2136,8 +2208,7 @@
         digit: function (num, space) {
             var prefix = (space) ? ' ' : '0';
             return (num < 10) ? prefix + num: num;
-    }
-
+        }
     });
     // end - Utility
 
