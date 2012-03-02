@@ -1194,7 +1194,10 @@
         }
 
         var pageInfo = [
-            '<p id="mtapp-debug-pageinfo-title" class="msg-text"><a href="javascript: void(0);">このページの情報</a></p>',
+            '<p id="mtapp-debug-tools" class="msg-text">',
+                '<a id="mtapp-debug-pageinfo-title" href="javascript:void(0);" class="button">このページの情報</a>',
+                '<a href="javascript:void(0);" class="button" id="mtapp-show-basename">ベースネームを表示（メインカラム）</a>',
+            '</p>',
             '<p id="mtapp-debug-pageinfo-content" class="msg-text">',
                 'body'+ bodyID + '.' + bodyClass + '<br />',
                 'var mtappVars = { <br />' + mtappVarsStr.join(',<br />') + '<br />};',
@@ -1207,6 +1210,20 @@
         });
         $('#mtapp-debug-pageinfo-title').click(function(){
             $('#mtapp-debug-pageinfo-content').slideToggle();
+        });
+        $('#mtapp-show-basename').click(function(){
+            var fieldSort = [];
+            $('#main-content')
+                .find('div.field:visible').each(function(){
+                    var basename = $(this).attr('id').replace(/-field$/,'').replace(/^customfield_/,'c:');
+                    fieldSort.push(basename);
+                    $(this).before('<input type="text" value="' + basename + '" />');
+                })
+                .end()
+                .prepend($.MTAppMakeField({
+                    label: '現在の並び順（MTAppFieldSort用）',
+                    content: '<textarea class="text high">' + fieldSort.join(',') + '</textarea>'
+                }));
         });
 
         // [ブログ記事の管理]
