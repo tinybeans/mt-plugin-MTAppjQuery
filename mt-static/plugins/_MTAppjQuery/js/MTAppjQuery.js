@@ -102,14 +102,16 @@
                 }
             // labelオプションがカンマ区切りのテキストもしくは空の場合
             } else if (typeof op.label === 'string') {
-                checkboxs = (op.label == '') ? $self.attr('title').split(',') : op.label.split(',');
-                if (checkboxs.length < 1) return;
+                checkboxs = (op.label === '') ? $self.attr('title').split(',') : op.label.split(',');
+                if (checkboxs.length === 1 && checkboxs[0] === '') {
+                    checkboxs = [];
+                }
                 for (var i = 0, n = checkboxs.length; i < n; i++) {
                     checkboxs[i] = $.trim(checkboxs[i]);
                 }
                 if (op.sort == 'ascend') {
                     checkboxs.sort();
-                } else if (op.sort == 'descend') {
+                } else if (op.sort === 'descend') {
                     checkboxs.sort();
                     checkboxs.reverse();
                 }
@@ -126,7 +128,7 @@
             // addオプションがtrueの場合（ユーザー追加可能の場合）
             if (op.add && op.skin == false) {
                 labels.push('<input class="mcb-add-item" type="text" value="+" />');
-            } else {
+            } else if (op.add) {
                 labels.push('<input class="mcb-add-item" type="text" value="" />');
             }
             $container
@@ -164,6 +166,7 @@
                                 .before(makeLabel(value, label, true))
                                 .prev()
                                     .children('input:checkbox').click(checkboxClick);
+                            var checked = $.data(self, 'mcb-lists');
                             checked.push(value);
                             $.data(self, 'mcb-lists', checked);
                             $self.val(checked.join(','));
