@@ -2255,10 +2255,20 @@
     });
 
     $.extend({
+        // 1桁の整数の場合、頭に0を付ける
         digit: function(num, space) {
             var prefix = (space) ? ' ' : '0';
             return (num < 10) ? prefix + num: num;
         },
+        // 指定した桁数に満たない場合は頭を0で埋める
+        zeroPad: function(num, pad) {
+            num = num.toString();
+            while (num.length < pad) {
+                num = '0' + num;
+            }
+            return num;
+        },
+        // 全角数字を半角数字に変換し、半角数字以外は削除する。
         toInt: function(str) {
             return str.replace(/０/g, '0')
                 .replace(/１/g, '1')
