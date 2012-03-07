@@ -1,0 +1,455 @@
+@charset "UTF-8";
+/*
+ * MTAppjQuery.css for MTAppjQuery (Movable Type Plugin)
+ *
+ * Copyright (c) 2010 Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
+ *
+ * Since:   2010-07-22
+ * Update:  2010-09-03
+ * for version: 0.15
+ * Comment: 
+ * 
+ */
+
+/* ----------------------------------------
+   __汎用クラス
+---------------------------------------- */
+.mtapp-hidden {
+    display: none;
+}
+
+.mtapp-2colum-l { float: left;  width: 49%; }
+.mtapp-2colum-r { float: right; width: 49%; }
+
+.mtapp-3colum-l { float: left;  width: 33%; margin-right: 1% !important; }
+.mtapp-3colum-c { float: left;  width: 32%; }
+.mtapp-3colum-r { float: right; width: 33%; }
+
+.mtapp-clear-l  { clear: left;  }
+.mtapp-clear-r  { clear: right; }
+.mtapp-clear-b  { clear: both;  }
+
+/* ----------------------------------------
+   __管理画面のスタイル
+---------------------------------------- */
+textarea#jqplugin,
+textarea#sys_jqplugin {
+    width: 98%;
+    height: 100px;
+}
+/* ----------------------------------------
+   __Uploadify - マルチファイルアップロード
+---------------------------------------- */
+.mtapp-uploadify-thumb {
+    width: 200px;
+    padding: 10px 0;
+}
+.mtapp-uploadify-cancel {
+    position: relative;
+    left: -16px;
+    padding-top: 10px;
+    vertical-align: top;
+    cursor: pointer;
+}
+
+/* ----------------------------------------
+   __ヒントのツールチップ
+---------------------------------------- */
+#mtapp-tooltip {
+    padding: 8px 10px;
+    border: 1px solid #FAC833;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-box-shadow: 2px 2px 10px #ABABAB;
+    -webkit-box-shadow: 2px 2px 10px #ABABAB;
+    background: #FAC833;
+}
+/* ----------------------------------------
+   __ヒントのバルーン
+---------------------------------------- */
+.balloon {
+    position: absolute;
+    z-index: 99;
+}
+#related-content .balloon {
+    max-width: 258px;
+}
+.balloon-content {
+    position: relative;
+    padding: 13px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    background-color: #FAC833;
+	box-shadow: 0px 2px 3px #888;
+	-moz-box-shadow: 0px 2px 3px #888;
+	-webkit-box-shadow: 0px 2px 3px #888;
+}
+.balloon .balloon-arrow {
+    position: absolute;
+    left: 20px;
+    width: 19px;
+    height: 10px;
+    div {
+    	margin: 0 auto;
+    	display: block;
+    	height: 1px;
+    	background: #FAC833;
+    	line-height: 0px;
+    	font-size: 0px;
+    	box-shadow: 0px 2px 3px #888;
+    	-moz-box-shadow: 0px 2px 3px #888;
+    	-webkit-box-shadow: 0px 2px 3px #888;
+    }
+}
+.balloon .balloon-arrow .line10{ width: 19px;} 
+.balloon .balloon-arrow .line9 { width: 17px;} 
+.balloon .balloon-arrow .line8 { width: 15px;}
+.balloon .balloon-arrow .line7 { width: 13px;}
+.balloon .balloon-arrow .line6 { width: 11px;}
+.balloon .balloon-arrow .line5 { width: 9px;}
+.balloon .balloon-arrow .line4 { width: 7px;}
+.balloon .balloon-arrow .line3 { width: 5px;}
+.balloon .balloon-arrow .line2 { width: 3px;}
+.balloon .balloon-arrow .line1 { width: 1px;}
+
+/* ----------------------------------------
+   __マルチチェックボックス
+---------------------------------------- */
+span.mcb-container {
+    display: block;
+}
+span.mcb-container .mcb-label {
+    line-height: 1.5;
+}
+span.mcb-container .mcb-label .mcb-checkbox {
+    margin: 0 3px 0 5px;
+}
+/* span.mcb-skin-tags */
+span.mcb-skin-tags .mcb-label,
+span.mcb-container .mcb-add-item {
+    display: inline-block;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    padding: 2px 4px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    background-color: #E5E5E5;
+    color: #000000;
+    cursor: pointer;
+}
+span.mcb-skin-tags .mcb-label-checked {
+    background-color: #658F9A;
+    color: #FFFFFF;
+    font-weight: normal;
+}
+span.mcb-skin-tags .mcb-checkbox {
+    display: none;
+}
+span.mcb-skin-tags .mcb-add-item {
+    margin-left: 0;
+}
+span.mcb-container .mcb-add-item {
+    width: 120px;
+    padding-left: 12px;
+    border: 1px solid #E5E5E5;
+    background: url(../images/create.gif) no-repeat 2px 50%;
+    font-size: 13px;
+    line-height: 1.5;
+    cursor: default;
+}
+/* ----------------------------------------
+   __ローディング
+---------------------------------------- */
+#container {
+    visibility: hidden;
+}
+#mtapp-loading {
+    position: absolute;
+    top: 250px;
+    left: 50%;
+    margin-left: -33px;
+}
+/* ----------------------------------------
+   __スライドメニュー
+---------------------------------------- */
+div#menu-bar div#selector-nav div.selector ul li {
+    position: relative;
+    line-height: 1.8;
+}
+div#menu-bar div#selector-nav div.selector ul li.system-overview ul,
+div#menu-bar div#selector-nav div.selector ul#fav-website-list li ul li ul,
+div#menu-bar div#selector-nav div.selector ul#fav-blog-list li ul li ul {
+    display: none;
+    position: absolute;
+    top: -1px;
+    left: 300px; /* JS */
+    border-left: 1px solid #9EA1A3;
+    background-color: #7B7C7D;
+}
+div#menu-bar div#selector-nav div.selector li.system-overview ul li,
+div#menu-bar div#selector-nav div.selector ul#fav-website-list li ul li ul li,
+div#menu-bar div#selector-nav div.selector ul#fav-blog-list li ul li ul li {
+/*     min-width: 300px; */
+    min-height: 28px;
+    border-top: 1px solid #9EA1A3;
+}
+div#menu-bar div#selector-nav div.selector li.system-overview ul li a,
+div#menu-bar div#selector-nav div.selector ul#fav-website-list li ul li ul li a,
+div#menu-bar div#selector-nav div.selector ul#fav-blog-list li ul li ul li a {
+    padding-right: 25px;
+}
+#selector-nav #fav-website-list .mtapp-slidemenu-current {
+    background-color: #839B5C;
+}
+#selector-nav #fav-blog-list .mtapp-slidemenu-current {
+    background-color: #5C909B;
+}
+/* ----------------------------------------
+   __スーパースライドメニュー
+---------------------------------------- */
+div#menu-bar div#selector-nav div.selector ul#fav-website-list.super-slide-menu li ul{
+    display: none;
+    position: absolute;
+    top: -1px;
+    left: 300px; /* JS */
+    border-left: 1px solid #9EA1A3;
+    background-color: #7B7C7D;
+}
+div#menu-bar div#selector-nav div.selector ul#fav-website-list.super-slide-menu li ul li{
+/*     min-width: 300px; */
+    min-height: 28px;
+    border-top: 1px solid #9EA1A3;
+}
+div#menu-bar div#selector-nav div.selector ul#fav-website-list.super-slide-menu li ul li a{
+    padding-right: 25px;
+}
+#selector-nav #fav-website-list.super-slide-menu .Blog a:hover {
+    background-color: #5C909B;
+}
+
+/* ----------------------------------------
+   __ストラクチャーダッシュボード
+---------------------------------------- */
+.favorite-blogs-widget #favorite-structure .blog-container {
+    height: auto;
+}
+.favorite-blogs-widget #favorite-structure .favorite-structure-container {
+    background-color: #f3f3f3;
+    margin: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+.favorite-blogs-widget #favorite-structure .blog-container .favorite-structure-blog-container {
+    margin-left: 110px;
+    padding: 10px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+.favorite-blogs-widget #favorite-structure .favorite-structure-container .last-child.blog-content {
+    margin-bottom: 0;
+}
+/* ----------------------------------------
+   __エディタの全画面表示
+---------------------------------------- */
+.cloneBtns {
+    display: none;
+    margin-right: 2px;
+}
+#overlay {
+     display: none;
+     position: absolute;
+     z-index: 1000;
+     width: 100%;
+     height: 100%;
+     background-color: #000000;
+     opacity: 0.8;
+     filter: alpha(opacity=80);
+}
+/* ----------------------------------------
+   __エディタのインラインエディットアイコン
+---------------------------------------- */
+.mtapp-inline-edit {
+    margin-left: 3px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+/* ----------------------------------------
+   __テンプレートの管理
+---------------------------------------- */
+/* 再構築カラム */
+#main-content th.rebuild,
+#main-content td.rebuild {
+    width: 4em;
+}
+/* 再構築アイコン */
+td.rebuild {
+    text-align: center;
+}
+td.mtapp-rebuild-icon {
+    vertical-align: middle;
+    cursor: pointer;
+}
+img.mtapp-rebuild-icon:hover {
+    opacity: 0.7;
+    filter: alpha(opacity=70);
+}
+/*
+a.mtapp-rebuild-icon {
+    display: block;
+    width: 15px;
+    height: 15px;
+    margin-left: 11px;
+    text-indent: -9999px;
+    cursor: pointer;
+    background: url(../images/rebuild-mini.png) no-repeat top left;
+    outline: none;
+    overflow: hidden;
+}
+*/
+/* ----------------------------------------
+   __固定右サイドバー
+---------------------------------------- */
+div.no-scroll-right-sidebar .widget {
+    margin-bottom: 0;
+}
+div.no-scroll-right-sidebar .widget-content {
+    display: none;
+}
+
+
+/* ----------------------------------------
+   __デバッグモード
+---------------------------------------- */
+#mtapp-debug-pageinfo-content {
+    display: none;
+    margin-right: 20px;
+    padding: 15px;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow-x: scroll;
+    background-color: #F3F3F3;
+    border: 1px solid #C0C6C9;
+}
+.mtapp-debug-block,
+.mtapp-debug-inline {
+    z-index: 999;
+    padding: 3px;
+    border: 1px solid #ffffff;
+    background-color: #000000;
+    color: #ffff00;
+    font-size: 13px;
+    font-weight: bold;
+    opacity: 0.9;
+    filter: alpha(opacity=90);
+}
+.mtapp-debug-block {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.mtapp-debug-inline {
+    display: inline;
+}
+
+a.mtapp-if-page {
+    padding-left: 4px;
+}
+/* ----------------------------------------
+   __プラグインの管理画面
+---------------------------------------- */
+fieldset#uploadify_setting {
+    border: 1px solid #C8C2BE;
+}
+fieldset#uploadify_setting legend {
+    display: block;
+    margin-left: 10px;
+    font-size: 120%;
+    font-weight: bold;
+}
+/* ----------------------------------------
+   __バリデーション
+---------------------------------------- */
+.err {
+    background: #F6BFBC !important;
+}
+/* ----------------------------------------
+   __MTAppRemoveVal
+---------------------------------------- */
+div.field span.remove-val {
+    display: block;
+    position: relative;
+    width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    background: #D1D7DC url(../../../images/status_icons/icon-remove.png) no-repeat center center;
+    text-indent: -9999px;
+    cursor: pointer;
+    opacity: 0.7;
+    filter: alpha(opacity=70);
+}
+/* ----------------------------------------
+   __キーボードショートカット
+---------------------------------------- */
+table.listing-table tbody tr.keyboard-selected {
+    background-color: #CEE4AE;
+}
+table.listing-table tbody tr.hover-selected {
+    background-color: #FEE47F;
+}
+/* ----------------------------------------
+   __MTAppNbspGUI
+---------------------------------------- */
+span.mtapp-nbsp-gui-item {
+    display: block;
+    position: relative;
+    margin-bottom: 5px;
+}
+input.mtapp-nbsp-gui-input {
+}
+span.mtapp-nbsp-gui-add {
+    display: block;
+    position: absolute;
+    top: 5px;
+    right: 2px;
+    width: 9px;
+    height: 9px;
+    background: url(../../../images/status_icons/create.gif) no-repeat right center;
+    text-indent: -9999px;
+    cursor: pointer;
+}
+/* ----------------------------------------
+   __FieldSuggest
+---------------------------------------- */
+.field-suggestion {
+    position: relative;
+    top: -1px;
+    left: 2px;
+    width: 100%;
+    .field_completion {
+/*         display: none; */
+        min-width: 200px;
+        max-width: 100%;
+        position: absolute;
+        z-index: 50;
+        border: 1px solid #C0C6C9;
+        background-color: #F3F3F3;
+        div {
+            padding: 2px 5px;
+            &.complete-highlight {
+                color: #2B2B2B;
+                background-color: #DCDDDD;
+            }
+        }
+    }
+}

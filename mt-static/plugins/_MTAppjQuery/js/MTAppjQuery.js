@@ -675,6 +675,99 @@
 
 
     // -------------------------------------------------
+    //  $(foo).MTAppSuggest();
+    //
+    //  Description:
+    //    
+    //
+    //  Usage:
+    //  　$(input:text).MTAppSuggest(options);
+    //
+    //  Options:
+    //    list: {Array} 候補になる用語の配列
+    // -------------------------------------------------
+    $.fn.MTAppSuggest = function(options){
+        var op = $.extend({}, $.fn.MTAppSuggest.defaults, options);
+
+        return this.each(function(){
+            var $self = $(this);
+            var rand = '' + Math.random();
+            rand = rand.replace('.','');
+            var suggestionId = 'suggestion-' + rand;
+            var completionId = 'completion-' + rand;
+            $.data(this, 'suggestList', op.list);
+            var list = '<div class="field-suggestion" id="' + suggestionId + '" style="display:none;"><div class="field_completion" id="' + completionId + '"></div></div>';
+            $self
+                .closest('div.field').css('overflow','visible')
+                .end()
+                .after(list);
+            var outerElm = document.getElementById(suggestionId);
+            var innerElm = document.getElementById(completionId);
+            $self
+                .blur(function(){
+                    outerElm.style.display = 'none';
+                })
+                .keydown(function(e){
+                    if (e.which == 13) { // Enter
+                        var $highlight = $(innerElm).children('.complete-highlight');
+                        if ($highlight.size() > 0) {
+                            var v = $self.val().replace(/(, )?([^,]*)$/,'$1');
+                            $self.val(v + $highlight.text() + ', ');
+                        }
+                        outerElm.style.display = 'none';
+                        return false;
+                    }
+                })
+                .keyup(function(e){
+                    switch (e.which) {
+                        case 40: // down
+                            var $highlight = $(innerElm).children('.complete-highlight');
+                            if ($highlight[0].nextSibling) {
+                                $highlight.removeClass('complete-highlight').addClass('complete-none').next().addClass('complete-highlight');
+                            }
+                            return false;
+                        case 38: // up
+                            var $highlight = $(innerElm).children('.complete-highlight');
+                            if ($highlight[0].previousSibling) {
+                                $highlight.removeClass('complete-highlight').addClass('complete-none').prev().addClass('complete-highlight');
+                            }
+                            return false;
+                        default:
+                            var contain = [];
+                            var first = true;
+                            var v = $(this).val().match(/(?:, )?([^,]*)$/)[1];
+                            if (v !== '') {
+                                for (var i = 0, n = op.list.length; i < n; i++) {
+                                    if (op.list[i].indexOf(v) >= 0) {
+                                        if (first) {
+                                            contain.push('<div class="complete-highlight">' + op.list[i] + '</div>');
+                                            first = false;
+                                            outerElm.style.display = 'block';
+                                        } else {
+                                            contain.push('<div class="complete-none">' + op.list[i] + '</div>');
+                                        }
+                                    }
+                                }
+                                innerElm.innerHTML = contain.join('');
+                                if (contain.length == 0) {
+                                    outerElm.style.display = 'none';
+                                }
+                            } else {
+                                outerElm.style.display = 'none';
+                            }
+                            break;
+                    } // switch
+                }); // keyup
+                return false;
+            }); // each
+    };
+    $.fn.MTAppSuggest.defaults = {
+        list: []
+    };
+    // end - $(foo).MTAppSuggest();
+
+
+    // -------------------------------------------------
     //  $.MTAppSetting();
     // -------------------------------------------------
 /*
