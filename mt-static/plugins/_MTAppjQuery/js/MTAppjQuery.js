@@ -1256,7 +1256,7 @@
                     .end()
                     .find('tbody')
                         .find('td.cb')
-                            .insertListingColum('after', 'td', '<img class="mtapp-rebuild-icon" src="' + mtappVars.static_plugin_path + 'images/rebuild-mini.png" width="13" height="13" />', 'rebuild')
+                            .insertListingColum('after', 'td', '<img class="mtapp-rebuild-icon" src="' + mtappVars.static_plugin_path + 'images/rebuild.png" width="13" height="13" />', 'rebuild')
                         .end()
                         .find('img.mtapp-rebuild-icon')
                             .each(function(){

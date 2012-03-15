@@ -325,10 +325,11 @@ div#menu-bar div#selector-nav div.selector ul#fav-website-list.super-slide-menu 
 /* 再構築アイコン */
 td.rebuild {
   text-align: center; }
-
 td.mtapp-rebuild-icon {
   vertical-align: middle;
   cursor: pointer; }
+  td.mtapp-rebuild-icon img:hover {
+    cursor: pointer; }
 
 img.mtapp-rebuild-icon:hover {
   opacity: 0.7;
