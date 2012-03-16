@@ -955,7 +955,11 @@
         var container = document.getElementById(containerId);
         for (var i = 0; i < l; i++) {
             var id = $.trim(field[i]).replace(/^c:/,'customfield_') + '-field';
-            container.insertBefore(document.getElementById(id), container.firstChild);
+            if (document.getElementById(id)) {
+                container.insertBefore(document.getElementById(id), container.firstChild);
+            } else if (window.console) {
+                console.log('#' + id + ' が見つかりません');
+            }
         }
     };
     $.MTAppFieldSort.defaults = {
