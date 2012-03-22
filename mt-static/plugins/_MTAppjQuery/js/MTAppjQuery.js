@@ -956,7 +956,9 @@
         for (var i = 0; i < l; i++) {
             var id = $.trim(field[i]).replace(/^c:/,'customfield_') + '-field';
             if (document.getElementById(id)) {
-                container.insertBefore(document.getElementById(id), container.firstChild);
+                var elm = document.getElementById(id);
+                container.insertBefore(elm, container.firstChild);
+                $(elm).removeClass('hidden');
             } else if (window.console) {
                 console.log('#' + id + ' が見つかりません');
             }
