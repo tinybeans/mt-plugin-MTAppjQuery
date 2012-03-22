@@ -1760,7 +1760,8 @@
         return this.each(function(){
             $(this)
                 .after('<span class="mun_msg" style="display:none;color:red;font-weight:bold;"></span>')
-                .keyup(function(){
+                .keyup(function(e){
+                    if (e.which == 37 || e.which == 39) return;
                     var self = $(this);
                     var text = self.val();
                     text = $.trim(text);
@@ -1775,7 +1776,8 @@
                         .replace(/７/g, '7')
                         .replace(/８/g, '8')
                         .replace(/９/g, '9');
-                    self.val(text.replace(/^0|[^0-9]/g, ''));
+                    var reg = RegExp('^0|[^0-9' + op.allow + ']', 'g');
+                    self.val(text.replace(reg, ''));
                     var span = $(this).nextAll('span.mun_msg');
                     var num = Number(text.replace(/^0|[^0-9]/g, ''));
                     if (num < op.min) {
@@ -1792,7 +1794,8 @@
         min: 0,
         max: 10000000000000000000,
         min_msg: '値が小さすぎます。',
-        max_msg: '値が大きすぎます。'
+        max_msg: '値が大きすぎます。',
+        allow: ''
     };
     // end - $(foo).MTAppNumChecker();
 
