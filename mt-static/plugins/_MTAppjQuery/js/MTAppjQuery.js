@@ -1754,6 +1754,9 @@
     //    max: {Number} 最大値
     //    min_msg: {String} 最小値よりも小さかったときのアラートメッセージ
     //    max_msg: {String} 最大値よりも大きかったときのアラートメッセージ
+    //    allow: {Reg} 置換しない文字を正規表現で指定
+    //    zero_pad: {Boolean} 先頭の0を残す場合はtrue
+    //    target: {String} numberを指定すると数字の置換のみの動作となる
     // -------------------------------------------------
     $.fn.MTAppNumChecker = function(options) {
         var op = $.extend({}, $.fn.MTAppNumChecker.defaults, options);
@@ -1776,8 +1779,17 @@
                         .replace(/７/g, '7')
                         .replace(/８/g, '8')
                         .replace(/９/g, '9');
-                    var reg = RegExp('^0|[^0-9' + op.allow + ']', 'g');
-                    self.val(text.replace(reg, ''));
+                    if (op.target === 'number' && op.zero_pad) {
+                        self.val(text);
+                    } else if (op.target === 'number') {
+                        self.val(text.replace(/^0+/g, ''));
+                    } else if (op.zero_pad) {
+                        var reg = RegExp('[^0-9' + op.allow + ']', 'g');
+                        self.val(text.replace(reg, ''));
+                    } else {
+                        var reg = RegExp('^0|[^0-9' + op.allow + ']', 'g');
+                        self.val(text.replace(reg, ''));
+                    }
                     var span = $(this).nextAll('span.mun_msg');
                     var num = Number(text.replace(/^0|[^0-9]/g, ''));
                     if (num < op.min) {
@@ -1795,7 +1807,9 @@
         max: 10000000000000000000,
         min_msg: '値が小さすぎます。',
         max_msg: '値が大きすぎます。',
-        allow: ''
+        allow: '',
+        zero_pad: false,
+        target: ''
     };
     // end - $(foo).MTAppNumChecker();
 
