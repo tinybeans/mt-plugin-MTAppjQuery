@@ -1458,11 +1458,12 @@
         if (typeof this.fancybox != 'function') {
             $('head').append(head.join(''));
         }
-        return this.each(function(i){
+        return this.each(function(){
+            var rand = parseInt(Math.random() * 1000);
             var self = $(this);
             var selfVal = self.val() ? self.val(): '';
-            var id = 'fancy_listing_' + i;
-            var spanId = 'fancy_listing_span_' + i;
+            var id = 'fancy_listing_' + rand;
+            var spanId = 'fancy_listing_span_' + rand;
             var hidden = !selfVal ? ' hidden': '';
             self.after('<a id="' + id + '" class="button" href="' + op.file_url + '">' + op.text + '</a>')
                 .after('<span id="' + spanId + '" style="margin-right:5px;" class="' + hidden + '">' + selfVal + '</span>');
