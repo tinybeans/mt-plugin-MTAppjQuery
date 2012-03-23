@@ -1869,13 +1869,16 @@
 
 
     // -------------------------------------------------
-    //  $(foo).MTAppDateAssist();
+    //  $('input:text').MTAppDateAssist();
     //
     //  Description:
     //    今日、明日、明後日をワンクリックで入力する
     //
     //  Usage:
-    //    $(foo).MTAppDateAssist();
+    //    $('input:text').MTAppDateAssist();
+    //
+    //  Options:
+    //    gengo: {Boolean} 元号表記にする（ex. 平成24年03月24日）
     // -------------------------------------------------
     $.fn.MTAppDateAssist = function(options) {
         var op = $.extend({}, $.fn.MTAppDateAssist.defaults, options);
@@ -1890,28 +1893,34 @@
 
         return this.each(function(){
             var self = $(this);
-            self.closest('.field-content')
-                .append(buttons.join(''))
-                .find('.day_0')
+            self.after(buttons.join(''))
+                .next()
                     .click(function(){
-                        self.val(getDateItem(ms));
+                        self.val(getDateItem(ms, op.gengo));
                     })
-                    .next()
-                        .click(function(){
-                            self.val(getDateItem(ms + 86400000));
-                        })
-                    .next()
-                        .click(function(){
-                            self.val(getDateItem(ms + 172800000));
-                        });
+                .next()
+                    .click(function(){
+                        self.val(getDateItem(ms + 86400000, op.gengo));
+                    })
+                .next()
+                    .click(function(){
+                        self.val(getDateItem(ms + 172800000, op.gengo));
+                    });
         });
-        function getDateItem(ms){
+        function getDateItem(ms, gengo){
             var d = new Date();
             d.setTime(ms);
-            return d.getFullYear() + '-' + $.digit(d.getMonth() + 1) + '-' + $.digit(d.getDate());
+            if (gengo) {
+                var y = d.getFullYear() - 1988;
+                return '平成' + y + '年' + $.digit(d.getMonth() + 1) + '月' + $.digit(d.getDate()) + '日';
+            } else {
+                return d.getFullYear() + '-' + $.digit(d.getMonth() + 1) + '-' + $.digit(d.getDate());
+            }
         }
     };
-    $.fn.MTAppDateAssist.defaults = {};
+    $.fn.MTAppDateAssist.defaults = {
+        gengo: false
+    };
     // end - $(foo).MTAppDateAssist();
 
 
