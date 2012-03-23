@@ -958,7 +958,7 @@
             if (document.getElementById(id)) {
                 var elm = document.getElementById(id);
                 container.insertBefore(elm, container.firstChild);
-                $(elm).removeClass('hidden');
+                $(elm).removeClass('hidden').show();
             } else if (window.console) {
                 console.log('#' + id + ' が見つかりません');
             }
