@@ -1791,7 +1791,7 @@
                         var reg = RegExp('^0|[^0-9' + op.allow + ']', 'g');
                         self.val(text.replace(reg, ''));
                     }
-                    var span = $(this).nextAll('span.mun_msg');
+                    var span = $(this).next('span.mun_msg');
                     var num = Number(text.replace(/^0|[^0-9]/g, ''));
                     if (num < op.min) {
                         span.text(op.min_msg).show();
