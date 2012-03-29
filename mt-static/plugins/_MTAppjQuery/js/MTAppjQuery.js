@@ -1758,6 +1758,8 @@
     //    allow: {Reg} 置換しない文字を正規表現で指定
     //    zero_pad: {Boolean} 先頭の0を残す場合はtrue
     //    target: {String} numberを指定すると数字の置換のみの動作となる
+    //    trim: {Boolean} 前後のスペースをトリムしないときはfalse
+    //    hyphen: {Boolean} ハイフンを常に半角にする場合はtrue
     // -------------------------------------------------
     $.fn.MTAppNumChecker = function(options) {
         var op = $.extend({}, $.fn.MTAppNumChecker.defaults, options);
@@ -1768,7 +1770,9 @@
                     if (e.which == 37 || e.which == 39) return;
                     var self = $(this);
                     var text = self.val();
-                    text = $.trim(text);
+                    if (op.trim) {
+                        text = $.trim(text);
+                    }
                     text = text
                         .replace(/０/g, '0')
                         .replace(/１/g, '1')
@@ -1780,6 +1784,9 @@
                         .replace(/７/g, '7')
                         .replace(/８/g, '8')
                         .replace(/９/g, '9');
+                    if (op.hyphen) {
+                        text = text.replace(/ー|—/g,'-');
+                    }
                     if (op.target === 'number' && op.zero_pad) {
                         self.val(text);
                     } else if (op.target === 'number') {
@@ -1810,7 +1817,9 @@
         max_msg: '値が大きすぎます。',
         allow: '',
         zero_pad: false,
-        target: ''
+        target: '',
+        trim: true,
+        hyphen: false
     };
     // end - $(foo).MTAppNumChecker();
 
