@@ -1849,11 +1849,13 @@
                 .after(tax_button.join(''))
                 .next()
                     .click(function(){
+                        $(this).addClass('clicked');
                         var val = Number(self.val()) * 1.05;
                         self.val(fraction(val));
                     })
                 .next()
                     .click(function(){
+                        $(this).addClass('clicked');
                         var val = Number(self.val()) / 1.05;
                         self.val(fraction(val));
                     });
