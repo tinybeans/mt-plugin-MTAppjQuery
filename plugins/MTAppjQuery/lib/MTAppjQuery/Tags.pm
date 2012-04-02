@@ -5,6 +5,9 @@ use strict;
 sub _fltr_split_format {
     my ($str, $arg, $ctx) = @_;
 
+    unless ($str) {
+        return '';
+    }
     # $arg = '%1 %2'
     my @array = split(/,/, $str);
     for (my $i = 1; $i <= scalar(@array); $i++) {
