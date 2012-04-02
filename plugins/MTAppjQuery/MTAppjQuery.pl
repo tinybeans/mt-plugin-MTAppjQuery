@@ -2,7 +2,7 @@ package MT::Plugin::MTAppjQuery;
 use strict;
 use base qw( MT::Plugin );
 
-our $VERSION = '0.25.1';
+our $VERSION = '0.26';
 
 my $plugin = MT::Plugin::MTAppjQuery->new({
     id          => 'mt_app_jquery',
@@ -66,6 +66,11 @@ sub init_registry {
             'MT::App::CMS::cms_post_save.entry' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_entry',
             'MT::App::CMS::cms_post_save.page' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_entry',
         },
+        tags => {
+            modifier => {
+                'split_format' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_split_format',
+            }
+        }
     });
 }
 
