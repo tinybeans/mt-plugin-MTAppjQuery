@@ -14,6 +14,7 @@ sub _fltr_split_format {
         my $pattern = '%'.$i;
         $arg =~ s/$pattern/$array[$i-1]/g;
     }
+    $arg =~ s/%\d+//g;
     return $arg;
 }
 
