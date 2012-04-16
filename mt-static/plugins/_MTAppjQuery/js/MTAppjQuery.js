@@ -1442,15 +1442,15 @@
     //    $('input:text').MTAppFancyListing(options);
     //
     //  Options:
-    //    file_url: {String} iframeに読み込むサイト内のページ
+    //    url: {String} iframeに読み込むサイト内のページ
     //    text: {String} ボタンに表示するテキスト
-    //    type: {String} button（ボタンを表示） or input（input:textをクリックで起動）
-    //    fancybox_setting: {Object} fancyboxに渡すオブジェクト
+    //    type: {String} button（ボタンを表示） or focus（input:textをフォーカスで起動） or input（入力可能＋ボタン）
+    //    setting: {Object} fancyboxに渡すオブジェクト
     // ---------------------------------------------------------------------
 
     $.fn.MTAppFancyListing = function(options){
         var op = $.extend({}, $.fn.MTAppFancyListing.defaults, options);
-        var path =  mtappVars.static_plugin_path ;
+        var path =  mtappVars.static_plugin_path;
         var head = [
             '<link rel="stylesheet" href="' + path + 'lib/fancybox/jquery.fancybox-1.3.4.css" />',
             '<script type="text/javascript" src="' + path + 'lib/fancybox/jquery.fancybox-1.3.4.pack.js"></script>'
@@ -1459,28 +1459,27 @@
             $('head').append(head.join(''));
         }
         return this.each(function(){
-            var rand = parseInt(Math.random() * 1000);
-            var self = $(this);
-            var selfVal = self.val() ? self.val(): '';
-            var id = 'fancy_listing_' + rand;
-            var spanId = 'fancy_listing_span_' + rand;
+            var $self = $(this);
+            var selfVal = $self.val() ? $self.val(): '';
             var hidden = !selfVal ? ' hidden': '';
-            self.after('<a id="' + id + '" class="button" href="' + op.file_url + '">' + op.text + '</a>')
-                .after('<span id="' + spanId + '" style="margin-right:5px;" class="' + hidden + '">' + selfVal + '</span>');
-            var $fancyBtn = $('#' + id);
+            $self.after('<a class="button" href="' + op.url + '">' + op.text + '</a>')
+                .after('<span style="margin-right:5px;" class="' + hidden + '">' + selfVal + '</span>');
+            var $fancyBtn = $self.next().next();
             switch (op.type) {
-                case 'button':
-                    self.hide();
-                    break;
                 case 'input':
+                    break;
+                case 'button':
+                    $self.hide();
+                    break;
+                case 'focus':
                     $fancyBtn.hide();
-                    $('#' + spanId).hide();
-                    self.focus(function(){
+                    $self.next().hide();
+                    $self.focus(function(){
                         $fancyBtn.click();
                     });
                     break;
             }
-            if (op.fancybox_setting === null) {
+            if (op.setting === null) {
                 $fancyBtn.fancybox({
                     'width'         : '70%',
                     'height'        : '90%',
@@ -1494,21 +1493,21 @@
                             return true;
                         } else {
                             var v = $iframe.find('input:radio:checked').val() ? $iframe.find('input:radio:checked').val(): '';
-                            self.focus().val(v).next().text(v).removeClass('hidden');
+                            $self.focus().val(v).next().text(v).removeClass('hidden');
                         }
                         return true;
                     }
                 });
             } else {
-                $('#' + id).fancybox(op.fancybox_setting);
+                $fancyBtn.fancybox(op.setting);
             }
         });
     };
     $.fn.MTAppFancyListing.defaults = {
-        file_url: '/',
+        url: '/',
         text: '一覧から選択',
-        type: 'button', // button or input
-        fancybox_setting: null
+        type: 'button', // button or focus or input
+        setting: null
     };
     // end - $.fn.MTAppFancyListing()
 
