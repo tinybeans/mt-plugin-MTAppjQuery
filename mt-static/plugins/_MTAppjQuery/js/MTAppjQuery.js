@@ -2405,8 +2405,8 @@
             return num;
         },
         // 全角数字を半角数字に変換し、半角数字以外は削除する。
-        toInt: function(str) {
-            return str.replace(/０/g, '0')
+        toInt: function(str, loose) {
+            str = str.replace(/０/g, '0')
                 .replace(/１/g, '1')
                 .replace(/２/g, '2')
                 .replace(/３/g, '3')
@@ -2415,8 +2415,11 @@
                 .replace(/６/g, '6')
                 .replace(/７/g, '7')
                 .replace(/８/g, '8')
-                .replace(/９/g, '9')
-                .replace(/\D/g, '');
+                .replace(/９/g, '9');
+            if (!loose) {
+                str = str.replace(/\D/g, '');
+            }
+            return str;
         }
     });
     // end - Utility
