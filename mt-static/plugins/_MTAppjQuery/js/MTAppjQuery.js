@@ -1465,15 +1465,17 @@
             $self.after('<a class="button" href="' + op.url + '">' + op.text + '</a>')
                 .after('<span style="margin-right:5px;" class="' + hidden + '">' + selfVal + '</span>');
             var $fancyBtn = $self.next().next();
+            var $span = $self.next();
             switch (op.type) {
                 case 'input':
+                    $span.hide();
                     break;
                 case 'button':
                     $self.hide();
                     break;
                 case 'focus':
                     $fancyBtn.hide();
-                    $self.next().hide();
+                    $span.hide();
                     $self.focus(function(){
                         $fancyBtn.click();
                     });
@@ -1489,11 +1491,17 @@
                     'type'          : 'iframe',
                     'onCleanup'     : function(){
                         var $iframe = $('#fancybox-frame').contents();
-                        if ($iframe.find('#cancel_check').is(':checked')) {
+                        var cancel_check = $iframe.find('#cancel_check').is(':checked');
+                        if (cancel_check) {
                             return true;
                         } else {
-                            var v = $iframe.find('input:radio:checked').val() ? $iframe.find('input:radio:checked').val(): '';
-                            $self.focus().val(v).next().text(v).removeClass('hidden');
+                            var $checked = $iframe.find('input:radio:checked');
+                            if ($checked.size()) {
+                                var v = $checked.val();
+                                $self.focus().val(v).next().removeClass('hidden').text(v);
+                            } else {
+                                return true;
+                            }
                         }
                         return true;
                     }
