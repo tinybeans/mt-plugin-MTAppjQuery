@@ -69,6 +69,7 @@ sub init_registry {
         tags => {
             modifier => {
                 'split_format' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_split_format',
+                'nengou' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_nengou',
             }
         }
     });
