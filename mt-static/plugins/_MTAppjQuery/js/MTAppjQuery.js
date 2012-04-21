@@ -973,6 +973,64 @@
 
 
     // -------------------------------------------------
+    //  $.MTAppTabs();
+    //
+    //  Description:
+    //    ブログ記事編集画面のフィールドをタブで表示する。
+    //
+    //  Usage:
+    //    $.MTAppTabs(options);
+    //
+    //  Options:
+    //    basename: {Object} タブにするフィールドを指定する。書式=>{'basename':'タブ名'}
+    //              カスタムフィールドの場合は「cf_basename」のように接頭辞「 cf_ 」を付ける。
+    //              ex. {'title':'タイトル','keywords':'キーワード','cf_price','価格'}
+    //    pointer: {String} タブを挿入する起点となるノードのセレクタ。ex. #title-field
+    //    pointer_basename: {String} タブを挿入する起点となるノードのbasename。ex. title
+    //    insert: {String} 起点となるノードの前に挿入（before）するか後ろに挿入（after）するか。
+    // -------------------------------------------------
+    $.MTAppTabs = function(options){
+        var op = $.extend({}, $.MTAppTabs.defaults, options);
+
+        if (op.basename == null) return;
+        var selector;
+        if (op.pointer != '') {
+            selector = op.pointer;
+        } else if (op.pointer_basename != '') {
+            selector = '#' + getFieldID(op.pointer_basename);
+        } else {
+            return;
+        }
+        var div = [
+            '<div class="mtapp-tabs-container">',
+                '<ul class="mtapp-tabs-navi"></ul>',
+            '</div>'
+        ];
+        var container = $(selector)[op.insert](div.join('')).next('.mtapp-tabs-container');
+        var ids = [];
+        var li = [];
+        for (var basename in op.basename) {
+            var id = '#' + getFieldID(basename);
+            ids.push(id);
+            li.push('<li><a href="' + id + '">' + op.basename[basename] + '</a></li>');
+        }
+        var $elms = $(ids.join(','));
+        $elms.removeClass('sort-enabled').find('div.field-header').addClass('hidden');
+        container
+            .append($elms)
+            .find('.mtapp-tabs-navi').html(li.join(''));
+        container.tabs();
+    };
+    $.MTAppTabs.defaults = {
+        basename: null,
+        pointer: '', // #title-field などのセレクタ
+        pointer_basename: '', // title などのベースネーム
+        insert: 'after', // before or after
+    };
+    // end - $.MTAppTabs
+
+
+    // -------------------------------------------------
     //  $.MTAppMsg();
     //
     //  Description:
@@ -2430,6 +2488,11 @@
             return str;
         }
     });
+
+    function getFieldID(basename) {
+        return basename.replace(/\s/g,'').replace(/^c:/,'customfield_').replace(/^cf_/,'customfield_') + '-field';
+    }
+
     // end - Utility
 
 })(jQuery);

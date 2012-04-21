@@ -454,3 +454,17 @@ span.mtapp-nbsp-gui-add {
         }
     }
 }
+/* !MTAppTabs */
+div.mtapp-tabs-container {
+    ul.mtapp-tabs-navi {
+        margin-bottom: 0;
+        border-bottom-style: none;
+    }
+    div.field {
+        padding: 13px !important;
+        border: 1px solid #ADADAD;
+        border-top-color: #CFD0D0;
+        border-left-color: #CFD0D0;
+        @include border-radius(5px);
+    }
+}
