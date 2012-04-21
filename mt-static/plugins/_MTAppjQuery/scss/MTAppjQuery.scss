@@ -5,11 +5,18 @@
  * Copyright (c) 2010 Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-07-22
- * Update:  2010-09-03
+ * Update:  2012-04-21
  * for version: 0.15
  * Comment: 
  * 
  */
+
+/* !mixin */
+@mixin border-radius($val) {
+    -webkit-border-radius: $val;
+    -moz-border-radius: $val;
+    border-radius: $val;
+}
 
 /* ----------------------------------------
    __汎用クラス
@@ -58,9 +65,7 @@ textarea#sys_jqplugin {
 #mtapp-tooltip {
     padding: 8px 10px;
     border: 1px solid #FAC833;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
+    @include border-radius(3px);
     -moz-box-shadow: 2px 2px 10px #ABABAB;
     -webkit-box-shadow: 2px 2px 10px #ABABAB;
     background: #FAC833;
@@ -78,9 +83,7 @@ textarea#sys_jqplugin {
 .balloon-content {
     position: relative;
     padding: 13px;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
+    @include border-radius(3px);
     background-color: #FAC833;
 	box-shadow: 0px 2px 3px #888;
 	-moz-box-shadow: 0px 2px 3px #888;
@@ -133,8 +136,7 @@ span.mcb-container .mcb-add-item {
     margin-right: 5px;
     margin-bottom: 5px;
     padding: 2px 4px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
+    @include border-radius(3px);
     background-color: #E5E5E5;
     color: #000000;
     cursor: pointer;
@@ -239,17 +241,13 @@ div#menu-bar div#selector-nav div.selector ul#fav-website-list.super-slide-menu 
     background-color: #f3f3f3;
     margin: 10px;
     padding: 15px;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
+    @include border-radius(5px);
 }
 .favorite-blogs-widget #favorite-structure .blog-container .favorite-structure-blog-container {
     margin-left: 110px;
     padding: 10px;
     background-color: #ffffff;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
+    @include border-radius(5px);
 }
 .favorite-blogs-widget #favorite-structure .favorite-structure-container .last-child.blog-content {
     margin-bottom: 0;
@@ -394,9 +392,7 @@ div.field span.remove-val {
     position: relative;
     width: 16px;
     height: 16px;
-    border-radius: 8px;
-    -webkit-border-radius: 8px;
-    -moz-border-radius: 8px;
+    @include border-radius(8px);
     background: #D1D7DC url(../../../images/status_icons/icon-remove.png) no-repeat center center;
     text-indent: -9999px;
     cursor: pointer;
