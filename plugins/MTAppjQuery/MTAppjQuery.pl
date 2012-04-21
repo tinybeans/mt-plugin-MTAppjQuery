@@ -2,7 +2,7 @@ package MT::Plugin::MTAppjQuery;
 use strict;
 use base qw( MT::Plugin );
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 my $plugin = MT::Plugin::MTAppjQuery->new({
     id          => 'mt_app_jquery',
@@ -32,7 +32,7 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             ['active',        {Default => 1,  Scope => 'blog'}],
             ['usercss',       {Default => 1,  Scope => 'blog'}],
             ['userjs',        {Default => 1,  Scope => 'blog'}],
-            ['slidemenu',     {Default => 1,  Scope => 'blog'}],
+            ['slidemenu',     {Default => 0,  Scope => 'blog'}],
             ['superslidemenu',{Default => 0,  Scope => 'blog'}],
             ['jqplugin',      {Default => '<!-- <__trans phrase="JavaScript free area of website or blog"> -->', Scope => 'blog'}],
             ['jquery_ready',  {Default => 0,  Scope => 'blog'}],
