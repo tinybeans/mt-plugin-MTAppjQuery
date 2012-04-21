@@ -2246,17 +2246,25 @@
             '</div>'
         ]: [''];
 
-        $('#entry-publishing-widget')
-            .find('div.delete-action')
-                .before(dupl_btn.join('') + dupl_ops.join(''));
+        var $deleteAction = $('#related-content').find('div.widget-content').find('div.delete-action');
+        if ($deleteAction.size() > 0) {
+            $deleteAction.before(dupl_btn.join('') + dupl_ops.join(''));
+        } else {
+            $('#related-content').find('div.actions-bar').find('button').each(function(){
+                var text = $(this).text();
+                if (text.indexOf('削除') >= 0) {
+                    $(this).closest('.actions-bar').after(dupl_btn.join('') + dupl_ops.join(''));
+                }
+            });
+        }
 
         $('#mtapp_duplicate_button').click(function(){
             var $this = $(this);
-            $('#entry_form').find('input:hidden').each(function(){
-                var n = $(this).attr('name');
-                switch (n) {
+            $('#main').find('form').find('input:hidden').each(function(){
+                var name = $(this).attr('name');
+                switch (name) {
                     case 'id':
-                        $(this).after('<input type="hidden" name="author_id" value="1" />').remove();
+                        $(this).after('<input type="hidden" name="author_id" value="' + mtappVars.author_id + '" />').remove();
                         break;
                     case 'blog_id':
                         var v = (op.change_blog) ? $('#duplicate_blog_id').val(): $(this).val();
