@@ -21,7 +21,7 @@ sub _fltr_split_format {
 sub _fltr_nengou {
     my ($str, $arg, $ctx) = @_;
 
-    unless ($arg or $str =~ /^\d{8}$/) {
+    if ($str == '' or $str !~ /^\d{8}$/) {
         return '';
     }
     my ($res, $nengou, $diff);
