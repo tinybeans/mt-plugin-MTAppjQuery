@@ -17,6 +17,7 @@ use vars qw ( %Lexicon );
 	'Failed to save the item.' => 'アイテムの保存に失敗しました。',
 	'Free area of system' => 'システムメニュー用のフリーエリア',
 	'Free area of website or blog' => 'ウェブサイト・ブログメニュー用のフリーエリア',
+	'Install [_1] and  [_2]' => '[_1]と[_2]をインストール',
 # Tmplset.pm
 	'structure' => '構造',
 # config.tmpl
