@@ -69,6 +69,7 @@ sub init_registry {
                 priority => 10,
             },
             'MT::App::CMS::template_source.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_favorite_blogs',
+            'MT::App::CMS::template_source.list_template' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_list_template',
             # 'template_param.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_favorite_blogs',
             'MT::App::CMS::template_param.edit_entry' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_edit_entry',
             'MT::App::CMS::cms_post_save.entry' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_entry',
@@ -78,6 +79,13 @@ sub init_registry {
             modifier => {
                 'split_format' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_split_format',
                 'nengou' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_nengou',
+            }
+        },
+        applications => {
+            cms => {
+                methods => {
+                    'create_user_files' => '$mt_app_jquery::MTAppjQuery::CMS::create_user_files',
+                }
             }
         }
     });
