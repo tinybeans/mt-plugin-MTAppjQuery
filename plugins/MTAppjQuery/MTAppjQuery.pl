@@ -51,6 +51,14 @@ MT->add_plugin($plugin);
 sub init_registry {
     my $plugin = shift;
     $plugin->registry({
+        config_settings => {
+            'MTAppjQueryUserJS' => {
+                default => 'user.js',
+            },
+            'MTAppjQueryUserCSS' => {
+                default => 'user.css',
+            },
+        },
         callbacks => {
             'MT::App::CMS::template_source.header' => {
                 handler => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_header',

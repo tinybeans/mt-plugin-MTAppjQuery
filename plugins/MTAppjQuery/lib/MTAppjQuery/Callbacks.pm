@@ -273,6 +273,35 @@ sub template_source_favorite_blogs {
 
 }
 
+sub template_source_list_template {
+    my ($cb, $app, $tmpl_ref) = @_;
+    my $plugin = MT->component('mt_app_jquery');
+    my $blog = $app->blog;
+    my $blog_id = $blog->id;
+    my $user_js = MT->config->MTAppjQueryUserJS || 'user.js';
+    my $user_css = MT->config->MTAppjQueryUserCSS || 'user.css';
+    my $FQDN = $app->base;
+    my $url = $FQDN . $app->uri(
+        mode => 'create_user_files',
+        args => {blog_id => $blog_id, return_args => '__mode=list_template&amp;blog_id=' . $blog_id});
+    my $label = $plugin->translate('Install [_1] and  [_2]', 'user.js', 'user.css');
+    my $widget = <<__MTML__;
+    <mtapp:widget
+        id="mtappjq-links"
+        label="MTAppjQuery <__trans phrase="Actions">">
+        <ul>
+            <li><a href="$url" class="icon-left icon-related">$label</a></li>
+        </ul>
+    </mtapp:widget>
+__MTML__
+    my $target = <<'__MTML__';
+<mtapp:widget
+        id="useful-links"
+__MTML__
+    my $target_reg = quotemeta($target);
+    $$tmpl_ref =~ s/$target_reg/$widget$target/;
+}
+
 # sub template_param_favorite_blogs {
 #     my ($cb, $app, $param, $tmpl) = @_;
 #     $param->{'blogs_json'} = ('あ','い','う');
