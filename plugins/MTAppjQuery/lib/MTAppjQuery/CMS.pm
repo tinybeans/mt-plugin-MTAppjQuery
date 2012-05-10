@@ -38,7 +38,7 @@ sub create_user_files {
 #         if (! powercms_files_dir() ) {
 #             $do = 0;
 #         }
-        my ($filename, $create_date, $content, %params, %return_params);
+        my ($filename, $create_date, $content, %search, %params, %return_params);
         my $ts = get_mt_ts();
         require MT::Template;
         # Create user.js
@@ -56,6 +56,10 @@ sub create_user_files {
 // ここに処理を書きます
 })(jQuery);
 __USER_JS__
+        %search = (
+            identifier => 'user_js',
+            blog_id => $blog->id,
+        );
         %params = (
             identifier => 'user_js',
             blog_id => $blog->id,
@@ -64,7 +68,7 @@ __USER_JS__
             name => $filename,
             outfile => $filename,
         );
-        $return_params{'user_js_status'} = create_template(\%params);
+        $return_params{'user_js_status'} = create_template(\%search, \%params);
 
         #Create user.css
         $filename = MT->config->MTAppjQueryUserCSS || 'user.css';
@@ -78,6 +82,10 @@ __USER_JS__
  *
  */
 __USER_CSS__
+        %search = (
+            identifier => 'user_css',
+            blog_id => $blog->id,
+        );
         %params = (
             identifier => 'user_css',
             blog_id => $blog->id,
@@ -86,7 +94,7 @@ __USER_CSS__
             name => $filename,
             outfile => $filename,
         );
-        $return_params{'user_css_status'} = create_template(\%params);
+        $return_params{'user_css_status'} = create_template(\%search, \%params);
 #         my $template = MT::Template->get_by_key({identifier => 'user_js', blog_id => $blog->id});
 #         doLog(defined $template->id);
 #         unless (defined $template->id) {

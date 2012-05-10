@@ -38,14 +38,11 @@ sub is_user_can {
 }
 
 sub create_template {
-    my $params = shift;
-    unless (ref $params eq 'HASH') {
+    my ($search, $params) = @_;
+    unless (ref $params eq 'HASH' and ref $search eq 'HASH') {
         return 1;
     }
-    my $template = MT::Template->get_by_key({
-        identifier => $params->{identifier},
-        blog_id => $params->{blog_id},
-    });
+    my $template = MT::Template->get_by_key($search);
     my $status;
     unless (defined $template->id) {
         my %values;
