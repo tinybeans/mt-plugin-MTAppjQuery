@@ -62,16 +62,24 @@ sub template_source_header {
     my $op_userjs         = $p->get_config_value('userjs', $scope);
     my $op_slidemenu      = $p->get_config_value('slidemenu', $scope);
     my $op_superslidemenu = $p->get_config_value('superslidemenu', $scope);
-    my $op_freearea       = $p->get_config_value('jqplugin', $scope);
     my $op_jquery_ready   = $p->get_config_value('jquery_ready', $scope);
     my $op_jqselectable   = $p->get_config_value('jqselectable', $scope);
+    # Free textarea
+    my $op_fa_mtapp_top_head  = $p->get_config_value('fa_mtapp_top_head', $scope) || '<!-- mtapp_top_head (MTAppjQuery) -->';
+    my $op_fa_html_head       = $p->get_config_value('fa_html_head', $scope) || '<!-- html_head (MTAppjQuery) -->';
+    my $op_fa_js_include      = $p->get_config_value('fa_js_include', $scope) || '<!-- js_include (MTAppjQuery) -->';
+    my $op_fa_html_body       = $p->get_config_value('fa_html_body', $scope) || '<!-- html_body (MTAppjQuery) -->';
+    my $op_fa_form_header     = $p->get_config_value('fa_form_header', $scope) || '<!-- form_header (MTAppjQuery) -->';
+    my $op_fa_jq_js_include   = $p->get_config_value('fa_jq_js_include', $scope) || '// jq_js_include (MTAppjQuery)';
+    my $op_fa_mtapp_html_foot = $p->get_config_value('fa_mtapp_html_foot', $scope) || '<!-- mtapp_html_foot (MTAppjQuery) -->';
+    my $op_fa_mtapp_end_body  = $p->get_config_value('fa_mtapp_end_body', $scope) || '<!-- mtapp_end_body (MTAppjQuery) -->';
 
     ### ローディング画像、ツールチップ用ボックスをページに追加する
     my $preset = <<__MTML__;
     <img id="mtapp-loading" src="${static_path}images/indicator.gif" alt="Loading..." />
-    <mt:setvarblock name="html_body_footer" append="1">
+    <mt:SetVarBlock name="html_body_footer" append="1">
     <div id="mtapp-tooltip" style="display: none;"></div>
-    </mt:setvarblock>
+    </mt:SetVarBlock>
 __MTML__
     $$tmpl_ref =~ s!(<div id="container")!$preset$1!g;
 
@@ -140,7 +148,7 @@ __MTML__
     my $mtapp_vars = <<__MTML__;
     <mt:unless name="screen_id">
         <mt:if name="template_filename" like="list_">
-            <mt:setvarblock name="screen_id">list-<mt:var name="object_type"></mt:setvarblock>
+            <mt:SetVarBlock name="screen_id">list-<mt:var name="object_type"></mt:SetVarBlock>
         </mt:if>
     </mt:unless>
 
@@ -175,7 +183,7 @@ __MTML__
         "selected_category" : <mt:if name="selected_category_loop"><mt:var name="selected_category_loop" to_json="1" regex_replace='/"/g',''><mt:else>[]</mt:if>,
         "main_category_id" : <mt:if name="category_id"><mt:var name="category_id"><mt:else>0</mt:if>,
         "screen_id" : "<mt:var name="screen_id">",
-        "body_class" : [<mt:setvarblock name="mtapp_body_class">"<mt:var name="screen_type" default="main-screen"> <mt:if name="scope_type" eq="user">user system<mt:else><mt:var name="scope_type"></mt:if><mt:if name="screen_class"> <mt:var name="screen_class"></mt:if><mt:if name="top_nav_loop"> has-menu-nav</mt:if><mt:if name="related_content"> has-related-content</mt:if><mt:if name="edit_screen"> edit-screen</mt:if><mt:if name="new_object"> create-new</mt:if><mt:if name="loaded_revision"> loaded-revision</mt:if><mt:if name="mt_beta"> mt-beta</mt:if>"</mt:setvarblock><mt:var name="mtapp_body_class" regex_replace='/ +/g',' ' regex_replace='/ /g','","'>],
+        "body_class" : [<mt:SetVarBlock name="mtapp_body_class">"<mt:var name="screen_type" default="main-screen"> <mt:if name="scope_type" eq="user">user system<mt:else><mt:var name="scope_type"></mt:if><mt:if name="screen_class"> <mt:var name="screen_class"></mt:if><mt:if name="top_nav_loop"> has-menu-nav</mt:if><mt:if name="related_content"> has-related-content</mt:if><mt:if name="edit_screen"> edit-screen</mt:if><mt:if name="new_object"> create-new</mt:if><mt:if name="loaded_revision"> loaded-revision</mt:if><mt:if name="mt_beta"> mt-beta</mt:if>"</mt:SetVarBlock><mt:var name="mtapp_body_class" regex_replace='/ +/g',' ' regex_replace='/ /g','","'>],
         "template_filename" : '<mt:var name="template_filename">',
         "json_can_create_post_blogs": [<mt:var name="json_can_create_post_blogs">]<mt:ignore>,
         "website_json" : [${website_json}],
@@ -194,9 +202,9 @@ __MTML__
 
     ### user.css をセットする
     my $user_css = ! $op_usercss ? '' : <<__MTML__;
-    <mt:setvarblock name="html_head" append="1">
+    <mt:SetVarBlock name="html_head" append="1">
     <link rel="stylesheet" href="${static_plugin_path}css/user.css" type="text/css" />
-    </mt:setvarblock>
+    </mt:SetVarBlock>
 __MTML__
 
     ### user.jsをセット
@@ -214,35 +222,35 @@ __MTML__
     my $prepend_html_head = <<__MTML__;
     <link rel="stylesheet" href="${static_plugin_path}css/MTAppjQuery.css" type="text/css" />
     $user_css
-
-    <mt:setvarblock name="js_include" append="1">
+    <mt:SetVarBlock name="html_head" append="1">$op_fa_html_head</mt:SetVarBlock>
+    <mt:SetVarBlock name="js_include" append="1">
     $jqselectable
     <mt:var name="uploadify_source">
     <script type="text/javascript" src="${static_plugin_path}js/MTAppjQuery.js"></script>
-    $op_freearea
-    </mt:setvarblock>
-
-    <mt:setvarblock name="mtapp_prepend_footer_js">
+    $op_fa_js_include
+    </mt:SetVarBlock>
+    <mt:SetVarBlock name="html_body" append="1">$op_fa_html_body</mt:SetVarBlock>
+    <mt:SetVarBlock name="form_header" append="1">$op_fa_form_header</mt:SetVarBlock>
+    <mt:SetVarBlock name="jq_js_include" append="1">$op_fa_jq_js_include</mt:SetVarBlock>
+    <mt:SetVarBlock name="mtapp_html_foot" append="1">
     <div id="mtapp-dialog-msg"></div>
-    </mt:setvarblock>
-
-    <mt:setvarblock name="mtapp_footer_js">
+    $op_fa_mtapp_html_foot
     $user_js
-    </mt:setvarblock>
+    </mt:SetVarBlock>
+    <mt:SetVarBlock name="mtapp_end_body" append="1">$op_fa_mtapp_end_body</mt:SetVarBlock>
 __MTML__
 
-    $$tmpl_ref =~ s/(<mt:var name="html_head">)/$prepend_html_head$1/g;
+    $$tmpl_ref =~ s/(<head>)/$1\n$op_fa_mtapp_top_head/g;
+    $$tmpl_ref =~ s/(<mt:var name="html_head">)/$prepend_html_head\n$1/g;
 }
 
 sub template_source_footer {
     my ($cb, $app, $tmpl_ref) = @_;
     my $replace = <<'__MTML__';
-    <mt:var name="mtapp_prepend_footer_js">
-    <mt:var name="mtapp_footer_js">
+    <mt:var name="mtapp_html_foot">
     <script type="text/javascript">
     /* <![CDATA[ */
     (function($){
-        <mt:var name="mtapp_footer_jq">
         $('#mtapp-loading').hide();
         $('#container').css('visibility','visible');
     })(jQuery);
