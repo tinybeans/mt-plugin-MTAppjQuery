@@ -4,7 +4,6 @@ use utf8;
 use MT::Website;
 use MT::Blog;
 use MT::Util;
-use MT::Theme;
 use MTAppjQuery::Tmplset;
 
 
