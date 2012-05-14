@@ -57,8 +57,10 @@ sub template_source_header {
     my $scope = (!$blog_id) ? 'system' : 'blog:'.$blog_id;
     my $op_active         = $p->get_config_value('active', $scope);
     return unless $op_active;
-    my $op_usercss        = $p->get_config_value('usercss', $scope);
     my $op_userjs         = $p->get_config_value('userjs', $scope);
+    my $op_userjs_url     = $p->get_config_value('userjs_url', $scope);
+    my $op_usercss        = $p->get_config_value('usercss', $scope);
+    my $op_usercss_url    = $p->get_config_value('usercss_url', $scope);
     my $op_slidemenu      = $p->get_config_value('slidemenu', $scope);
     my $op_superslidemenu = $p->get_config_value('superslidemenu', $scope);
     my $op_jquery_ready   = $p->get_config_value('jquery_ready', $scope);
@@ -82,7 +84,7 @@ sub template_source_header {
 __MTML__
     $$tmpl_ref =~ s!(<div id="container")!$preset$1!g;
 
-    ### スライドメニューをセットする（MT5.1未対応、対応予定あり）
+    ### スライドメニューをセットする（MT5.1未対応、対応予定未定）
     if ($op_slidemenu && !$op_superslidemenu) {
         my $s_menu_org = MTAppjQuery::Tmplset::s_menu_org;
         my $w_menu_org = MTAppjQuery::Tmplset::w_menu_org;
@@ -199,17 +201,32 @@ __MTML__
 
     $$tmpl_ref =~ s!($target)!$mtapp_vars  $1\n  $jquery_ready!g;
 
-    ### user.css をセットする
-    my $user_css = ! $op_usercss ? '' : <<__MTML__;
-    <mt:SetVarBlock name="html_head" append="1">
-    <link rel="stylesheet" href="${static_plugin_path}css/user.css" type="text/css" />
-    </mt:SetVarBlock>
-__MTML__
-
     ### user.jsをセット
-    my $user_js = ! $op_userjs ? '' : <<__MTML__;
-    <script type="text/javascript" src="${static_plugin_path}js/user.js"></script>
-__MTML__
+    require MT::Template;
+    my $user_js_url;
+    my $user_js_tmplname = MT->config->MTAppjQueryUserJSName || 'user.js';
+    my $user_js_tmpl = MT::Template->load({name => $user_js_tmplname, identifier => 'user_js', blog_id => $blog_id});
+    if (defined($user_js_tmpl)) {
+        $user_js_url = $blog->site_url . $user_js_tmpl->outfile;
+    } elsif ($op_userjs_url ne '') {
+        $user_js_url = $op_userjs_url;
+    } else {
+        $user_js_url = "${static_plugin_path}js/user.js";
+    }
+    my $user_js = ($op_userjs == 1) ? qq(<script type="text/javascript" src="$user_js_url"></script>): '';
+
+    ### user.css をセットする
+    my $user_css_url;
+    my $user_css_tmplname = MT->config->MTAppjQueryusercssName || 'user.css';
+    my $user_css_tmpl = MT::Template->load({name => $user_css_tmplname, identifier => 'user_css', blog_id => $blog_id});
+    if (defined($user_css_tmpl)) {
+        $user_css_url = $blog->site_url . $user_css_tmpl->outfile;
+    } elsif ($op_usercss_url ne '') {
+        $user_css_url = $op_usercss_url;
+    } else {
+        $user_css_url = "${static_plugin_path}css/user.css";
+    }
+    my $user_css = ($op_usercss == 1) ? qq(<link rel="stylesheet" href="$user_css_url" type="text/css" />): '';
 
     ### jQselectableプラグインを利用する
     my $jqselectable = ! $op_jqselectable ? '' : <<__MTML__;
@@ -219,9 +236,11 @@ __MTML__
 
     ### 各情報をheadにセットする
     my $prepend_html_head = <<__MTML__;
+    <mt:SetVarBlock name="html_head" append="1">
     <link rel="stylesheet" href="${static_plugin_path}css/MTAppjQuery.css" type="text/css" />
     $user_css
-    <mt:SetVarBlock name="html_head" append="1">$op_fa_html_head</mt:SetVarBlock>
+    $op_fa_html_head
+    </mt:SetVarBlock>
     <mt:SetVarBlock name="js_include" append="1">
     $jqselectable
     <mt:var name="uploadify_source">
@@ -285,13 +304,13 @@ sub template_source_list_template {
     my $plugin = MT->component('mt_app_jquery');
     my $blog = $app->blog;
     my $blog_id = $blog->id;
-    my $user_js = MT->config->MTAppjQueryUserJS || 'user.js';
-    my $user_css = MT->config->MTAppjQueryUserCSS || 'user.css';
+    my $user_js = MT->config->MTAppjQueryUserJSName || 'user.js';
+    my $user_css = MT->config->MTAppjQueryUserCSSName || 'user.css';
     my $FQDN = $app->base;
     my $url = $FQDN . $app->uri(
         mode => 'create_user_files',
         args => {blog_id => $blog_id, return_args => '__mode=list_template&amp;blog_id=' . $blog_id});
-    my $label = $plugin->translate('Install [_1] and  [_2]', 'user.js', 'user.css');
+    my $label = $plugin->translate('Install [_1] and  [_2]', $user_js, $user_css);
     my $widget = <<__MTML__;
     <mtapp:widget
         id="mtappjq-links"
@@ -413,6 +432,23 @@ __MTML__
         $tmpl->insertAfter($new_node, $host_node);
     };
 
+}
+
+sub template_param_edit_template {
+    my ($cb, $app, $param, $tmpl) = @_;
+    my $identifier = $param->{identifier};
+    my $index_identifiers = $param->{index_identifiers};
+    if ($identifier eq 'user_js' or $identifier eq 'user_css') {
+        push(@$index_identifiers, {
+            'label' => 'user.js',
+            'selected' => $identifier eq 'user_js',
+            'key' => 'user_js'
+          },{
+            'label' => 'user.css',
+            'selected' => $identifier eq 'user_css',
+            'key' => 'user_css'
+          });
+    }
 }
 
 sub cms_post_save_entry {

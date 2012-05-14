@@ -50,6 +50,7 @@ sub create_template {
         $values{type}    = $params->{type};
         $values{name}    = $params->{name};
         $values{outfile} = $params->{outfile};
+        $values{identifier} = $params->{identifier};
         $template->set_values(\%values);
         $template->save or die $template->errstr;
         $status = 'saved';

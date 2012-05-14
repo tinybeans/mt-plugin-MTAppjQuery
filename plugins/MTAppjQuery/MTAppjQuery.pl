@@ -19,8 +19,10 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
     settings    => new MT::PluginSettings([
             # Set system scope
             ['active',        {Default => 1,  Scope => 'system'}],
-            ['usercss',       {Default => 1,  Scope => 'system'}],
             ['userjs',        {Default => 1,  Scope => 'system'}],
+            ['userjs_url',    {Default => '', Scope => 'system'}],
+            ['usercss',       {Default => 1,  Scope => 'system'}],
+            ['usercss_url',   {Default => '', Scope => 'system'}],
             #['slidemenu',     {Default => 0,  Scope => 'system'}],
             #['superslidemenu',{Default => 0,  Scope => 'system'}],
             ['jquery_ready',  {Default => 0,  Scope => 'system'}],
@@ -29,8 +31,10 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
 
             # Set blog scope
             ['active',        {Default => 1,  Scope => 'blog'}],
-            ['usercss',       {Default => 1,  Scope => 'blog'}],
             ['userjs',        {Default => 1,  Scope => 'blog'}],
+            ['userjs_url',    {Default => '', Scope => 'blog'}],
+            ['usercss',       {Default => 1,  Scope => 'blog'}],
+            ['usercss_url',   {Default => '', Scope => 'blog'}],
             #['slidemenu',     {Default => 0,  Scope => 'blog'}],
             #['superslidemenu',{Default => 0,  Scope => 'blog'}],
             ['jquery_ready',  {Default => 0,  Scope => 'blog'}],
@@ -69,10 +73,10 @@ sub init_registry {
     my $plugin = shift;
     $plugin->registry({
         config_settings => {
-            'MTAppjQueryUserJS' => {
+            'MTAppjQueryUserJSName' => {
                 default => 'user.js',
             },
-            'MTAppjQueryUserCSS' => {
+            'MTAppjQueryUserCSSName' => {
                 default => 'user.css',
             },
         },
@@ -89,6 +93,7 @@ sub init_registry {
             'MT::App::CMS::template_source.list_template' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_list_template',
             # 'template_param.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_favorite_blogs',
             'MT::App::CMS::template_param.edit_entry' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_edit_entry',
+            'MT::App::CMS::template_param.edit_template' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_edit_template',
             'MT::App::CMS::cms_post_save.entry' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_entry',
             'MT::App::CMS::cms_post_save.page' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_entry',
         },
