@@ -96,21 +96,75 @@ sub init_registry {
             'MT::App::CMS::template_param.edit_template' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_edit_template',
             'MT::App::CMS::cms_post_save.entry' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_entry',
             'MT::App::CMS::cms_post_save.page' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_entry',
+            'MT::App::CMS::pre_run' => \&pre_run,
         },
         tags => {
             modifier => {
                 'split_format' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_split_format',
                 'nengou' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_nengou',
-            }
+            },
         },
         applications => {
             cms => {
+                menus => {
+                    'design:user_js' => {
+                        label             => 'Edit user.js',
+                        order             => 20000,
+                        mode              => 'edit_user_js',
+                        permission        => 'edit_templates',
+                        system_permission => 'edit_templates',
+                        view              => ['blog', 'website'],
+                    },
+                    'design:user_css' => {
+                        label             => 'Edit user.css',
+                        order             => 20010,
+                        mode              => 'edit_user_css',
+                        permission        => 'edit_templates',
+                        system_permission => 'edit_templates',
+                        view              => ['blog', 'website'],
+                    },
+                },
                 methods => {
                     'create_user_files' => '$mt_app_jquery::MTAppjQuery::CMS::create_user_files',
-                }
-            }
-        }
+                    'edit_user_js'      => '$mt_app_jquery::MTAppjQuery::CMS::edit_user_js',
+                    'edit_user_css'     => '$mt_app_jquery::MTAppjQuery::CMS::edit_user_css',
+                },
+            },
+        },
     });
+}
+
+sub pre_run {
+    my $app = MT->instance;
+    my $blog = $app->blog;
+    my $blog_id = $blog->{column_values}->{id};
+    return unless $blog_id;
+    my $menus  = $plugin->registry('applications', 'cms', 'menus');
+    require MT::Template;
+    # user.js
+    my $user_js_name = MT->config->MTAppjQueryUserJSName || 'user.js';
+    my $user_js = MT::Template->load({
+        name => $user_js_name,
+        identifier => 'user_js',
+        blog_id => $blog_id,
+    });
+    unless ($user_js) {
+        $menus->{'design:user_js'} = {
+            view => '',
+        };
+    }
+    # user.css
+    my $user_css_name = MT->config->MTAppjQueryUserCSSName || 'user.css';
+    my $user_css = MT::Template->load({
+        name => $user_css_name,
+        identifier => 'user_css',
+        blog_id => $blog_id,
+    });
+    unless ($user_css) {
+        $menus->{'design:user_css'} = {
+            view => '',
+        };
+    }
 }
 
 1;

@@ -7,6 +7,8 @@ use vars qw ( %Lexicon );
 # MTAppjQuery.pl
 	'Customize the management screen of MT5.1 to use jQuery.' => 'MT5.1の管理画面をjQueryを使ってカスタマイズします。',
     'basename' => 'ベースネーム',
+    'Edit user.js' => 'user.jsを編集',
+    'Edit user.css' => 'user.cssを編集',
 # Callbacks.pm
 	'Page Loading' => 'ページをロード中',
 	'Custom Fields' => 'カスタムフィールド',
