@@ -89,8 +89,20 @@ sub edit_user_css {
     _go_user_files($app, $name, $ident);
 }
 
+sub edit_user_js_append {
+    my $app = shift;
+    my $name = MT->config->MTAppjQueryUserJSName || 'user.js';
+    my $ident = 'user_js';
+    my $append = <<__EOF__;
+
+okuwaki
+__EOF__
+
+    _go_user_files($app, $name, $ident, $append);
+}
+
 sub _go_user_files {
-    my ($app, $name, $ident) = @_;
+    my ($app, $name, $ident, $append) = @_;
     my %return_params;
     if (my $blog = $app->blog) {
         unless (is_user_can($blog, $app->user, 'edit_templates')) {
@@ -103,6 +115,16 @@ sub _go_user_files {
             blog_id => $blog->id,
         });
         if (defined $template) {
+            if ($append) {
+                my $text = $template->text;
+                if ($text =~ /(<\$?mt:?appendtext\$?>)/i) {
+                    $text =~ s/(<\$?mt:?appendtext\$?>)/$append$1/i;
+                } else {
+                    $text .= $append;
+                }
+                $template->text($text);
+                $template->save or die 'Failed to save the template.';
+            }
             %return_params = (
                 __mode => 'view',
                 _type => 'template',
