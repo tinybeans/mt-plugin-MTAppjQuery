@@ -99,6 +99,9 @@ sub init_registry {
             'MT::App::CMS::pre_run' => \&pre_run,
         },
         tags => {
+            function => {
+                'UserFileAppendText' => '$mt_app_jquery::MTAppjQuery::Tags::_hdlr_user_file_append_text',
+            },
             modifier => {
                 'split_format' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_split_format',
                 'nengou' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_nengou',

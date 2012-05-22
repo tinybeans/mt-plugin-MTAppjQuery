@@ -117,8 +117,8 @@ sub _go_user_files {
         if (defined $template) {
             if ($append) {
                 my $text = $template->text;
-                if ($text =~ /(<\$?mt:?appendtext\$?>)/i) {
-                    $text =~ s/(<\$?mt:?appendtext\$?>)/$append$1/i;
+                if ($text =~ /(<\$?mt:?UserFileAppendText\$?>)/i) {
+                    $text =~ s/(<\$?mt:?UserFileAppendText\$?>)/$append$1/i;
                 } else {
                     $text .= $append;
                 }
