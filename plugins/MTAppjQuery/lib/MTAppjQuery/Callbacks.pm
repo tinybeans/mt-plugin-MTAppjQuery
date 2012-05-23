@@ -6,23 +6,6 @@ use MT::Blog;
 use MT::Util;
 use MTAppjQuery::Tmplset;
 
-
-###
-##
-#
-use MT::Log;
-use Data::Dumper;
-sub doLog {
-    my ($msg, $code) = @_;     return unless defined($msg);
-    my $log = MT::Log->new;
-    $log->message($msg);
-    $log->metadata($code);
-    $log->save or die $log->errstr;
-}
-#
-##
-###
-
 sub template_source_header {
     my ($cb, $app, $tmpl_ref) = @_;
     my $version = MT->version_id;
