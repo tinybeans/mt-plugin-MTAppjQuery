@@ -34,7 +34,7 @@ sub template_source_header {
     my $_type   = $app->param('_type') || '_type';
     my $id      = $app->param('id') || 0;
     my $blog_id = (defined $blog) ? $blog->id : 0;
-    my $author_id   = $author->id;
+    my $author_id = $author->id;
     return unless ($_type =~ m/^\w+$/);
     return unless ($id =~ m/^\d+$/);
 
@@ -50,8 +50,24 @@ sub template_source_header {
     my $user_id     = $_type eq 'author' ? $id : 0; # ログイン中のユーザーは author_id だよ
     my $field_id    = $_type eq 'field' ? $id : 0;
 
-    ### ログインユーザーのパーミッションを取得する
     require MT::Permission;
+    require MT::Association;
+    require MT::Role;
+    ### ログインユーザーのロールを取得する
+    my @role = MT::Role->load(undef, {
+        join => MT::Association->join_on(
+            'role_id', {
+                'author_id' => $author_id,
+            }
+        )
+    });
+    my @role_name;
+    foreach my $role (@role) {
+        push @role_name, '"' . $role->name . '"';
+    }
+    my $role_names = join ',', @role_name;
+
+    ### ログインユーザーのパーミッションを取得する
     my $permission = MT::Permission->load({author_id => $author_id, blog_id => $blog_id})
         or die "Author has no permissions for blog";
     my $permissions = $permission->permissions or '';
@@ -180,6 +196,7 @@ __MTML__
         "author_id" : <mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if>,
         "author_name" : "<mt:var name="author_name" encode_js="1">",
         "author_permissions" : [$permissions],
+        "author_roles" : [$role_names],
         "user_name" : "<mt:var name="author_name" encode_js="1">",
         "curr_website_id" : <mt:if name="curr_website_id"><mt:var name="curr_website_id"><mt:else>0</mt:if>,
         "blog_id" : ${blog_id},
