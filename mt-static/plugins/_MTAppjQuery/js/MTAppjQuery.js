@@ -2562,6 +2562,11 @@ jQuery(function($){
     // -------------------------------------------------
     $('body').addClass('blog-id-' + mtappVars.blog_id + ' author-id-' + mtappVars.author_id);
 
+    // cookieにページを判別する情報を保存
+    setCookie('mtappVars_type', mtappVars.type, 30);
+    setCookie('mtappVars_scope_type', mtappVars.scope_type, 30);
+    setCookie('mtappVars_screen_id', mtappVars.screen_id, 30);
+
     // -------------------------------------------------
     //  Favorite Structure ダッシュボード
     // -------------------------------------------------

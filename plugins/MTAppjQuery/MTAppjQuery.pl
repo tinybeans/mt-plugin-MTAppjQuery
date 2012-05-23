@@ -173,6 +173,9 @@ sub pre_run {
         $menus->{'design:user_js'} = {
             view => '',
         };
+        $menus->{'design:user_js_append'} = {
+            view => '',
+        };
     }
     # user.css
     my $user_css_name = MT->config->MTAppjQueryUserCSSName || 'user.css';
@@ -183,6 +186,9 @@ sub pre_run {
     });
     unless ($user_css) {
         $menus->{'design:user_css'} = {
+            view => '',
+        };
+        $menus->{'design:user_css_append'} = {
             view => '',
         };
     }

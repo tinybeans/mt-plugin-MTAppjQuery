@@ -26,7 +26,7 @@ sub create_user_files {
  *
  */
 (function(\$){
-// ここに処理を書きます
+<mt:UserFileAppendText>
 })(jQuery);
 __USER_JS__
         %search = (
@@ -55,6 +55,7 @@ __USER_JS__
  * Update:  <mt:Date format="%Y-%m-%d">
  *
  */
+<mt:UserFileAppendText>
 __USER_CSS__
         %search = (
             name => $tmplname,
@@ -91,13 +92,33 @@ sub edit_user_css {
 
 sub edit_user_js_append {
     my $app = shift;
+    my $type = $app->cookie_val('mtappVars_type');
+    my $scope_type = $app->cookie_val('mtappVars_scope_type');
+    my $screen_id = $app->cookie_val('mtappVars_screen_id');
     my $name = MT->config->MTAppjQueryUserJSName || 'user.js';
     my $ident = 'user_js';
     my $append = <<__EOF__;
 
-okuwaki
+if (mtappVars.screen_id == '$screen_id' && mtappVars.scope_type == '$scope_type' && mtappVars.type == '$type') {
+    
+}
 __EOF__
+    _go_user_files($app, $name, $ident, $append);
+}
 
+sub edit_user_css_append {
+    my $app = shift;
+    my $type = $app->cookie_val('mtappVars_type');
+    my $scope_type = $app->cookie_val('mtappVars_scope_type');
+    my $screen_id = $app->cookie_val('mtappVars_screen_id');
+    my $name = MT->config->MTAppjQueryUserCSSName || 'user.css';
+    my $ident = 'user_css';
+    my $append = <<__EOF__;
+
+body#$screen_id.$scope_type {
+    
+}
+__EOF__
     _go_user_files($app, $name, $ident, $append);
 }
 
