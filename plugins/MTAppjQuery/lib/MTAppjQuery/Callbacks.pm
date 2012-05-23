@@ -28,15 +28,16 @@ sub template_source_header {
     my $version = MT->version_id;
     my $p = MT->component('mt_app_jquery');
     my $blog = $app->blog;
+    my $author = $app->user;
 
     ### 各種情報を取得する
     my $_type   = $app->param('_type') || '_type';
     my $id      = $app->param('id') || 0;
     my $blog_id = (defined $blog) ? $blog->id : 0;
+    my $author_id   = $author->id;
     return unless ($_type =~ m/^\w+$/);
     return unless ($id =~ m/^\d+$/);
 
-    my $author_id   = $app->user->id;
     # オブジェクトのタイプを判別して各オブジェクトのIDを取得する
     my $entry_id    = $_type eq 'entry' ? $id : 0;
     my $page_id     = $_type eq 'page' ? $id : 0;
@@ -48,6 +49,12 @@ sub template_source_header {
     my $ping_id     = $_type eq 'ping' ? $id : 0;
     my $user_id     = $_type eq 'author' ? $id : 0; # ログイン中のユーザーは author_id だよ
     my $field_id    = $_type eq 'field' ? $id : 0;
+
+    ### ログインユーザーのパーミッションを取得する
+    require MT::Permission;
+    my $permission = MT::Permission->load({author_id => $author_id, blog_id => $blog_id})
+        or die "Author has no permissions for blog";
+    my $permissions = $permission->permissions or '';
 
     ### 各種パスを取得する（スラッシュで終わる）
     my $static_path        = $app->static_path;
@@ -171,6 +178,8 @@ __MTML__
     var mtappVars = {
         "type" : "${_type}",
         "author_id" : <mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if>,
+        "author_name" : "<mt:var name="author_name" encode_js="1">",
+        "author_permissions" : [$permissions],
         "user_name" : "<mt:var name="author_name" encode_js="1">",
         "curr_website_id" : <mt:if name="curr_website_id"><mt:var name="curr_website_id"><mt:else>0</mt:if>,
         "blog_id" : ${blog_id},
