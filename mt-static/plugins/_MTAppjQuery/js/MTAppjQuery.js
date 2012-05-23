@@ -26,15 +26,14 @@
     $.MTAppNoScrollRightSidebar = function(open_type){
         var type = (open_type) ? 'no-scroll-right-sidebar' : '';
         $('#content-body').noScroll('#related-content', 'right');
-        var span = $('#related-content')
+        var header = $('#related-content')
                 .addClass(type)
                 .children()
                     .addClass('widget-wrapper')
                     .find('div.widget-header')
-                        .find('span')
-                            .css({cursor:'pointer'});
+                        .css({cursor:'pointer'});
         if (open_type) {
-            span.click(function(){
+            header.click(function(){
                 $(this)
                     .closest('div.widget-wrapper')
                         .siblings()
@@ -44,7 +43,7 @@
                     .find('div.widget-content').slideToggle();
             });
         } else {
-            span.click(function(){
+            header.click(function(){
                 $(this).parents('div.widget-header').next().slideToggle();
             });
         }
@@ -2415,11 +2414,11 @@
             }
         },
         noScroll: function (selector, horizontal){
-            var self = $(this).css('position', 'relative'),
-                target = self.find(selector).css({'position': 'absolute', 'z-index':99});
-                if (horizontal) {
-                    target.css(horizontal, 0);
-                }
+            var self = $(this).css('position', 'relative');
+            var target = self.find(selector).css({'position': 'absolute', 'z-index': 99});
+            if (horizontal) {
+                target.css(horizontal, 0);
+            }
             $(window).scroll(function(){
                 var thisTop = $(document).scrollTop() - self.offset().top + 10;
                 if (thisTop < 0) {
