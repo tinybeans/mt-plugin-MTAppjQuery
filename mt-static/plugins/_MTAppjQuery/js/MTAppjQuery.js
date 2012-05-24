@@ -351,10 +351,11 @@
                     options.unshift('<optgroup label="' + op.initGroupName + '"><option value="' + selfVal + '">' + selfVal + '</option></optgroup>');
                 }
             }
+            var option_add = op.dinamic ? '<option value="_add_">' + op.addText + '</option>': '';
             var select = [
                 '<select class="dynamic_select">',
                     options.join(''),
-                    '<option value="_add_">' + op.addText + '</option>',
+                    option_add,
                 '</select>'
             ];
             var $select = $(select.join('')).change(function(){
@@ -388,6 +389,7 @@
     };    
     $.fn.MTAppDynamicSelect.defaults = {
         debug: false,
+        dinamic: true,
         text: '', // カンマ区切りの文字列か連想配列と配列の入れ子。value|labelと分けることも可能（要separateMode: true）。
         addText: '項目を追加する',
         promptMsg: '追加する項目名を入力',
