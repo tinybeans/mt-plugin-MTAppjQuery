@@ -171,10 +171,10 @@ sub pre_run {
     });
     unless ($user_js) {
         $menus->{'design:user_js'} = {
-            view => '',
+            display => 0,
         };
         $menus->{'design:user_js_append'} = {
-            view => '',
+            display => 0,
         };
     }
     # user.css
@@ -186,10 +186,10 @@ sub pre_run {
     });
     unless ($user_css) {
         $menus->{'design:user_css'} = {
-            view => '',
+            display => 0,
         };
         $menus->{'design:user_css_append'} = {
-            view => '',
+            display => 0,
         };
     }
 }
