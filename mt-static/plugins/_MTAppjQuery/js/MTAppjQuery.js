@@ -18,13 +18,16 @@
     //    右サイドバーのウィジェットをスクロールに追随するようにする。
     //
     //  Usage:
-    //    $.MTAppNoScrollRightSidebar(open_type);
+    //    $.MTAppNoScrollRightSidebar(Options);
     //
-    //  Param:
-    //    open_type: {Boolean} true=ウィジェットを閉じた状態にする。
+    //  Options:
+    //    closeMode: {Boolean} true=ウィジェットを閉じた状態にする。
+    //    openSelector: {String} closeMode が true の場合で、空いた状態にしておきたいウィジェットのIDセレクタ
     // -------------------------------------------------
-    $.MTAppNoScrollRightSidebar = function(open_type){
-        var type = (open_type) ? 'no-scroll-right-sidebar' : '';
+    $.MTAppNoScrollRightSidebar = function(options){
+        var op = $.extend({}, $.MTAppNoScrollRightSidebar.defaults, options);
+
+        var type = (op.closeMode) ? 'no-scroll-right-sidebar' : '';
         $('#content-body').noScroll('#related-content', 'right');
         var header = $('#related-content')
                 .addClass(type)
@@ -32,7 +35,10 @@
                     .addClass('widget-wrapper')
                     .find('div.widget-header')
                         .css({cursor:'pointer'});
-        if (open_type) {
+        if (op.closeMode) {
+            if (op.openSelector !== '') {
+                $(op.openSelector).find('div.widget-content').show();
+            }
             header.click(function(){
                 $(this)
                     .closest('div.widget-wrapper')
@@ -47,7 +53,11 @@
                 $(this).parents('div.widget-header').next().slideToggle();
             });
         }
-    }
+    };
+    $.MTAppNoScrollRightSidebar.defaults = {
+        closeMode: false, // ウィジェットを閉じた状態にする場合はtrue
+        openSelector: ''
+    };
     // end - $.MTAppNoScrollRightSidebar()
 
 
