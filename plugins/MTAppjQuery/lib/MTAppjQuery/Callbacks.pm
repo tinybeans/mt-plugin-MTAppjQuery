@@ -51,9 +51,18 @@ sub template_source_header {
     my $role_names = join ',', @role_name;
 
     ### ログインユーザーのパーミッションを取得する
-    my $permission = MT::Permission->load({author_id => $author_id, blog_id => $blog_id})
-        or die "Author has no permissions for blog";
-    my $permissions = $permission->permissions or '';
+    my $perm_blog_id = $blog_id > 0 ? [0, $blog_id]: 0;
+    my @permission = MT::Permission->load({author_id => $author_id, blog_id => $perm_blog_id});
+    my $permissions = '';
+    if (scalar @permission > 0) {
+        my @perms;
+        foreach my $permission (@permission) {
+            if ($permission->permissions) {
+                push @perms, $permission->permissions;
+            }
+        }
+        $permissions = join ',', @perms;
+    }
 
     ### 各種パスを取得する（スラッシュで終わる）
     my $static_path        = $app->static_path;
