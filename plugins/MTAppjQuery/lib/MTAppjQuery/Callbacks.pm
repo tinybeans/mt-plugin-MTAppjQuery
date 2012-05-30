@@ -86,7 +86,7 @@ sub template_source_header {
     my $op_fa_js_include      = $p->get_config_value('fa_js_include', $scope) || '<!-- js_include (MTAppjQuery) -->';
     my $op_fa_html_body       = $p->get_config_value('fa_html_body', $scope) || '<!-- html_body (MTAppjQuery) -->';
     my $op_fa_form_header     = $p->get_config_value('fa_form_header', $scope) || '<!-- form_header (MTAppjQuery) -->';
-    my $op_fa_jq_js_include   = $p->get_config_value('fa_jq_js_include', $scope) || '// jq_js_include (MTAppjQuery)';
+    my $op_fa_jq_js_include   = $p->get_config_value('fa_jq_js_include', $scope) || '/* jq_js_include (MTAppjQuery) */';
     my $op_fa_mtapp_html_foot = $p->get_config_value('fa_mtapp_html_foot', $scope) || '<!-- mtapp_html_foot (MTAppjQuery) -->';
     my $op_fa_mtapp_end_body  = $p->get_config_value('fa_mtapp_end_body', $scope) || '<!-- mtapp_end_body (MTAppjQuery) -->';
 
