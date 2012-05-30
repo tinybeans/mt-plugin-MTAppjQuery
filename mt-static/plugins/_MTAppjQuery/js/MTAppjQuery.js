@@ -900,6 +900,9 @@
         // フィールドの表示・非表示
         if (opS == 'show') {
             $field.removeClass('hidden');
+            if (opB == 'body' || opB == 'more') {
+                $label.closest('div.tab').removeClass('hidden');
+            }
         } else if (opS == 'hide' && opB != 'body' && opB != 'more') {
             $field.addClass('hidden');
         } else if (opS == 'hide' && (opB == 'body' || opB == 'more')) {
