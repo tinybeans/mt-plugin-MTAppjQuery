@@ -1690,7 +1690,7 @@
                 val = self.val(),
                 $btn = $('<button class="mt-edit-field-button button">' + op.edit + '</button>').click(function(){
                     $(this).hide()
-                        .prev().show()
+                            .prev().show().addClass('edited')
                             .prev().hide();
                     return false;
                 });
