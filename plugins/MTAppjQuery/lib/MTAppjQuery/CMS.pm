@@ -6,7 +6,7 @@ use MTAppjQuery::Util qw(is_user_can create_template get_mt_ts);
 
 sub create_user_files {
     my $app = shift;
-    $app->validate_magic or return $app->trans_error('Permission denied.');
+#     $app->validate_magic or return $app->trans_error('Permission denied.');
     if (my $blog = $app->blog) {
         unless (is_user_can($blog, $app->user, 'edit_templates')) {
             return $app->trans_error('Permission denied.');
