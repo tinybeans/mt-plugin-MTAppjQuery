@@ -2482,6 +2482,7 @@
         // 1桁の整数の場合、頭に0を付ける
         digit: function(num, space) {
             var prefix = (space) ? ' ' : '0';
+            num += '';
             return (num.length < 2) ? prefix + num: num;
         },
         // 指定した桁数に満たない場合は頭を0で埋める
