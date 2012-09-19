@@ -378,6 +378,9 @@
                 } else {
                     $self.val($(this).val());
                 }
+                if (op.selected && typeof op.selected === 'function') {
+                    op.selected();
+                }
             });
             if (op.separateMode) {
                 $select.find('option').last().remove();
@@ -404,7 +407,8 @@
         addText: '項目を追加する',
         promptMsg: '追加する項目名を入力',
         initGroupName: '選択中アイテム',
-        separateMode: false
+        separateMode: false,
+        selected: null
     };
     // end - $(foo).MTAppDynamicSelect()
 
