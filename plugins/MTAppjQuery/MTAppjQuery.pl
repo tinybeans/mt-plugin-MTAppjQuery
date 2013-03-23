@@ -2,7 +2,7 @@ package MT::Plugin::MTAppjQuery;
 use strict;
 use base qw( MT::Plugin );
 
-our $VERSION = '0.27';
+our $VERSION = '1.00';
 
 my $plugin = MT::Plugin::MTAppjQuery->new({
     id          => 'mt_app_jquery',
@@ -59,7 +59,7 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             ['fa_jq_js_include',   {Default => '', Scope => 'blog'}],
             ['fa_mtapp_html_foot', {Default => '', Scope => 'blog'}],
             ['fa_mtapp_end_body',  {Default => '', Scope => 'blog'}],
-            
+
             # Uploadify
             #['active_uploadify',{Default => 0,  Scope => 'blog'}],
             #['upload_folder',   {Default => '', Scope => 'blog'}],
