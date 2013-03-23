@@ -236,7 +236,7 @@ __MTML__
 
     ### user.css をセットする
     my $user_css_url;
-    my $user_css_tmplname = MT->config->MTAppjQueryusercssName || 'user.css';
+    my $user_css_tmplname = MT->config->MTAppjQueryUserCSSName || 'user.css';
     my $user_css_tmpl = MT::Template->load({name => $user_css_tmplname, identifier => 'user_css', blog_id => $blog_id});
     if (defined($user_css_tmpl)) {
         $user_css_url = $blog->site_url . $user_css_tmpl->outfile;
