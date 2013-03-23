@@ -48,6 +48,34 @@ div#free_area-field div.field-content textarea {
     margin-bottom: 20px;
 }
 /* ----------------------------------------
+   __スキン
+---------------------------------------- */
+body.mtapp-skin {
+    #header {
+        font-weight: bold;
+    }
+    &.skin-brown {
+        #brand {
+            background-color: #573F19;
+            a {
+                background-color: #BDB282;
+            }
+        }
+        .edit-entry #permalink-field .field-content {
+            color: white;
+        }
+    }
+    &.skin-purple {
+        #brand {
+            background-color: #641464;
+            a {
+                background-color: #FCE5FC;
+            }
+        }
+    }
+}
+
+/* ----------------------------------------
    __Uploadify - マルチファイルアップロード
 ---------------------------------------- */
 .mtapp-uploadify-thumb {
