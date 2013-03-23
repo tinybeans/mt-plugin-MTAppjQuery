@@ -226,7 +226,7 @@ __MTML__
     my $user_js_tmplname = MT->config->MTAppjQueryUserJSName || 'user.js';
     my $user_js_tmpl = MT::Template->load({name => $user_js_tmplname, identifier => 'user_js', blog_id => $blog_id});
     if (defined($user_js_tmpl)) {
-        $user_js_url = $blog->site_url . $user_js_tmpl->outfile . '?' . $user_js_tmpl->modified_on;
+        $user_js_url = $blog->site_url . $user_js_tmpl->outfile . '?v=' . $user_js_tmpl->modified_on;
     } elsif ($op_userjs_url ne '') {
         $user_js_url = $op_userjs_url;
     } else {
@@ -239,7 +239,7 @@ __MTML__
     my $user_css_tmplname = MT->config->MTAppjQueryUserCSSName || 'user.css';
     my $user_css_tmpl = MT::Template->load({name => $user_css_tmplname, identifier => 'user_css', blog_id => $blog_id});
     if (defined($user_css_tmpl)) {
-        $user_css_url = $blog->site_url . $user_css_tmpl->outfile;
+        $user_css_url = $blog->site_url . $user_css_tmpl->outfile . '?v=' . $user_css_tmpl->modified_on;
     } elsif ($op_usercss_url ne '') {
         $user_css_url = $op_usercss_url;
     } else {
