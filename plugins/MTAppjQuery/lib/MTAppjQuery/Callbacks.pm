@@ -322,7 +322,7 @@ sub template_source_list_template {
     my ($cb, $app, $tmpl_ref) = @_;
     my $plugin = MT->component('mt_app_jquery');
     my $blog = $app->blog;
-    my $blog_id = $blog->id;
+    my $blog_id = $blog ? $blog->id : 0;
     my $user_js = MT->config->MTAppjQueryUserJSName || 'user.js';
     my $user_css = MT->config->MTAppjQueryUserCSSName || 'user.css';
     my $FQDN = $app->base;
