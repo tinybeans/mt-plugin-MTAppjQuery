@@ -216,7 +216,7 @@ __MTML__
 __MTML__
 
     my $target = '<script type="text/javascript" src="<\$mt:var name="static_uri"\$>jquery/jquery\.(min\.)*js\?v=<mt:var name="mt_version_id" escape="URL">"></script>';
-    my $jquery_ready = $op_jquery_ready ? qq(<script type="text/javascript" src="${static_plugin_path}js/jquery_ready.js"></script>) : '';
+    my $jquery_ready = $op_jquery_ready ? qq(<script type="text/javascript" src="${static_plugin_path}user-files/jquery_ready.js"></script>) : '';
 
     $$tmpl_ref =~ s!($target)!$mtapp_vars  $1\n  $jquery_ready!g;
 
