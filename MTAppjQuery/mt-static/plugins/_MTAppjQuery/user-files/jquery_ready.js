@@ -1,1 +1,1 @@
-# jquery_ready.js
+// jquery_ready.js
