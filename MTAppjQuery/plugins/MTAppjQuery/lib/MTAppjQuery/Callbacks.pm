@@ -78,7 +78,8 @@ sub template_source_header {
     my $op_usercss_url    = $p->get_config_value('usercss_url', $scope);
     my $op_slidemenu      = $p->get_config_value('slidemenu', $scope);
     my $op_superslidemenu = $p->get_config_value('superslidemenu', $scope);
-    my $op_jquery_ready   = $p->get_config_value('jquery_ready', $scope);
+    my $op_jquery_ready     = $p->get_config_value('jquery_ready', $scope);
+    my $op_jquery_ready_url = $p->get_config_value('jquery_ready_url', $scope);
     my $op_jqselectable   = $p->get_config_value('jqselectable', $scope);
     # Free textarea
     my $op_fa_mtapp_top_head  = $p->get_config_value('fa_mtapp_top_head', $scope) || '<!-- mtapp_top_head (MTAppjQuery) -->';
@@ -216,7 +217,8 @@ __MTML__
 __MTML__
 
     my $target = '<script type="text/javascript" src="<\$mt:var name="static_uri"\$>jquery/jquery\.(min\.)*js\?v=<mt:var name="mt_version_id" escape="URL">"></script>';
-    my $jquery_ready = $op_jquery_ready ? qq(<script type="text/javascript" src="${static_plugin_path}user-files/jquery_ready.js"></script>) : '';
+    my $jquery_ready_url = $op_jquery_ready_url ? $op_jquery_ready_url : "${static_plugin_path}user-files/jquery_ready.js";
+    my $jquery_ready = $op_jquery_ready ? qq(<script type="text/javascript" src="${jquery_ready_url}"></script>) : '';
 
     $$tmpl_ref =~ s!($target)!$mtapp_vars  $1\n  $jquery_ready!g;
 

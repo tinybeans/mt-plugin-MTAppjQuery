@@ -25,7 +25,8 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             ['usercss_url',   {Default => '', Scope => 'system'}],
             #['slidemenu',     {Default => 0,  Scope => 'system'}],
             #['superslidemenu',{Default => 0,  Scope => 'system'}],
-            ['jquery_ready',  {Default => 0,  Scope => 'system'}],
+            ['jquery_ready',    {Default => 0,  Scope => 'system'}],
+            ['jquery_ready_url',{Default => '', Scope => 'system'}],
 
             ['jqselectable',  {Default => 0,  Scope => 'system'}],
 
@@ -37,7 +38,8 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             ['usercss_url',   {Default => '', Scope => 'blog'}],
             #['slidemenu',     {Default => 0,  Scope => 'blog'}],
             #['superslidemenu',{Default => 0,  Scope => 'blog'}],
-            ['jquery_ready',  {Default => 0,  Scope => 'blog'}],
+            ['jquery_ready',    {Default => 0,  Scope => 'blog'}],
+            ['jquery_ready_url',{Default => '', Scope => 'blog'}],
 
             ['jqselectable',  {Default => 0,  Scope => 'blog'}],
 

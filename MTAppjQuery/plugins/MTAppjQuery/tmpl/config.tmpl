@@ -67,6 +67,13 @@
                 <option value="1"<mt:if name="jquery_ready" eq="1"> selected="selected"</mt:if>><__trans phrase="Enable"></option>
                 <option value="0"<mt:if name="jquery_ready" eq="0"> selected="selected"</mt:if>><__trans phrase="Disable"></option>
             </select>
+            <mt:Unless name="jquery_ready_url">
+            <a href="javascript:void(0);" class="change_user_file"><__trans phrase="Change URL"></a>
+            </mt:Unless>
+            <span<mt:Unless name="jquery_ready_url"> style="display:none;"</mt:Unless>>
+                &nbsp;URL&nbsp;
+                <input type="text" value="<mt:If name="jquery_ready_url"><$mt:Var name="jquery_ready_url" encode_html="1"$></mt:If>" name="jquery_ready_url" id="jquery_ready_url" />
+            </span>
         </li>
     </ul>
 </mtapp:setting>
@@ -138,7 +145,7 @@
             </li>
         </ul>
     </mtapp:setting>
-    
+
     <!-- 廃止 -->
     <mtapp:setting
         id="slidemenu"
@@ -151,7 +158,7 @@
             </li>
         </ul>
     </mtapp:setting>
-    
+
     <!-- 廃止 -->
     <mtapp:setting
         id="superslidemenu"
