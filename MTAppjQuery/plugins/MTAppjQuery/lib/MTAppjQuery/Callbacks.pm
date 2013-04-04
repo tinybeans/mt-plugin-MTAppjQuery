@@ -230,7 +230,7 @@ __MTML__
     } elsif ($op_userjs_url ne '') {
         $user_js_url = $op_userjs_url;
     } else {
-        $user_js_url = "${static_plugin_path}js/user.js";
+        $user_js_url = "${static_plugin_path}user-files/user.js";
     }
     my $user_js = ($op_userjs == 1) ? qq(<script type="text/javascript" src="$user_js_url"></script>): '';
 
@@ -243,7 +243,7 @@ __MTML__
     } elsif ($op_usercss_url ne '') {
         $user_css_url = $op_usercss_url;
     } else {
-        $user_css_url = "${static_plugin_path}css/user.css";
+        $user_css_url = "${static_plugin_path}user-files/user.css";
     }
     my $user_css = ($op_usercss == 1) ? qq(<link rel="stylesheet" href="$user_css_url" type="text/css" />): '';
 
