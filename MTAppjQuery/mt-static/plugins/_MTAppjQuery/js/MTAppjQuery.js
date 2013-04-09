@@ -1014,9 +1014,11 @@
         var selector;
         if (op.pointer != '') {
             selector = op.pointer;
-        } else if (op.pointer_basename != '') {
+        }
+        else if (op.pointer_basename != '') {
             selector = '#' + getFieldID(op.pointer_basename);
-        } else {
+        }
+        else {
             return;
         }
         var div = [
