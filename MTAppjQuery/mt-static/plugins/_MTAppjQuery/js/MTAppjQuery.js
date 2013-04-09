@@ -314,7 +314,7 @@
      * Since:   2012-02-24
      * Update:  2012-03-01
      * version: 0.2
-     * 
+     *
      */
     $.fn.MTAppDynamicSelect = function(options){
         var op = $.extend({}, $.fn.MTAppDynamicSelect.defaults, options);
@@ -399,7 +399,7 @@
                 return array;
             }
         });
-    };    
+    };
     $.fn.MTAppDynamicSelect.defaults = {
         debug: false,
         dinamic: true,
@@ -424,7 +424,7 @@
      * Since:   2012-03-01
      * Update:  2012-03-01
      * version: 0.1
-     * 
+     *
      */
     $.fn.MTAppFieldSplit = function(options){
         var op = $.extend({}, $.fn.MTAppFieldSplit.defaults, options);
@@ -459,7 +459,7 @@
             }).end();
             $self.after($span);
         });
-    };    
+    };
     $.fn.MTAppFieldSplit.defaults = {
         debug: false,
         splitCount: 2,
@@ -693,7 +693,7 @@
     //  $(foo).MTAppSuggest();
     //
     //  Description:
-    //    
+    //
     //
     //  Usage:
     //  　$(input:text).MTAppSuggest(options);
