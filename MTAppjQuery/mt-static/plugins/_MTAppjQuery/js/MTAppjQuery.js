@@ -1004,7 +1004,8 @@
     //              カスタムフィールドの場合は「cf_basename」のように接頭辞「 cf_ 」を付ける。
     //              ex. {'title':'タイトル','keywords':'キーワード','cf_price','価格'}
     //    pointer: {String} タブを挿入する起点となるノードのセレクタ。ex. #title-field
-    //    pointer_basename: {String} タブを挿入する起点となるノードのbasename。ex. title
+    //    pointer_basename: {String} pointerを指定しない場合は、pointer_basenameに
+    //                      タブを挿入する起点となるノードのbasenameを指定できる。ex. title
     //    insert: {String} 起点となるノードの前に挿入（before）するか後ろに挿入（after）するか。
     // -------------------------------------------------
     $.MTAppTabs = function(options){
@@ -1023,19 +1024,29 @@
         }
         var div = [
             '<div class="mtapp-tabs-container">',
-                '<ul class="mtapp-tabs-navi"></ul>',
+                '<ul class="mtapp-tabs-navi" style="position:relative;z-index:9999;">',
+                '</ul>',
             '</div>'
         ];
-        var container = $(selector)[op.insert](div.join('')).next('.mtapp-tabs-container');
+        var container;
+        if (op.insert == 'before') {
+            container = $(selector).before(div.join('')).prev('.mtapp-tabs-container');
+        }
+        else if (op.insert == 'after') {
+            container = $(selector).after(div.join('')).next('.mtapp-tabs-container');
+        }
+        else {
+            return;
+        }
         var ids = [];
         var li = [];
         for (var basename in op.basename) {
-            var id = '#' + getFieldID(basename);
-            ids.push(id);
-            li.push('<li><a href="' + id + '">' + op.basename[basename] + '</a></li>');
+            var _id = '#' + getFieldID(basename);
+            ids.push(_id);
+            li.push('<li><a href="' + _id + '">' + op.basename[basename] + '</a></li>');
         }
         var $elms = $(ids.join(','));
-        $elms.removeClass('sort-enabled').find('div.field-header').addClass('hidden');
+        $elms.removeClass('sort-enabled hidden').find('div.field-header').addClass('hidden');
         container
             .append($elms)
             .find('.mtapp-tabs-navi').html(li.join(''));
