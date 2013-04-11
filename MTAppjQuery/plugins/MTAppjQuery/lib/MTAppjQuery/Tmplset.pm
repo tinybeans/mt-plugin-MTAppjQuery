@@ -301,8 +301,8 @@ __MT__
 
 sub fav_blogs_tab {
     my ($type) = @_;
-    
     # Confirmed the varsion of 5.0, 5.01, 5.02.
+
     my $before = '<li class="tab"><a href="#favorite-blog"><__trans phrase="Blogs"></a></li>';
     return quotemeta($before) if ($type eq 'before');
 
@@ -504,20 +504,20 @@ sub MTAppSuperSlideMenu {
         var parent_id = "w" + mtapp_blogs_json[i].parent_id,
             blog_id = mtapp_blogs_json[i].id;
         if (blogs[parent_id]) {
-            blogs[parent_id] += 
-                "<li class='blog'>" + 
-                    "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:blog_id}) + "'>" + 
-                        mtapp_blogs_json[i].name + 
-                    "</a>" + 
-                    createBlogMenu(blog_id) + 
+            blogs[parent_id] +=
+                "<li class='blog'>" +
+                    "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:blog_id}) + "'>" +
+                        mtapp_blogs_json[i].name +
+                    "</a>" +
+                    createBlogMenu(blog_id) +
                 "</li>";
         } else {
-            blogs[parent_id] = 
-                "<li class='blog'>" + 
-                    "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:blog_id}) + "'>" + 
-                        mtapp_blogs_json[i].name + 
-                    "</a>" + 
-                    createBlogMenu(blog_id) + 
+            blogs[parent_id] =
+                "<li class='blog'>" +
+                    "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:blog_id}) + "'>" +
+                        mtapp_blogs_json[i].name +
+                    "</a>" +
+                    createBlogMenu(blog_id) +
                 "</li>";
         }
     }
@@ -528,11 +528,11 @@ sub MTAppSuperSlideMenu {
         var currentClass = (website_id == <mt:if name="curr_website_id"><mt:var name="curr_website_id"><mt:else>0</mt:if>) ? " mtapp-slidemenu-current" : "";
         var child_blogs = blogs["w" + website_id] ? blogs["w" + website_id] : "";
         websites.push(
-            "<li class='website mtapp-superslide" + currentClass + "'>" + 
-                "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:website_id}) + "'>" + 
-                    mtapp_websites_json[i].name + 
-                "</a>" + 
-                createWebsiteMenu(website_id, child_blogs) + 
+            "<li class='website mtapp-superslide" + currentClass + "'>" +
+                "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:website_id}) + "'>" +
+                    mtapp_websites_json[i].name +
+                "</a>" +
+                createWebsiteMenu(website_id, child_blogs) +
             "</li>"
         );
     }
@@ -574,7 +574,7 @@ sub MTAppSuperSlideMenu {
                 );
         $('#fav-blog-list, #create-blog-action').hide();
     });
-    
+
     // ウェブサイトの各種メニューを表示
     function createWebsiteMenu(id, child_blogs){
         return [
@@ -798,19 +798,19 @@ sub uploadify_widget_innerHTML {
     Uploadify v2.1.0
     Release Date: August 24, 2009
     Modified by Tomohiro Okuwaki (2010-04-12)
-    
+
     Copyright (c) 2009 Ronnie Garcia, Travis Nickels
-    
+
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
     in the Software without restriction, including without limitation the rights
     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
     copies of the Software, and to permit persons to whom the Software is
     furnished to do so, subject to the following conditions:
-    
+
     The above copyright notice and this permission notice shall be included in
     all copies or substantial portions of the Software.
-    
+
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -819,7 +819,7 @@ sub uploadify_widget_innerHTML {
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
     THE SOFTWARE.
     */
-    
+
     if(jQuery)(
         function(jQuery){
             jQuery.extend(jQuery.fn,{
@@ -940,7 +940,7 @@ sub uploadify_widget_innerHTML {
                             ];
                             jQuery(queue).append(innerHtml.join(''));
                             // modified by Tomohiro Okuwaki [ end ]
-    
+
                         }
                     });
                     if (typeof(settings.onSelectOnce) == 'function') {
@@ -956,10 +956,10 @@ sub uploadify_widget_innerHTML {
                         postData = fileQueueObj;
                         // modified by Tomohiro Okuwaki [start]
                         if (folder.match(/^\//) || folder.match(/^http/)) {
-                            postData.folder = folder;                   
-    
+                            postData.folder = folder;
+
                         } else {
-                            postData.folder = pagePath + folder;                    
+                            postData.folder = pagePath + folder;
                         }
                         // modified by Tomohiro Okuwaki [ end ]
                         if (single) {
@@ -1259,7 +1259,7 @@ sub uploadify_widget_innerHTML {
     });
     jQuery("#asset_uploadify_").val(getCookie('asset_uploadify'));
     jQuery("#asset_uploadify_meta").val(getCookie('asset_uploadify_meta'));
-    </mt:setvarblock>    
+    </mt:setvarblock>
 __MT__
     return $out;
 }
