@@ -302,6 +302,7 @@ __MTML__
 
 sub template_source_favorite_blogs {
     my ($cb, $app, $tmpl_ref) = @_;
+    my $version = MT->version_id;
 
     ### class="parent-website-n"を付与
     my $classname = 'class="blog-content"';
@@ -315,7 +316,7 @@ sub template_source_favorite_blogs {
 
     ### 構造タブの中身を入れる
     my $fav_blogs_wdg_close_org = MTAppjQuery::Tmplset::fav_blogs_wdg_close_org;
-    my $fav_blogs_wdg_close     = MTAppjQuery::Tmplset::fav_blogs_wdg_close;
+    my $fav_blogs_wdg_close     = MTAppjQuery::Tmplset::fav_blogs_wdg_close($version);
     $$tmpl_ref =~ s!$fav_blogs_wdg_close_org!$fav_blogs_wdg_close!g;
 
 }
