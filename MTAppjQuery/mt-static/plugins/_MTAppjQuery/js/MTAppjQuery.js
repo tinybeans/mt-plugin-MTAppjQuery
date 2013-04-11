@@ -2135,7 +2135,7 @@
     //  $.MTAppBatchEditCategory();
     //
     //  Description:
-    //    ブログ記事・ウェブページ一括編集画面をソート可能にして、日付を自動変更する
+    //    ブログ記事・ウェブページ一括編集画面でカテゴリやフォルダをまとめて変更する
     //
     //  Usage:
     //    $.MTAppBatchEditCategory();
