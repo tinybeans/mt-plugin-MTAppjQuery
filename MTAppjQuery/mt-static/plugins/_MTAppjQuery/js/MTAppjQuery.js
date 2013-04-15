@@ -987,6 +987,36 @@
     };
     // end - $.MTAppGetLabel
 
+    // -------------------------------------------------
+    //  $.MTAppSetLabel();
+    //
+    //  Description:
+    //    現在のページのlabel要素のテキストをセットする
+    //
+    //  Usage:
+    //    $.MTAppSetLabel([
+    //        ["セレクタ", "旧テキスト", "新テキスト"]
+    //    ]);
+    // -------------------------------------------------
+    $.MTAppSetLabel = function(array){
+        for (var i = 0, n = array.length; i < n; i++) {
+            var exp = new RegExp(array[i][1], "g");
+            var element = $(array[i][0])[0];
+            textNodeRewrite(element, array[i][1], array[i][2]);
+        }
+        function textNodeRewrite(element, pattan, replacement) {
+            var children = element.childNodes;
+            for (var i = 0, l = children.length; i < l; i++) {
+                if (children[i].nodeType == 1) {
+                    textNodeRewrite(children[i], pattan, replacement);
+                }
+                else if (children[i].nodeType == 3 && children[i].nodeValue.indexOf(pattan) > -1) {
+                    children[i].nodeValue = children[i].nodeValue.replace(pattan, replacement);
+                }
+            }
+        }
+    };
+    // end - $.MTAppSetLabel
 
     // -------------------------------------------------
     //  $.MTAppFieldSort();
