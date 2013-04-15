@@ -301,17 +301,15 @@ __MT__
 
 sub fav_blogs_tab {
     my ($type) = @_;
-    
-    # Confirmed the varsion of 5.0, 5.01, 5.02.
+
+    # Confirmed the varsion of 5.0, 5.01, 5.02, 5.2.2
     my $before = '<li class="tab"><a href="#favorite-blog"><__trans phrase="Blogs"></a></li>';
     return quotemeta($before) if ($type eq 'before');
 
     my $after = <<__MT__;
     ${before}
     <li class="tab">
-        <a href="#favorite-structure">
-            <__trans_section component="mt_app_jquery"><__trans phrase="structure"></__trans_section>
-        </a>
+        <a href="#favorite-structure"><__trans_section component="mt_app_jquery"><__trans phrase="structure"></__trans_section></a>
     </li>
 __MT__
     return $after;
@@ -321,7 +319,10 @@ sub fav_blogs_wdg_close_org {
     return quotemeta('</mtapp:widget>');
 }
 sub fav_blogs_wdg_close {
-    my $out = <<'__MT__';
+    my ($version) = @_;
+    my $out;
+    if ($version =~ /^5\.0/) {
+        $out = <<'__MT__';
 <div id="favorite-structure">
 <mt:if name="website_object_loop">
     <div id="favorite-website-container" class="blog-container">
@@ -490,6 +491,184 @@ sub fav_blogs_wdg_close {
 </div>
 </mtapp:widget>
 __MT__
+    }
+    elsif ($version =~ /^5\.(1|2)/) {
+        $out = <<'__MT__';
+<div id="favorite-structure">
+<mt:if name="website_object_loop">
+    <div id="favorite-website-container" class="blog-container">
+    <mt:loop name="website_object_loop">
+        <div class="favorite-structure-container">
+            <mt:Var name="website_id" setvar="crt_website_id" />
+            <div id="website-<mt:var name="website_id">" class="blog-content">
+                <div id="website-<mt:var name="website_id">-theme-thumbnail" class="thumbnail picture small">
+                    <img src="<mt:var name="website_theme_thumb">" />
+                </div>
+                <div id="website-<mt:var name="website_id">-meta" class="blog-meta">
+                    <h4 id="website-<mt:var name="website_id">-name" class="blog-name"><a href="<mt:var name="script_url">?__mode=dashboard&amp;blog_id=<mt:var name="website_id">"><mt:var name="website_name" escape="html"></a></h4>
+                    <p id="website-<mt:var name="website_id">-link" class="blog-link"><a href="<mt:var name="website_url" encode_html="1">"><mt:var name="website_url" encode_html="1"></a></p>
+        <mt:if name="website_description">
+                    <div id="website-<mt:var name="website_id">-description" class="blog-description">
+                        <mt:var name="website_description" remove_html="1">
+                    </div>
+        </mt:if>
+                    <ul id="website-<mt:var name="website_id">-control" class="blog-control">
+                        <li>
+        <mt:if name="can_access_to_blog_list">
+                            <a href="<mt:var name="script_url">?__mode=list&amp;_type=blog&amp;blog_id=<mt:var name="website_id">"><__trans phrase="[quant,_1,blog,blogs]" params="<mt:var name="website_blog_count">"></a>
+        <mt:else>
+                            <__trans phrase="[quant,_1,blog,blogs]" params="<mt:var name="website_blog_count">">
+        </mt:if>
+                        </li>
+                        <li>
+        <mt:if name="can_access_to_page_list">
+                            <a href="<mt:var name="script_url">?__mode=list&amp;_type=page&amp;blog_id=<mt:var name="website_id">&amp;filter_key=my_posts_on_this_context"><__trans phrase="[quant,_1,page,pages]" params="<mt:var name="website_page_count">"></a>
+        <mt:else>
+                            <__trans phrase="[quant,_1,page,pages]" params="<mt:var name="website_page_count">">
+        </mt:if>
+                        </li>
+                        <li>
+        <mt:if name="can_access_to_comment_list">
+                            <a href="<mt:var name="script_url">?__mode=list&amp;_type=comment&amp;blog_id=<mt:var name="website_id">&amp;filter_key=comments_on_my_entry"><__trans phrase="[quant,_1,comment,comments]" params="<mt:var name="website_comment_count">"></a>
+        <mt:else>
+                            <__trans phrase="[quant,_1,comment,comments]" params="<mt:var name="website_comment_count">">
+        </mt:if>
+                        </li>
+        <mt:if name="can_access_to_template_list">
+                        <li>
+                            <a href="<mt:var name="script_url">?__mode=list_template&amp;blog_id=<mt:var name="website_id">"><__trans phrase="Templates"></a>
+                        </li>
+        </mt:if>
+        <mt:if name="can_access_to_blog_setting_screen">
+                        <li>
+                            <a href="<mt:var name="script_url">?__mode=cfg_prefs&amp;blog_id=<mt:var name="website_id">"><__trans phrase="Settings"></a>
+                        </li>
+        </mt:if>
+        <mt:if name="can_use_tools_search">
+                        <li>
+                            <a href="<mt:var name="script_url">?__mode=search_replace&amp;blog_id=<mt:var name="website_id">"><__trans phrase="Search"></a>
+                        </li>
+        </mt:if>
+                    </ul>
+                    <ul id="website-<mt:var name="website_id">-action" class="blog-action">
+        <mt:if name="can_create_new_page">
+                        <li><a class="button" href="<mt:var name="script_url">?__mode=view&_type=page&amp;blog_id=<mt:var name="website_id">"><__trans phrase="New Page"></a></li>
+        </mt:if>
+        <mt:if name="can_create_blog">
+                        <li><a class="button" href="<mt:var name="script_url">?__mode=view&_type=blog&amp;blog_id=<mt:var name="website_id">"><__trans phrase="New Blog"></a></li>
+        </mt:if>
+                    </ul>
+                <!-- /.blog-meta -->
+                </div>
+            <!-- /.blog-content -->
+            </div>
+
+            <mt:if name="blog_object_loop">
+            <div class="favorite-structure-blog-container">
+                <mt:loop name="blog_object_loop">
+                    <mt:if name="website_id" eq="$crt_website_id">
+                    <div id="blog-<mt:var name="blog_id">-content" class="blog-content structure-blog">
+                        <div id="blog-<mt:var name="blog_id">-theme-thumbnail" class="thumbnail picture small">
+                            <img src="<mt:var name="blog_theme_thumb">" />
+                        </div>
+                        <div id="blog-<mt:var name="blog_id">-meta" class="blog-meta">
+                            <h4 id="blog-<mt:var name="blog_id">-name" class="blog-name">
+                                <a href="<mt:var name="script_url">?__mode=dashboard&amp;blog_id=<mt:var name="blog_id">"><mt:var name="blog_name" escape="html"></a>
+                                <span class="parent">(<mt:if name="can_access_to_website"><a href="<mt:var name="script_url">?__mode=dashboard&amp;blog_id=<mt:var name="website_id">"><mt:var name="website_name" escape="html"></a><mt:else><mt:var name="website_name" escape="html"></mt:if>)</span>
+                            </h4>
+                            <p id="blog-<mt:var name="blog_id">-link" class="blog-link"><a href="<mt:var name="blog_url" encode_html="1">"><mt:var name="blog_url" encode_html="1"></a></p>
+                <mt:if name="blog_description">
+                            <div id="blog-<mt:var name="blog_id">-description" class="blog-description">
+                                <mt:var name="blog_description" remove_html="1">
+                            </div>
+                </mt:if>
+                            <ul id="blog-<mt:var name="blog_id">-control" class="blog-control">
+                                <li>
+                <mt:if name="can_access_to_entry_list">
+                                    <a href="<mt:var name="script_url">?__mode=list&amp;_type=entry&amp;blog_id=<mt:var name="blog_id">&amp;filter_key=my_posts_on_this_context"><__trans phrase="[quant,_1,entry,entries]" params="<mt:var name="blog_entry_count">"></a>
+                <mt:else>
+                                    <__trans phrase="[quant,_1,entry,entries]" params="<mt:var name="blog_entry_count">">
+                </mt:if>
+                                </li>
+                                <li>
+                <mt:if name="can_access_to_page_list">
+                                    <a href="<mt:var name="script_url">?__mode=list&amp;_type=page&amp;blog_id=<mt:var name="blog_id">&amp;filter_key=my_posts_on_this_context"><__trans phrase="[quant,_1,page,pages]" params="<mt:var name="blog_page_count">"></a>
+                <mt:else>
+                                    <__trans phrase="[quant,_1,page,pages]" params="<mt:var name="blog_page_count">">
+                </mt:if>
+                                </li>
+                                <li>
+                <mt:if name="can_access_to_comment_list">
+                                    <a href="<mt:var name="script_url">?__mode=list&amp;_type=comment&amp;blog_id=<mt:var name="blog_id">&amp;filter_key=comments_on_my_entry"><__trans phrase="[quant,_1,comment,comments]" params="<mt:var name="blog_comment_count">"></a>
+                <mt:else>
+                                    <__trans phrase="[quant,_1,comment,comments]" params="<mt:var name="blog_comment_count">">
+                </mt:if>
+                                </li>
+                <mt:if name="can_access_to_template_list">
+                                <li>
+                                    <a href="<mt:var name="script_url">?__mode=list_template&amp;blog_id=<mt:var name="blog_id">"><__trans phrase="Template"></a>
+                                </li>
+                </mt:if>
+                <mt:if name="can_access_to_blog_setting_screen">
+                                <li>
+                                    <a href="<mt:var name="script_url">?__mode=cfg_prefs&amp;blog_id=<mt:var name="blog_id">"><__trans phrase="Settings"></a>
+                                </li>
+                </mt:if>
+                <mt:if name="can_use_tools_search">
+                                <li>
+                                    <a href="<mt:var name="script_url">?__mode=search_replace&amp;blog_id=<mt:var name="blog_id">"><__trans phrase="Search"></a>
+                                </li>
+                </mt:if>
+                            </ul>
+                <mt:if name="can_create_new_entry">
+                            <ul id="blog-<mt:var name="blog_id">-action" class="blog-action">
+                                <li><a class="button" href="<mt:var name="script_url">?__mode=view&amp;_type=entry&amp;blog_id=<mt:var name="blog_id">"><__trans phrase="New Entry"></a></li>
+                            </ul>
+                </mt:if>
+                        <!-- /.blog-meta -->
+                        </div>
+                    <!-- /.blog-content.structure-blog -->
+                    </div>
+                    </mt:if>
+                </mt:loop>
+            <!-- /.favorite-structure-blog-container -->
+            </div>
+            <mt:else>
+                <mtapp:statusmsg
+                    id="zero-state"
+                    class="info zero-state"
+                    can_close="0">
+                    <__trans phrase="No blog could be found.">
+                </mtapp:statusmsg>
+            </mt:if>
+            <mt:if name="has_more_blogs">
+                <div class="select-blog">
+                    <a href="<mt:var name="script_url">?__mode=dialog_select_weblog&amp;return_args=__mode=dashboard&amp;select_favorites=1" class="mt-open-dialog"><__trans phrase="Select another blog..."></a>
+                </div>
+            </mt:if>
+        <!-- /.favorite-structure-container -->
+        </div>
+    </mt:loop>
+    <!-- /#favorite-website-container -->
+    </div>
+<mt:else>
+    <mtapp:statusmsg
+        id="zero-state"
+        class="info zero-state"
+        can_close="0">
+        <__trans phrase="No website could be found. [_1]" params="<mt:if name="can_create_website"><a href="<$mt:var name="mt_url"$>?__mode=view&amp;_type=website&amp;blog_id=0"><__trans phrase="Create a new"></a></mt:if>">
+    </mtapp:statusmsg>
+</mt:if>
+<mt:if name="has_more_websites">
+    <div class="select-website">
+        <a href="<mt:var name="script_url">?__mode=dialog_select_website&amp;return_args=__mode=dashboard&amp;select_favorites=1" class="mt-open-dialog"><__trans phrase="Select another website..."></a>
+    </div>
+</mt:if>
+<!-- /.favorite-structure -->
+</div>
+</mtapp:widget>
+__MT__
+    }
     return $out;
 }
 
@@ -504,20 +683,20 @@ sub MTAppSuperSlideMenu {
         var parent_id = "w" + mtapp_blogs_json[i].parent_id,
             blog_id = mtapp_blogs_json[i].id;
         if (blogs[parent_id]) {
-            blogs[parent_id] += 
-                "<li class='blog'>" + 
-                    "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:blog_id}) + "'>" + 
-                        mtapp_blogs_json[i].name + 
-                    "</a>" + 
-                    createBlogMenu(blog_id) + 
+            blogs[parent_id] +=
+                "<li class='blog'>" +
+                    "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:blog_id}) + "'>" +
+                        mtapp_blogs_json[i].name +
+                    "</a>" +
+                    createBlogMenu(blog_id) +
                 "</li>";
         } else {
-            blogs[parent_id] = 
-                "<li class='blog'>" + 
-                    "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:blog_id}) + "'>" + 
-                        mtapp_blogs_json[i].name + 
-                    "</a>" + 
-                    createBlogMenu(blog_id) + 
+            blogs[parent_id] =
+                "<li class='blog'>" +
+                    "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:blog_id}) + "'>" +
+                        mtapp_blogs_json[i].name +
+                    "</a>" +
+                    createBlogMenu(blog_id) +
                 "</li>";
         }
     }
@@ -528,11 +707,11 @@ sub MTAppSuperSlideMenu {
         var currentClass = (website_id == <mt:if name="curr_website_id"><mt:var name="curr_website_id"><mt:else>0</mt:if>) ? " mtapp-slidemenu-current" : "";
         var child_blogs = blogs["w" + website_id] ? blogs["w" + website_id] : "";
         websites.push(
-            "<li class='website mtapp-superslide" + currentClass + "'>" + 
-                "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:website_id}) + "'>" + 
-                    mtapp_websites_json[i].name + 
-                "</a>" + 
-                createWebsiteMenu(website_id, child_blogs) + 
+            "<li class='website mtapp-superslide" + currentClass + "'>" +
+                "<a href='" + $.MTAppCreateLink({title:'ダッシュボード',blog_id:website_id}) + "'>" +
+                    mtapp_websites_json[i].name +
+                "</a>" +
+                createWebsiteMenu(website_id, child_blogs) +
             "</li>"
         );
     }
@@ -574,7 +753,7 @@ sub MTAppSuperSlideMenu {
                 );
         $('#fav-blog-list, #create-blog-action').hide();
     });
-    
+
     // ウェブサイトの各種メニューを表示
     function createWebsiteMenu(id, child_blogs){
         return [
@@ -798,19 +977,19 @@ sub uploadify_widget_innerHTML {
     Uploadify v2.1.0
     Release Date: August 24, 2009
     Modified by Tomohiro Okuwaki (2010-04-12)
-    
+
     Copyright (c) 2009 Ronnie Garcia, Travis Nickels
-    
+
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
     in the Software without restriction, including without limitation the rights
     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
     copies of the Software, and to permit persons to whom the Software is
     furnished to do so, subject to the following conditions:
-    
+
     The above copyright notice and this permission notice shall be included in
     all copies or substantial portions of the Software.
-    
+
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -819,7 +998,7 @@ sub uploadify_widget_innerHTML {
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
     THE SOFTWARE.
     */
-    
+
     if(jQuery)(
         function(jQuery){
             jQuery.extend(jQuery.fn,{
@@ -940,7 +1119,7 @@ sub uploadify_widget_innerHTML {
                             ];
                             jQuery(queue).append(innerHtml.join(''));
                             // modified by Tomohiro Okuwaki [ end ]
-    
+
                         }
                     });
                     if (typeof(settings.onSelectOnce) == 'function') {
@@ -956,10 +1135,10 @@ sub uploadify_widget_innerHTML {
                         postData = fileQueueObj;
                         // modified by Tomohiro Okuwaki [start]
                         if (folder.match(/^\//) || folder.match(/^http/)) {
-                            postData.folder = folder;                   
-    
+                            postData.folder = folder;
+
                         } else {
-                            postData.folder = pagePath + folder;                    
+                            postData.folder = pagePath + folder;
                         }
                         // modified by Tomohiro Okuwaki [ end ]
                         if (single) {
@@ -1259,7 +1438,7 @@ sub uploadify_widget_innerHTML {
     });
     jQuery("#asset_uploadify_").val(getCookie('asset_uploadify'));
     jQuery("#asset_uploadify_meta").val(getCookie('asset_uploadify_meta'));
-    </mt:setvarblock>    
+    </mt:setvarblock>
 __MT__
     return $out;
 }
