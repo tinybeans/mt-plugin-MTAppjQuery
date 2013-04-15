@@ -949,6 +949,44 @@
     };
     // end - $.MTAppCustomize()
 
+    // -------------------------------------------------
+    //  $.MTAppGetLabel();
+    //
+    //  Description:
+    //    現在のページのlabel要素のテキストとそのlabel要素を指定するセレクタを$.MTAppMsg()で表示する
+    //
+    //  Usage:
+    //    $.MTAppGetLabel();
+    // -------------------------------------------------
+    $.MTAppGetLabel = function(){
+        var label = [];
+        $("label").each(function(idx){
+            var text = $(this).text();
+            var id = $(this).attr("id");
+            var selector = "";
+            if (id) {
+                selector = "#" + id;
+            }
+            else if ($(this).attr("for")) {
+                selector =  "[for='" + $(this).attr("for") + "']";
+            }
+            else {
+                selector = "#" + $(this).closest("[id]").attr("id");
+                $(selector).find("label").each(function(idx){
+                    if ($(this).text() === text) {
+                        selector += " label:eq(" + idx + ")";
+                    }
+                });
+            }
+            label.push('["' + selector + '", "' + text + '", "' + text + '"]');
+        });
+        $.MTAppMsg({
+            msg: label.join(",<br />"),
+            type: "success"
+        });
+    };
+    // end - $.MTAppGetLabel
+
 
     // -------------------------------------------------
     //  $.MTAppFieldSort();
