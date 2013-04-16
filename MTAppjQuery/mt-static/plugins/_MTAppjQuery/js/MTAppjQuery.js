@@ -958,32 +958,47 @@
     //  Usage:
     //    $.MTAppGetLabel();
     // -------------------------------------------------
-    $.MTAppGetLabel = function(){
-        var label = [];
-        $("label").each(function(idx){
-            var text = $(this).text();
-            var id = $(this).attr("id");
-            var selector = "";
-            if (id) {
-                selector = "#" + id;
-            }
-            else if ($(this).attr("for")) {
-                selector =  "[for='" + $(this).attr("for") + "']";
-            }
-            else {
-                selector = "#" + $(this).closest("[id]").attr("id");
-                $(selector).find("label").each(function(idx){
-                    if ($(this).text() === text) {
-                        selector += " label:eq(" + idx + ")";
-                    }
-                });
-            }
-            label.push('["' + selector + '", "' + text + '", "' + text + '"]');
-        });
+    $.MTAppGetLabel = function(text){
+        var res = [];
+        var tagNames = text.split(",");
+        for (var i = 0, l = tagNames.length; i < l; i++) {
+            makeOptions($.trim(tagNames[i]));
+        }
         $.MTAppMsg({
-            msg: label.join(",<br />"),
+            msg: res.join(",<br />"),
             type: "success"
         });
+        function makeOptions(tagName) {
+            $(tagName).each(function(idx){
+                var text = $(this).text();
+                var id = $(this).attr("id");
+                var selector = "";
+                if (id) {
+                    selector = "#" + id;
+                }
+                else if ($(this).attr("for")) {
+                    selector =  "label[for='" + $(this).attr("for") + "']";
+                }
+                else {
+                    var parentId = $(this).closest("[id]").attr("id");
+                    selector = "#" + parentId;
+                    switch (parentId) {
+                        case "entry-pref-field-list":
+                        case "metadata_fields-field":
+                            selector += " " + tagName + ":contains('" + $.trim(text) + "')";
+                            break;
+                        default:
+                            $(selector).find(tagName).each(function(idx){
+                                if ($(this).text() === text) {
+                                    selector += " " + tagName + ":eq(" + idx + ")";
+                                }
+                            });
+                            break;
+                    }
+                }
+                res.push('["' + selector + '", "' + text + '", "' + text + '"]');
+            });
+        }
     };
     // end - $.MTAppGetLabel
 
