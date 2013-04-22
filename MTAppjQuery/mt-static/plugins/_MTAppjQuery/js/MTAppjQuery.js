@@ -1229,6 +1229,9 @@
                 autoOpen: false,
                 modal: true,
                 title: op.title,
+                width: op.width,
+                height: op.height,
+                modal: op.modal,
                 hide: op.hide_effect
             });
         $('#mtapp-dialog-msg').dialog('open');
@@ -1236,6 +1239,9 @@
     $.MTAppDialogMsg.defaults = {
         title: 'メッセージ',
         content: 'Movable Typeへようこそ！',
+        width: 300,
+        height: 'auto',
+        modal: false,
         hide_effect: ''
     };
     // end - $.MTAppDialogMsg();
