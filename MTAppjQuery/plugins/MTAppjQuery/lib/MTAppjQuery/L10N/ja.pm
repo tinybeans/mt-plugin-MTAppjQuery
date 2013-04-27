@@ -49,9 +49,10 @@ use vars qw ( %Lexicon );
     'Append to variable mtapp_top_head' => '変数 mtapp_top_head に追加（&lt;head&gt;内の最初）',
     'Append to variable html_head' => '変数 html_head に追加（mt.jsの直前）',
     'Append to variable js_include' => '変数 js_include に追加（&lt;/head&gt;の直前）',
+    'The first half of the body tag' => '&lt;body&gt;&lt;/body&gt;タグの前半',
     'Append to variable html_body' => '変数 html_body に追加（div#headerの直前）',
     'Append to variable form_header' => '変数 form_header に追加（div#content内の最初）',
-    'Before &lt;/html&gt;' => '&lt;/body&gt;タグの手前',
+    'Before &lt;/body&gt;' => '&lt;/body&gt;タグの手前',
     'Append to variable jq_js_include' => '変数 jq_js_include に追加（MT本体のjQuery内の最初）',
     'Append to variable mtapp_html_foot' => '変数 mtapp_html_foot に追加（MTAppjQueryのuser.jsの直前）',
     'Append to variable mtapp_end_body' => '変数 mtapp_end_body に追加（&lt;/body&gt;タグの直前）',
@@ -65,7 +66,7 @@ use vars qw ( %Lexicon );
 	'active Uploadify' => 'マルチファイルアップロードを有効する',
 	'To stop using Uploadify' => 'Uploadifyの利用を停止する',
     'Upload folder' => 'アップロード先フォルダ',
-    'The path to the folder you would like to save the files to. Do not end the path with a ‘/’.' 
+    'The path to the folder you would like to save the files to. Do not end the path with a ‘/’.'
         => 'ファイルをアップロードするフォルダのパスを指定。末尾の「/」は不要。',
 	'img element' => 'img要素',
 	'a element' => 'a要素',
