@@ -135,11 +135,12 @@
                 }
             }
             // addオプションがtrueの場合（ユーザー追加可能の場合）
-            if (op.add && op.skin == false) {
-                labels.push('<input class="mcb-add-item" type="text" value="+" />');
-            } else if (op.add) {
-                labels.push('<input class="mcb-add-item" type="text" value="" />');
-            }
+            // if (op.add && op.skin == false) {
+            //     labels.push('<input class="mcb-add-item" type="text" value="" />');
+            // } else if (op.add) {
+            //     labels.push('<input class="mcb-add-item" type="text" value="" />');
+            // }
+            labels.push('<input class="mcb-add-item" type="text" value="" />');
             $container
                 .html(labels.join(''))
                 .find('input:checkbox')
@@ -152,12 +153,12 @@
             // ユーザーが項目を追加できるようにする
             if (op.add) {
                 $container.find('input.mcb-add-item')
-                    .focus(function(){
-                        if ($(this).val() === '+' && op.skin == false) $(this).val('');
-                    })
-                    .blur(function(){
-                        if ($(this).val() === '' && op.skin == false) $(this).val('+');
-                    })
+                    // .focus(function(){
+                    //     if ($(this).val() === '+' && op.skin == false) $(this).val('');
+                    // })
+                    // .blur(function(){
+                    //     if ($(this).val() === '' && op.skin == false) $(this).val('+');
+                    // })
                     .keydown(function(e){
                         var keycode = e.which || e.keyCode;
                         if (keycode == 13) {
