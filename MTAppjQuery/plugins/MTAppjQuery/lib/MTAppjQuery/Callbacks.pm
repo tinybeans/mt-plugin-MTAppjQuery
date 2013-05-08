@@ -9,6 +9,8 @@ use MTAppjQuery::Tmplset;
 sub template_source_header {
     my ($cb, $app, $tmpl_ref) = @_;
     my $version = MT->version_id;
+    my $minor_version = $version;
+    $minor_version =~ s/^(\d\.\d).*/$1/;
     my $p = MT->component('mt_app_jquery');
     my $blog = $app->blog;
     my $author = $app->user;
@@ -185,6 +187,8 @@ __MTML__
 
     // 推奨
     var mtappVars = {
+        "version" : "${version}",
+        "minor_version" : "${minor_version}",
         "type" : "${_type}",
         "author_id" : <mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if>,
         "author_name" : "<mt:var name="author_name" encode_js="1">",
