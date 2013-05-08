@@ -1360,6 +1360,10 @@
         var fullBtn = $('<div/>')
             .attr('id','fullBtn')
             .addClass('tab')
+            .css({
+                'margin-right': '4px',
+                'margin-left': '4px'
+            })
             .html('<label><a href="javascript:void(0);">Full</a></label>')
             .toggle(
                 function(){
@@ -1369,7 +1373,9 @@
                         'overflow':'hidden',
                         'padding-right':'17px'
                     });
-                    $('#overlay').fadeIn(function(){
+                    $('#overlay')
+                        .height($(document).height())
+                        .fadeIn(function(){
                         $('#text-field').css({
                             'position':'absolute',
                             'z-index':'2000',
