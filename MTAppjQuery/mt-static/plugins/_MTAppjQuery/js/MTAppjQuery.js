@@ -2607,18 +2607,18 @@
             return num;
         },
         // 全角数字を半角数字に変換し、半角数字以外は削除する。
-        toInt: function(str, loose) {
+        toInt: function(str, allow) {
             str = str.replace(/０/g, '0')
-                .replace(/１/g, '1')
-                .replace(/２/g, '2')
-                .replace(/３/g, '3')
-                .replace(/４/g, '4')
-                .replace(/５/g, '5')
-                .replace(/６/g, '6')
-                .replace(/７/g, '7')
-                .replace(/８/g, '8')
-                .replace(/９/g, '9');
-            if (!loose) {
+                     .replace(/１/g, '1')
+                     .replace(/２/g, '2')
+                     .replace(/３/g, '3')
+                     .replace(/４/g, '4')
+                     .replace(/５/g, '5')
+                     .replace(/６/g, '6')
+                     .replace(/７/g, '7')
+                     .replace(/８/g, '8')
+                     .replace(/９/g, '9');
+            if (!allow) {
                 str = str.replace(/\D/g, '');
             }
             return str;
