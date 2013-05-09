@@ -2608,6 +2608,7 @@
         },
         // 全角数字を半角数字に変換し、半角数字以外は削除する。
         toInt: function(str, allow) {
+            str = str + "";
             str = str.replace(/０/g, '0')
                      .replace(/１/g, '1')
                      .replace(/２/g, '2')
