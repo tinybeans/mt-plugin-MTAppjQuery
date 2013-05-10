@@ -82,7 +82,7 @@ sub template_source_header {
     my $op_superslidemenu = $p->get_config_value('superslidemenu', $scope);
     my $op_jquery_ready     = $p->get_config_value('jquery_ready', $scope);
     my $op_jquery_ready_url = $p->get_config_value('jquery_ready_url', $scope);
-    my $op_jqselectable   = $p->get_config_value('jqselectable', $scope);
+    my $op_jqselectable   = 0;#$p->get_config_value('jqselectable', $scope);
     # Free textarea
     my $op_fa_mtapp_top_head  = $p->get_config_value('fa_mtapp_top_head', $scope) || '<!-- mtapp_top_head (MTAppjQuery) -->';
     my $op_fa_html_head       = $p->get_config_value('fa_html_head', $scope) || '<!-- html_head (MTAppjQuery) -->';
@@ -255,8 +255,8 @@ __MTML__
 
     ### jQselectableプラグインを利用する
     my $jqselectable = ! $op_jqselectable ? '' : <<__MTML__;
-    <link type="text/css" rel="stylesheet" href="${static_plugin_path}lib/jQselectable/skin/selectable/style.css" />
-    <script type="text/javascript" src="${static_plugin_path}lib/jQselectable/js/jQselectable.js"></script>
+    <link type="text/css" rel="stylesheet" href="${static_plugin_path}lib/jqselectable/style/selectable/style.css" />
+    <script type="text/javascript" src="${static_plugin_path}lib/jqselectable/jqselectable.js"></script>
 __MTML__
 
     ### 各情報をheadにセットする
