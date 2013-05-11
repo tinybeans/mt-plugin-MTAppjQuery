@@ -28,7 +28,7 @@
         var op = $.extend({}, $.MTAppNoScrollRightSidebar.defaults, options);
 
         var type = (op.closeMode) ? 'no-scroll-right-sidebar' : '';
-        $('#content-body').noScroll('#related-content', 'right');
+        $('#content-body').noScroll('#related-content', {'right': 0}, '#container');
         var header = $('#related-content')
                 .addClass(type)
                 .children()
@@ -2505,14 +2505,15 @@
     //    Param:
     //      classes: {String} カンマ区切りの文字列
     //
-    //  $(foo).noScroll(selector, horizontal);
+    //  $(foo).noScroll(selector, selectorCss, containerSelector);
     //
     //    Description:
     //      $(foo)の子要素である$(selector)をスクロールに追随させる。
     //    Param:
     //      selector: {String} jQueryセレクタ
-    //      horizontal: {String} $(selector)のpositionプロパティに{horizontal: 0}を付与
-    //
+    //      selectorCss: {Object} $(selector)に設定するCSSがある場合はObjectで設定する
+    //      containerSelector: $(selector)の最上位の親要素のセレクタを指定。
+    //                         $(selector)の高さがウィンドウよりも大きい場合はこの設定をしないと無限スクロールになってしまう。
     //
     //  $.digit(num, space);
     //
@@ -2541,11 +2542,16 @@
                 return true;
             }
         },
-        noScroll: function (selector, horizontal){
+        noScroll: function (selector, selectorCss, containerSelector){
+            if (containerSelector) {
+                $(containerSelector).css('overflow-y', 'hidden');
+            }
             var self = $(this).css('position', 'relative');
+            var selfHeight = self.height();
+            self.height(selfHeight);
             var target = self.find(selector).css({'position': 'absolute', 'z-index': 99});
-            if (horizontal) {
-                target.css(horizontal, 0);
+            if (selectorCss) {
+                target.css(selectorCss);
             }
             $(window).scroll(function(){
                 var thisTop = $(document).scrollTop() - self.offset().top + 10;
