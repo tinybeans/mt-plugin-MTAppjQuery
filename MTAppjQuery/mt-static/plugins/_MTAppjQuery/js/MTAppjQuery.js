@@ -28,18 +28,18 @@
         var op = $.extend({}, $.MTAppNoScrollRightSidebar.defaults, options);
 
         var type = (op.closeMode) ? 'no-scroll-right-sidebar' : '';
-        $('#content-body').noScroll('#related-content', {'right': 0}, '#container');
-        var header = $('#related-content')
+        var $header = $('#related-content')
+                .noScroll({'right': 0}, '#container')
                 .addClass(type)
                 .children()
                     .addClass('widget-wrapper')
-                    .find('div.widget-header')
-                        .css({cursor:'pointer'});
+                    .find('div.widget-header');
         if (op.closeMode) {
+            $header.css({cursor:'pointer'});
             if (op.openSelector !== '') {
                 $(op.openSelector).find('div.widget-content').show();
             }
-            header.click(function(){
+            $header.click(function(){
                 $(this)
                     .closest('div.widget-wrapper')
                         .siblings()
@@ -49,7 +49,7 @@
                     .find('div.widget-content').slideToggle();
             });
         } else {
-            header.click(function(){
+            $header.click(function(){
                 $(this).parents('div.widget-header').next().slideToggle();
             });
         }
@@ -2505,15 +2505,14 @@
     //    Param:
     //      classes: {String} カンマ区切りの文字列
     //
-    //  $(foo).noScroll(selector, selectorCss, containerSelector);
+    //  $(foo).noScroll(styles, containerSelector);
     //
     //    Description:
-    //      $(foo)の子要素である$(selector)をスクロールに追随させる。
+    //      $(foo)をスクロールに追随させる。
     //    Param:
-    //      selector: {String} jQueryセレクタ
-    //      selectorCss: {Object} $(selector)に設定するCSSがある場合はObjectで設定する
-    //      containerSelector: $(selector)の最上位の親要素のセレクタを指定。
-    //                         $(selector)の高さがウィンドウよりも大きい場合はこの設定をしないと無限スクロールになってしまう。
+    //      styles: {Object} $(foo)に設定するCSSがある場合はObjectで設定する
+    //      containerSelector: $(foo)の最上位の親要素のセレクタを指定。
+    //                         $(foo)の高さがウィンドウよりも大きい場合に無限スクロールになってしまうのを防ぐ。
     //
     //  $.digit(num, space);
     //
@@ -2542,29 +2541,30 @@
                 return true;
             }
         },
-        noScroll: function (selector, selectorCss, containerSelector){
+        noScroll: function (styles, containerSelector){
+            var $this = this;
             if (containerSelector) {
                 $(containerSelector).css('overflow-y', 'hidden');
             }
-            var self = $(this).css('position', 'relative');
-            var selfHeight = self.height();
-            self.height(selfHeight);
-            var target = self.find(selector).css({'position': 'absolute', 'z-index': 99});
-            if (selectorCss) {
-                target.css(selectorCss);
+            var $parent = $this.parent().css('position', 'relative');
+            var parentHeight = $parent.height();
+            $parent.height(parentHeight);
+            $this.css({'position': 'absolute', 'z-index': 99});
+            if (styles) {
+                $this.css(styles);
             }
             $(window).scroll(function(){
-                var thisTop = $(document).scrollTop() - self.offset().top + 10;
+                var thisTop = $(document).scrollTop() - $parent.offset().top + 10;
                 if (thisTop < 0) {
                     thisTop = 0;
                 }
-                target.stop().animate(
+                $this.stop().animate(
                     {top: thisTop + 'px'},
                     'fast',
                     'swing'
                 );
             });
-            return self;
+            return $this;
         },
         insertListingColum: function(position, element, html, classname){
             return this.each(function(){
