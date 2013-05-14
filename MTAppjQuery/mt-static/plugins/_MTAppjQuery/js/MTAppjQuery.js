@@ -1881,6 +1881,30 @@
 
 
     // -------------------------------------------------
+    //  $(foo).MTAppRemoveVal();
+    //
+    //  Description:
+    //    指定したinput:text, textareaにクリアボタンを付ける。
+    //
+    //  Usage:
+    //    $(foo).MTAppRemoveVal();
+    // -------------------------------------------------
+    $.fn.MTAppRemoveVal = function() {
+        return this.each(function(){
+            var $this = $(this).css('padding-right', '16px').wrap('<div class="mtapp-remove-val" />');
+            var $wrap = $this.parent().css('position', 'relative');
+            var outerH = $wrap.outerHeight(),
+                posTop = outerH / 2 - 7;
+            $wrap.append('<img class="mtapp-remove-val-btn" alt="" src="' + mtappVars.static_plugin_path + 'images/cancel-gray.png" style="top: ' + posTop + 'px;" />')
+                .children('img').click(function(){
+                    $this.val('').focus();
+                });
+        });
+    };
+    // end - $(foo).MTAppRemoveVal();
+
+
+    // -------------------------------------------------
     //  $.MTAppRemoveVal();
     //
     //  Description:
@@ -1889,48 +1913,14 @@
     //  Usage:
     //    $.MTAppRemoveVal();
     // -------------------------------------------------
-    $.MTAppRemoveVal = function(options) {
+    $.MTAppRemoveVal = function() {
+        console.log(1);
         if (mtappVars.screen_id == 'edit-entry' || mtappVars.screen_id == 'edit-page') {
-            $('#sortable div.field-content').find('input:text,textarea').filter(':visible').each(function(){
-                var self = $(this),
-                    self_width = self.outerWidth(),
-                    self_height = self.outerHeight(),
-                    pos_left = self_width - 18,
-                    pos_top = (self_height - 16) / 2 + 16;
-                self.after('<span class="remove-val" style="left:' + pos_left + 'px; top: -' + pos_top + 'px;">クリア</span>')
-                    .next('span.remove-val')
-                        .click(function(){
-                            self.val('');
-                        });
-            });
+            console.log(2);
+            $('#sortable div.field-content').find('input:text,textarea').filter(':visible').MTAppRemoveVal();
         }
     };
     // end - $.MTAppRemoveVal();
-
-    // -------------------------------------------------
-    //  $(foo).MTAppRemoveVal();
-    //
-    //  Description:
-    //    指定したinput:textにクリアボタンを付ける。
-    //
-    //  Usage:
-    //    $(foo).MTAppRemoveVal();
-    // -------------------------------------------------
-    $.fn.MTAppRemoveVal = function(options) {
-        return this.each(function(){
-            var self = $(this),
-                self_width = self.outerWidth(),
-                self_height = self.outerHeight(),
-                pos_left = self_width - 18,
-                pos_top = (self_height - 16) / 2 + 16;
-            self.after('<span class="remove-val" style="left:' + pos_left + 'px; top: -' + pos_top + 'px;">クリア</span>')
-                .next('span.remove-val')
-                    .click(function(){
-                        self.val('');
-                    });
-        });
-    };
-    // end - $(foo).MTAppRemoveVal();
 
 
     // -------------------------------------------------
