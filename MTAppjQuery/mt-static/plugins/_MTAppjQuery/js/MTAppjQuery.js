@@ -27,6 +27,7 @@
     $.MTAppNoScrollRightSidebar = function(options){
         var op = $.extend({}, $.MTAppNoScrollRightSidebar.defaults, options);
 
+        if ($('#related-content').length < 1) return;
         var type = (op.closeMode) ? 'no-scroll-right-sidebar' : '';
         var $header = $('#related-content')
                 .noScroll({'right': 0}, '#container')
@@ -2532,6 +2533,7 @@
             }
         },
         noScroll: function (styles, containerSelector){
+            if (this.length < 1) return;
             var $this = this;
             if (containerSelector) {
                 $(containerSelector).css('overflow-y', 'hidden');
