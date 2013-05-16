@@ -720,9 +720,15 @@
                 .after(list);
             var outerElm = document.getElementById(suggestionId);
             var innerElm = document.getElementById(completionId);
+            $(innerElm).on('click', 'div', function(){
+                var v = $self.val().replace(/(, )?([^,]*)$/,'$1');
+                $self.val(v + $(this).text() + ', ');
+            });
             $self
                 .blur(function(){
-                    outerElm.style.display = 'none';
+                    setTimeout(function _hide(){
+                        outerElm.style.display = 'none';
+                    }, 100);
                 })
                 .keydown(function(e){
                     if (e.which == 13) { // Enter
@@ -775,8 +781,8 @@
                             break;
                     } // switch
                 }); // keyup
-                return false;
-            }); // each
+            return false;
+        }); // each
     };
     $.fn.MTAppSuggest.defaults = {
         list: []
