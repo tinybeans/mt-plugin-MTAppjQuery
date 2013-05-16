@@ -1936,73 +1936,65 @@
     //  Options:
     //    min: {Number} 最小値
     //    max: {Number} 最大値
-    //    min_msg: {String} 最小値よりも小さかったときのアラートメッセージ
-    //    max_msg: {String} 最大値よりも大きかったときのアラートメッセージ
-    //    allow: {Reg} 置換しない文字を正規表現で指定
-    //    zero_pad: {Boolean} 先頭の0を残す場合はtrue
-    //    target: {String} numberを指定すると数字の置換のみの動作となる
-    //    trim: {Boolean} 前後のスペースをトリムしないときはfalse
-    //    hyphen: {Boolean} ハイフンを常に半角にする場合はtrue
+    //    minMsg: {String} 最小値よりも小さかったときのアラートメッセージ
+    //    maxMsg: {String} 最大値よりも大きかったときのアラートメッセージ
+    //    zeroPad: {Boolean} 先頭の0を残す場合はtrue
     // -------------------------------------------------
     $.fn.MTAppNumChecker = function(options) {
         var op = $.extend({}, $.fn.MTAppNumChecker.defaults, options);
+        op.minMsg = op.minMsg ? op.minMsg : op.min_msg;
+        op.maxMsg = op.maxMsg ? op.maxMsg : op.max_msg;
+        op.zeroPad = op.zeroPad ? op.zeroPad : op.zero_pad;
         return this.each(function(){
             $(this)
                 .after('<span class="mun_msg" style="display:none;color:red;font-weight:bold;"></span>')
-                .keyup(function(e){
-                    if (e.which == 37 || e.which == 39) return;
-                    var self = $(this);
-                    var text = self.val();
-                    if (op.trim) {
-                        text = $.trim(text);
+                .blur(function(){
+                    var $this = $(this);
+                    var text = $this.val() + '';
+                    text = $.toInt(text, true).replace(/．|。/g, '.').replace(/，|、/g, ',').replace(/ー|ｰ|−|—/g,'-');
+                    text = $.trim(text);
+                    if (!op.zeroPad) {
+                        text = text.replace(/^0+/g, '');
                     }
-                    text = text
-                        .replace(/０/g, '0')
-                        .replace(/１/g, '1')
-                        .replace(/２/g, '2')
-                        .replace(/３/g, '3')
-                        .replace(/４/g, '4')
-                        .replace(/５/g, '5')
-                        .replace(/６/g, '6')
-                        .replace(/７/g, '7')
-                        .replace(/８/g, '8')
-                        .replace(/９/g, '9');
-                    if (op.hyphen) {
-                        text = text.replace(/ー|—/g,'-');
+                    if (op.min !== -1 || op.max !== -1) {
+                        var span = $this.next('span');
+                        text = Number(text.replace(/^0+/g, '').replace(/(.+)-+(.*)/g, '$1$2').replace(/[^0-9\-\.]/g, ''));
                     }
-                    if (op.target === 'number' && op.zero_pad) {
-                        self.val(text);
-                    } else if (op.target === 'number') {
-                        self.val(text.replace(/^0+/g, ''));
-                    } else if (op.zero_pad) {
-                        var reg = RegExp('[^0-9' + op.allow + ']', 'g');
-                        self.val(text.replace(reg, ''));
-                    } else {
-                        var reg = RegExp('^0|[^0-9' + op.allow + ']', 'g');
-                        self.val(text.replace(reg, ''));
+                    if (op.min !== -1 && op.max !== -1) {
+                        if (op.min > text) {
+                            span.text(op.minMsg).show();
+                        }
+                        else if (op.max < text) {
+                            span.text(op.maxMsg).show();
+                        }
+                        else {
+                            span.text('').hide();
+                        }
                     }
-                    var span = $(this).next('span.mun_msg');
-                    var num = Number(text.replace(/^0|[^0-9]/g, ''));
-                    if (num < op.min) {
-                        span.text(op.min_msg).show();
-                    } else if (num > op.max) {
-                        span.text(op.max_msg).show();
-                    } else {
-                        span.text('').hide();
+                    else if (op.min !== -1 && op.max === -1) {
+                        if (op.min > text) {
+                            span.text(op.minMsg).show();
+                        } else {
+                            span.text('').hide();
+                        }
                     }
+                    else if (op.min === -1 && op.max !== -1) {
+                        if (op.max < text) {
+                            span.text(op.maxMsg).show();
+                        } else {
+                            span.text('').hide();
+                        }
+                    }
+                $this.val(text);
                 })
         });
     };
     $.fn.MTAppNumChecker.defaults = {
-        min: 0,
-        max: 10000000000000000000,
-        min_msg: '値が小さすぎます。',
-        max_msg: '値が大きすぎます。',
-        allow: '',
-        zero_pad: false,
-        target: '',
-        trim: true,
-        hyphen: false
+        min: -1,
+        max: -1,
+        minMsg: '値が小さすぎます。',
+        maxMsg: '値が大きすぎます。',
+        zeroPad: false
     };
     // end - $(foo).MTAppNumChecker();
 
