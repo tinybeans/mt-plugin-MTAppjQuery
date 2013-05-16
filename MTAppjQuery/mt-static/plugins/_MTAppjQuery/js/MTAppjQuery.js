@@ -1956,11 +1956,11 @@
                     if (!op.zeroPad) {
                         text = text.replace(/^0+/g, '');
                     }
-                    if (op.min !== -1 || op.max !== -1) {
+                    if (op.min !== -9999999999 || op.max !== 9999999999) {
                         var span = $this.next('span');
                         text = Number(text.replace(/^0+/g, '').replace(/(.+)-+(.*)/g, '$1$2').replace(/[^0-9\-\.]/g, ''));
                     }
-                    if (op.min !== -1 && op.max !== -1) {
+                    if (op.min !== -9999999999 && op.max !== 9999999999) {
                         if (op.min > text) {
                             span.text(op.minMsg).show();
                         }
@@ -1971,14 +1971,14 @@
                             span.text('').hide();
                         }
                     }
-                    else if (op.min !== -1 && op.max === -1) {
+                    else if (op.min !== -9999999999 && op.max === 9999999999) {
                         if (op.min > text) {
                             span.text(op.minMsg).show();
                         } else {
                             span.text('').hide();
                         }
                     }
-                    else if (op.min === -1 && op.max !== -1) {
+                    else if (op.min === -9999999999 && op.max !== 9999999999) {
                         if (op.max < text) {
                             span.text(op.maxMsg).show();
                         } else {
@@ -1990,8 +1990,8 @@
         });
     };
     $.fn.MTAppNumChecker.defaults = {
-        min: -1,
-        max: -1,
+        min: -9999999999,
+        max: 9999999999,
         minMsg: '値が小さすぎます。',
         maxMsg: '値が大きすぎます。',
         zeroPad: false
