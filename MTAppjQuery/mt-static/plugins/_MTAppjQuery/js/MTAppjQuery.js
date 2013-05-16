@@ -1956,15 +1956,16 @@
                     if (!op.zeroPad) {
                         text = text.replace(/^0+/g, '');
                     }
+                    var num = 0;
                     if (op.min !== -9999999999 || op.max !== 9999999999) {
                         var span = $this.next('span');
-                        text = Number(text.replace(/^0+/g, '').replace(/(.+)-+(.*)/g, '$1$2').replace(/[^0-9\-\.]/g, ''));
+                        num = Number(text.replace(/^0+/g, '').replace(/(.+)-+(.*)/g, '$1$2').replace(/[^0-9\-\.]/g, ''));
                     }
                     if (op.min !== -9999999999 && op.max !== 9999999999) {
-                        if (op.min > text) {
+                        if (op.min > num) {
                             span.text(op.minMsg).show();
                         }
-                        else if (op.max < text) {
+                        else if (op.max < num) {
                             span.text(op.maxMsg).show();
                         }
                         else {
@@ -1972,14 +1973,14 @@
                         }
                     }
                     else if (op.min !== -9999999999 && op.max === 9999999999) {
-                        if (op.min > text) {
+                        if (op.min > num) {
                             span.text(op.minMsg).show();
                         } else {
                             span.text('').hide();
                         }
                     }
                     else if (op.min === -9999999999 && op.max !== 9999999999) {
-                        if (op.max < text) {
+                        if (op.max < num) {
                             span.text(op.maxMsg).show();
                         } else {
                             span.text('').hide();
