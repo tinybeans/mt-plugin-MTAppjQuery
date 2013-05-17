@@ -17,10 +17,12 @@ sub template_source_header {
 
     ### 各種情報を取得する
     my $_type   = $app->param('_type') || '_type';
+    my $mode    = $app->param('__mode') || '';
     my $id      = $app->param('id') || 0;
     my $blog_id = (defined $blog) ? $blog->id : 0;
     my $author_id = $author->id;
     return unless ($_type =~ m/^\w+$/);
+    return unless ($mode =~ m/^\w+$/);
     return unless ($id =~ m/^\d+$/);
 
     # オブジェクトのタイプを判別して各オブジェクトのIDを取得する
@@ -190,6 +192,7 @@ __MTML__
         "version" : "${version}",
         "minor_version" : "${minor_version}",
         "type" : "${_type}",
+        "mode" : "${mode}",
         "author_id" : <mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if>,
         "author_name" : "<mt:var name="author_name" encode_js="1">",
         "author_permissions" : [$permissions],
