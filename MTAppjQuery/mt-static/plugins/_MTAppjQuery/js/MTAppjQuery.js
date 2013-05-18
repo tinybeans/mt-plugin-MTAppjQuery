@@ -2291,7 +2291,7 @@
 
             $fieldContent
                 .on('click', 'img.mtapp-linebreak-field-add', function(){
-                    $(this).parent().parent().after(item(''));
+                    $(this).parent().parent().after(item('')).next().children().children().focus();
                 })
                 .on('blur', 'input.mtapp-linebreak-field-input', function(){
                     var text = [];
@@ -2309,7 +2309,7 @@
                 .on('keydown', 'input.mtapp-linebreak-field-input', function(e){
                     var keycode = e.which || e.keyCode;
                     if (keycode == 13) {
-                        $(this).blur().next().click().parent().parent().next().children().children().focus();
+                        $(this).blur().next().click();
                     }
                 });
             if (isSortable) {
