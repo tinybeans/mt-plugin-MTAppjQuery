@@ -436,26 +436,29 @@ table.listing-table tbody tr.hover-selected {
     background-color: #FEE47F;
 }
 /* ----------------------------------------
-   __MTAppNbspGUI
+   __MTAppLineBreakField
 ---------------------------------------- */
-span.mtapp-nbsp-gui-item {
+span.mtapp-linebreak-field-item {
     display: block;
     position: relative;
     margin-bottom: 5px;
 }
-input.mtapp-nbsp-gui-input {
+span.mtapp-linebreak-field-item-inner {
+    position: relative;
 }
-span.mtapp-nbsp-gui-add {
-    display: block;
+img.mtapp-linebreak-field-add {
     position: absolute;
-    top: 5px;
+    top: 0;
     right: 2px;
-    width: 9px;
-    height: 9px;
-    background: url(../../../images/status_icons/create.gif) no-repeat right center;
-    text-indent: -9999px;
     cursor: pointer;
 }
+/* options - sortable: true*/
+div.mtapp-sortable span.mtapp-linebreak-field-item {
+    padding-left: 18px;
+    background: url(../images/arrow-move.png) no-repeat center left;
+    cursor: move;
+}
+
 /* ----------------------------------------
    __FieldSuggest
 ---------------------------------------- */

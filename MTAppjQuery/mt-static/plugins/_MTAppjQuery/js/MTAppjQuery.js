@@ -2260,66 +2260,82 @@
 
 
     // -------------------------------------------------
-    //  $(foo).MTAppNbspGUI();
+    //  $(foo).MTAppLineBreakField();
     //
     //  Description:
-    //    「1項目ごとに改行してください」をGUIで実現する
+    //    「1項目ごとに改行してください」をGUIで実現します。(MT5.2 later)
     //
     //  Usage:
-    //    $(foo).MTAppNbspGUI(options);
+    //    $(foo).MTAppLineBreakField(options);
     //
     //  Options:
-    //    wrapper_class: {Array} ['main-class', 'sub-class']
-    //    input_class: {Array} ['main-class', 'sub-class']
-    //    add_class: {Array} ['main-class', 'sub-class']
+    //    input_class: {String} 'sub-class1 sub-class2'
     //
     // -------------------------------------------------
-    $.fn.MTAppNbspGUI = function(options) {
-        var op = $.extend({}, $.fn.MTAppNbspGUI.defaults, options);
+    $.fn.MTAppLineBreakField = function(options) {
+        var op = $.extend({}, $.fn.MTAppLineBreakField.defaults, options);
+
+        var inputClass = op.inputClass ? op.inputClass : op.input_class;
+        var isSortable = op.sortable;
         return this.each(function(){
-            var self = $(this).hide();
-            var self_id = self.attr('id')
-            var self_value = self.val().split('\n');
+            var $this = $(this).hide();
+            var this_id = $this.attr('id')
+            var this_value = $this.val().split('\n');
+            var $fieldContent = $this.parent();
 
             var input = [];
-            for (var i = 0, n = self_value.length; i < n; i++) {
-                input.push(item(self_value[i]));
+            for (var i = 0, n = this_value.length; i < n; i++) {
+                input.push(item(this_value[i]));
             }
-            self.after(input.join(''));
+            $this.after(input.join(''));
 
-            $('span.' + op.add_class[0]).live('click', function(){
-                $(this).parent().after(item(''));
-            });
-
-            $('input.' + op.input_class[0]).live('blur', function(){
-                var text = [];
-                var inputs = $('input.' + op.input_class[0]);
-                var inputs_count = inputs.length;
-                inputs.each(function(){
-                    if ($(this).val() != '') {
-                        text.push($(this).val());
-                    } else if (inputs_count > 1) {
-                        $(this).parent().remove();
+            $fieldContent
+                .on('click', 'img.mtapp-linebreak-field-add', function(){
+                    $(this).parent().parent().after(item(''));
+                })
+                .on('blur', 'input.mtapp-linebreak-field-input', function(){
+                    var text = [];
+                    var inputs = $('input.mtapp-linebreak-field-input');
+                    var inputs_count = inputs.length;
+                    inputs.each(function(){
+                        if ($(this).val() != '') {
+                            text.push($(this).val());
+                        } else if (inputs_count > 1) {
+                            $(this).parent().parent().remove();
+                        }
+                    });
+                    $this.val(text.join("\n"));
+                })
+                .on('keydown', 'input.mtapp-linebreak-field-input', function(e){
+                    var keycode = e.which || e.keyCode;
+                    if (keycode == 13) {
+                        $(this).blur().next().click().parent().parent().next().children().children().focus();
                     }
                 });
-                self.val(text.join("\n"));
-            });
+            if (isSortable) {
+                $fieldContent.addClass('mtapp-sortable').sortable({
+                    update: function(e, ui){
+                        $(ui.item).find('input').blur();
+                    }
+                });
+            }
 
             function item (val) {
                 return [
-                    '<span class="' + op.wrapper_class.join(' ') + '">',
-                        '<input type="text" class="' + op.input_class.join(' ') + '" value="' + val + '" />',
-                        '<span class="' + op.add_class.join(' ') + '">追加</span>',
+                    '<span class="mtapp-linebreak-field-item">',
+                        '<span class="mtapp-linebreak-field-item-inner">',
+                            '<input type="text" class="mtapp-linebreak-field-input ' + inputClass + '" value="' + val + '" />',
+                            '<img class="mtapp-linebreak-field-add" src="' + mtappVars.static_plugin_path + 'images/plus-circle.png" alt="plus" />',
+                        '</span>',
                     '</span>'
                 ].join('');
             }
 
         });
     };
-    $.fn.MTAppNbspGUI.defaults = {
-        wrapper_class: ['mtapp-nbsp-gui-item'],
-        input_class: ['mtapp-nbsp-gui-input','text','full'],
-        add_class: ['mtapp-nbsp-gui-add']
+    $.fn.MTAppLineBreakField.defaults = {
+        inputClass: 'text full',
+        sortable: true
     };
     // end - $(foo).MTAppNbspGUI();
 
