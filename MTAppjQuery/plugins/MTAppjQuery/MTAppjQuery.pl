@@ -105,6 +105,7 @@ sub init_registry {
                 'UserFileAppendText' => '$mt_app_jquery::MTAppjQuery::Tags::_hdlr_user_file_append_text',
             },
             modifier => {
+                'split' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_split',
                 'split_format' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_split_format',
                 'nengou' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_nengou',
             },
