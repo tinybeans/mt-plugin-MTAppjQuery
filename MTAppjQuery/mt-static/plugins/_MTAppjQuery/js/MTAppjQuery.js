@@ -1205,16 +1205,22 @@
         $('#msg-block').append($myMsg);
 
         if (op.timeout > 0) {
+            var animation = (op.animation === 'slideUp') ? 'slideUp' : 'fadeOut';
             setTimeout(function(){
-                $myMsg.fadeOut();
+                if (animation === 'slideUp') {
+                    $myMsg.slideUp();
+                } else {
+                    $myMsg.fadeOut();
+                }
             }, op.timeout);
         }
     };
     $.MTAppMsg.defaults = {
         msg: '',
-        type: '',
+        type: 'info',
         parent: false,
-        timeout: 0
+        timeout: 0,
+        animation: 'fadeOut'
     };
     // end - $.MTAppMsg();
 
