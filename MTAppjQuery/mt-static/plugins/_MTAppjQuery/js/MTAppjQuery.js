@@ -1060,8 +1060,14 @@
         var field = op.sort.split(',').reverse();
         var l = field.length;
         if (l == 0) return;
-        var containerId = (op.insert_id !== 'sortable') ? op.insert_id: op.insertID;
+        var containerId = 'sortable';
+        if (op.insertID !== 'sortable') {
+            containerId = op.insertID;
+        } else if (op.insert_id !== 'sortable') {
+            containerId = op.insert_id;
+        }
         var container = document.getElementById(containerId);
+        if (!container) return;
         for (var i = 0; i < l; i++) {
             var id = $.trim(field[i]).replace(/^c:/,'customfield_') + '-field';
             if (document.getElementById(id)) {
@@ -1076,7 +1082,7 @@
     $.MTAppFieldSort.defaults = {
         sort: 'title,text,tags,excerpt,keywords',
         insert_id: 'sortable',
-        insertID: 'sortable' // 後方互換（非推奨）
+        insertID: 'sortable'
     };
     // end - $.MTAppFieldSort
 
