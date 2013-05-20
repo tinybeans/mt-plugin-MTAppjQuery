@@ -77,12 +77,12 @@ div#free_area-field div.field-content textarea {
 ---------------------------------------- */
 #mtapp-tooltip {
   padding: 8px 10px;
-  border: 1px solid #FAC833;
+  border: 1px solid #fac833;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  -moz-box-shadow: 2px 2px 10px #ABABAB;
-  -webkit-box-shadow: 2px 2px 10px #ABABAB;
+  -moz-box-shadow: 2px 2px 10px #ababab;
+  -webkit-box-shadow: 2px 2px 10px #ababab;
   background: #FAC833; }
 
 /* ----------------------------------------
@@ -102,9 +102,9 @@ div#free_area-field div.field-content textarea {
   -moz-border-radius: 3px;
   border-radius: 3px;
   background-color: #FAC833;
-  box-shadow: 0px 2px 3px #888;
-  -moz-box-shadow: 0px 2px 3px #888;
-  -webkit-box-shadow: 0px 2px 3px #888; }
+  box-shadow: 0px 2px 3px #888888;
+  -moz-box-shadow: 0px 2px 3px #888888;
+  -webkit-box-shadow: 0px 2px 3px #888888; }
 
 .balloon .balloon-arrow {
   position: absolute;
@@ -118,9 +118,8 @@ div#free_area-field div.field-content textarea {
     background: #FAC833;
     line-height: 0px;
     font-size: 0px;
-    box-shadow: 0px 2px 3px #888;
-    -moz-box-shadow: 0px 2px 3px #888;
-    -webkit-box-shadow: 0px 2px 3px #888; }
+    box-shadow: 0px 2px 3px #888888;
+    -webkit-box-shadow: 0px 2px 3px #888888; }
 
 .balloon .balloon-arrow .line10 {
   width: 19px; }
