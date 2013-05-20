@@ -1,7 +1,19 @@
 package MTAppjQuery::Tags;
 use strict;
 
+# Function
+sub _hdlr_user_file_append_text {
+    my ($ctx, $args) = @_;
+    return '';
+}
+
 # Modifiers
+sub _fltr_split {
+    my ($str, $arg, $ctx) = @_;
+    my @array = split(/$arg/, $str);
+    return \@array;
+}
+
 sub _fltr_split_format {
     my ($str, $arg, $ctx) = @_;
 

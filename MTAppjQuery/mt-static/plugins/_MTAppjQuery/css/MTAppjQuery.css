@@ -7,8 +7,8 @@
  * Since:   2010-07-22
  * Update:  2012-04-21
  * for version: 0.15
- * Comment: 
- * 
+ * Comment:
+ *
  */
 /* !mixin */
 /* ----------------------------------------
@@ -55,6 +55,9 @@ textarea#sys_jqplugin {
   width: 98%;
   height: 100px; }
 
+div#free_area-field div.field-content textarea {
+  margin-bottom: 20px; }
+
 /* ----------------------------------------
    __Uploadify - マルチファイルアップロード
 ---------------------------------------- */
@@ -74,12 +77,12 @@ textarea#sys_jqplugin {
 ---------------------------------------- */
 #mtapp-tooltip {
   padding: 8px 10px;
-  border: 1px solid #FAC833;
+  border: 1px solid #fac833;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  -moz-box-shadow: 2px 2px 10px #ABABAB;
-  -webkit-box-shadow: 2px 2px 10px #ABABAB;
+  -moz-box-shadow: 2px 2px 10px #ababab;
+  -webkit-box-shadow: 2px 2px 10px #ababab;
   background: #FAC833; }
 
 /* ----------------------------------------
@@ -99,9 +102,9 @@ textarea#sys_jqplugin {
   -moz-border-radius: 3px;
   border-radius: 3px;
   background-color: #FAC833;
-  box-shadow: 0px 2px 3px #888;
-  -moz-box-shadow: 0px 2px 3px #888;
-  -webkit-box-shadow: 0px 2px 3px #888; }
+  box-shadow: 0px 2px 3px #888888;
+  -moz-box-shadow: 0px 2px 3px #888888;
+  -webkit-box-shadow: 0px 2px 3px #888888; }
 
 .balloon .balloon-arrow {
   position: absolute;
@@ -115,9 +118,9 @@ textarea#sys_jqplugin {
     background: #FAC833;
     line-height: 0px;
     font-size: 0px;
-    box-shadow: 0px 2px 3px #888;
-    -moz-box-shadow: 0px 2px 3px #888;
-    -webkit-box-shadow: 0px 2px 3px #888; }
+    box-shadow: 0px 2px 3px #888888;
+    -moz-box-shadow: 0px 2px 3px #888888;
+    -webkit-box-shadow: 0px 2px 3px #888888; }
 
 .balloon .balloon-arrow .line10 {
   width: 19px; }
@@ -189,7 +192,7 @@ span.mcb-skin-tags .mcb-add-item {
 span.mcb-container .mcb-add-item {
   width: 120px;
   padding-left: 12px;
-  border: 1px solid #E5E5E5;
+  border: 1px solid #e5e5e5;
   background: url(../images/create.gif) no-repeat 2px 50%;
   font-size: 13px;
   line-height: 1.5;
@@ -222,7 +225,7 @@ div#menu-bar div#selector-nav div.selector ul#fav-blog-list li ul li ul {
   top: -1px;
   left: 300px;
   /* JS */
-  border-left: 1px solid #9EA1A3;
+  border-left: 1px solid #9ea1a3;
   background-color: #7B7C7D; }
 
 div#menu-bar div#selector-nav div.selector li.system-overview ul li,
@@ -230,7 +233,7 @@ div#menu-bar div#selector-nav div.selector ul#fav-website-list li ul li ul li,
 div#menu-bar div#selector-nav div.selector ul#fav-blog-list li ul li ul li {
   /*     min-width: 300px; */
   min-height: 28px;
-  border-top: 1px solid #9EA1A3; }
+  border-top: 1px solid #9ea1a3; }
 
 div#menu-bar div#selector-nav div.selector li.system-overview ul li a,
 div#menu-bar div#selector-nav div.selector ul#fav-website-list li ul li ul li a,
@@ -252,13 +255,13 @@ div#menu-bar div#selector-nav div.selector ul#fav-website-list.super-slide-menu 
   top: -1px;
   left: 300px;
   /* JS */
-  border-left: 1px solid #9EA1A3;
+  border-left: 1px solid #9ea1a3;
   background-color: #7B7C7D; }
 
 div#menu-bar div#selector-nav div.selector ul#fav-website-list.super-slide-menu li ul li {
   /*     min-width: 300px; */
   min-height: 28px;
-  border-top: 1px solid #9EA1A3; }
+  border-top: 1px solid #9ea1a3; }
 
 div#menu-bar div#selector-nav div.selector ul#fav-website-list.super-slide-menu li ul li a {
   padding-right: 25px; }
@@ -372,13 +375,13 @@ div.no-scroll-right-sidebar .widget-content {
   white-space: nowrap;
   overflow-x: scroll;
   background-color: #F3F3F3;
-  border: 1px solid #C0C6C9; }
+  border: 1px solid #c0c6c9; }
 
 .mtapp-debug-block,
 .mtapp-debug-inline {
   z-index: 999;
   padding: 3px;
-  border: 1px solid #ffffff;
+  border: 1px solid white;
   background-color: #000000;
   color: #ffff00;
   font-size: 13px;
@@ -402,7 +405,7 @@ a.mtapp-if-page {
    __プラグインの管理画面
 ---------------------------------------- */
 fieldset#uploadify_setting {
-  border: 1px solid #C8C2BE; }
+  border: 1px solid #c8c2be; }
 
 fieldset#uploadify_setting legend {
   display: block;
@@ -414,24 +417,18 @@ fieldset#uploadify_setting legend {
    __バリデーション
 ---------------------------------------- */
 .err {
-  background: #F6BFBC !important; }
+  background: #f6bfbc !important; }
 
 /* ----------------------------------------
    __MTAppRemoveVal
 ---------------------------------------- */
-div.field span.remove-val {
+div.field img.mtapp-remove-val-btn {
   display: block;
-  position: relative;
-  width: 16px;
-  height: 16px;
-  -webkit-border-radius: 8px;
-  -moz-border-radius: 8px;
-  border-radius: 8px;
-  background: #d1d7dc url(../../../images/status_icons/icon-remove.png) no-repeat center center;
-  text-indent: -9999px;
-  cursor: pointer;
-  opacity: 0.7;
-  filter: alpha(opacity=70); }
+  position: absolute;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  cursor: pointer; }
 
 /* ----------------------------------------
    __キーボードショートカット
@@ -443,23 +440,27 @@ table.listing-table tbody tr.hover-selected {
   background-color: #FEE47F; }
 
 /* ----------------------------------------
-   __MTAppNbspGUI
+   __MTAppLineBreakField
 ---------------------------------------- */
-span.mtapp-nbsp-gui-item {
+span.mtapp-linebreak-field-item {
   display: block;
   position: relative;
   margin-bottom: 5px; }
 
-span.mtapp-nbsp-gui-add {
-  display: block;
+span.mtapp-linebreak-field-item-inner {
+  position: relative; }
+
+img.mtapp-linebreak-field-add {
   position: absolute;
-  top: 5px;
+  top: 0;
   right: 2px;
-  width: 9px;
-  height: 9px;
-  background: url(../../../images/status_icons/create.gif) no-repeat right center;
-  text-indent: -9999px;
   cursor: pointer; }
+
+/* options - sortable: true*/
+div.mtapp-sortable span.mtapp-linebreak-field-item {
+  padding-left: 18px;
+  background: url(../images/arrow-move.png) no-repeat center left;
+  cursor: move; }
 
 /* ----------------------------------------
    __FieldSuggest
@@ -475,7 +476,7 @@ span.mtapp-nbsp-gui-add {
     max-width: 100%;
     position: absolute;
     z-index: 50;
-    border: 1px solid #C0C6C9;
+    border: 1px solid #c0c6c9;
     background-color: #F3F3F3; }
     .field-suggestion .field_completion div {
       padding: 2px 5px; }
@@ -489,7 +490,7 @@ div.mtapp-tabs-container ul.mtapp-tabs-navi {
   border-bottom-style: none; }
 div.mtapp-tabs-container div.field {
   padding: 13px !important;
-  border: 1px solid #ADADAD;
+  border: 1px solid #adadad;
   border-top-color: #CFD0D0;
   border-left-color: #CFD0D0;
   -webkit-border-radius: 5px;

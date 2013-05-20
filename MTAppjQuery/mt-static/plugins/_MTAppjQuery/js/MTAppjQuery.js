@@ -18,23 +18,29 @@
     //    右サイドバーのウィジェットをスクロールに追随するようにする。
     //
     //  Usage:
-    //    $.MTAppNoScrollRightSidebar(open_type);
+    //    $.MTAppNoScrollRightSidebar(Options);
     //
-    //  Param:
-    //    open_type: {Boolean} true=ウィジェットを閉じた状態にする。
+    //  Options:
+    //    closeMode: {Boolean} true=ウィジェットを閉じた状態にする。
+    //    openSelector: {String} closeMode が true の場合で、空いた状態にしておきたいウィジェットのIDセレクタ
     // -------------------------------------------------
-    $.MTAppNoScrollRightSidebar = function(open_type){
-        var type = (open_type) ? 'no-scroll-right-sidebar' : '';
-        $('#content-body').noScroll('#related-content', 'right');
-        var span = $('#related-content')
+    $.MTAppNoScrollRightSidebar = function(options){
+        var op = $.extend({}, $.MTAppNoScrollRightSidebar.defaults, options);
+
+        if ($('#related-content').length < 1) return;
+        var type = (op.closeMode) ? 'no-scroll-right-sidebar' : '';
+        var $header = $('#related-content')
+                .noScroll({'right': 0}, '#container')
                 .addClass(type)
                 .children()
                     .addClass('widget-wrapper')
-                    .find('div.widget-header')
-                        .find('span')
-                            .css({cursor:'pointer'});
-        if (open_type) {
-            span.click(function(){
+                    .find('div.widget-header');
+        if (op.closeMode) {
+            $header.css({cursor:'pointer'});
+            if (op.openSelector !== '') {
+                $(op.openSelector).find('div.widget-content').show();
+            }
+            $header.click(function(){
                 $(this)
                     .closest('div.widget-wrapper')
                         .siblings()
@@ -44,11 +50,15 @@
                     .find('div.widget-content').slideToggle();
             });
         } else {
-            span.click(function(){
+            $header.click(function(){
                 $(this).parents('div.widget-header').next().slideToggle();
             });
         }
-    }
+    };
+    $.MTAppNoScrollRightSidebar.defaults = {
+        closeMode: false, // ウィジェットを閉じた状態にする場合はtrue
+        openSelector: ''
+    };
     // end - $.MTAppNoScrollRightSidebar()
 
 
@@ -126,11 +136,12 @@
                 }
             }
             // addオプションがtrueの場合（ユーザー追加可能の場合）
-            if (op.add && op.skin == false) {
-                labels.push('<input class="mcb-add-item" type="text" value="+" />');
-            } else if (op.add) {
-                labels.push('<input class="mcb-add-item" type="text" value="" />');
-            }
+            // if (op.add && op.skin == false) {
+            //     labels.push('<input class="mcb-add-item" type="text" value="" />');
+            // } else if (op.add) {
+            //     labels.push('<input class="mcb-add-item" type="text" value="" />');
+            // }
+            labels.push('<input class="mcb-add-item" type="text" value="" />');
             $container
                 .html(labels.join(''))
                 .find('input:checkbox')
@@ -143,12 +154,12 @@
             // ユーザーが項目を追加できるようにする
             if (op.add) {
                 $container.find('input.mcb-add-item')
-                    .focus(function(){
-                        if ($(this).val() === '+' && op.skin == false) $(this).val('');
-                    })
-                    .blur(function(){
-                        if ($(this).val() === '' && op.skin == false) $(this).val('+');
-                    })
+                    // .focus(function(){
+                    //     if ($(this).val() === '+' && op.skin == false) $(this).val('');
+                    // })
+                    // .blur(function(){
+                    //     if ($(this).val() === '' && op.skin == false) $(this).val('+');
+                    // })
                     .keydown(function(e){
                         var keycode = e.which || e.keyCode;
                         if (keycode == 13) {
@@ -352,10 +363,11 @@
                     options.unshift('<optgroup label="' + op.initGroupName + '"><option value="' + selfVal + '">' + selfVal + '</option></optgroup>');
                 }
             }
+            var option_add = op.dinamic ? '<option value="_add_">' + op.addText + '</option>': '';
             var select = [
                 '<select class="dynamic_select">',
                     options.join(''),
-                    '<option value="_add_">' + op.addText + '</option>',
+                    option_add,
                 '</select>'
             ];
             var $select = $(select.join('')).change(function(){
@@ -367,6 +379,9 @@
                     $option.eq(size-1).before('<option value="' + additon + '" selected="selected">' + additon + '</option>');
                 } else {
                     $self.val($(this).val());
+                }
+                if (op.selected && typeof op.selected === 'function') {
+                    op.selected();
                 }
             });
             if (op.separateMode) {
@@ -389,11 +404,13 @@
     };
     $.fn.MTAppDynamicSelect.defaults = {
         debug: false,
+        dinamic: true,
         text: '', // カンマ区切りの文字列か連想配列と配列の入れ子。value|labelと分けることも可能（要separateMode: true）。
         addText: '項目を追加する',
         promptMsg: '追加する項目名を入力',
         initGroupName: '選択中アイテム',
-        separateMode: false
+        separateMode: false,
+        selected: null
     };
     // end - $(foo).MTAppDynamicSelect()
 
@@ -703,9 +720,15 @@
                 .after(list);
             var outerElm = document.getElementById(suggestionId);
             var innerElm = document.getElementById(completionId);
+            $(innerElm).on('click', 'div', function(){
+                var v = $self.val().replace(/(, )?([^,]*)$/,'$1');
+                $self.val(v + $(this).text() + ', ');
+            });
             $self
                 .blur(function(){
-                    outerElm.style.display = 'none';
+                    setTimeout(function _hide(){
+                        outerElm.style.display = 'none';
+                    }, 100);
                 })
                 .keydown(function(e){
                     if (e.which == 13) { // Enter
@@ -758,8 +781,8 @@
                             break;
                     } // switch
                 }); // keyup
-                return false;
-            }); // each
+            return false;
+        }); // each
     };
     $.fn.MTAppSuggest.defaults = {
         list: []
@@ -889,6 +912,9 @@
         // フィールドの表示・非表示
         if (opS == 'show') {
             $field.removeClass('hidden');
+            if (opB == 'body' || opB == 'more') {
+                $label.closest('div.tab').removeClass('hidden');
+            }
         } else if (opS == 'hide' && opB != 'body' && opB != 'more') {
             $field.addClass('hidden');
         } else if (opS == 'hide' && (opB == 'body' || opB == 'more')) {
@@ -931,6 +957,89 @@
     };
     // end - $.MTAppCustomize()
 
+    // -------------------------------------------------
+    //  $.MTAppGetLabel();
+    //
+    //  Description:
+    //    現在のページのlabel要素のテキストとそのlabel要素を指定するセレクタを$.MTAppMsg()で表示する
+    //
+    //  Usage:
+    //    $.MTAppGetLabel();
+    // -------------------------------------------------
+    $.MTAppGetLabel = function(text){
+        var res = [];
+        var tagNames = text.split(",");
+        for (var i = 0, l = tagNames.length; i < l; i++) {
+            makeOptions($.trim(tagNames[i]));
+        }
+        $.MTAppMsg({
+            msg: res.join(",<br />"),
+            type: "success"
+        });
+        function makeOptions(tagName) {
+            $(tagName).each(function(idx){
+                var text = $(this).text();
+                var id = $(this).attr("id");
+                var selector = "";
+                if (id) {
+                    selector = "#" + id;
+                }
+                else if ($(this).attr("for")) {
+                    selector =  "label[for='" + $(this).attr("for") + "']";
+                }
+                else {
+                    var parentId = $(this).closest("[id]").attr("id");
+                    selector = "#" + parentId;
+                    switch (parentId) {
+                        case "entry-pref-field-list":
+                        case "metadata_fields-field":
+                            selector += " " + tagName + ":contains('" + $.trim(text) + "')";
+                            break;
+                        default:
+                            $(selector).find(tagName).each(function(idx){
+                                if ($(this).text() === text) {
+                                    selector += " " + tagName + ":eq(" + idx + ")";
+                                }
+                            });
+                            break;
+                    }
+                }
+                res.push('["' + selector + '", "' + text + '", "' + text + '"]');
+            });
+        }
+    };
+    // end - $.MTAppGetLabel
+
+    // -------------------------------------------------
+    //  $.MTAppSetLabel();
+    //
+    //  Description:
+    //    現在のページのlabel要素のテキストをセットする
+    //
+    //  Usage:
+    //    $.MTAppSetLabel([
+    //        ["セレクタ", "旧テキスト", "新テキスト"]
+    //    ]);
+    // -------------------------------------------------
+    $.MTAppSetLabel = function(array){
+        for (var i = 0, n = array.length; i < n; i++) {
+            var exp = new RegExp(array[i][1], "g");
+            var element = $(array[i][0])[0];
+            textNodeRewrite(element, array[i][1], array[i][2]);
+        }
+        function textNodeRewrite(element, pattan, replacement) {
+            var children = element.childNodes;
+            for (var i = 0, l = children.length; i < l; i++) {
+                if (children[i].nodeType == 1) {
+                    textNodeRewrite(children[i], pattan, replacement);
+                }
+                else if (children[i].nodeType == 3 && children[i].nodeValue.indexOf(pattan) > -1) {
+                    children[i].nodeValue = children[i].nodeValue.replace(pattan, replacement);
+                }
+            }
+        }
+    };
+    // end - $.MTAppSetLabel
 
     // -------------------------------------------------
     //  $.MTAppFieldSort();
@@ -951,8 +1060,14 @@
         var field = op.sort.split(',').reverse();
         var l = field.length;
         if (l == 0) return;
-        var containerId = (op.insert_id !== 'sortable') ? op.insert_id: op.insertID;
+        var containerId = 'sortable';
+        if (op.insertID !== 'sortable') {
+            containerId = op.insertID;
+        } else if (op.insert_id !== 'sortable') {
+            containerId = op.insert_id;
+        }
         var container = document.getElementById(containerId);
+        if (!container) return;
         for (var i = 0; i < l; i++) {
             var id = $.trim(field[i]).replace(/^c:/,'customfield_') + '-field';
             if (document.getElementById(id)) {
@@ -967,7 +1082,7 @@
     $.MTAppFieldSort.defaults = {
         sort: 'title,text,tags,excerpt,keywords',
         insert_id: 'sortable',
-        insertID: 'sortable' // 後方互換（非推奨）
+        insertID: 'sortable'
     };
     // end - $.MTAppFieldSort
 
@@ -986,7 +1101,8 @@
     //              カスタムフィールドの場合は「cf_basename」のように接頭辞「 cf_ 」を付ける。
     //              ex. {'title':'タイトル','keywords':'キーワード','cf_price','価格'}
     //    pointer: {String} タブを挿入する起点となるノードのセレクタ。ex. #title-field
-    //    pointer_basename: {String} タブを挿入する起点となるノードのbasename。ex. title
+    //    pointer_basename: {String} pointerを指定しない場合は、pointer_basenameに
+    //                      タブを挿入する起点となるノードのbasenameを指定できる。ex. title
     //    insert: {String} 起点となるノードの前に挿入（before）するか後ろに挿入（after）するか。
     // -------------------------------------------------
     $.MTAppTabs = function(options){
@@ -1005,19 +1121,29 @@
         }
         var div = [
             '<div class="mtapp-tabs-container">',
-                '<ul class="mtapp-tabs-navi"></ul>',
+                '<ul class="mtapp-tabs-navi" style="position:relative;z-index:9999;">',
+                '</ul>',
             '</div>'
         ];
-        var container = $(selector)[op.insert](div.join('')).next('.mtapp-tabs-container');
+        var container;
+        if (op.insert == 'before') {
+            container = $(selector).before(div.join('')).prev('.mtapp-tabs-container');
+        }
+        else if (op.insert == 'after') {
+            container = $(selector).after(div.join('')).next('.mtapp-tabs-container');
+        }
+        else {
+            return;
+        }
         var ids = [];
         var li = [];
         for (var basename in op.basename) {
-            var id = '#' + getFieldID(basename);
-            ids.push(id);
-            li.push('<li><a href="' + id + '">' + op.basename[basename] + '</a></li>');
+            var _id = '#' + getFieldID(basename);
+            ids.push(_id);
+            li.push('<li><a href="' + _id + '">' + op.basename[basename] + '</a></li>');
         }
         var $elms = $(ids.join(','));
-        $elms.removeClass('sort-enabled').find('div.field-header').addClass('hidden');
+        $elms.removeClass('sort-enabled hidden').find('div.field-header').addClass('hidden');
         container
             .append($elms)
             .find('.mtapp-tabs-navi').html(li.join(''));
@@ -1079,16 +1205,22 @@
         $('#msg-block').append($myMsg);
 
         if (op.timeout > 0) {
+            var animation = (op.animation === 'slideUp') ? 'slideUp' : 'fadeOut';
             setTimeout(function(){
-                $myMsg.fadeOut();
+                if (animation === 'slideUp') {
+                    $myMsg.slideUp();
+                } else {
+                    $myMsg.fadeOut();
+                }
             }, op.timeout);
         }
     };
     $.MTAppMsg.defaults = {
         msg: '',
-        type: '',
+        type: 'info',
         parent: false,
-        timeout: 0
+        timeout: 0,
+        animation: 'fadeOut'
     };
     // end - $.MTAppMsg();
 
@@ -1117,6 +1249,9 @@
                 autoOpen: false,
                 modal: true,
                 title: op.title,
+                width: op.width,
+                height: op.height,
+                modal: op.modal,
                 hide: op.hide_effect
             });
         $('#mtapp-dialog-msg').dialog('open');
@@ -1124,6 +1259,9 @@
     $.MTAppDialogMsg.defaults = {
         title: 'メッセージ',
         content: 'Movable Typeへようこそ！',
+        width: 300,
+        height: 'auto',
+        modal: false,
         hide_effect: ''
     };
     // end - $.MTAppDialogMsg();
@@ -1241,6 +1379,10 @@
         var fullBtn = $('<div/>')
             .attr('id','fullBtn')
             .addClass('tab')
+            .css({
+                'margin-right': '4px',
+                'margin-left': '4px'
+            })
             .html('<label><a href="javascript:void(0);">Full</a></label>')
             .toggle(
                 function(){
@@ -1250,7 +1392,9 @@
                         'overflow':'hidden',
                         'padding-right':'17px'
                     });
-                    $('#overlay').fadeIn(function(){
+                    $('#overlay')
+                        .height($(document).height())
+                        .fadeIn(function(){
                         $('#text-field').css({
                             'position':'absolute',
                             'z-index':'2000',
@@ -1678,7 +1822,7 @@
                 val = self.val(),
                 $btn = $('<button class="mt-edit-field-button button">' + op.edit + '</button>').click(function(){
                     $(this).hide()
-                        .prev().show()
+                            .prev().show().addClass('edited')
                             .prev().hide();
                     return false;
                 });
@@ -1756,6 +1900,30 @@
 
 
     // -------------------------------------------------
+    //  $(foo).MTAppRemoveVal();
+    //
+    //  Description:
+    //    指定したinput:text, textareaにクリアボタンを付ける。
+    //
+    //  Usage:
+    //    $(foo).MTAppRemoveVal();
+    // -------------------------------------------------
+    $.fn.MTAppRemoveVal = function() {
+        return this.each(function(){
+            var $this = $(this).css('padding-right', '16px').wrap('<div class="mtapp-remove-val" />');
+            var $wrap = $this.parent().css('position', 'relative');
+            var outerH = $wrap.outerHeight(),
+                posTop = outerH / 2 - 7;
+            $wrap.append('<img class="mtapp-remove-val-btn" alt="" src="' + mtappVars.static_plugin_path + 'images/cancel-gray.png" style="top: ' + posTop + 'px;" />')
+                .children('img').click(function(){
+                    $this.val('').focus();
+                });
+        });
+    };
+    // end - $(foo).MTAppRemoveVal();
+
+
+    // -------------------------------------------------
     //  $.MTAppRemoveVal();
     //
     //  Description:
@@ -1764,48 +1932,14 @@
     //  Usage:
     //    $.MTAppRemoveVal();
     // -------------------------------------------------
-    $.MTAppRemoveVal = function(options) {
+    $.MTAppRemoveVal = function() {
+        console.log(1);
         if (mtappVars.screen_id == 'edit-entry' || mtappVars.screen_id == 'edit-page') {
-            $('#sortable div.field-content').find('input:text,textarea').filter(':visible').each(function(){
-                var self = $(this),
-                    self_width = self.outerWidth(),
-                    self_height = self.outerHeight(),
-                    pos_left = self_width - 18,
-                    pos_top = (self_height - 16) / 2 + 16;
-                self.after('<span class="remove-val" style="left:' + pos_left + 'px; top: -' + pos_top + 'px;">クリア</span>')
-                    .next('span.remove-val')
-                        .click(function(){
-                            self.val('');
-                        });
-            });
+            console.log(2);
+            $('#sortable div.field-content').find('input:text,textarea').filter(':visible').MTAppRemoveVal();
         }
     };
     // end - $.MTAppRemoveVal();
-
-    // -------------------------------------------------
-    //  $(foo).MTAppRemoveVal();
-    //
-    //  Description:
-    //    指定したinput:textにクリアボタンを付ける。
-    //
-    //  Usage:
-    //    $(foo).MTAppRemoveVal();
-    // -------------------------------------------------
-    $.fn.MTAppRemoveVal = function(options) {
-        return this.each(function(){
-            var self = $(this),
-                self_width = self.outerWidth(),
-                self_height = self.outerHeight(),
-                pos_left = self_width - 18,
-                pos_top = (self_height - 16) / 2 + 16;
-            self.after('<span class="remove-val" style="left:' + pos_left + 'px; top: -' + pos_top + 'px;">クリア</span>')
-                .next('span.remove-val')
-                    .click(function(){
-                        self.val('');
-                    });
-        });
-    };
-    // end - $(foo).MTAppRemoveVal();
 
 
     // -------------------------------------------------
@@ -1820,73 +1954,66 @@
     //  Options:
     //    min: {Number} 最小値
     //    max: {Number} 最大値
-    //    min_msg: {String} 最小値よりも小さかったときのアラートメッセージ
-    //    max_msg: {String} 最大値よりも大きかったときのアラートメッセージ
-    //    allow: {Reg} 置換しない文字を正規表現で指定
-    //    zero_pad: {Boolean} 先頭の0を残す場合はtrue
-    //    target: {String} numberを指定すると数字の置換のみの動作となる
-    //    trim: {Boolean} 前後のスペースをトリムしないときはfalse
-    //    hyphen: {Boolean} ハイフンを常に半角にする場合はtrue
+    //    minMsg: {String} 最小値よりも小さかったときのアラートメッセージ
+    //    maxMsg: {String} 最大値よりも大きかったときのアラートメッセージ
+    //    zeroPad: {Boolean} 先頭の0を残す場合はtrue
     // -------------------------------------------------
     $.fn.MTAppNumChecker = function(options) {
         var op = $.extend({}, $.fn.MTAppNumChecker.defaults, options);
+        op.minMsg = op.minMsg ? op.minMsg : op.min_msg;
+        op.maxMsg = op.maxMsg ? op.maxMsg : op.max_msg;
+        op.zeroPad = op.zeroPad ? op.zeroPad : op.zero_pad;
         return this.each(function(){
             $(this)
                 .after('<span class="mun_msg" style="display:none;color:red;font-weight:bold;"></span>')
-                .keyup(function(e){
-                    if (e.which == 37 || e.which == 39) return;
-                    var self = $(this);
-                    var text = self.val();
-                    if (op.trim) {
-                        text = $.trim(text);
+                .blur(function(){
+                    var $this = $(this);
+                    var text = $this.val() + '';
+                    text = $.toInt(text, true).replace(/．|。/g, '.').replace(/，|、/g, ',').replace(/ー|ｰ|−|—/g,'-');
+                    text = $.trim(text);
+                    if (!op.zeroPad) {
+                        text = text.replace(/^0+/g, '');
                     }
-                    text = text
-                        .replace(/０/g, '0')
-                        .replace(/１/g, '1')
-                        .replace(/２/g, '2')
-                        .replace(/３/g, '3')
-                        .replace(/４/g, '4')
-                        .replace(/５/g, '5')
-                        .replace(/６/g, '6')
-                        .replace(/７/g, '7')
-                        .replace(/８/g, '8')
-                        .replace(/９/g, '9');
-                    if (op.hyphen) {
-                        text = text.replace(/ー|—/g,'-');
+                    var num = 0;
+                    if (op.min !== -9999999999 || op.max !== 9999999999) {
+                        var span = $this.next('span');
+                        num = Number(text.replace(/^0+/g, '').replace(/(.+)-+(.*)/g, '$1$2').replace(/[^0-9\-\.]/g, ''));
                     }
-                    if (op.target === 'number' && op.zero_pad) {
-                        self.val(text);
-                    } else if (op.target === 'number') {
-                        self.val(text.replace(/^0+/g, ''));
-                    } else if (op.zero_pad) {
-                        var reg = RegExp('[^0-9' + op.allow + ']', 'g');
-                        self.val(text.replace(reg, ''));
-                    } else {
-                        var reg = RegExp('^0|[^0-9' + op.allow + ']', 'g');
-                        self.val(text.replace(reg, ''));
+                    if (op.min !== -9999999999 && op.max !== 9999999999) {
+                        if (op.min > num) {
+                            span.text(op.minMsg).show();
+                        }
+                        else if (op.max < num) {
+                            span.text(op.maxMsg).show();
+                        }
+                        else {
+                            span.text('').hide();
+                        }
                     }
-                    var span = $(this).next('span.mun_msg');
-                    var num = Number(text.replace(/^0|[^0-9]/g, ''));
-                    if (num < op.min) {
-                        span.text(op.min_msg).show();
-                    } else if (num > op.max) {
-                        span.text(op.max_msg).show();
-                    } else {
-                        span.text('').hide();
+                    else if (op.min !== -9999999999 && op.max === 9999999999) {
+                        if (op.min > num) {
+                            span.text(op.minMsg).show();
+                        } else {
+                            span.text('').hide();
+                        }
                     }
+                    else if (op.min === -9999999999 && op.max !== 9999999999) {
+                        if (op.max < num) {
+                            span.text(op.maxMsg).show();
+                        } else {
+                            span.text('').hide();
+                        }
+                    }
+                $this.val(text);
                 })
         });
     };
     $.fn.MTAppNumChecker.defaults = {
-        min: 0,
-        max: 10000000000000000000,
-        min_msg: '値が小さすぎます。',
-        max_msg: '値が大きすぎます。',
-        allow: '',
-        zero_pad: false,
-        target: '',
-        trim: true,
-        hyphen: false
+        min: -9999999999,
+        max: 9999999999,
+        minMsg: '値が小さすぎます。',
+        maxMsg: '値が大きすぎます。',
+        zeroPad: false
     };
     // end - $(foo).MTAppNumChecker();
 
@@ -1901,11 +2028,12 @@
     //    $(foo).MTAppTaxAssist(options);
     //
     //  Options:
-    //    rate: {Number} 消費税率
-    //    fraction: {String} 端数処理 => floor（切り捨て）、ceil（切り上げ）、round（四捨五入）
+    //    rate: {Number} 消費税率（例）5%の時は0.05と書く
+    //    rounding: {String} 端数処理 => floor（切り捨て）、ceil（切り上げ）、round（四捨五入）
     // -------------------------------------------------
     $.fn.MTAppTaxAssist = function(options) {
         var op = $.extend({}, $.fn.MTAppTaxAssist.defaults, options);
+        var roundingType = op.rounding ? op.rounding : op.fraction;
         var tax_button = [
             '<span class="taxes_included button" title="金額から税込み価格を計算する">税込み</span>',
             '<span class="after_taxes button" title="金額から税抜き価格を計算する">税抜き</span>'
@@ -1917,31 +2045,35 @@
                 .next()
                     .click(function(){
                         $(this).addClass('clicked');
-                        var val = Number(self.val()) * 1.05;
-                        self.val(fraction(val));
+                        var val = Number(self.val()) * (1 + op.rate);
+                        self.val(rounding(val, roundingType));
                     })
                 .next()
                     .click(function(){
                         $(this).addClass('clicked');
-                        var val = Number(self.val()) / 1.05;
-                        self.val(fraction(val));
+                        var val = Number(self.val()) / (1 + op.rate);
+                        self.val(rounding(val, roundingType));
                     });
         });
-        function fraction(num){
-            if (op.fraction == 'floor') {
-                return Math.floor(num);
-            } else if (op.fraction == 'ceil') {
-                return Math.ceil(num);
-            } else if (op.fraction == 'round') {
-                return Math.round(num);
-            } else {
-                return num;
+        function rounding(num, roundingType){
+            switch (roundingType) {
+                case 'floor':
+                    num = Math.floor(num);
+                    break;
+                case 'ceil':
+                    num = Math.ceil(num);
+                    break;
+                case 'round':
+                    num = Math.round(num);
+                    break;
             }
+            return num;
         }
     };
     $.fn.MTAppTaxAssist.defaults = {
         rate: 0.05,
-        fraction: 'floor' // floor（切り捨て）、ceil（切り上げ）、round（四捨五入）
+        rounding: 'floor', // floor（切り捨て）、ceil（切り上げ）、round（四捨五入）
+        fraction: 'floor' // rounding の後方互換
     };
     // end - $(foo).MTAppTaxAssist();
 
@@ -2012,12 +2144,11 @@
     //    $.MTAppSortableBatchEdit(options);
     //
     //  Options:
-    //    target: 自動変更する日付の種類を指定。公開日'created_on'または更新日'modified_on'
-    //    date_change: 日付の自動変更を無効にする（並び替えのみ有効にする）
+    //    target: {String} 自動変更する日付の種類を指定。公開日'created_on'または更新日'modified_on'
+    //    update: {Function} 並べ替えが完了したときのイベントを設定。
     // -------------------------------------------------
     $.MTAppSortableBatchEdit = function(options){
         var op = $.extend({}, $.MTAppSortableBatchEdit.defaults, options);
-
         if (mtappVars.screen_id.indexOf('batch-edit-') < 0) return;
         $('#' + mtappVars.screen_id.replace(/batch-edit-/,'') + '-listing-table')
             .find('tr')
@@ -2044,8 +2175,9 @@
                         });
                     },
                     update: function(ev, ui){
-                        if (! op.date_change) return;
-                        if (op.target == 'created_on' || op.target == 'modified_on') {
+                        if (typeof op.update == 'function') {
+                            op.update(ev, ui);
+                        } else if (op.target == 'created_on' || op.target == 'modified_on') {
                             // 公開日か更新日か
                             var n = op.target == 'created_on' ? 0 : 1;
                             var input = ui.item.find('td.datetime:eq(' + n + ') input:text');
@@ -2097,7 +2229,7 @@
     };
     $.MTAppSortableBatchEdit.defaults = {
         target: 'created_on', // created_on, modified_on
-        date_change: true
+        update: null
     };
     // end - $.MTAppSortableBatchEdit();
 
@@ -2106,7 +2238,7 @@
     //  $.MTAppBatchEditCategory();
     //
     //  Description:
-    //    ブログ記事・ウェブページ一括編集画面をソート可能にして、日付を自動変更する
+    //    ブログ記事・ウェブページ一括編集画面でカテゴリやフォルダをまとめて変更する
     //
     //  Usage:
     //    $.MTAppBatchEditCategory();
@@ -2140,66 +2272,82 @@
 
 
     // -------------------------------------------------
-    //  $(foo).MTAppNbspGUI();
+    //  $(foo).MTAppLineBreakField();
     //
     //  Description:
-    //    「1項目ごとに改行してください」をGUIで実現する
+    //    「1項目ごとに改行してください」をGUIで実現します。(MT5.2 later)
     //
     //  Usage:
-    //    $(foo).MTAppNbspGUI(options);
+    //    $(foo).MTAppLineBreakField(options);
     //
     //  Options:
-    //    wrapper_class: {Array} ['main-class', 'sub-class']
-    //    input_class: {Array} ['main-class', 'sub-class']
-    //    add_class: {Array} ['main-class', 'sub-class']
+    //    input_class: {String} 'sub-class1 sub-class2'
     //
     // -------------------------------------------------
-    $.fn.MTAppNbspGUI = function(options) {
-        var op = $.extend({}, $.fn.MTAppNbspGUI.defaults, options);
+    $.fn.MTAppLineBreakField = function(options) {
+        var op = $.extend({}, $.fn.MTAppLineBreakField.defaults, options);
+
+        var inputClass = op.inputClass ? op.inputClass : op.input_class;
+        var isSortable = op.sortable;
         return this.each(function(){
-            var self = $(this).hide();
-            var self_id = self.attr('id')
-            var self_value = self.val().split('\n');
+            var $this = $(this).hide();
+            var this_id = $this.attr('id')
+            var this_value = $this.val().split('\n');
+            var $fieldContent = $this.parent();
 
             var input = [];
-            for (var i = 0, n = self_value.length; i < n; i++) {
-                input.push(item(self_value[i]));
+            for (var i = 0, n = this_value.length; i < n; i++) {
+                input.push(item(this_value[i]));
             }
-            self.after(input.join(''));
+            $this.after(input.join(''));
 
-            $('span.' + op.add_class[0]).live('click', function(){
-                $(this).parent().after(item(''));
-            });
-
-            $('input.' + op.input_class[0]).live('blur', function(){
-                var text = [];
-                var inputs = $('input.' + op.input_class[0]);
-                var inputs_count = inputs.length;
-                inputs.each(function(){
-                    if ($(this).val() != '') {
-                        text.push($(this).val());
-                    } else if (inputs_count > 1) {
-                        $(this).parent().remove();
+            $fieldContent
+                .on('click', 'img.mtapp-linebreak-field-add', function(){
+                    $(this).parent().parent().after(item('')).next().children().children().focus();
+                })
+                .on('blur', 'input.mtapp-linebreak-field-input', function(){
+                    var text = [];
+                    var inputs = $('input.mtapp-linebreak-field-input');
+                    var inputs_count = inputs.length;
+                    inputs.each(function(){
+                        if ($(this).val() != '') {
+                            text.push($(this).val());
+                        } else if (inputs_count > 1) {
+                            $(this).parent().parent().remove();
+                        }
+                    });
+                    $this.val(text.join("\n"));
+                })
+                .on('keydown', 'input.mtapp-linebreak-field-input', function(e){
+                    var keycode = e.which || e.keyCode;
+                    if (keycode == 13) {
+                        $(this).blur().next().click();
                     }
                 });
-                self.val(text.join("\n"));
-            });
+            if (isSortable) {
+                $fieldContent.addClass('mtapp-sortable').sortable({
+                    update: function(e, ui){
+                        $(ui.item).find('input').blur();
+                    }
+                });
+            }
 
             function item (val) {
                 return [
-                    '<span class="' + op.wrapper_class.join(' ') + '">',
-                        '<input type="text" class="' + op.input_class.join(' ') + '" value="' + val + '" />',
-                        '<span class="' + op.add_class.join(' ') + '">追加</span>',
+                    '<span class="mtapp-linebreak-field-item">',
+                        '<span class="mtapp-linebreak-field-item-inner">',
+                            '<input type="text" class="mtapp-linebreak-field-input ' + inputClass + '" value="' + val + '" />',
+                            '<img class="mtapp-linebreak-field-add" src="' + mtappVars.static_plugin_path + 'images/plus-circle.png" alt="plus" />',
+                        '</span>',
                     '</span>'
                 ].join('');
             }
 
         });
     };
-    $.fn.MTAppNbspGUI.defaults = {
-        wrapper_class: ['mtapp-nbsp-gui-item'],
-        input_class: ['mtapp-nbsp-gui-input','text','full'],
-        add_class: ['mtapp-nbsp-gui-add']
+    $.fn.MTAppLineBreakField.defaults = {
+        inputClass: 'text full',
+        sortable: true
     };
     // end - $(foo).MTAppNbspGUI();
 
@@ -2380,14 +2528,14 @@
     //    Param:
     //      classes: {String} カンマ区切りの文字列
     //
-    //  $(foo).noScroll(selector, horizontal);
+    //  $(foo).noScroll(styles, containerSelector);
     //
     //    Description:
-    //      $(foo)の子要素である$(selector)をスクロールに追随させる。
+    //      $(foo)をスクロールに追随させる。
     //    Param:
-    //      selector: {String} jQueryセレクタ
-    //      horizontal: {String} $(selector)のpositionプロパティに{horizontal: 0}を付与
-    //
+    //      styles: {Object} $(foo)に設定するCSSがある場合はObjectで設定する
+    //      containerSelector: $(foo)の最上位の親要素のセレクタを指定。
+    //                         $(foo)の高さがウィンドウよりも大きい場合に無限スクロールになってしまうのを防ぐ。
     //
     //  $.digit(num, space);
     //
@@ -2416,24 +2564,31 @@
                 return true;
             }
         },
-        noScroll: function (selector, horizontal){
-            var self = $(this).css('position', 'relative'),
-                target = self.find(selector).css({'position': 'absolute', 'z-index':99});
-                if (horizontal) {
-                    target.css(horizontal, 0);
-                }
+        noScroll: function (styles, containerSelector){
+            if (this.length < 1) return;
+            var $this = this;
+            if (containerSelector) {
+                $(containerSelector).css('overflow-y', 'hidden');
+            }
+            var $parent = $this.parent().css('position', 'relative');
+            var parentHeight = $parent.height();
+            $parent.height(parentHeight);
+            $this.css({'position': 'absolute', 'z-index': 99});
+            if (styles) {
+                $this.css(styles);
+            }
             $(window).scroll(function(){
-                var thisTop = $(document).scrollTop() - self.offset().top + 10;
+                var thisTop = $(document).scrollTop() - $parent.offset().top + 10;
                 if (thisTop < 0) {
                     thisTop = 0;
                 }
-                target.stop().animate(
+                $this.stop().animate(
                     {top: thisTop + 'px'},
                     'fast',
                     'swing'
                 );
             });
-            return self;
+            return $this;
         },
         insertListingColum: function(position, element, html, classname){
             return this.each(function(){
@@ -2482,18 +2637,19 @@
             return num;
         },
         // 全角数字を半角数字に変換し、半角数字以外は削除する。
-        toInt: function(str, loose) {
+        toInt: function(str, allow) {
+            str = str + "";
             str = str.replace(/０/g, '0')
-                .replace(/１/g, '1')
-                .replace(/２/g, '2')
-                .replace(/３/g, '3')
-                .replace(/４/g, '4')
-                .replace(/５/g, '5')
-                .replace(/６/g, '6')
-                .replace(/７/g, '7')
-                .replace(/８/g, '8')
-                .replace(/９/g, '9');
-            if (!loose) {
+                     .replace(/１/g, '1')
+                     .replace(/２/g, '2')
+                     .replace(/３/g, '3')
+                     .replace(/４/g, '4')
+                     .replace(/５/g, '5')
+                     .replace(/６/g, '6')
+                     .replace(/７/g, '7')
+                     .replace(/８/g, '8')
+                     .replace(/９/g, '9');
+            if (!allow) {
                 str = str.replace(/\D/g, '');
             }
             return str;
@@ -2564,6 +2720,11 @@ jQuery(function($){
     //  <body>にブログIDとユーザーIDのクラス名を付与
     // -------------------------------------------------
     $('body').addClass('blog-id-' + mtappVars.blog_id + ' author-id-' + mtappVars.author_id);
+
+    // cookieにページを判別する情報を保存
+    setCookie('mtappVars_type', mtappVars.type, 30);
+    setCookie('mtappVars_scope_type', mtappVars.scope_type, 30);
+    setCookie('mtappVars_screen_id', mtappVars.screen_id, 30);
 
     // -------------------------------------------------
     //  Favorite Structure ダッシュボード
