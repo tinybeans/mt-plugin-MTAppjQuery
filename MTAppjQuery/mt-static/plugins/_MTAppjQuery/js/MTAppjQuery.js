@@ -2144,12 +2144,11 @@
     //    $.MTAppSortableBatchEdit(options);
     //
     //  Options:
-    //    target: 自動変更する日付の種類を指定。公開日'created_on'または更新日'modified_on'
-    //    date_change: 日付の自動変更を無効にする（並び替えのみ有効にする）
+    //    target: {String} 自動変更する日付の種類を指定。公開日'created_on'または更新日'modified_on'
+    //    update: {Function} 並べ替えが完了したときのイベントを設定。
     // -------------------------------------------------
     $.MTAppSortableBatchEdit = function(options){
         var op = $.extend({}, $.MTAppSortableBatchEdit.defaults, options);
-
         if (mtappVars.screen_id.indexOf('batch-edit-') < 0) return;
         $('#' + mtappVars.screen_id.replace(/batch-edit-/,'') + '-listing-table')
             .find('tr')
@@ -2176,8 +2175,9 @@
                         });
                     },
                     update: function(ev, ui){
-                        if (! op.date_change) return;
-                        if (op.target == 'created_on' || op.target == 'modified_on') {
+                        if (typeof op.update == 'function') {
+                            op.update(ev, ui);
+                        } else if (op.target == 'created_on' || op.target == 'modified_on') {
                             // 公開日か更新日か
                             var n = op.target == 'created_on' ? 0 : 1;
                             var input = ui.item.find('td.datetime:eq(' + n + ') input:text');
@@ -2229,7 +2229,7 @@
     };
     $.MTAppSortableBatchEdit.defaults = {
         target: 'created_on', // created_on, modified_on
-        date_change: true
+        update: null
     };
     // end - $.MTAppSortableBatchEdit();
 
