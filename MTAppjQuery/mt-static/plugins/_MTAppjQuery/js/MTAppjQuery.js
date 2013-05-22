@@ -1101,7 +1101,7 @@
     //              カスタムフィールドの場合は「cf_basename」のように接頭辞「 cf_ 」を付ける。
     //              ex. {'title':'タイトル','keywords':'キーワード','cf_price','価格'}
     //    pointer: {String} タブを挿入する起点となるノードのセレクタ。ex. #title-field
-    //    pointer_basename: {String} pointerを指定しない場合は、pointer_basenameに
+    //    pointerBasename: {String} pointerを指定しない場合は、pointerBasenameに
     //                      タブを挿入する起点となるノードのbasenameを指定できる。ex. title
     //    insert: {String} 起点となるノードの前に挿入（before）するか後ろに挿入（after）するか。
     // -------------------------------------------------
@@ -1109,12 +1109,14 @@
         var op = $.extend({}, $.MTAppTabs.defaults, options);
 
         if (op.basename == null) return;
+        op.pointerBasename = (op.pointer_basename && !op.pointerBasename) ? op.pointer_basename : op.pointerBasename;
         var selector;
         if (op.pointer != '') {
             selector = op.pointer;
         }
-        else if (op.pointer_basename != '') {
-            selector = '#' + getFieldID(op.pointer_basename);
+        else if (op.pointerBasename != '') {
+            selector = '#' + getFieldID(op.pointerBasename);
+            if (!$(selector).length) return;
         }
         else {
             return;
@@ -1152,7 +1154,7 @@
     $.MTAppTabs.defaults = {
         basename: null,
         pointer: '', // #title-field などのセレクタ
-        pointer_basename: '', // title などのベースネーム
+        pointerBasename: '', // title などのベースネーム
         insert: 'after', // before or after
     };
     // end - $.MTAppTabs
