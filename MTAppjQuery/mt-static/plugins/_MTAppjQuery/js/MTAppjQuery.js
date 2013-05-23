@@ -1239,12 +1239,16 @@
     //  Options:
     //    title: {String} ダイアログのタイトル
     //    content: {String} ダイアログのコンテンツ
-    //    hide_effect: {String} 閉じる時のエフェクト 'explode', 'slide', 'drop'など
+    //    width: {Number} ダイアログの横幅（初期値 'auto'）pxの単位は不要。
+    //    height: {Number} ダイアログの高さ（初期値 'auto'）pxの単位は不要。
+    //    modal: {Boolean} true を設定するとモーダルダイアログになります。
+    //    hideEffect: {String} 閉じる時のエフェクト 'explode', 'slide', 'drop'
     // ---------------------------------------------------------------------
 
     $.MTAppDialogMsg = function(options){
         var op = $.extend({}, $.MTAppDialogMsg.defaults, options);
 
+        op.hideEffect = op.hide_effect ? op.hide_effect : op.hideEffect;
         $('#mtapp-dialog-msg')
             .html(op.content)
             .dialog({
@@ -1254,17 +1258,17 @@
                 width: op.width,
                 height: op.height,
                 modal: op.modal,
-                hide: op.hide_effect
+                hide: op.hideEffect
             });
         $('#mtapp-dialog-msg').dialog('open');
     };
     $.MTAppDialogMsg.defaults = {
         title: 'メッセージ',
         content: 'Movable Typeへようこそ！',
-        width: 300,
+        width: 'auto',
         height: 'auto',
         modal: false,
-        hide_effect: ''
+        hideEffect: ''
     };
     // end - $.MTAppDialogMsg();
 
