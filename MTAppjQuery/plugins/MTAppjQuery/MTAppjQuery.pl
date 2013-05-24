@@ -28,7 +28,7 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             ['jquery_ready',    {Default => 0,  Scope => 'system'}],
             ['jquery_ready_url',{Default => '', Scope => 'system'}],
 
-            ['jqselectable',  {Default => 0,  Scope => 'system'}],
+            #['jqselectable',  {Default => 0,  Scope => 'system'}],
 
             # Set blog scope
             ['active',        {Default => 1,  Scope => 'blog'}],
@@ -41,7 +41,7 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             ['jquery_ready',    {Default => 0,  Scope => 'blog'}],
             ['jquery_ready_url',{Default => '', Scope => 'blog'}],
 
-            ['jqselectable',  {Default => 0,  Scope => 'blog'}],
+            #['jqselectable',  {Default => 0,  Scope => 'blog'}],
 
             # Free area
             ['fa_mtapp_top_head',  {Default => '', Scope => 'system'}],
