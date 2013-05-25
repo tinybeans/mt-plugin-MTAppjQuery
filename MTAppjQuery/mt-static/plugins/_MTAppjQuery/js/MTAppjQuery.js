@@ -136,12 +136,12 @@
                 }
             }
             // addオプションがtrueの場合（ユーザー追加可能の場合）
-            // if (op.add && op.skin == false) {
-            //     labels.push('<input class="mcb-add-item" type="text" value="" />');
-            // } else if (op.add) {
-            //     labels.push('<input class="mcb-add-item" type="text" value="" />');
-            // }
-            labels.push('<input class="mcb-add-item" type="text" value="" />');
+            if (op.add && op.skin == false) {
+                labels.push('<input class="mcb-add-item" type="text" value="" />');
+            } else if (op.add) {
+                labels.push('<input class="mcb-add-item" type="text" value="" />');
+            }
+            // labels.push('<input class="mcb-add-item" type="text" value="" />');
             $container
                 .html(labels.join(''))
                 .find('input:checkbox')
@@ -291,6 +291,7 @@
             label: op.label,
             sort: op.sort
         });
+        return $(fieldID + '-field');
     };
     $.MTAppMultiCheckbox.defaults = {
         basename: '',
