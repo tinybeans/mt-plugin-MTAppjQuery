@@ -828,10 +828,10 @@
     //  Options:
     //    basename: {String} 各フォーム要素のベースネーム
     //    label: {String} 変更後のラベル名
-    //    add_class: {String} 追加するクラス名
+    //    addClass: {String} 追加するクラス名
     //    hint: {String} ヒントに表示させたいメッセージ
-    //    show_field: {String}  強制表示('show')、強制表示('hide')(注:basename が body か more の場合はタブの表示制御）
-    //    show_parent: {String}  強制表示('show')、強制非表示('hide') (注:show_parent は、basename が body か more のみ）
+    //    showField: {String}  強制表示('show')、強制表示('hide')(注:basename が body か more の場合はタブの表示制御）
+    //    showParent: {String}  強制表示('show')、強制非表示('hide') (注:showParent は、basename が body か more のみ）
     //    custom: {Boolean} カスタムフィールドの場合 true
     //    widget: {Boolean} ウィジェットの場合 true
     //    edit: {Boolean} 非編集モードにする場合 true
@@ -840,7 +840,6 @@
         var op = $.extend({}, $.MTAppCustomize.defaults, options);
         var opL = op.label,
             opH = op.hint,
-            opS = op.show_field,
             opC = op.custom,
             opW = op.widget,
             opE = op.edit,
@@ -897,8 +896,10 @@
         }
 
         // フィールドにクラス名を追加しよう
-        if (op.add_class != '') {
-            $field.addClass(op.add_class);
+        if (op.add_class) op.addClass = op.add_class;
+        if (op.add_class) op.addClass = op.addclass;
+        if (op.addClass != '') {
+            $field.addClass(op.addClass);
         }
 
         // ラベルの変更
@@ -911,6 +912,7 @@
         }
 
         // フィールドの表示・非表示
+        var opS = op.show_field ? op.show_field: op.showField;
         if (opS == 'show') {
             $field.removeClass('hidden');
             if (opB == 'body' || opB == 'more') {
@@ -923,7 +925,8 @@
         }
 
         // テキストフィールドの表示・非表示
-        if ((opB == 'body' || opB == 'more') && op.show_parent == 'hide') {
+        op.showParent = op.show_parent ? op.show_parent: op.showParent;
+        if ((opB == 'body' || opB == 'more') && op.showParent == 'hide') {
             $field.css({
                 position: 'absolute',
                 top: '-9999px',
@@ -931,7 +934,7 @@
                 width: '1px',
                 height: '1px'
             });
-        } else if ((opB == 'body' || opB == 'more') && op.show_parent == 'show') {
+        } else if ((opB == 'body' || opB == 'more') && op.showParent == 'show') {
             $field.removeAttr('style');
         }
 
@@ -948,10 +951,10 @@
     $.MTAppCustomize.defaults = {
         basename: '',
         label: '',
-        addclass: '',
+        addClass: '',
         hint: '',
-        show_field: '',
-        show_parent: '',
+        showField: '',
+        showParent: '',
         custom: false,
         widget: false,
         edit: false
