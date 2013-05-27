@@ -364,7 +364,7 @@
                     options.unshift('<optgroup label="' + op.initGroupName + '"><option value="' + selfVal + '">' + selfVal + '</option></optgroup>');
                 }
             }
-            var option_add = op.dinamic ? '<option value="_add_">' + op.addText + '</option>': '';
+            var option_add = op.dynamic ? '<option value="_add_">' + op.addText + '</option>': '';
             var select = [
                 '<select class="dynamic_select">',
                     options.join(''),
@@ -375,14 +375,18 @@
                 if ($(this).val() === '_add_') {
                     var $option = $(this).find('option');
                     var size = $option.size();
-                    var additon = prompt(op.promptMsg,'');
-                    $self.val(additon);
-                    $option.eq(size-1).before('<option value="' + additon + '" selected="selected">' + additon + '</option>');
+                    var addition = prompt(op.promptMsg,'');
+                    if (addition) {
+                        $self.val(addition);
+                        $option.eq(size-1).before('<option value="' + addition + '" selected="selected">' + addition + '</option>');
+                    } else {
+                        $(this).val($self.val());
+                    }
                 } else {
                     $self.val($(this).val());
                 }
                 if (op.selected && typeof op.selected === 'function') {
-                    op.selected();
+                    op.selected($self.val());
                 }
             });
             if (op.separateMode) {
@@ -405,7 +409,7 @@
     };
     $.fn.MTAppDynamicSelect.defaults = {
         debug: false,
-        dinamic: true,
+        dynamic: true,
         text: '', // カンマ区切りの文字列か連想配列と配列の入れ子。value|labelと分けることも可能（要separateMode: true）。
         addText: '項目を追加する',
         promptMsg: '追加する項目名を入力',
