@@ -438,7 +438,6 @@
         return this.each(function(){
             var $self = $(this);
             var separator = op.separator;
-            var addClass = (op.addClass !== '') ? ' class="' + op.addClass + '"': '';
             var splitCount = op.splitCount > 1 ? op.splitCount: 2;
             var selfVal = $self.val() ? $self.val().split(op.separator) : [];
 
@@ -447,22 +446,34 @@
             }
 
             var input = [];
-            var value = '';
-            var placeholder = '';
+            var value = '', placeholders = '', styles = '', classes = '';
+            op.placeholders = op.placeholder ? op.placeholder : op.placeholders;
             for (var i = 0; i < splitCount; i++) {
                 value = (selfVal[i]) ? selfVal[i] : '';
-                placeholder = (op.placeholder[i]) ? op.placeholder[i] : '';
-                input.push('<input type="text"' + addClass + ' value="' + value + '" placeholder="' + placeholder + '" style="margin-right:' + op.interval + '" />');
+                placeholders = (op.placeholders[i]) ? op.placeholders[i] : '';
+                styles = (op.styles[i]) ? op.styles[i] : '';
+                classes = (op.classes[i]) ? op.classes[i] : '';
+                input.push('<input type="text" class="' + op.addClass + classes + '"" value="' + value + '" placeholder="' + placeholders + '" style="' + styles + '" />');
                 value = '';
             }
-            var $span = $('<span>' + input.join('') + '</span>').children().each(function(){
-                $(this).blur(function(){
-                    var values = [];
-                    $(this).siblings().andSelf().each(function(){
-                        values.push($(this).val());
+            var $span = $('<span class="mtapp-fieldsplit">' + input.join('') + '</span>').children().each(function(){
+                $(this)
+                    .blur(function(){
+                        var values = [];
+                        $(this).siblings().andSelf().each(function(){
+                            values.push($(this).val());
+                        });
+                        $self.val(values.join(separator));
+                    })
+                    .keydown(function(e){
+                        if (e.which == 13) {
+                            var values = [];
+                            $(this).siblings().andSelf().each(function(){
+                                values.push($(this).val());
+                            });
+                            $self.val(values.join(separator));
+                        }
                     });
-                    $self.val(values.join(separator));
-                });
             }).end();
             $self.after($span);
         });
@@ -470,9 +481,10 @@
     $.fn.MTAppFieldSplit.defaults = {
         debug: false,
         splitCount: 2,
-        placeholder: [],
-        interval: '5px',
-        addClass: '',
+        placeholders: [],
+        styles: [],
+        classes: [],
+        addClass: '',// 後方互換
         separator: ','
     };
     // end - $(foo).MTAppFieldSplit()
