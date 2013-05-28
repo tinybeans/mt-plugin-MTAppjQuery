@@ -433,6 +433,7 @@
     //    debug: {Boolean} true を設定すると元のフィールドを表示
     //    type: {String} 'checkbox', 'radio', 'select', 'select.multiple' のいずれか
     //    items: {Array} 生成する項目を配列で設定
+    //    styles: {String} type: 'select.multiple' の場合のみ有効。select[multiple]の高さ調整に。
     // -------------------------------------------------
     $.fn.MTAppMultiForm = function(options){
         var op = $.extend({}, $.fn.MTAppMultiForm.defaults, options);
@@ -474,7 +475,7 @@
                     _html.push('</select>');
                     break;
                 case 'select.multiple':
-                    _html.push('<select multiple="multiple">');
+                    _html.push('<select multiple="multiple" style="' + op.styles + '">');
                     for (var i = 0, l = op.items.length; i < l; i++) {
                         var selected = ($.inArray(op.items[i], thisData) > -1) ? ' selected' : '';
                         _html.push('<option value="' + op.items[i] + '"' + selected + '>' + op.items[i] + '</option>');
@@ -511,7 +512,8 @@
     $.fn.MTAppMultiForm.defaults = {
         debug: false,
         type: '', // 'checkbox', 'radio', 'select', 'select.multiple' のいずれか
-        items: []
+        items: [],
+        styles: 'height: auto;'
     };
     // end - $(foo).MTAppMultiForm()
 
