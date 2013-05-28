@@ -498,3 +498,14 @@ div.mtapp-tabs-container {
         @include border-radius(5px);
     }
 }
+/* ----------------------------------------
+   __MTAppMultiForm
+---------------------------------------- */
+span.mtappmultiform-checkbox {
+    label {
+        line-height: 1.5;
+    }
+    input {
+        margin: 0 3px 0 5px;
+    }
+}
