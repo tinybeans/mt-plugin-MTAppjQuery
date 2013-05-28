@@ -516,7 +516,9 @@ div.mtapp-tabs-container div.field {
 /* ----------------------------------------
    __MTAppMultiForm
 ---------------------------------------- */
-span.mtappmultiform-checkbox label {
+span.mtappmultiform-checkbox label,
+span.mtappmultiform-radio label {
   line-height: 1.5; }
-span.mtappmultiform-checkbox input {
+span.mtappmultiform-checkbox input,
+span.mtappmultiform-radio input {
   margin: 0 3px 0 5px; }
