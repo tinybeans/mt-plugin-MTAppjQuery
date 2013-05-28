@@ -420,6 +420,102 @@
     // end - $(foo).MTAppDynamicSelect()
 
 
+    // -------------------------------------------------
+    //  $(foo).MTAppMultiForm();
+    //
+    //  Description:
+    //    指定した要素をチェックボックスかドロップダウンリストに変更する。いずれも multiple 対応。
+    //
+    //  Usage:
+    //  　$(foo).MTAppTooltip(options);
+    //
+    //  Options:
+    //    debug: {Boolean} true を設定すると元のフィールドを表示
+    //    type: {String} 'checkbox', 'radio', 'select', 'select.multiple' のいずれか
+    //    items: {Array} 生成する項目を配列で設定
+    // -------------------------------------------------
+    $.fn.MTAppMultiForm = function(options){
+        var op = $.extend({}, $.fn.MTAppMultiForm.defaults, options);
+        return this.each(function(idx){
+            if (!op.type || op.items.length == 0) return;
+            var $this = (op.debug) ? $(this) : $(this).hide();
+
+            var thisVal = $this.val();
+            var thisData = (thisVal) ? thisVal.split(',') : [];
+            var thisId = $this.attr('id') ? 'mtappmltform-' + $this.attr('id') : '';
+            if (thisId == '') {
+                var rand = '' + Math.random();
+                rand = rand.replace('.','');
+                thisId = 'mtappmltform-' + op.type.replace('.multiple', '') + '-' + rand;
+            }
+
+            var _html = ['<span id="' + thisId + '" class="mtappmultiform mtappmultiform-' + op.type.replace('.', '-') + '">'];
+            switch (op.type) {
+                case 'checkbox':
+                    for (var i = 0, l = op.items.length; i < l; i++) {
+                        var checked = ($.inArray(op.items[i], thisData) > -1) ? ' checked' : '';
+                        _html.push('<label><input type="checkbox" value="' + op.items[i] + '"' + checked + '>' + op.items[i] + '</label>');
+                    }
+                    _html.push();
+                    break;
+                case 'radio':
+                    for (var i = 0, l = op.items.length; i < l; i++) {
+                        var checked = ($.inArray(op.items[i], thisData) > -1) ? ' checked' : '';
+                        _html.push('<label><input type="radio" name="' + thisId + '-item" value="' + op.items[i] + '"' + checked + '>' + op.items[i] + '</label>');
+                    }
+                    _html.push();
+                    break;
+                case 'select':
+                    _html.push('<select>');
+                    for (var i = 0, l = op.items.length; i < l; i++) {
+                        var selected = ($.inArray(op.items[i], thisData) > -1) ? ' selected' : '';
+                        _html.push('<option value="' + op.items[i] + '"' + selected + '>' + op.items[i] + '</option>');
+                    }
+                    _html.push('</select>');
+                    break;
+                case 'select.multiple':
+                    _html.push('<select multiple="multiple">');
+                    for (var i = 0, l = op.items.length; i < l; i++) {
+                        var selected = ($.inArray(op.items[i], thisData) > -1) ? ' selected' : '';
+                        _html.push('<option value="' + op.items[i] + '"' + selected + '>' + op.items[i] + '</option>');
+                    }
+                    _html.push('</select>');
+                    break;
+            }
+            _html.push('</span>');
+
+            $this.after(_html.join(''));
+
+            var $span = $('#' + thisId);
+            // $span.find('input.default-checked').prop('checked', true);
+            // $span.find('option.default-selected').prop('selected', true);
+            if ($span.hasClass('mtappmultiform-radio') || $span.hasClass('mtappmultiform-checkbox')) {
+                $span.find('input').click(function(){
+                    thisData = [];
+                    $span.find('input:checked').each(function(){
+                        thisData.push($(this).val());
+                    });
+                    $this.val(thisData.join(','));
+                });
+            } else if ($span.hasClass('mtappmultiform-select') || $span.hasClass('mtappmultiform-select-multiple')) {
+                $span.find('select').change(function(){
+                    thisData = [];
+                    $(this).find('option:selected').each(function(){
+                        thisData.push($(this).val());
+                    });
+                    $this.val(thisData.join(','));
+                });
+            }
+        });
+    };
+    $.fn.MTAppMultiForm.defaults = {
+        debug: false,
+        type: '', // 'checkbox', 'radio', 'select', 'select.multiple' のいずれか
+        items: []
+    };
+    // end - $(foo).MTAppMultiForm()
+
+
     /*
      * jquery.MTAppFieldSplit.js
      *
