@@ -8,7 +8,7 @@
  * for version: 0.2x
  *
  */
-(function($){
+;(function($){
 
     if (typeof mtappVars !== 'object') return;
     // -------------------------------------------------
