@@ -1848,6 +1848,71 @@
     // end - $.fn.MTAppFancyListing()
 
     // ---------------------------------------------------------------------
+    //  $.MTAppHasCategory();
+    //
+    //  Description:
+    //
+    //    必要な数のカテゴリや指定したIDのカテゴリが選択されているかチェックし、選択されていない場合はエラーダイアログを表示する。
+    //
+    //  Usage:
+    //    $.MTAppHasCategory(options);
+    //
+    //  Options:
+    //    requiredIds: {String} 必須カテゴリIDをカンマ区切り
+    //    requiredCount: {Number} 必須選択の数
+    //    idErrorTitle: {String} 'エラー',
+    //    idErrorContent: {String} '必須カテゴリが選択されていません。'
+    //    countErrorTitle: {String} 'エラー',
+    //    countErrorContent: {String} '必要な数のカテゴリが選択されていません。'
+    // ---------------------------------------------------------------------
+
+    $.MTAppHasCategory = function(options){
+        var op = $.extend({}, $.MTAppHasCategory.defaults, options);
+        var $form = $('form#entry_form');
+        if ($form.length < 1) return;
+        var type = mtappVars.type;
+        if (!(type == 'entry' || type == 'page')) return;
+        var reqCats = (op.requiredIds) ? op.requiredIds.split(',') : [];
+        $form.on('click', ':submit.primary', function(){
+            var categoryIds = $("input[name='category_ids']").val().split(',');
+            var count = 0;
+            var eerror = false;
+            if (reqCats.length) {
+                for (var i = 0, l = reqCats.length; i < l; i++) {
+                    if ($.inArray(reqCats[i], categoryIds) == -1) {
+                        $.MTAppDialogMsg({
+                            title: op.idErrorTitle,
+                            content: op.idErrorContent,
+                            modal: true
+                        });
+                        $form.find('button:submit:disabled').prop('disabled', false);
+                        return false;
+                    }
+                }
+            }
+            if (op.requiredCount && op.requiredCount > categoryIds.length) {
+                $.MTAppDialogMsg({
+                    title: op.countErrorTitle,
+                    content: op.countErrorContent,
+                    modal: true
+                });
+                $form.find('button:submit:disabled').prop('disabled', false);
+                return false;
+            }
+        });
+    };
+    $.MTAppHasCategory.defaults = {
+        requiredIds: '',
+        requiredCount: 0,
+        idErrorTitle: 'エラー',
+        idErrorContent: '必須カテゴリが選択されていません。',
+        countErrorTitle: 'エラー',
+        countErrorContent: '必要な数のカテゴリが選択されていません。'
+    };
+    // end - $.MTAppHasCategory()
+
+
+    // ---------------------------------------------------------------------
     //  $.fn.MTAppCheckCategoryCount();
     //
     //  Description:
