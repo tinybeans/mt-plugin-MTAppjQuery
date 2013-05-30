@@ -2638,24 +2638,30 @@
     //    $.MTAppMakeField(options);
     //
     //  Options:
+    //    id: {String} フィールドのID。自動で -field が付与される。
     //    label: {String} ラベル部分のテキスト、HTML
     //    content: {String} コンテンツ部分のテキスト、HTML
+    //    hint: {String} コンテンツのヒント部分のテキスト、HTML
     //
     // -------------------------------------------------
     $.MTAppMakeField = function(options) {
         var op = $.extend({}, $.MTAppMakeField.defaults, options);
+        var id = op.id ? ' id="' + op.id + '-field"' : '';
+        var hint = op.hint ? '<div class="hint">' + op.hint + '</div>' : '';
         return [
-            '<div class="field field-top-label">',
-                '<div><label>' + op.label + '</label></div>',
+            '<div' + id + ' class="field field-top-label sort-enabled">',
+                '<div class="field-header"><label>' + op.label + '</label></div>',
                 '<div class="field-content">',
-                op.content,
+                op.content + hint,
                 '</div>',
             '</div>'
         ].join('');
     };
     $.MTAppMakeField.defaults = {
+        id: '',
         label: '',
-        content: ''
+        content: '',
+        hint: ''
     };
     // end - $.MTAppMakeField();
 
