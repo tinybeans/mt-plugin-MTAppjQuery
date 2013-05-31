@@ -193,18 +193,6 @@ span.mcb-container .mcb-add-item {
     cursor: default;
 }
 /* ----------------------------------------
-   __ローディング
----------------------------------------- */
-#container {
-    visibility: hidden;
-}
-#mtapp-loading {
-    position: absolute;
-    top: 250px;
-    left: 50%;
-    margin-left: -33px;
-}
-/* ----------------------------------------
    __スライドメニュー
 ---------------------------------------- */
 div#menu-bar div#selector-nav div.selector ul li {
