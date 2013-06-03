@@ -1144,6 +1144,9 @@
             var exp = new RegExp(array[i][1], "g");
             var element = $(array[i][0])[0];
             textNodeRewrite(element, array[i][1], array[i][2]);
+            if (array[i][0] === '#title-label') {
+                $('#title').attr('placeholder', array[i][2]);
+            }
         }
         function textNodeRewrite(element, pattan, replacement) {
             var children = element.childNodes;
