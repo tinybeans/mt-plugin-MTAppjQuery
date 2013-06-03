@@ -4,40 +4,27 @@ use utf8;
 use MT::Website;
 use MT::Blog;
 use MT::Util;
-use MT::Theme;
 use MTAppjQuery::Tmplset;
-
-
-###
-##
-#
-use MT::Log;
-use Data::Dumper;
-sub doLog {
-    my ($msg, $code) = @_;     return unless defined($msg);
-    my $log = MT::Log->new;
-    $log->message($msg);
-    $log->metadata($code);
-    $log->save or die $log->errstr;
-}
-#
-##
-###
 
 sub template_source_header {
     my ($cb, $app, $tmpl_ref) = @_;
     my $version = MT->version_id;
+    my $minor_version = $version;
+    $minor_version =~ s/^(\d\.\d).*/$1/;
     my $p = MT->component('mt_app_jquery');
     my $blog = $app->blog;
+    my $author = $app->user;
 
     ### 各種情報を取得する
     my $_type   = $app->param('_type') || '_type';
+    my $mode    = $app->param('__mode') || '';
     my $id      = $app->param('id') || 0;
     my $blog_id = (defined $blog) ? $blog->id : 0;
+    my $author_id = $author->id;
     return unless ($_type =~ m/^\w+$/);
+    return unless ($mode =~ m/^\w+$/);
     return unless ($id =~ m/^\d+$/);
 
-    my $author_id   = $app->user->id;
     # オブジェクトのタイプを判別して各オブジェクトのIDを取得する
     my $entry_id    = $_type eq 'entry' ? $id : 0;
     my $page_id     = $_type eq 'page' ? $id : 0;
@@ -50,6 +37,37 @@ sub template_source_header {
     my $user_id     = $_type eq 'author' ? $id : 0; # ログイン中のユーザーは author_id だよ
     my $field_id    = $_type eq 'field' ? $id : 0;
 
+    require MT::Permission;
+    require MT::Association;
+    require MT::Role;
+    ### ログインユーザーのロールを取得する
+    my @role = MT::Role->load(undef, {
+        join => MT::Association->join_on(
+            'role_id', {
+                'author_id' => $author_id,
+            }
+        )
+    });
+    my @role_name;
+    foreach my $role (@role) {
+        push @role_name, '"' . $role->name . '"';
+    }
+    my $role_names = join ',', @role_name;
+
+    ### ログインユーザーのパーミッションを取得する
+    my $perm_blog_id = $blog_id > 0 ? [0, $blog_id]: 0;
+    my @permission = MT::Permission->load({author_id => $author_id, blog_id => $perm_blog_id});
+    my $permissions = '';
+    if (scalar @permission > 0) {
+        my @perms;
+        foreach my $permission (@permission) {
+            if ($permission->permissions) {
+                push @perms, $permission->permissions;
+            }
+        }
+        $permissions = join ',', @perms;
+    }
+
     ### 各種パスを取得する（スラッシュで終わる）
     my $static_path        = $app->static_path;
     my $static_plugin_path = $static_path . $p->envelope . '/';
@@ -58,24 +76,34 @@ sub template_source_header {
     my $scope = (!$blog_id) ? 'system' : 'blog:'.$blog_id;
     my $op_active         = $p->get_config_value('active', $scope);
     return unless $op_active;
-    my $op_usercss        = $p->get_config_value('usercss', $scope);
     my $op_userjs         = $p->get_config_value('userjs', $scope);
+    my $op_userjs_url     = $p->get_config_value('userjs_url', $scope);
+    my $op_usercss        = $p->get_config_value('usercss', $scope);
+    my $op_usercss_url    = $p->get_config_value('usercss_url', $scope);
     my $op_slidemenu      = $p->get_config_value('slidemenu', $scope);
     my $op_superslidemenu = $p->get_config_value('superslidemenu', $scope);
-    my $op_freearea       = $p->get_config_value('jqplugin', $scope);
-    my $op_jquery_ready   = $p->get_config_value('jquery_ready', $scope);
-    my $op_jqselectable   = $p->get_config_value('jqselectable', $scope);
+    my $op_jquery_ready     = $p->get_config_value('jquery_ready', $scope);
+    my $op_jquery_ready_url = $p->get_config_value('jquery_ready_url', $scope);
+    my $op_jqselectable   = 0;#$p->get_config_value('jqselectable', $scope);
+    # Free textarea
+    my $op_fa_mtapp_top_head  = $p->get_config_value('fa_mtapp_top_head', $scope) || '<!-- mtapp_top_head (MTAppjQuery) -->';
+    my $op_fa_html_head       = $p->get_config_value('fa_html_head', $scope) || '<!-- html_head (MTAppjQuery) -->';
+    my $op_fa_js_include      = $p->get_config_value('fa_js_include', $scope) || '<!-- js_include (MTAppjQuery) -->';
+    my $op_fa_html_body       = $p->get_config_value('fa_html_body', $scope) || '<!-- html_body (MTAppjQuery) -->';
+    my $op_fa_form_header     = $p->get_config_value('fa_form_header', $scope) || '<!-- form_header (MTAppjQuery) -->';
+    my $op_fa_jq_js_include   = $p->get_config_value('fa_jq_js_include', $scope) || '/* jq_js_include (MTAppjQuery) */';
+    my $op_fa_mtapp_html_foot = $p->get_config_value('fa_mtapp_html_foot', $scope) || '<!-- mtapp_html_foot (MTAppjQuery) -->';
+    my $op_fa_mtapp_end_body  = $p->get_config_value('fa_mtapp_end_body', $scope) || '<!-- mtapp_end_body (MTAppjQuery) -->';
 
-    ### ローディング画像、ツールチップ用ボックスをページに追加する
+    ### ツールチップ用ボックスをページに追加する
     my $preset = <<__MTML__;
-    <img id="mtapp-loading" src="${static_path}images/indicator.gif" alt="Loading..." />
-    <mt:setvarblock name="html_body_footer" append="1">
+    <mt:SetVarBlock name="html_body_footer" append="1">
     <div id="mtapp-tooltip" style="display: none;"></div>
-    </mt:setvarblock>
+    </mt:SetVarBlock>
 __MTML__
     $$tmpl_ref =~ s!(<div id="container")!$preset$1!g;
 
-    ### スライドメニューをセットする（MT5.1未対応、対応予定あり）
+    ### スライドメニューをセットする（MT5.1未対応、対応予定未定）
     if ($op_slidemenu && !$op_superslidemenu) {
         my $s_menu_org = MTAppjQuery::Tmplset::s_menu_org;
         my $w_menu_org = MTAppjQuery::Tmplset::w_menu_org;
@@ -140,10 +168,11 @@ __MTML__
     my $mtapp_vars = <<__MTML__;
     <mt:unless name="screen_id">
         <mt:if name="template_filename" like="list_">
-            <mt:setvarblock name="screen_id">list-<mt:var name="object_type"></mt:setvarblock>
+            <mt:SetVarBlock name="screen_id">list-<mt:var name="object_type"></mt:SetVarBlock>
         </mt:if>
     </mt:unless>
 
+    <mt:SetVarBlock name="mtapp_html_title"><mt:if name="html_title"><mt:var name="html_title"><mt:else><mt:var name="page_title"></mt:if></mt:SetVarBlock>
     <script type="text/javascript">
     /* <![CDATA[ */
     // 後方互換（非推奨）
@@ -152,15 +181,21 @@ __MTML__
         ${_type}ID = ${id},
         blogURL = '<mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if>',
         mtappURL = '${static_plugin_path}',
-        mtappTitle = '<mt:if name="html_title"><mt:var name="html_title" encode_js="1"><mt:else><mt:var name="page_title" encode_js="1"></mt:if>',
+        mtappTitle = '<mt:var name="mtapp_html_title" replace="'","\'">',
         mtappScopeType = '<mt:var name="scope_type">',
         catsSelected = <mt:if name="selected_category_loop"><mt:var name="selected_category_loop" to_json="1"><mt:else>[]</mt:if>,
         mainCatSelected = <mt:if name="category_id"><mt:var name="category_id"><mt:else>''</mt:if>;
 
     // 推奨
     var mtappVars = {
+        "version" : "${version}",
+        "minor_version" : "${minor_version}",
         "type" : "${_type}",
+        "mode" : "${mode}",
         "author_id" : <mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if>,
+        "author_name" : "<mt:var name="author_name" encode_js="1">",
+        "author_permissions" : [$permissions],
+        "author_roles" : [$role_names],
         "user_name" : "<mt:var name="author_name" encode_js="1">",
         "curr_website_id" : <mt:if name="curr_website_id"><mt:var name="curr_website_id"><mt:else>0</mt:if>,
         "blog_id" : ${blog_id},
@@ -170,12 +205,12 @@ __MTML__
         "template_id" : ${template_id},
         "blog_url" : "<mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if>",
         "static_plugin_path" : "${static_plugin_path}",
-        "html_title" : "<mt:if name="html_title"><mt:var name="html_title" encode_js="1"><mt:else><mt:var name="page_title" encode_js="1"></mt:if>",
+        "html_title" : "<mt:var name="mtapp_html_title" replace='"','\"'>",
         "scope_type" : "<mt:var name="scope_type">",
         "selected_category" : <mt:if name="selected_category_loop"><mt:var name="selected_category_loop" to_json="1" regex_replace='/"/g',''><mt:else>[]</mt:if>,
         "main_category_id" : <mt:if name="category_id"><mt:var name="category_id"><mt:else>0</mt:if>,
         "screen_id" : "<mt:var name="screen_id">",
-        "body_class" : [<mt:setvarblock name="mtapp_body_class">"<mt:var name="screen_type" default="main-screen"> <mt:if name="scope_type" eq="user">user system<mt:else><mt:var name="scope_type"></mt:if><mt:if name="screen_class"> <mt:var name="screen_class"></mt:if><mt:if name="top_nav_loop"> has-menu-nav</mt:if><mt:if name="related_content"> has-related-content</mt:if><mt:if name="edit_screen"> edit-screen</mt:if><mt:if name="new_object"> create-new</mt:if><mt:if name="loaded_revision"> loaded-revision</mt:if><mt:if name="mt_beta"> mt-beta</mt:if>"</mt:setvarblock><mt:var name="mtapp_body_class" regex_replace='/ +/g',' ' regex_replace='/ /g','","'>],
+        "body_class" : [<mt:SetVarBlock name="mtapp_body_class">"<mt:var name="screen_type" default="main-screen"> <mt:if name="scope_type" eq="user">user system<mt:else><mt:var name="scope_type"></mt:if><mt:if name="screen_class"> <mt:var name="screen_class"></mt:if><mt:if name="top_nav_loop"> has-menu-nav</mt:if><mt:if name="related_content"> has-related-content</mt:if><mt:if name="edit_screen"> edit-screen</mt:if><mt:if name="new_object"> create-new</mt:if><mt:if name="loaded_revision"> loaded-revision</mt:if><mt:if name="mt_beta"> mt-beta</mt:if>"</mt:SetVarBlock><mt:var name="mtapp_body_class" regex_replace='/ +/g',' ' regex_replace='/ /g','","'>],
         "template_filename" : '<mt:var name="template_filename">',
         "json_can_create_post_blogs": [<mt:var name="json_can_create_post_blogs">]<mt:ignore>,
         "website_json" : [${website_json}],
@@ -188,66 +223,76 @@ __MTML__
 __MTML__
 
     my $target = '<script type="text/javascript" src="<\$mt:var name="static_uri"\$>jquery/jquery\.(min\.)*js\?v=<mt:var name="mt_version_id" escape="URL">"></script>';
-    my $jquery_ready = $op_jquery_ready ? qq(<script type="text/javascript" src="${static_plugin_path}js/jquery_ready.js"></script>) : '';
+    my $jquery_ready_url = $op_jquery_ready_url ? $op_jquery_ready_url : "${static_plugin_path}user-files/jquery_ready.js";
+    my $jquery_ready = $op_jquery_ready ? qq(<script type="text/javascript" src="${jquery_ready_url}"></script>) : '';
 
     $$tmpl_ref =~ s!($target)!$mtapp_vars  $1\n  $jquery_ready!g;
 
-    ### user.css をセットする
-    my $user_css = ! $op_usercss ? '' : <<__MTML__;
-    <mt:setvarblock name="html_head" append="1">
-    <link rel="stylesheet" href="${static_plugin_path}css/user.css" type="text/css" />
-    </mt:setvarblock>
-__MTML__
-
     ### user.jsをセット
-    my $user_js = ! $op_userjs ? '' : <<__MTML__;
-    <script type="text/javascript" src="${static_plugin_path}js/user.js"></script>
-__MTML__
+    require MT::Template;
+    my $user_js_url;
+    my $user_js_tmplname = MT->config->MTAppjQueryUserJSName || 'user.js';
+    my $user_js_tmpl = MT::Template->load({name => $user_js_tmplname, identifier => 'user_js', blog_id => $blog_id});
+    if (defined($user_js_tmpl)) {
+        $user_js_url = $blog->site_url . $user_js_tmpl->outfile . '?v=' . $user_js_tmpl->modified_on;
+    } elsif ($op_userjs_url ne '') {
+        $user_js_url = $op_userjs_url;
+    } else {
+        $user_js_url = "${static_plugin_path}user-files/user.js";
+    }
+    my $user_js = ($op_userjs == 1) ? qq(<script type="text/javascript" src="$user_js_url"></script>): '';
+
+    ### user.css をセットする
+    my $user_css_url;
+    my $user_css_tmplname = MT->config->MTAppjQueryUserCSSName || 'user.css';
+    my $user_css_tmpl = MT::Template->load({name => $user_css_tmplname, identifier => 'user_css', blog_id => $blog_id});
+    if (defined($user_css_tmpl)) {
+        $user_css_url = $blog->site_url . $user_css_tmpl->outfile . '?v=' . $user_css_tmpl->modified_on;
+    } elsif ($op_usercss_url ne '') {
+        $user_css_url = $op_usercss_url;
+    } else {
+        $user_css_url = "${static_plugin_path}user-files/user.css";
+    }
+    my $user_css = ($op_usercss == 1) ? qq(<link rel="stylesheet" href="$user_css_url" type="text/css" />): '';
 
     ### jQselectableプラグインを利用する
     my $jqselectable = ! $op_jqselectable ? '' : <<__MTML__;
-    <link type="text/css" rel="stylesheet" href="${static_plugin_path}lib/jQselectable/skin/selectable/style.css" />
-    <script type="text/javascript" src="${static_plugin_path}lib/jQselectable/js/jQselectable.js"></script>
+    <link type="text/css" rel="stylesheet" href="${static_plugin_path}lib/jqselectable/style/selectable/style.css" />
+    <script type="text/javascript" src="${static_plugin_path}lib/jqselectable/jqselectable.js"></script>
 __MTML__
 
     ### 各情報をheadにセットする
     my $prepend_html_head = <<__MTML__;
+    <mt:SetVarBlock name="html_head" append="1">
     <link rel="stylesheet" href="${static_plugin_path}css/MTAppjQuery.css" type="text/css" />
     $user_css
-
-    <mt:setvarblock name="js_include" append="1">
+    $op_fa_html_head
+    </mt:SetVarBlock>
+    <mt:SetVarBlock name="js_include" append="1">
     $jqselectable
     <mt:var name="uploadify_source">
     <script type="text/javascript" src="${static_plugin_path}js/MTAppjQuery.js"></script>
-    $op_freearea
-    </mt:setvarblock>
-
-    <mt:setvarblock name="mtapp_prepend_footer_js">
+    $op_fa_js_include
+    </mt:SetVarBlock>
+    <mt:SetVarBlock name="html_body" append="1">$op_fa_html_body</mt:SetVarBlock>
+    <mt:SetVarBlock name="form_header" append="1">$op_fa_form_header</mt:SetVarBlock>
+    <mt:SetVarBlock name="jq_js_include" append="1">$op_fa_jq_js_include</mt:SetVarBlock>
+    <mt:SetVarBlock name="mtapp_html_foot" append="1">
     <div id="mtapp-dialog-msg"></div>
-    </mt:setvarblock>
-
-    <mt:setvarblock name="mtapp_footer_js">
+    $op_fa_mtapp_html_foot
     $user_js
-    </mt:setvarblock>
+    </mt:SetVarBlock>
+    <mt:SetVarBlock name="mtapp_end_body" append="1">$op_fa_mtapp_end_body</mt:SetVarBlock>
 __MTML__
 
-    $$tmpl_ref =~ s/(<mt:var name="html_head">)/$prepend_html_head$1/g;
+    $$tmpl_ref =~ s/(<head>)/$1\n$op_fa_mtapp_top_head/g;
+    $$tmpl_ref =~ s/(<mt:var name="html_head">)/$prepend_html_head\n$1/g;
 }
 
 sub template_source_footer {
     my ($cb, $app, $tmpl_ref) = @_;
     my $replace = <<'__MTML__';
-    <mt:var name="mtapp_prepend_footer_js">
-    <mt:var name="mtapp_footer_js">
-    <script type="text/javascript">
-    /* <![CDATA[ */
-    (function($){
-        <mt:var name="mtapp_footer_jq">
-        $('#mtapp-loading').hide();
-        $('#container').css('visibility','visible');
-    })(jQuery);
-    /* ]]> */
-    </script>
+    <mt:var name="mtapp_html_foot">
     <mt:var name="mtapp_end_body">
 __MTML__
     $$tmpl_ref =~ s!(</body>)!$replace$1!;
@@ -272,6 +317,35 @@ sub template_source_favorite_blogs {
     my $fav_blogs_wdg_close     = MTAppjQuery::Tmplset::fav_blogs_wdg_close($version);
     $$tmpl_ref =~ s!$fav_blogs_wdg_close_org!$fav_blogs_wdg_close!g;
 
+}
+
+sub template_source_list_template {
+    my ($cb, $app, $tmpl_ref) = @_;
+    my $plugin = MT->component('mt_app_jquery');
+    my $blog = $app->blog;
+    my $blog_id = $blog ? $blog->id : 0;
+    my $user_js = MT->config->MTAppjQueryUserJSName || 'user.js';
+    my $user_css = MT->config->MTAppjQueryUserCSSName || 'user.css';
+    my $FQDN = $app->base;
+    my $url = $FQDN . $app->uri(
+        mode => 'create_user_files',
+        args => {blog_id => $blog_id, return_args => '__mode=list_template&amp;blog_id=' . $blog_id});
+    my $label = $plugin->translate('Install [_1] and  [_2]', $user_js, $user_css);
+    my $widget = <<__MTML__;
+    <mtapp:widget
+        id="mtappjq-links"
+        label="MTAppjQuery <__trans phrase="Actions">">
+        <ul>
+            <li><a href="$url" class="icon-left icon-related">$label</a></li>
+        </ul>
+    </mtapp:widget>
+__MTML__
+    my $target = <<'__MTML__';
+<mtapp:widget
+        id="useful-links"
+__MTML__
+    my $target_reg = quotemeta($target);
+    $$tmpl_ref =~ s/$target_reg/$widget$target/;
 }
 
 # sub template_param_favorite_blogs {
@@ -378,6 +452,23 @@ __MTML__
         $tmpl->insertAfter($new_node, $host_node);
     };
 
+}
+
+sub template_param_edit_template {
+    my ($cb, $app, $param, $tmpl) = @_;
+    my $identifier = $param->{identifier};
+    my $index_identifiers = $param->{index_identifiers};
+    if ($identifier eq 'user_js' or $identifier eq 'user_css') {
+        push(@$index_identifiers, {
+            'label' => 'user.js',
+            'selected' => $identifier eq 'user_js',
+            'key' => 'user_js'
+          },{
+            'label' => 'user.css',
+            'selected' => $identifier eq 'user_css',
+            'key' => 'user_css'
+          });
+    }
 }
 
 sub cms_post_save_entry {

@@ -7,8 +7,8 @@
  * Since:   2010-07-22
  * Update:  2012-04-21
  * for version: 0.15
- * Comment: 
- * 
+ * Comment:
+ *
  */
 /* !mixin */
 /* ----------------------------------------
@@ -54,6 +54,25 @@ textarea#jqplugin,
 textarea#sys_jqplugin {
   width: 98%;
   height: 100px; }
+
+div#free_area-field div.field-content textarea {
+  margin-bottom: 20px; }
+
+/* ----------------------------------------
+   __スキン
+---------------------------------------- */
+body.mtapp-skin #header {
+  font-weight: bold; }
+body.mtapp-skin.skin-brown #brand {
+  background-color: #573F19; }
+  body.mtapp-skin.skin-brown #brand a {
+    background-color: #BDB282; }
+body.mtapp-skin.skin-brown .edit-entry #permalink-field .field-content {
+  color: white; }
+body.mtapp-skin.skin-purple #brand {
+  background-color: #641464; }
+  body.mtapp-skin.skin-purple #brand a {
+    background-color: #FCE5FC; }
 
 /* ----------------------------------------
    __Uploadify - マルチファイルアップロード
@@ -194,18 +213,6 @@ span.mcb-container .mcb-add-item {
   font-size: 13px;
   line-height: 1.5;
   cursor: default; }
-
-/* ----------------------------------------
-   __ローディング
----------------------------------------- */
-#container {
-  visibility: hidden; }
-
-#mtapp-loading {
-  position: absolute;
-  top: 250px;
-  left: 50%;
-  margin-left: -33px; }
 
 /* ----------------------------------------
    __スライドメニュー
@@ -419,19 +426,13 @@ fieldset#uploadify_setting legend {
 /* ----------------------------------------
    __MTAppRemoveVal
 ---------------------------------------- */
-div.field span.remove-val {
+div.field img.mtapp-remove-val-btn {
   display: block;
-  position: relative;
-  width: 16px;
-  height: 16px;
-  -webkit-border-radius: 8px;
-  -moz-border-radius: 8px;
-  border-radius: 8px;
-  background: #d1d7dc url(../../../images/status_icons/icon-remove.png) no-repeat center center;
-  text-indent: -9999px;
-  cursor: pointer;
-  opacity: 0.7;
-  filter: alpha(opacity=70); }
+  position: absolute;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  cursor: pointer; }
 
 /* ----------------------------------------
    __キーボードショートカット
@@ -443,23 +444,27 @@ table.listing-table tbody tr.hover-selected {
   background-color: #FEE47F; }
 
 /* ----------------------------------------
-   __MTAppNbspGUI
+   __MTAppLineBreakField
 ---------------------------------------- */
-span.mtapp-nbsp-gui-item {
+span.mtapp-linebreak-field-item {
   display: block;
   position: relative;
   margin-bottom: 5px; }
 
-span.mtapp-nbsp-gui-add {
-  display: block;
+span.mtapp-linebreak-field-item-inner {
+  position: relative; }
+
+img.mtapp-linebreak-field-add {
   position: absolute;
-  top: 5px;
+  top: 0;
   right: 2px;
-  width: 9px;
-  height: 9px;
-  background: url(../../../images/status_icons/create.gif) no-repeat right center;
-  text-indent: -9999px;
   cursor: pointer; }
+
+/* options - sortable: true*/
+div.mtapp-sortable span.mtapp-linebreak-field-item {
+  padding-left: 18px;
+  background: url(../images/arrow-move.png) no-repeat center left;
+  cursor: move; }
 
 /* ----------------------------------------
    __FieldSuggest
@@ -495,3 +500,13 @@ div.mtapp-tabs-container div.field {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px; }
+
+/* ----------------------------------------
+   __MTAppMultiForm
+---------------------------------------- */
+span.mtappmultiform-checkbox label,
+span.mtappmultiform-radio label {
+  line-height: 1.5; }
+span.mtappmultiform-checkbox input,
+span.mtappmultiform-radio input {
+  margin: 0 3px 0 5px; }
