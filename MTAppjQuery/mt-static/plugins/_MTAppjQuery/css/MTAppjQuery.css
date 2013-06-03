@@ -59,6 +59,22 @@ div#free_area-field div.field-content textarea {
   margin-bottom: 20px; }
 
 /* ----------------------------------------
+   __スキン
+---------------------------------------- */
+body.mtapp-skin #header {
+  font-weight: bold; }
+body.mtapp-skin.skin-brown #brand {
+  background-color: #573F19; }
+  body.mtapp-skin.skin-brown #brand a {
+    background-color: #BDB282; }
+body.mtapp-skin.skin-brown .edit-entry #permalink-field .field-content {
+  color: white; }
+body.mtapp-skin.skin-purple #brand {
+  background-color: #641464; }
+  body.mtapp-skin.skin-purple #brand a {
+    background-color: #FCE5FC; }
+
+/* ----------------------------------------
    __Uploadify - マルチファイルアップロード
 ---------------------------------------- */
 .mtapp-uploadify-thumb {
@@ -77,12 +93,12 @@ div#free_area-field div.field-content textarea {
 ---------------------------------------- */
 #mtapp-tooltip {
   padding: 8px 10px;
-  border: 1px solid #fac833;
+  border: 1px solid #FAC833;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-  -moz-box-shadow: 2px 2px 10px #ababab;
-  -webkit-box-shadow: 2px 2px 10px #ababab;
+  -moz-box-shadow: 2px 2px 10px #ABABAB;
+  -webkit-box-shadow: 2px 2px 10px #ABABAB;
   background: #FAC833; }
 
 /* ----------------------------------------
@@ -102,9 +118,9 @@ div#free_area-field div.field-content textarea {
   -moz-border-radius: 3px;
   border-radius: 3px;
   background-color: #FAC833;
-  box-shadow: 0px 2px 3px #888888;
-  -moz-box-shadow: 0px 2px 3px #888888;
-  -webkit-box-shadow: 0px 2px 3px #888888; }
+  box-shadow: 0px 2px 3px #888;
+  -moz-box-shadow: 0px 2px 3px #888;
+  -webkit-box-shadow: 0px 2px 3px #888; }
 
 .balloon .balloon-arrow {
   position: absolute;
@@ -118,9 +134,9 @@ div#free_area-field div.field-content textarea {
     background: #FAC833;
     line-height: 0px;
     font-size: 0px;
-    box-shadow: 0px 2px 3px #888888;
-    -moz-box-shadow: 0px 2px 3px #888888;
-    -webkit-box-shadow: 0px 2px 3px #888888; }
+    box-shadow: 0px 2px 3px #888;
+    -moz-box-shadow: 0px 2px 3px #888;
+    -webkit-box-shadow: 0px 2px 3px #888; }
 
 .balloon .balloon-arrow .line10 {
   width: 19px; }
@@ -192,23 +208,11 @@ span.mcb-skin-tags .mcb-add-item {
 span.mcb-container .mcb-add-item {
   width: 120px;
   padding-left: 12px;
-  border: 1px solid #e5e5e5;
+  border: 1px solid #E5E5E5;
   background: url(../images/create.gif) no-repeat 2px 50%;
   font-size: 13px;
   line-height: 1.5;
   cursor: default; }
-
-/* ----------------------------------------
-   __ローディング
----------------------------------------- */
-#container {
-  visibility: hidden; }
-
-#mtapp-loading {
-  position: absolute;
-  top: 250px;
-  left: 50%;
-  margin-left: -33px; }
 
 /* ----------------------------------------
    __スライドメニュー
@@ -225,7 +229,7 @@ div#menu-bar div#selector-nav div.selector ul#fav-blog-list li ul li ul {
   top: -1px;
   left: 300px;
   /* JS */
-  border-left: 1px solid #9ea1a3;
+  border-left: 1px solid #9EA1A3;
   background-color: #7B7C7D; }
 
 div#menu-bar div#selector-nav div.selector li.system-overview ul li,
@@ -233,7 +237,7 @@ div#menu-bar div#selector-nav div.selector ul#fav-website-list li ul li ul li,
 div#menu-bar div#selector-nav div.selector ul#fav-blog-list li ul li ul li {
   /*     min-width: 300px; */
   min-height: 28px;
-  border-top: 1px solid #9ea1a3; }
+  border-top: 1px solid #9EA1A3; }
 
 div#menu-bar div#selector-nav div.selector li.system-overview ul li a,
 div#menu-bar div#selector-nav div.selector ul#fav-website-list li ul li ul li a,
@@ -255,13 +259,13 @@ div#menu-bar div#selector-nav div.selector ul#fav-website-list.super-slide-menu 
   top: -1px;
   left: 300px;
   /* JS */
-  border-left: 1px solid #9ea1a3;
+  border-left: 1px solid #9EA1A3;
   background-color: #7B7C7D; }
 
 div#menu-bar div#selector-nav div.selector ul#fav-website-list.super-slide-menu li ul li {
   /*     min-width: 300px; */
   min-height: 28px;
-  border-top: 1px solid #9ea1a3; }
+  border-top: 1px solid #9EA1A3; }
 
 div#menu-bar div#selector-nav div.selector ul#fav-website-list.super-slide-menu li ul li a {
   padding-right: 25px; }
@@ -375,13 +379,13 @@ div.no-scroll-right-sidebar .widget-content {
   white-space: nowrap;
   overflow-x: scroll;
   background-color: #F3F3F3;
-  border: 1px solid #c0c6c9; }
+  border: 1px solid #C0C6C9; }
 
 .mtapp-debug-block,
 .mtapp-debug-inline {
   z-index: 999;
   padding: 3px;
-  border: 1px solid white;
+  border: 1px solid #ffffff;
   background-color: #000000;
   color: #ffff00;
   font-size: 13px;
@@ -405,7 +409,7 @@ a.mtapp-if-page {
    __プラグインの管理画面
 ---------------------------------------- */
 fieldset#uploadify_setting {
-  border: 1px solid #c8c2be; }
+  border: 1px solid #C8C2BE; }
 
 fieldset#uploadify_setting legend {
   display: block;
@@ -417,7 +421,7 @@ fieldset#uploadify_setting legend {
    __バリデーション
 ---------------------------------------- */
 .err {
-  background: #f6bfbc !important; }
+  background: #F6BFBC !important; }
 
 /* ----------------------------------------
    __MTAppRemoveVal
@@ -476,7 +480,7 @@ div.mtapp-sortable span.mtapp-linebreak-field-item {
     max-width: 100%;
     position: absolute;
     z-index: 50;
-    border: 1px solid #c0c6c9;
+    border: 1px solid #C0C6C9;
     background-color: #F3F3F3; }
     .field-suggestion .field_completion div {
       padding: 2px 5px; }
@@ -490,9 +494,19 @@ div.mtapp-tabs-container ul.mtapp-tabs-navi {
   border-bottom-style: none; }
 div.mtapp-tabs-container div.field {
   padding: 13px !important;
-  border: 1px solid #adadad;
+  border: 1px solid #ADADAD;
   border-top-color: #CFD0D0;
   border-left-color: #CFD0D0;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px; }
+
+/* ----------------------------------------
+   __MTAppMultiForm
+---------------------------------------- */
+span.mtappmultiform-checkbox label,
+span.mtappmultiform-radio label {
+  line-height: 1.5; }
+span.mtappmultiform-checkbox input,
+span.mtappmultiform-radio input {
+  margin: 0 3px 0 5px; }

@@ -95,9 +95,8 @@ sub template_source_header {
     my $op_fa_mtapp_html_foot = $p->get_config_value('fa_mtapp_html_foot', $scope) || '<!-- mtapp_html_foot (MTAppjQuery) -->';
     my $op_fa_mtapp_end_body  = $p->get_config_value('fa_mtapp_end_body', $scope) || '<!-- mtapp_end_body (MTAppjQuery) -->';
 
-    ### ローディング画像、ツールチップ用ボックスをページに追加する
+    ### ツールチップ用ボックスをページに追加する
     my $preset = <<__MTML__;
-    <img id="mtapp-loading" src="${static_path}images/indicator.gif" alt="Loading..." />
     <mt:SetVarBlock name="html_body_footer" append="1">
     <div id="mtapp-tooltip" style="display: none;"></div>
     </mt:SetVarBlock>
@@ -294,14 +293,6 @@ sub template_source_footer {
     my ($cb, $app, $tmpl_ref) = @_;
     my $replace = <<'__MTML__';
     <mt:var name="mtapp_html_foot">
-    <script type="text/javascript">
-    /* <![CDATA[ */
-    (function($){
-        $('#mtapp-loading').hide();
-        $('#container').css('visibility','visible');
-    })(jQuery);
-    /* ]]> */
-    </script>
     <mt:var name="mtapp_end_body">
 __MTML__
     $$tmpl_ref =~ s!(</body>)!$replace$1!;

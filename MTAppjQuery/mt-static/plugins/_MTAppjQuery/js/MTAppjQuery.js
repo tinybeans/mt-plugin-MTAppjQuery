@@ -8,7 +8,7 @@
  * for version: 0.2x
  *
  */
-(function($){
+;(function($){
 
     if (typeof mtappVars !== 'object') return;
     // -------------------------------------------------
@@ -136,12 +136,12 @@
                 }
             }
             // addオプションがtrueの場合（ユーザー追加可能の場合）
-            // if (op.add && op.skin == false) {
-            //     labels.push('<input class="mcb-add-item" type="text" value="" />');
-            // } else if (op.add) {
-            //     labels.push('<input class="mcb-add-item" type="text" value="" />');
-            // }
-            labels.push('<input class="mcb-add-item" type="text" value="" />');
+            if (op.add && op.skin == false) {
+                labels.push('<input class="mcb-add-item" type="text" value="" />');
+            } else if (op.add) {
+                labels.push('<input class="mcb-add-item" type="text" value="" />');
+            }
+            // labels.push('<input class="mcb-add-item" type="text" value="" />');
             $container
                 .html(labels.join(''))
                 .find('input:checkbox')
@@ -291,6 +291,7 @@
             label: op.label,
             sort: op.sort
         });
+        return $(fieldID + '-field');
     };
     $.MTAppMultiCheckbox.defaults = {
         basename: '',
@@ -363,7 +364,7 @@
                     options.unshift('<optgroup label="' + op.initGroupName + '"><option value="' + selfVal + '">' + selfVal + '</option></optgroup>');
                 }
             }
-            var option_add = op.dinamic ? '<option value="_add_">' + op.addText + '</option>': '';
+            var option_add = op.dynamic ? '<option value="_add_">' + op.addText + '</option>': '';
             var select = [
                 '<select class="dynamic_select">',
                     options.join(''),
@@ -374,14 +375,18 @@
                 if ($(this).val() === '_add_') {
                     var $option = $(this).find('option');
                     var size = $option.size();
-                    var additon = prompt(op.promptMsg,'');
-                    $self.val(additon);
-                    $option.eq(size-1).before('<option value="' + additon + '" selected="selected">' + additon + '</option>');
+                    var addition = prompt(op.promptMsg,'');
+                    if (addition) {
+                        $self.val(addition);
+                        $option.eq(size-1).before('<option value="' + addition + '" selected="selected">' + addition + '</option>');
+                    } else {
+                        $(this).val($self.val());
+                    }
                 } else {
                     $self.val($(this).val());
                 }
                 if (op.selected && typeof op.selected === 'function') {
-                    op.selected();
+                    op.selected($self.val());
                 }
             });
             if (op.separateMode) {
@@ -404,7 +409,7 @@
     };
     $.fn.MTAppDynamicSelect.defaults = {
         debug: false,
-        dinamic: true,
+        dynamic: true,
         text: '', // カンマ区切りの文字列か連想配列と配列の入れ子。value|labelと分けることも可能（要separateMode: true）。
         addText: '項目を追加する',
         promptMsg: '追加する項目名を入力',
@@ -413,6 +418,104 @@
         selected: null
     };
     // end - $(foo).MTAppDynamicSelect()
+
+
+    // -------------------------------------------------
+    //  $(foo).MTAppMultiForm();
+    //
+    //  Description:
+    //    指定した要素をチェックボックスかドロップダウンリストに変更する。いずれも multiple 対応。
+    //
+    //  Usage:
+    //  　$(foo).MTAppTooltip(options);
+    //
+    //  Options:
+    //    debug: {Boolean} true を設定すると元のフィールドを表示
+    //    type: {String} 'checkbox', 'radio', 'select', 'select.multiple' のいずれか
+    //    items: {Array} 生成する項目を配列で設定
+    //    styles: {String} type: 'select.multiple' の場合のみ有効。select[multiple]の高さ調整に。
+    // -------------------------------------------------
+    $.fn.MTAppMultiForm = function(options){
+        var op = $.extend({}, $.fn.MTAppMultiForm.defaults, options);
+        return this.each(function(idx){
+            if (!op.type || op.items.length == 0) return;
+            var $this = (op.debug) ? $(this) : $(this).hide();
+
+            var thisVal = $this.val();
+            var thisData = (thisVal) ? thisVal.split(',') : [];
+            var thisId = $this.attr('id') ? 'mtappmltform-' + $this.attr('id') : '';
+            if (thisId == '') {
+                var rand = '' + Math.random();
+                rand = rand.replace('.','');
+                thisId = 'mtappmltform-' + op.type.replace('.multiple', '') + '-' + rand;
+            }
+
+            var _html = ['<span id="' + thisId + '" class="mtappmultiform mtappmultiform-' + op.type.replace('.', '-') + '">'];
+            switch (op.type) {
+                case 'checkbox':
+                    for (var i = 0, l = op.items.length; i < l; i++) {
+                        var checked = ($.inArray(op.items[i], thisData) > -1) ? ' checked' : '';
+                        _html.push('<label><input type="checkbox" value="' + op.items[i] + '"' + checked + '>' + op.items[i] + '</label>');
+                    }
+                    _html.push();
+                    break;
+                case 'radio':
+                    for (var i = 0, l = op.items.length; i < l; i++) {
+                        var checked = ($.inArray(op.items[i], thisData) > -1) ? ' checked' : '';
+                        _html.push('<label><input type="radio" name="' + thisId + '-item" value="' + op.items[i] + '"' + checked + '>' + op.items[i] + '</label>');
+                    }
+                    _html.push();
+                    break;
+                case 'select':
+                    _html.push('<select>');
+                    for (var i = 0, l = op.items.length; i < l; i++) {
+                        var selected = ($.inArray(op.items[i], thisData) > -1) ? ' selected' : '';
+                        _html.push('<option value="' + op.items[i] + '"' + selected + '>' + op.items[i] + '</option>');
+                    }
+                    _html.push('</select>');
+                    break;
+                case 'select.multiple':
+                    _html.push('<select multiple="multiple" style="' + op.styles + '">');
+                    for (var i = 0, l = op.items.length; i < l; i++) {
+                        var selected = ($.inArray(op.items[i], thisData) > -1) ? ' selected' : '';
+                        _html.push('<option value="' + op.items[i] + '"' + selected + '>' + op.items[i] + '</option>');
+                    }
+                    _html.push('</select>');
+                    break;
+            }
+            _html.push('</span>');
+
+            $this.after(_html.join(''));
+
+            var $span = $('#' + thisId);
+            // $span.find('input.default-checked').prop('checked', true);
+            // $span.find('option.default-selected').prop('selected', true);
+            if ($span.hasClass('mtappmultiform-radio') || $span.hasClass('mtappmultiform-checkbox')) {
+                $span.find('input').click(function(){
+                    thisData = [];
+                    $span.find('input:checked').each(function(){
+                        thisData.push($(this).val());
+                    });
+                    $this.val(thisData.join(','));
+                });
+            } else if ($span.hasClass('mtappmultiform-select') || $span.hasClass('mtappmultiform-select-multiple')) {
+                $span.find('select').change(function(){
+                    thisData = [];
+                    $(this).find('option:selected').each(function(){
+                        thisData.push($(this).val());
+                    });
+                    $this.val(thisData.join(','));
+                });
+            }
+        });
+    };
+    $.fn.MTAppMultiForm.defaults = {
+        debug: false,
+        type: '', // 'checkbox', 'radio', 'select', 'select.multiple' のいずれか
+        items: [],
+        styles: 'height: auto;'
+    };
+    // end - $(foo).MTAppMultiForm()
 
 
     /*
@@ -433,7 +536,6 @@
         return this.each(function(){
             var $self = $(this);
             var separator = op.separator;
-            var addClass = (op.addClass !== '') ? ' class="' + op.addClass + '"': '';
             var splitCount = op.splitCount > 1 ? op.splitCount: 2;
             var selfVal = $self.val() ? $self.val().split(op.separator) : [];
 
@@ -442,22 +544,34 @@
             }
 
             var input = [];
-            var value = '';
-            var placeholder = '';
+            var value = '', placeholders = '', styles = '', classes = '';
+            op.placeholders = op.placeholder ? op.placeholder : op.placeholders;
             for (var i = 0; i < splitCount; i++) {
                 value = (selfVal[i]) ? selfVal[i] : '';
-                placeholder = (op.placeholder[i]) ? op.placeholder[i] : '';
-                input.push('<input type="text"' + addClass + ' value="' + value + '" placeholder="' + placeholder + '" style="margin-right:' + op.interval + '" />');
+                placeholders = (op.placeholders[i]) ? op.placeholders[i] : '';
+                styles = (op.styles[i]) ? op.styles[i] : '';
+                classes = (op.classes[i]) ? op.classes[i] : '';
+                input.push('<input type="text" class="' + op.addClass + classes + '"" value="' + value + '" placeholder="' + placeholders + '" style="' + styles + '" />');
                 value = '';
             }
-            var $span = $('<span>' + input.join('') + '</span>').children().each(function(){
-                $(this).blur(function(){
-                    var values = [];
-                    $(this).siblings().andSelf().each(function(){
-                        values.push($(this).val());
+            var $span = $('<span class="mtapp-fieldsplit">' + input.join('') + '</span>').children().each(function(){
+                $(this)
+                    .blur(function(){
+                        var values = [];
+                        $(this).siblings().andSelf().each(function(){
+                            values.push($(this).val());
+                        });
+                        $self.val(values.join(separator));
+                    })
+                    .keydown(function(e){
+                        if (e.which == 13) {
+                            var values = [];
+                            $(this).siblings().andSelf().each(function(){
+                                values.push($(this).val());
+                            });
+                            $self.val(values.join(separator));
+                        }
                     });
-                    $self.val(values.join(separator));
-                });
             }).end();
             $self.after($span);
         });
@@ -465,9 +579,10 @@
     $.fn.MTAppFieldSplit.defaults = {
         debug: false,
         splitCount: 2,
-        placeholder: [],
-        interval: '5px',
-        addClass: '',
+        placeholders: [],
+        styles: [],
+        classes: [],
+        addClass: '',// 後方互換
         separator: ','
     };
     // end - $(foo).MTAppFieldSplit()
@@ -827,10 +942,10 @@
     //  Options:
     //    basename: {String} 各フォーム要素のベースネーム
     //    label: {String} 変更後のラベル名
-    //    add_class: {String} 追加するクラス名
+    //    addClass: {String} 追加するクラス名
     //    hint: {String} ヒントに表示させたいメッセージ
-    //    show_field: {String}  強制表示('show')、強制表示('hide')(注:basename が body か more の場合はタブの表示制御）
-    //    show_parent: {String}  強制表示('show')、強制非表示('hide') (注:show_parent は、basename が body か more のみ）
+    //    showField: {String}  強制表示('show')、強制表示('hide')(注:basename が body か more の場合はタブの表示制御）
+    //    showParent: {String}  強制表示('show')、強制非表示('hide') (注:showParent は、basename が body か more のみ）
     //    custom: {Boolean} カスタムフィールドの場合 true
     //    widget: {Boolean} ウィジェットの場合 true
     //    edit: {Boolean} 非編集モードにする場合 true
@@ -839,7 +954,6 @@
         var op = $.extend({}, $.MTAppCustomize.defaults, options);
         var opL = op.label,
             opH = op.hint,
-            opS = op.show_field,
             opC = op.custom,
             opW = op.widget,
             opE = op.edit,
@@ -896,8 +1010,10 @@
         }
 
         // フィールドにクラス名を追加しよう
-        if (op.add_class != '') {
-            $field.addClass(op.add_class);
+        if (op.add_class) op.addClass = op.add_class;
+        if (op.add_class) op.addClass = op.addclass;
+        if (op.addClass != '') {
+            $field.addClass(op.addClass);
         }
 
         // ラベルの変更
@@ -910,6 +1026,7 @@
         }
 
         // フィールドの表示・非表示
+        var opS = op.show_field ? op.show_field: op.showField;
         if (opS == 'show') {
             $field.removeClass('hidden');
             if (opB == 'body' || opB == 'more') {
@@ -922,7 +1039,8 @@
         }
 
         // テキストフィールドの表示・非表示
-        if ((opB == 'body' || opB == 'more') && op.show_parent == 'hide') {
+        op.showParent = op.show_parent ? op.show_parent: op.showParent;
+        if ((opB == 'body' || opB == 'more') && op.showParent == 'hide') {
             $field.css({
                 position: 'absolute',
                 top: '-9999px',
@@ -930,7 +1048,7 @@
                 width: '1px',
                 height: '1px'
             });
-        } else if ((opB == 'body' || opB == 'more') && op.show_parent == 'show') {
+        } else if ((opB == 'body' || opB == 'more') && op.showParent == 'show') {
             $field.removeAttr('style');
         }
 
@@ -947,10 +1065,10 @@
     $.MTAppCustomize.defaults = {
         basename: '',
         label: '',
-        addclass: '',
+        addClass: '',
         hint: '',
-        show_field: '',
-        show_parent: '',
+        showField: '',
+        showParent: '',
         custom: false,
         widget: false,
         edit: false
@@ -1026,6 +1144,9 @@
             var exp = new RegExp(array[i][1], "g");
             var element = $(array[i][0])[0];
             textNodeRewrite(element, array[i][1], array[i][2]);
+            if (array[i][0] === '#title-label') {
+                $('#title').attr('placeholder', array[i][2]);
+            }
         }
         function textNodeRewrite(element, pattan, replacement) {
             var children = element.childNodes;
@@ -1101,7 +1222,7 @@
     //              カスタムフィールドの場合は「cf_basename」のように接頭辞「 cf_ 」を付ける。
     //              ex. {'title':'タイトル','keywords':'キーワード','cf_price','価格'}
     //    pointer: {String} タブを挿入する起点となるノードのセレクタ。ex. #title-field
-    //    pointer_basename: {String} pointerを指定しない場合は、pointer_basenameに
+    //    pointerBasename: {String} pointerを指定しない場合は、pointerBasenameに
     //                      タブを挿入する起点となるノードのbasenameを指定できる。ex. title
     //    insert: {String} 起点となるノードの前に挿入（before）するか後ろに挿入（after）するか。
     // -------------------------------------------------
@@ -1109,12 +1230,14 @@
         var op = $.extend({}, $.MTAppTabs.defaults, options);
 
         if (op.basename == null) return;
+        op.pointerBasename = (op.pointer_basename && !op.pointerBasename) ? op.pointer_basename : op.pointerBasename;
         var selector;
         if (op.pointer != '') {
             selector = op.pointer;
         }
-        else if (op.pointer_basename != '') {
-            selector = '#' + getFieldID(op.pointer_basename);
+        else if (op.pointerBasename != '') {
+            selector = '#' + getFieldID(op.pointerBasename);
+            if (!$(selector).length) return;
         }
         else {
             return;
@@ -1152,7 +1275,7 @@
     $.MTAppTabs.defaults = {
         basename: null,
         pointer: '', // #title-field などのセレクタ
-        pointer_basename: '', // title などのベースネーム
+        pointerBasename: '', // title などのベースネーム
         insert: 'after', // before or after
     };
     // end - $.MTAppTabs
@@ -1237,12 +1360,16 @@
     //  Options:
     //    title: {String} ダイアログのタイトル
     //    content: {String} ダイアログのコンテンツ
-    //    hide_effect: {String} 閉じる時のエフェクト 'explode', 'slide', 'drop'など
+    //    width: {Number} ダイアログの横幅（初期値 'auto'）pxの単位は不要。
+    //    height: {Number} ダイアログの高さ（初期値 'auto'）pxの単位は不要。
+    //    modal: {Boolean} true を設定するとモーダルダイアログになります。
+    //    hideEffect: {String} 閉じる時のエフェクト 'explode', 'slide', 'drop'
     // ---------------------------------------------------------------------
 
     $.MTAppDialogMsg = function(options){
         var op = $.extend({}, $.MTAppDialogMsg.defaults, options);
 
+        op.hideEffect = op.hide_effect ? op.hide_effect : op.hideEffect;
         $('#mtapp-dialog-msg')
             .html(op.content)
             .dialog({
@@ -1252,17 +1379,17 @@
                 width: op.width,
                 height: op.height,
                 modal: op.modal,
-                hide: op.hide_effect
+                hide: op.hideEffect
             });
         $('#mtapp-dialog-msg').dialog('open');
     };
     $.MTAppDialogMsg.defaults = {
         title: 'メッセージ',
         content: 'Movable Typeへようこそ！',
-        width: 300,
+        width: 'auto',
         height: 'auto',
         modal: false,
-        hide_effect: ''
+        hideEffect: ''
     };
     // end - $.MTAppDialogMsg();
 
@@ -1722,6 +1849,71 @@
         setting: null
     };
     // end - $.fn.MTAppFancyListing()
+
+    // ---------------------------------------------------------------------
+    //  $.MTAppHasCategory();
+    //
+    //  Description:
+    //
+    //    必要な数のカテゴリや指定したIDのカテゴリが選択されているかチェックし、選択されていない場合はエラーダイアログを表示する。
+    //
+    //  Usage:
+    //    $.MTAppHasCategory(options);
+    //
+    //  Options:
+    //    requiredIds: {String} 必須カテゴリIDをカンマ区切り
+    //    requiredCount: {Number} 必須選択の数
+    //    idErrorTitle: {String} 'エラー',
+    //    idErrorContent: {String} '必須カテゴリが選択されていません。'
+    //    countErrorTitle: {String} 'エラー',
+    //    countErrorContent: {String} '必要な数のカテゴリが選択されていません。'
+    // ---------------------------------------------------------------------
+
+    $.MTAppHasCategory = function(options){
+        var op = $.extend({}, $.MTAppHasCategory.defaults, options);
+        var $form = $('form#entry_form');
+        if ($form.length < 1) return;
+        var type = mtappVars.type;
+        if (!(type == 'entry' || type == 'page')) return;
+        var reqCats = (op.requiredIds) ? op.requiredIds.split(',') : [];
+        $form.on('click', ':submit.primary', function(){
+            var categoryIds = $("input[name='category_ids']").val().split(',');
+            var count = 0;
+            var eerror = false;
+            if (reqCats.length) {
+                for (var i = 0, l = reqCats.length; i < l; i++) {
+                    if ($.inArray(reqCats[i], categoryIds) == -1) {
+                        $.MTAppDialogMsg({
+                            title: op.idErrorTitle,
+                            content: op.idErrorContent,
+                            modal: true
+                        });
+                        $form.find('button:submit:disabled').prop('disabled', false);
+                        return false;
+                    }
+                }
+            }
+            if (op.requiredCount && op.requiredCount > categoryIds.length) {
+                $.MTAppDialogMsg({
+                    title: op.countErrorTitle,
+                    content: op.countErrorContent,
+                    modal: true
+                });
+                $form.find('button:submit:disabled').prop('disabled', false);
+                return false;
+            }
+        });
+    };
+    $.MTAppHasCategory.defaults = {
+        requiredIds: '',
+        requiredCount: 0,
+        idErrorTitle: 'エラー',
+        idErrorContent: '必須カテゴリが選択されていません。',
+        countErrorTitle: 'エラー',
+        countErrorContent: '必要な数のカテゴリが選択されていません。'
+    };
+    // end - $.MTAppHasCategory()
+
 
     // ---------------------------------------------------------------------
     //  $.fn.MTAppCheckCategoryCount();
@@ -2449,24 +2641,30 @@
     //    $.MTAppMakeField(options);
     //
     //  Options:
+    //    id: {String} フィールドのID。自動で -field が付与される。
     //    label: {String} ラベル部分のテキスト、HTML
     //    content: {String} コンテンツ部分のテキスト、HTML
+    //    hint: {String} コンテンツのヒント部分のテキスト、HTML
     //
     // -------------------------------------------------
     $.MTAppMakeField = function(options) {
         var op = $.extend({}, $.MTAppMakeField.defaults, options);
+        var id = op.id ? ' id="' + op.id + '-field"' : '';
+        var hint = op.hint ? '<div class="hint">' + op.hint + '</div>' : '';
         return [
-            '<div class="field field-top-label">',
-                '<div><label>' + op.label + '</label></div>',
+            '<div' + id + ' class="field field-top-label sort-enabled">',
+                '<div class="field-header"><label>' + op.label + '</label></div>',
                 '<div class="field-content">',
-                op.content,
+                op.content + hint,
                 '</div>',
             '</div>'
         ].join('');
     };
     $.MTAppMakeField.defaults = {
+        id: '',
         label: '',
-        content: ''
+        content: '',
+        hint: ''
     };
     // end - $.MTAppMakeField();
 

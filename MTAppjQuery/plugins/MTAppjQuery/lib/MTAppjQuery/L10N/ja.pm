@@ -11,6 +11,14 @@ use vars qw ( %Lexicon );
     'Edit user.js(append)' => 'user.jsを編集(追記)',
     'Edit user.css' => 'user.cssを編集',
     'Edit user.css(append)' => 'user.cssを編集(追記)',
+# Tags.pm
+  'meiji' => '明治',
+  'taisho' => '大正',
+  'showa' => '昭和',
+  'heisei' => '平成',
+  'nen' => '年',
+  'gatsu' => '月',
+  'nichi' => '日',
 # Callbacks.pm
 	'Page Loading' => 'ページをロード中',
 	'Custom Fields' => 'カスタムフィールド',
