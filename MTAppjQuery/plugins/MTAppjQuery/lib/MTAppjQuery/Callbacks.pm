@@ -181,7 +181,7 @@ __MTML__
         ${_type}ID = ${id},
         blogURL = '<mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if>',
         mtappURL = '${static_plugin_path}',
-        mtappTitle = '<mt:var name="mtapp_html_title" replace="'","\'">',
+        mtappTitle = '<mt:var name="mtapp_html_title" trim="1" replace="'","\'">',
         mtappScopeType = '<mt:var name="scope_type">',
         catsSelected = <mt:if name="selected_category_loop"><mt:var name="selected_category_loop" to_json="1"><mt:else>[]</mt:if>,
         mainCatSelected = <mt:if name="category_id"><mt:var name="category_id"><mt:else>''</mt:if>;
@@ -205,7 +205,7 @@ __MTML__
         "template_id" : ${template_id},
         "blog_url" : "<mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if>",
         "static_plugin_path" : "${static_plugin_path}",
-        "html_title" : "<mt:var name="mtapp_html_title" replace='"','\"'>",
+        "html_title" : "<mt:var name="mtapp_html_title" trim="1" replace='"','\"'>",
         "scope_type" : "<mt:var name="scope_type">",
         "selected_category" : <mt:if name="selected_category_loop"><mt:var name="selected_category_loop" to_json="1" regex_replace='/"/g',''><mt:else>[]</mt:if>,
         "main_category_id" : <mt:if name="category_id"><mt:var name="category_id"><mt:else>0</mt:if>,
