@@ -2710,6 +2710,33 @@
 
 
     // -------------------------------------------------
+    //  $.MTAppGroupFilter();
+    //
+    //  Description:
+    //    PowerCMSのグループ作成画面の左のカラムに検索フィルター機能を追加します。
+    //
+    //  Usage:
+    //    $.MTAppGroupFilter(options);
+    //
+    // -------------------------------------------------
+    $.MTAppGroupFilter = function(options) {
+        if (!/group$/.test(mtappVars.screen_id) || $('#filter-select').length == 0) return;
+        $('#filter-select').append('<input type="search" value="" id="mtapp-group-filter" placeholder="filter...">');
+        $('#mtapp-group-filter').keyup(function(){
+            var reg = new RegExp($(this).val(), 'i');
+            $('#item-left div.object-listing-content li > span').each(function(){
+                if (reg.test($(this).text())) {
+                    $(this).parent().removeClass('hidden');
+                } else {
+                    $(this).parent().addClass('hidden');
+                }
+            });
+        });
+    };
+    // end - $.MTAppGroupFilter();
+
+
+    // -------------------------------------------------
     //  Utilities
     //
     //  $(foo).hasClasses(classes);
