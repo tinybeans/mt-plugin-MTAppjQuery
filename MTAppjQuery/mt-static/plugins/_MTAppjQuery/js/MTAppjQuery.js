@@ -2710,7 +2710,7 @@
 
 
     // -------------------------------------------------
-    //  $.MTAppGroupFilter();
+    //  $.MTAppGroupFilter(); (for PowerCMS)
     //
     //  Description:
     //    PowerCMSのグループ作成画面の左のカラムに検索フィルター機能を追加します。
