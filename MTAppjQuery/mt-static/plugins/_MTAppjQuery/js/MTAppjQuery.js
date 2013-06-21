@@ -2748,16 +2748,23 @@
     // -------------------------------------------------
     $.MTAppSnippetHelper = function(options) {
         if (mtappVars.screen_id != 'edit_field') return;
-        var type = $('#type').val();
-        if (type == 'snippet') {
+        var $helperBtn = $('<button class="button" id="mtapp-snippet-helper-action">スニペットヘルパー ON</button>').click(function(){
+            $(this).addClass('hidden');
             _snippetHelper();
             if ($('#default:visible').length > 0) {
                 _defaultHelper();
             }
+            return false;
+        });
+        var type = $('#type').val();
+        if (type == 'snippet') {
+            $('#type-field div.field-content').append($helperBtn);
         } else {
             $('#type').change(function(){
                 var _type = $(this).find('option:selected').val();
-                if (_type == 'snippet') _snippetHelper();
+                if (_type == 'snippet') {
+                    $('#type-field div.field-content').append($helperBtn);
+                }
             });
         }
 
@@ -2785,6 +2792,7 @@
             var $default = $('#default').after('<button class="button" id="mtapp-snippet-make-default">連番系ひな形作成</button>');
             $('#mtapp-snippet-make-default').click(function(){
                 var res = [];
+                var resHasValue = '';
                 var optionsCount = 0;
                 var optionsArry = $options.val().split(',');
                 var optionsFirst = optionsArry[0].replace(/_[0-9]+$/, '');
@@ -2800,10 +2808,13 @@
                     res.push('<mt:For var="i" from="0" to="' + (optionsCount - 1) + '">');
                     for (var i = 0, l = optionsArry.length; i < l; i++) {
                         res.push('<mt:SetVarBlock name="_' + optionsArry[i] + '">' + optionsArry[i] + '_<mt:Var name="i" /></mt:SetVarBlock>');
-                        res.push('id="<mt:Var name="_' + optionsArry[i] + '" name="<mt:Var name="_' + optionsArry[i] + '">"');
+                        res.push('id="<mt:Var name="_' + optionsArry[i] + '">" name="<mt:Var name="_' + optionsArry[i] + '">"');
                         res.push('value="<mt:Var name="$_' + optionsArry[i] + '">"');
                         res.push('');
+                        resHasValue += '<mt:Var name="$_' + optionsArry[i] + '">';
                     }
+                    res.push('<mt:SetVarBlock name="has_value">' + resHasValue + '</mt:SetVarBlock>');
+                    res.push('<mt:If name="i" eq="0"><mt:SetVar name="has_value" value="1" /></mt:If>');
                     res.push('</mt:For>');
                     $default.val(res.join("\n"));
                 }
