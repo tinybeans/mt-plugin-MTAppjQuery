@@ -2710,6 +2710,207 @@
 
 
     // -------------------------------------------------
+    //  $.MTAppGroupFilter(); (for PowerCMS)
+    //
+    //  Description:
+    //    PowerCMSのグループ作成画面の左のカラムに検索フィルター機能を追加します。
+    //
+    //  Usage:
+    //    $.MTAppGroupFilter(options);
+    //
+    // -------------------------------------------------
+    $.MTAppGroupFilter = function(options) {
+        if (!/group$/.test(mtappVars.screen_id) || $('#filter-select').length == 0) return;
+        $('#filter-select').append('<input type="search" value="" id="mtapp-group-filter" placeholder="filter...">');
+        $('#mtapp-group-filter').keyup(function(){
+            var reg = new RegExp($(this).val(), 'i');
+            $('#item-left div.object-listing-content li > span').each(function(){
+                if (reg.test($(this).text())) {
+                    $(this).parent().removeClass('hidden');
+                } else {
+                    $(this).parent().addClass('hidden');
+                }
+            });
+        });
+    };
+    // end - $.MTAppGroupFilter();
+
+
+    // -------------------------------------------------
+    //  $.MTAppSnippetHelper(); (for PowerCMS)
+    //
+    //  Description:
+    //    PowerCMSのスニペット・カスタムフィールドの新規作成を手助けする。
+    //
+    //  Usage:
+    //    $.MTAppSnippetHelper();
+    //
+    // -------------------------------------------------
+    // $.MTAppSnippetHelper = function(options) {
+    //     if (mtappVars.screen_id != 'edit_field') return;
+    //     var $helperBtn = $('<button class="button" id="mtapp-snippet-helper-action">スニペットヘルパー ON</button>').click(function(){
+    //         $(this).addClass('hidden');
+    //         _snippetHelper();
+    //         if ($('#default:visible').length > 0) {
+    //             _defaultHelper();
+    //         }
+    //         return false;
+    //     });
+    //     var type = $('#type').val();
+    //     if (type == 'snippet') {
+    //         $('#type-field div.field-content').append($helperBtn);
+    //     } else {
+    //         $('#type').change(function(){
+    //             var _type = $(this).find('option:selected').val();
+    //             if (_type == 'snippet') {
+    //                 $('#type-field div.field-content').append($helperBtn);
+    //             }
+    //         });
+    //     }
+
+    //     function _snippetHelper() {
+    //         var $options = $('#options').after('<button class="button" id="mtapp-snippet-make-options">連番オプション作成</button>');
+    //         $('#mtapp-snippet-make-options').click(function(){
+    //             var res = [];
+    //             var optionsArry = $options.val().split(',');
+    //             for (var i = 0, l = optionsArry.length; i < l; i++) {
+    //                 optionsArry[i] = optionsArry[i].replace(/_[0-9]+$/, '');
+    //             }
+    //             optionsArry = $.unique(optionsArry);
+    //             var to = prompt('連番の個数はいくつですか？', 10);
+    //             for (var i = 0, l = optionsArry.length; i < l; i++) {
+    //                 for (var x = 0; x < to; x++) {
+    //                     res.push(optionsArry[i] + '_' + x);
+    //                 }
+    //             }
+    //             $options.val(res.join(','));
+    //             return false;
+    //         });
+    //     }
+    //     function _defaultHelper() {
+    //         var $options = $('#options');
+    //         var $default = $('#default').after('<button class="button" id="mtapp-snippet-make-default">連番系ひな形作成</button>');
+    //         $('#mtapp-snippet-make-default').click(function(){
+    //             var resHasValue = '';
+    //             var optionsCount = 0;
+    //             var optionsAll = $options.val().split(',');
+    //             var optionsFirst = optionsAll[0].replace(/_[0-9]+$/, '');
+    //             var basename = $('#basename').val();
+    //             var optionsUnique = [];
+    //             for (var i = 0, l = optionsAll.length; i < l; i++) {
+    //                 if (optionsAll[i].indexOf(optionsFirst) > -1) {
+    //                     optionsCount++;
+    //                 }
+    //                 optionsUnique[i] = optionsAll[i].replace(/_[0-9]+$/, '');
+    //             }
+    //             optionsUnique = $.unique(optionsUnique);
+
+    //             // for (var i = 0, l = optionsAll.length; i < l; i++) {
+    //             //     res.push('<mt:SetVarBlock name="' + basename + '" key="' + optionsAll[i] + '"><mt:Var name="' + optionsAll[i] + '" /></mt:SetVarBlock>');
+    //             // }
+    //             var defaultVal = $default.val();
+    //             if (defaultVal && confirm('現在の既定値を上書きしますか？')) {
+    //                 var res = [];
+    //                 var separator = "\n";
+
+    //                 res.push('<div id="' + basename + '">');
+    //                 for (var i = 0; i < optionsCount; i++) {
+    //                     res.push([
+    //                         '<div class="mtapp-sortable-item">',
+    //                         '  <div class="mtapp-sortable-item-header"></div>',
+    //                         '  <div class="mtapp-sortable-item-header">'
+    //                     ].join(separator));
+    //                     for (var x = 0, y = optionsUnique.length; x < y; x++) {
+    //                         res.push('    <input type="text" id="' + optionsUnique[x] + '_' + i + '" name="' + optionsUnique[x] + '_' + i + '" value="<mt:Var name="' + optionsUnique[x] + '_' + i + '">">');
+    //                     }
+    //                     res.push([
+    //                         '  </div>',
+    //                         '</div>'
+    //                     ].join(separator));
+    //                 }
+    //                 res.push('</div>');
+
+    //                 // res.push('<mt:For var="i" from="0" to="' + (optionsCount - 1) + '">');
+    //                 // for (var i = 0, l = optionsAll.length; i < l; i++) {
+    //                 //     // res.push('<mt:SetVarBlock name="v_' + optionsAll[i] + '">' + optionsAll[i] + '_<mt:Var name="i" /></mt:SetVarBlock>');
+    //                 //     var innerHTML = [
+    //                 //     ];
+    //                 //     res.push(innerHTML.join(''));
+    //                 //     // resHasValue += '<mt:Var name="$v_' + optionsAll[i] + '">';
+    //                 // }
+    //                 // res.push('<mt:SetVarBlock name="has_value">' + resHasValue + '</mt:SetVarBlock>');
+    //                 // res.push('<mt:If name="i" eq="0"><mt:SetVar name="has_value" value="1" /></mt:If>');
+    //                 // res.push('</mt:For>');
+    //                 $default.val(res.join(separator));
+    //             }
+    //             return false;
+    //         });
+    //     }
+    // };
+    // end - $.MTAppSnippetHelper();
+
+
+    // -------------------------------------------------
+    //  $(foo).MTAppSortableSnippet(); (for PowerCMS)
+    //
+    //  Description:
+    //    「1項目ごとに改行してください」をGUIで実現します。(MT5.2 later)
+    //
+    //  Usage:
+    //    $(foo).MTAppSortableSnippet(options);
+    //
+    //  Options:
+    //    input_class: {String} 'sub-class1 sub-class2'
+    //
+    // -------------------------------------------------
+    // $.fn.MTAppSortableSnippet = function(options) {
+    //     var op = $.extend({}, $.fn.MTAppSortableSnippet.defaults, options);
+
+    //     return this.each(function(){
+    //         var $this = $(this);
+    //         var $sortableItem = $this
+    //             .find('.mtapp-sortable-item').css({
+    //                 position: 'relative',
+    //                 marginBottom: '10px',
+    //                 paddingLeft: '20px'
+    //             })
+    //             .each(function(){
+    //                 $(this)
+    //                     .find('.mtapp-sortable-item-header')
+    //                     .append('<img src="' + mtappVars.static_plugin_path + 'images/arrow-move.png" style="cursor:move;position:absolute;top:3px;left:0;">');
+    //             });
+    //         var $addBtn = $('<div style="text-align:right;"><button class="button" data-count="1">追加</button></div>')
+    //             .find('button')
+    //             .click(function(){
+    //                 var $hiddenItem = $sortableItem.filter('.hidden:first').removeClass('hidden');
+    //                 if ($hiddenItem.next('.mtapp-sortable-item').length == 0) {
+    //                     $(this).addClass('hidden');
+    //                 }
+    //                 return false;
+    //             })
+    //             .end();
+    //         $this.append($addBtn);
+    //         $this.sortable({
+    //             items: '.mtapp-sortable-item',
+    //             cursor: 'move',
+    //             stop: function(ev, ui){
+    //                 $(ui.item).siblings().andSelf().each(function(i){
+    //                     $(this).find('.mtapp-item-data').each(function(){
+    //                         var n = this.name.replace(/(.+_)[0-9]+$/, '$1' + i);
+    //                         $(this).attr('name', n);
+    //                     });
+    //                 });
+    //             }
+    //         });
+    //     });
+    // };
+    // $.fn.MTAppSortableSnippet.defaults = {
+    //     limit: 10
+    // };
+    // end - $(foo).MTAppSortableSnippet();
+
+
+    // -------------------------------------------------
     //  Utilities
     //
     //  $(foo).hasClasses(classes);
