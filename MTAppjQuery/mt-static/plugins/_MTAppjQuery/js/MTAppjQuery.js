@@ -2791,32 +2791,57 @@
             var $options = $('#options');
             var $default = $('#default').after('<button class="button" id="mtapp-snippet-make-default">連番系ひな形作成</button>');
             $('#mtapp-snippet-make-default').click(function(){
-                var res = [];
                 var resHasValue = '';
                 var optionsCount = 0;
-                var optionsArry = $options.val().split(',');
-                var optionsFirst = optionsArry[0].replace(/_[0-9]+$/, '');
-                for (var i = 0, l = optionsArry.length; i < l; i++) {
-                    if (optionsArry[i].indexOf(optionsFirst) > -1) {
+                var optionsAll = $options.val().split(',');
+                var optionsFirst = optionsAll[0].replace(/_[0-9]+$/, '');
+                var basename = $('#basename').val();
+                var optionsUnique = [];
+                for (var i = 0, l = optionsAll.length; i < l; i++) {
+                    if (optionsAll[i].indexOf(optionsFirst) > -1) {
                         optionsCount++;
                     }
-                    optionsArry[i] = optionsArry[i].replace(/_[0-9]+$/, '');
+                    optionsUnique[i] = optionsAll[i].replace(/_[0-9]+$/, '');
                 }
-                optionsArry = $.unique(optionsArry);
+                optionsUnique = $.unique(optionsUnique);
+
+                // for (var i = 0, l = optionsAll.length; i < l; i++) {
+                //     res.push('<mt:SetVarBlock name="' + basename + '" key="' + optionsAll[i] + '"><mt:Var name="' + optionsAll[i] + '" /></mt:SetVarBlock>');
+                // }
                 var defaultVal = $default.val();
-                if (confirm('現在の既定値を上書きしますか？')) {
-                    res.push('<mt:For var="i" from="0" to="' + (optionsCount - 1) + '">');
-                    for (var i = 0, l = optionsArry.length; i < l; i++) {
-                        res.push('<mt:SetVarBlock name="_' + optionsArry[i] + '">' + optionsArry[i] + '_<mt:Var name="i" /></mt:SetVarBlock>');
-                        res.push('id="<mt:Var name="_' + optionsArry[i] + '">" name="<mt:Var name="_' + optionsArry[i] + '">"');
-                        res.push('value="<mt:Var name="$_' + optionsArry[i] + '">"');
-                        res.push('');
-                        resHasValue += '<mt:Var name="$_' + optionsArry[i] + '">';
+                if (defaultVal && confirm('現在の既定値を上書きしますか？')) {
+                    var res = [];
+                    var separator = "\n";
+
+                    res.push('<div id="' + basename + '">');
+                    for (var i = 0; i < optionsCount; i++) {
+                        res.push([
+                            '<div class="mtapp-sortable-item">',
+                            '  <div class="mtapp-sortable-item-header"></div>',
+                            '  <div class="mtapp-sortable-item-header">'
+                        ].join(separator));
+                        for (var x = 0, y = optionsUnique.length; x < y; x++) {
+                            res.push('    <input type="text" id="' + optionsUnique[x] + '_' + i + '" name="' + optionsUnique[x] + '_' + i + '" value="<mt:Var name="' + optionsUnique[x] + '_' + i + '">">');
+                        }
+                        res.push([
+                            '  </div>',
+                            '</div>'
+                        ].join(separator));
                     }
-                    res.push('<mt:SetVarBlock name="has_value">' + resHasValue + '</mt:SetVarBlock>');
-                    res.push('<mt:If name="i" eq="0"><mt:SetVar name="has_value" value="1" /></mt:If>');
-                    res.push('</mt:For>');
-                    $default.val(res.join("\n"));
+                    res.push('</div>');
+
+                    // res.push('<mt:For var="i" from="0" to="' + (optionsCount - 1) + '">');
+                    // for (var i = 0, l = optionsAll.length; i < l; i++) {
+                    //     // res.push('<mt:SetVarBlock name="v_' + optionsAll[i] + '">' + optionsAll[i] + '_<mt:Var name="i" /></mt:SetVarBlock>');
+                    //     var innerHTML = [
+                    //     ];
+                    //     res.push(innerHTML.join(''));
+                    //     // resHasValue += '<mt:Var name="$v_' + optionsAll[i] + '">';
+                    // }
+                    // res.push('<mt:SetVarBlock name="has_value">' + resHasValue + '</mt:SetVarBlock>');
+                    // res.push('<mt:If name="i" eq="0"><mt:SetVar name="has_value" value="1" /></mt:If>');
+                    // res.push('</mt:For>');
+                    $default.val(res.join(separator));
                 }
                 return false;
             });
