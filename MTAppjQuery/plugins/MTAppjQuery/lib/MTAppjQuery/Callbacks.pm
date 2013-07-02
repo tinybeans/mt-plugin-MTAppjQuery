@@ -23,7 +23,7 @@ sub template_source_header {
     my $author_id = $author->id;
     return unless ($_type =~ m/^\w+$/);
     return unless ($mode =~ m/^\w+$/);
-    return unless ($id =~ m/^\d+$/);
+    return unless ($id =~ m/^-?\d+$/);
 
     # オブジェクトのタイプを判別して各オブジェクトのIDを取得する
     my $entry_id    = $_type eq 'entry' ? $id : 0;
