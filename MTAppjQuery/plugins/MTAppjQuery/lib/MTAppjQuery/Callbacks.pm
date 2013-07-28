@@ -201,6 +201,7 @@ __MTML__
         "blog_id" : ${blog_id},
         "entry_id" : ${entry_id},
         "page_id" : ${page_id},
+        "status" : "<mt:Var name="status">",
         "category_id" : ${category_id},
         "template_id" : ${template_id},
         "blog_url" : "<mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if>",
