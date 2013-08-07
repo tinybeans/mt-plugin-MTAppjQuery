@@ -492,7 +492,7 @@ sub fav_blogs_wdg_close {
 </mtapp:widget>
 __MT__
     }
-    elsif ($version =~ /^5\.(1|2)/) {
+    elsif ($version =~ /^5\.(1|2)/ || $version =~ /^6\./) {
         $out = <<'__MT__';
 <div id="favorite-structure">
 <mt:if name="website_object_loop">
