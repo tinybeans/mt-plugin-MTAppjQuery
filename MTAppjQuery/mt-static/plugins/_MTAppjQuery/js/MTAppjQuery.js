@@ -2499,7 +2499,7 @@
                 })
                 .on('blur', 'input.mtapp-linebreak-field-input', function(){
                     var text = [];
-                    var inputs = $('input.mtapp-linebreak-field-input');
+                    var inputs = $fieldContent.find('input.mtapp-linebreak-field-input');
                     var inputs_count = inputs.length;
                     inputs.each(function(){
                         if ($(this).val() != '') {
@@ -2514,6 +2514,7 @@
                     var keycode = e.which || e.keyCode;
                     if (keycode == 13) {
                         $(this).blur().next().click();
+                        return false;
                     }
                 });
             if (isSortable) {
