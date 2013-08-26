@@ -4,8 +4,8 @@
  * Copyright (c) Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-06-22
- * Update:  2013-06-04
- * for version: 1.0.0
+ * Update:  2013-08-27
+ * for version: 1.1.1
  *
  */
 ;(function($){
