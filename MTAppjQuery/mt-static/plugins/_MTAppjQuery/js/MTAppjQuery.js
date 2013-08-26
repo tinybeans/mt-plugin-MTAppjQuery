@@ -4,8 +4,8 @@
  * Copyright (c) Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-06-22
- * Update:  2013-06-04
- * for version: 1.0.0
+ * Update:  2013-08-27
+ * for version: 1.1.1
  *
  */
 ;(function($){
@@ -697,11 +697,14 @@
     //    $(foo).MTAppshowHint(options);
     //
     //  Options:
-    //    text: {String} ヒントの吹き出しに表示させるテキスト
+    //    html: {String} ヒントの吹き出しに表示させるテキスト
     // -------------------------------------------------
     $.fn.MTAppshowHint = function(options){
         var op = $.extend({}, $.fn.MTAppshowHint.defaults, options);
         return this.each(function(idx){
+            if (op.text && op.html === "") {
+                op.html = op.text;
+            }
             var balloon = [
                     '<div class="balloon" style="visibility: hidden;">',
                         '<div class="balloon-content">',
@@ -722,7 +725,7 @@
                 ],
                 $balloon = $(this).prepend(balloon.join(''))
                                   .find('div.balloon')
-                                      .find('div.balloon-content').text(op.text)
+                                      .find('div.balloon-content').html(op.html)
                                       .end(),
                 height = '-' + ($balloon.outerHeight() + 10) + 'px';
 
@@ -739,7 +742,7 @@
         });
     };
     $.fn.MTAppshowHint.defaults = {
-        text: ''
+        html: ''
     };
     // end - $(foo).MTAppshowHint();
 
@@ -756,39 +759,42 @@
     //    textオプション、title属性、alt属性の値の優先順位でツールチップで表示する。
     //
     //  Options:
-    //    text: {String} ツールチップに表示させるテキスト
+    //    html: {String} ツールチップに表示させるテキスト
     // -------------------------------------------------
     $.fn.MTAppTooltip = function(options){
         var op = $.extend({}, $.fn.MTAppTooltip.defaults, options);
 
         return this.each(function(){
 
+            if (op.text && op.html === "") {
+                op.html = op.text;
+            }
             var self = $(this),
                 tooltip = $('#mtapp-tooltip'),
                 target, tipText;
 
-            if (op.text != '') {
-                tipText = op.text;
+            if (op.html != '') {
+                tipText = op.html;
             } else {
                 target = this.title ? 'title' : 'alt',
                 tipText = self.attr(target);
             }
 
             self.hover(function(e){
-                if (op.text == '') {
+                if (op.html == '') {
                     self.attr(target,'');
                 }
                 tooltip
                     .stop(true,true)
                     .fadeIn('fast')
-                    .text(tipText)
+                    .html(tipText)
                     .css({
                         position: 'absolute',
                         top: e.pageY - 20,
                         left: e.pageX + 20
                     });
             },function(){
-                if (op.text == '') {
+                if (op.html == '') {
                     self.attr(target,tipText);
                 }
                 tooltip.fadeOut('fast');
@@ -801,7 +807,7 @@
         });
     };
     $.fn.MTAppTooltip.defaults = {
-        text: ''
+        html: ''
     };
     // end - $(foo).MTAppTooltip();
 
@@ -1877,7 +1883,7 @@
         if (!(type == 'entry' || type == 'page')) return;
         var reqCats = (op.requiredIds) ? op.requiredIds.split(',') : [];
         $form.on('click', ':submit.primary', function(){
-            var categoryIds = $("input[name='category_ids']").val().split(',');
+            var categoryIds = $("input[name='category_ids']").val() ? $("input[name='category_ids']").val().split(',') : [];
             var count = 0;
             var eerror = false;
             if (reqCats.length) {
