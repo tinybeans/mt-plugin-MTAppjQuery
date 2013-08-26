@@ -1877,7 +1877,7 @@
         if (!(type == 'entry' || type == 'page')) return;
         var reqCats = (op.requiredIds) ? op.requiredIds.split(',') : [];
         $form.on('click', ':submit.primary', function(){
-            var categoryIds = $("input[name='category_ids']").val().split(',');
+            var categoryIds = $("input[name='category_ids']").val() ? $("input[name='category_ids']").val().split(',') : [];
             var count = 0;
             var eerror = false;
             if (reqCats.length) {
