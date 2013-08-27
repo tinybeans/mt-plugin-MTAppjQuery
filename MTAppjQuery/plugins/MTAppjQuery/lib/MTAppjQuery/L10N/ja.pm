@@ -68,6 +68,8 @@ use vars qw ( %Lexicon );
 
 	'invalid' => '無効化設定',
     '(JavasScript unless you are familiar with the contents of the file it is recommended that you disable it.)' => '（JavasScriptファイルの内容を理解している場合以外は無効にしないことをお勧めします。）',
+  'Apply the setting to all websites and blogs.' => '全てのウェブサイトとブログに設定を適用する',
+  'Apply to all websites and blogs?' => '全てのウェブサイトとブログに設定を適用しますか？',
 
 # Uploadify blog_config.tmpl / system_config.tmpl
 	'Uploadify' => 'マルチファイルアップロード',
