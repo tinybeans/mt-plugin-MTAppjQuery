@@ -27,6 +27,7 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             #['superslidemenu',{Default => 0,  Scope => 'system'}],
             ['jquery_ready',    {Default => 0,  Scope => 'system'}],
             ['jquery_ready_url',{Default => '', Scope => 'system'}],
+            ['jquery_ready_all',{Default => 0,  Scope => 'system'}],
 
             #['jqselectable',  {Default => 0,  Scope => 'system'}],
 

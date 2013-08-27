@@ -1,4 +1,5 @@
 <mt:Ignore>全般設定</mt:Ignore>
+<input type="hidden" id="mtappjquery-setting-form">
 <mtapp:setting
     id="active"
     show_label="1"
@@ -74,6 +75,9 @@
                 &nbsp;URL&nbsp;
                 <input type="text" value="<mt:If name="jquery_ready_url"><$mt:Var name="jquery_ready_url" encode_html="1"$></mt:If>" name="jquery_ready_url" id="jquery_ready_url" />
             </span>
+        </li>
+        <li id="jquery_ready_all_container">
+            <label for="jquery_ready_all"><input type="checkbox" name="jquery_ready_all" id="jquery_ready_all" value="1"<mt:If name="jquery_ready_all" class="mtapp-apply-all"> checked</mt:If>> <__trans phrase="Apply the setting to all websites and blogs."></label>
         </li>
     </ul>
 </mtapp:setting>
@@ -233,6 +237,15 @@
     (function($){
         $('a.change_user_file').click(function(){
             $(this).hide().next().show();
+        });
+        if (mtappVars.blog_id != 0) {
+            $('#jquery_ready_all_container').hide();
+        }
+        var $form = $('#mtappjquery-setting-form').closest('form');
+        $form.submit(function(){
+            if ($('#jquery_ready_all').is(':checked')) {
+                return window.confirm('<__trans phrase="Setting jquery_ready.js">: <__trans phrase="Apply to all websites and blogs?">');
+            }
         });
     })(jQuery);
     // ]]>
