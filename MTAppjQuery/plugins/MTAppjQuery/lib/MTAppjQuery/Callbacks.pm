@@ -560,6 +560,30 @@ sub cms_post_save_entry {
     }
 }
 
+sub save_config_filter {
+    my ($cb, $plugin, $data, $scope) = @_;
+    my $jquery_ready_all = $data->{jquery_ready_all};
+    if ($jquery_ready_all eq '1') {
+        my $jquery_ready = $data->{jquery_ready};
+        my $jquery_ready_url = $data->{jquery_ready_url};
+
+        require MT::Blog;
+        my @blogs = MT::Blog->load();
+        foreach my $blog (@blogs) {
+            $plugin->set_config_value('jquery_ready', $jquery_ready, 'blog:'.$blog->id);
+            $plugin->set_config_value('jquery_ready_url', $jquery_ready_url, 'blog:'.$blog->id);
+        }
+
+        require MT::Website;
+        my @websites = MT::Website->load();
+        foreach my $website (@websites) {
+            $plugin->set_config_value('jquery_ready', $jquery_ready, 'blog:'.$website->id);
+            $plugin->set_config_value('jquery_ready_url', $jquery_ready_url, 'blog:'.$website->id);
+        }
+    }
+    return 1;
+}
+
 sub _config_replace {
     my ($str) = @_;
     $str =~ s!__filepath__!' + fileObj.filePath.replace(/\\/\\//g,"/") + '!g;
