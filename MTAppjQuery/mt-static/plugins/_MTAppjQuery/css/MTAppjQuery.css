@@ -207,6 +207,7 @@ span.mcb-skin-tags .mcb-add-item {
 
 span.mcb-container .mcb-add-item {
   width: 120px;
+  margin-left: 5px;
   padding-left: 12px;
   border: 1px solid #E5E5E5;
   background: url(../images/create.gif) no-repeat 2px 50%;
