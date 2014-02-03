@@ -2208,9 +2208,7 @@
     //    $.MTAppRemoveVal();
     // -------------------------------------------------
     $.MTAppRemoveVal = function() {
-        console.log(1);
         if (mtappVars.screen_id == 'edit-entry' || mtappVars.screen_id == 'edit-page') {
-            console.log(2);
             $('#sortable div.field-content').find('input:text,textarea').filter(':visible').MTAppRemoveVal();
         }
     };
