@@ -498,3 +498,21 @@ span.mtappmultiform-radio {
         margin: 0 3px 0 5px;
     }
 }
+/* ----------------------------------------
+   __MTAppOtherTypeCategories
+---------------------------------------- */
+#category-field.mtapp-other-type-categories {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+}
+#other-type-category-list {
+    label {
+        display: block;
+        line-height: 1.7;
+        input {
+            margin-right: 5px;
+        }
+    }
+}
