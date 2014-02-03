@@ -3223,11 +3223,11 @@ jQuery(function($){
     }
 */
     $('#favorite-structure').find('div.favorite-structure-container').hover(
-    	function(){
-    		$(this).css('backgroundColor','#C2EEB5');
-    	},
-    	function(){
-    		$(this).css('backgroundColor','#F3F3F3');
-    	}
+        function(){
+            $(this).css('backgroundColor','#C2EEB5');
+        },
+        function(){
+            $(this).css('backgroundColor','#F3F3F3');
+        }
     );
 });
