@@ -3134,7 +3134,12 @@
                 str = str.replace(/\D/g, '');
             }
             return str;
-        }
+        },
+        // 変数の型を調べる(jQuery 1.9.1 later => jQuery.type)
+        varType: function(obj) {
+            return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
+        },
+
     });
 
     function getFieldID(basename) {
