@@ -4,8 +4,8 @@
  * Copyright (c) Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-06-22
- * Update:  2013-08-26
- * for version: 1.1.1
+ * Update:  2014-02-03
+ * for MTAppjQuery v1.2.0
  *
  */
 ;(function($){
@@ -1474,6 +1474,105 @@
         code: function(){ return; }
     };
     // end - $.MTAppInCats();
+
+
+    // -------------------------------------------------
+    //  $.MTAppOtherTypeCategories();
+    //
+    //  Description:
+    //    記事カテゴリ選択のUIをラジオボタンまたはドロップダウンリストに変更する。
+    //
+    //  Usage:
+    //    $.MTAppOtherTypeCategories(options);
+    //
+    //  Options:
+    //    type: {String} 'radio'（ラジオボタン） or 'select'（ドロップダウンリスト）
+    //    label: {String} ウィジェットのタイトルバーに表示されるラベル
+    //    lanotSelectedTextbel: {String} 未選択状態にするための要素のラベル
+    //    debug: {Boolean} trueにすると元のカテゴリウィジェットが表示される
+    // -------------------------------------------------
+    $.MTAppOtherTypeCategories = function(options){
+        var op = $.extend({}, $.MTAppOtherTypeCategories.defaults, options);
+
+        if (mtappVars.type === 'entry' || mtappVars.screen_id === 'edit-entry') {
+            var newCategoryWidgetType = op.type;
+            var newCategoryWidgetHtml = $.MTAppMakeWidget({
+                label: op.label,
+                content: '<div id="other-type-category-list"></div>'
+            });
+            $('#category-field').after(newCategoryWidgetHtml);
+            var $anotherCategoryList = $('#other-type-category-list');
+            $(window).load(function(){
+                if (!op.debug) {
+                    $('#category-field').addClass('mtapp-other-type-categories');
+                }
+                var radioCatList = [];
+                $('#category-selector-list div.list-item').each(function(i){
+                    var categoryIds = $('#category-ids').val();
+                    var $div = $(this).children().children('div');
+                    var catLabel = $div.text().replace(/\s/g, '');
+                    var catId = $div.children('input').attr('name');
+                    var _html = [];
+                    if (catId) {
+                        catId = catId.match(/[0-9]+$/)[0];
+                    }
+                    else {
+                        return true;
+                    }
+                    switch (newCategoryWidgetType) {
+                        case 'radio':
+                            var AttrDefChecked = categoryIds ? '': ' checked="checked"';
+                            var AttrChecked = (categoryIds == catId) ? ' checked="checked"': '';
+                            if (i == 0) {
+                                _html.push('<label for="another-cat-0"><input id="another-cat-0" type="radio" name="other-type-category" value=""' + AttrDefChecked + '>' + op.notSelectedText+ '</label>');
+                            }
+                            _html.push('<label for="another-cat-' + catId + '"><input id="another-cat-' + catId + '" type="radio" name="other-type-category" value="' + catId + '"' + AttrChecked + '>' + catLabel + '</label>');
+                            break;
+                        case 'select':
+                            var AttrDefSelected = categoryIds ? '': ' selected';
+                            var AttrSelected = (categoryIds == catId) ? ' selected': '';
+                            if (i == 0) {
+                                _html.push('<select name="other-type-category"><option value=""' + AttrDefSelected + '>未選択</option>');
+                            }
+                            _html.push('<option value="' + catId + '"' + AttrSelected + '>' + catLabel + '</option>');
+                            break;
+                        default: return false;
+                    }
+                    radioCatList.push(_html.join(''));
+                });
+                switch (newCategoryWidgetType) {
+                    case 'radio':
+                        $anotherCategoryList.html(radioCatList.join(''));
+                        $anotherCategoryList
+                            .find('input[name="other-type-category"]')
+                            .on('click', function(){
+                                if ($(this).is(':checked')) {
+                                    $('#category-ids').val($(this).val());
+                                }
+                                else {
+                                    $('#category-ids').val('');
+                                }
+                            });
+                        break;
+                    case 'select':
+                        $anotherCategoryList.html(radioCatList.join('') + '</select>');
+                        $anotherCategoryList
+                            .find('select')
+                            .on('change', function(){
+                                $('#category-ids').val($(this).find('option:selected').val());
+                            });
+                        break;
+                }
+            });
+        }
+    };
+    $.MTAppOtherTypeCategories.defaults = {
+        type: 'radio', // or 'select'
+        label: 'カテゴリ',
+        notSelectedText: '未選択',
+        debug: false
+    };
+    // end - $.MTAppOtherTypeCategories();
 
 
     // -------------------------------------------------
