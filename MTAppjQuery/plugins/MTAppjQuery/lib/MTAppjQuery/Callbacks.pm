@@ -230,6 +230,36 @@ __MTML__
     }
     /* ]]> */
     </script>
+    <mt:SetHashVar name="mtappVars">
+    <mt:SetVar name="version" value="${version}">
+    <mt:SetVar name="minor_version" value="${minor_version}">
+    <mt:SetVar name="type" value="${_type}">
+    <mt:SetVar name="mode" value="${mode}">
+    <mt:SetVar name="entry_id" value="${entry_id}">
+    <mt:SetVar name="page_id" value="${page_id}">
+    <mt:SetVar name="category_id" value="${category_id}">
+    <mt:SetVar name="template_id" value="${template_id}">
+    <mt:SetVar name="blog_id" value="${blog_id}">
+    <mt:SetVar name="static_plugin_path" value="${static_plugin_path}">
+    </mt:SetHashVar>
+
+    <mt:SetVarBlock name="mtappVars" key="author_permissions"><mt:SetVarBlock name="_author_permissions">${permissions}</mt:SetVarBlock>,<mt:Var name="_author_permissions" replace="'","">,</mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="author_roles"><mt:SetVarBlock name="_author_roles">${role_names}</mt:SetVarBlock>,<mt:Var name="_author_roles" replace='"',''>,</mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="author_name"><mt:var name="author_name"></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="user_name"><mt:var name="author_name"></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="status"><mt:Var name="status"></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="html_title"><mt:var name="mtapp_html_title" trim="1"></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="scope_type"><mt:var name="scope_type"></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="screen_id"><mt:var name="screen_id"></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="template_filename"><mt:var name="template_filename"></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="json_can_create_post_blogs"><mt:var name="json_can_create_post_blogs"></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="body_class">,<mt:var name="mtapp_body_class" replace='"','' regex_replace="/ +/g",",">,</mt:SetVarBlock>
+
+    <mt:SetVarBlock name="mtappVars" key="author_id"><mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="curr_website_id"><mt:if name="curr_website_id"><mt:var name="curr_website_id"><mt:else>0</mt:if></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="selected_category">,<mt:Loop name="selected_category_loop" glue=","><mt:Var name="__value__"></mt:Loop>,</mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="main_category_id"><mt:if name="category_id"><mt:var name="category_id"><mt:else>0</mt:if></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="blog_url"><mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if></mt:SetVarBlock>
 __MTML__
 
     my $target = '<script type="text/javascript" src="<\$mt:var name="static_uri"\$>jquery/jquery\.(min\.)*js\?v=<mt:var name="mt_version_id" escape="URL">"></script>';
