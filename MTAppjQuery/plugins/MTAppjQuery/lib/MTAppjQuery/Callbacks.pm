@@ -6,6 +6,15 @@ use MT::Blog;
 use MT::Util;
 use MTAppjQuery::Tmplset;
 
+sub template_source_dashboard {
+    my ($cb, $app, $tmpl_ref) = @_;
+
+    if ($app->request('fresh_login')) {
+        my $url = $app->uri(mode => 'dashboard', args => undef);
+        $app->redirect($url);
+    }
+}
+
 sub template_source_header {
     my ($cb, $app, $tmpl_ref) = @_;
     my $version = MT->version_id;
