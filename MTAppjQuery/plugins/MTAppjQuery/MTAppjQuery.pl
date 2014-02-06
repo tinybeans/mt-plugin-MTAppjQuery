@@ -2,7 +2,7 @@ package MT::Plugin::MTAppjQuery;
 use strict;
 use base qw( MT::Plugin );
 
-our $VERSION = '1.2.0';
+our $VERSION = '1.3.0';
 
 my $plugin = MT::Plugin::MTAppjQuery->new({
     id          => 'mt_app_jquery',
@@ -84,6 +84,7 @@ sub init_registry {
             },
         },
         callbacks => {
+            'MT::App::CMS::template_source.dashboard' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_dashboard',
             'MT::App::CMS::template_source.header' => {
                 handler => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_header',
                 priority => 10,
