@@ -14,8 +14,8 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
     author_link => 'http://www.tinybeans.net/blog/',
     plugin_link => 'http://www.tinybeans.net/blog/download/mt-plugin/mtapp-jquery.html',
     l10n_class  => 'MTAppjQuery::L10N',
-    blog_config_template => 'config.tmpl',
-    system_config_template => 'config.tmpl',
+    blog_config_template => 'config_blog.tmpl',
+    system_config_template => 'config_system.tmpl',
     settings    => new MT::PluginSettings([
             # Set system scope
             ['active',        {Default => 1,  Scope => 'system'}],
