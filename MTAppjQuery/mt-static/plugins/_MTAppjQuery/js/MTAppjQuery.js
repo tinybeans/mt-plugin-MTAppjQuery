@@ -4,8 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-06-22
- * Update:  2014-02-03
- * for MTAppjQuery v1.2.0
+ * Update:  2014-04-22
  *
  */
 ;(function($){
@@ -71,8 +70,8 @@
      * http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
      *
      * Since:   2010-06-22
-     * Update:  2014-01-27
-     * version: 0.2.0
+     * Update:  2014-04-22
+     * version: 0.2.1
      *
      * jQuery 1.7 later (maybe...)
      *
@@ -152,9 +151,13 @@
                 .on('click', 'input:checkbox', function(e){
                     var checkbox = e.target;
                     var checkValues = [];
-                    $container.find(':checked').each(function(){
-                        checkValues.push(this.value);
-                    });
+                    $container
+                        .find('label').removeClass('mcb-label-checked')
+                        .end()
+                        .find(':checked').each(function(){
+                            checkValues.push(this.value);
+                            $(this).parent().addClass('mcb-label-checked');
+                        });
                     $this.val(checkValues.join(','));
                 });
             if (savedItems.length > 0) {
