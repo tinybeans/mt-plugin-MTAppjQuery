@@ -164,7 +164,7 @@
                 $container.find(':checkbox').each(function(){
                     var v = this.value;
                     if ($.inArray(v, savedItems) !== -1) {
-                        $(this).prop('checked', true);
+                        $(this).prop('checked', true).parent().addClass('mcb-label-checked');
                     }
                 })
             }
