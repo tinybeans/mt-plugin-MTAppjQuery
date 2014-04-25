@@ -1254,6 +1254,7 @@
         }
         var $elms = $(ids.join(','));
         $elms.removeClass('sort-enabled hidden').find('div.field-header').addClass('hidden');
+        $('body').addClass('mtapp-tabs');
         container
             .append($elms)
             .find('.mtapp-tabs-navi').html(li.join(''));
