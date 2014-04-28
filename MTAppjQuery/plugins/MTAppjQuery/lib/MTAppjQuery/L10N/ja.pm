@@ -12,13 +12,13 @@ use vars qw ( %Lexicon );
     'Edit user.css' => 'user.cssを編集',
     'Edit user.css(append)' => 'user.cssを編集(追記)',
 # Tags.pm
-  'meiji' => '明治',
-  'taisho' => '大正',
-  'showa' => '昭和',
-  'heisei' => '平成',
-  'nen' => '年',
-  'gatsu' => '月',
-  'nichi' => '日',
+    'meiji' => '明治',
+    'taisho' => '大正',
+    'showa' => '昭和',
+    'heisei' => '平成',
+    'nen' => '年',
+    'gatsu' => '月',
+    'nichi' => '日',
 # Callbacks.pm
 	'Page Loading' => 'ページをロード中',
 	'Custom Fields' => 'カスタムフィールド',
@@ -68,16 +68,15 @@ use vars qw ( %Lexicon );
 
 	'invalid' => '無効化設定',
     '(JavasScript unless you are familiar with the contents of the file it is recommended that you disable it.)' => '（JavasScriptファイルの内容を理解している場合以外は無効にしないことをお勧めします。）',
-  'Apply the setting to all websites and blogs.' => '全てのウェブサイトとブログに設定を適用する',
-  'Apply to all websites and blogs?' => '全てのウェブサイトとブログに設定を適用しますか？',
+    'Apply the setting to all websites and blogs.' => '全てのウェブサイトとブログに設定を適用する',
+    'Apply to all websites and blogs?' => '全てのウェブサイトとブログに設定を適用しますか？',
 
 # Uploadify blog_config.tmpl / system_config.tmpl
 	'Uploadify' => 'マルチファイルアップロード',
 	'active Uploadify' => 'マルチファイルアップロードを有効する',
 	'To stop using Uploadify' => 'Uploadifyの利用を停止する',
     'Upload folder' => 'アップロード先フォルダ',
-    'The path to the folder you would like to save the files to. Do not end the path with a ‘/’.'
-        => 'ファイルをアップロードするフォルダのパスを指定。末尾の「/」は不要。',
+    'The path to the folder you would like to save the files to. Do not end the path with a ‘/’.' => 'ファイルをアップロードするフォルダのパスを指定。末尾の「/」は不要。',
 	'img element' => 'img要素',
 	'a element' => 'a要素',
 	'You can write that File name is __filename__, File path is __filepath__.' => 'ファイル名＝「__filename__」、ファイルのパス＝「__filepath__」',
