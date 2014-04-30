@@ -10,7 +10,7 @@
 ;(function($){
 
     if (typeof mtappVars !== 'object') return;
-    var adminScript = location.href.replace(/\?.*/, '');
+    mtappVars.adminScript = location.href.replace(/\?.*/, '');
 
     // -------------------------------------------------
     //  $.MTAppNoScrollRightSidebar();
