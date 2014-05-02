@@ -319,6 +319,10 @@ __MTML__
         "perms_json" : [${perms_json}]
         </mt:ignore>
     }
+    var mtappL10N = {
+        "User_Dashboard" : "<__trans phrase='User Dashboard'>",
+        "System" : "<__trans phrase='System'>"
+    }
     /* ]]> */
     </script>
     <mt:SetHashVar name="mtappVars">
