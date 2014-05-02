@@ -24,6 +24,11 @@ sub template_source_header {
     my $blog = $app->blog;
     my $author = $app->user;
 
+    # システム管理者かどうか
+    my $is_superuser = 0;
+    if ($author->is_superuser) {
+        $is_superuser = 1;
+    }
     ### 各種情報を取得する
     my $_type   = $app->param('_type') || '_type';
     my $mode    = $app->param('__mode') || '';
@@ -219,6 +224,7 @@ __MTML__
         "author_permissions" : [$permissions],
         "author_roles" : [$role_names],
         "user_name" : "<mt:var name="author_name" encode_js="1">",
+        "is_superuser" : $is_superuser,
         "curr_website_id" : <mt:if name="curr_website_id"><mt:var name="curr_website_id"><mt:else>0</mt:if>,
         "blog_id" : ${blog_id},
         "entry_id" : ${entry_id},
@@ -254,6 +260,7 @@ __MTML__
     <mt:SetVar name="template_id" value="${template_id}">
     <mt:SetVar name="blog_id" value="${blog_id}">
     <mt:SetVar name="static_plugin_path" value="${static_plugin_path}">
+    <mt:SetVar name="is_superuser" value="${is_superuser}">
     </mt:SetHashVar>
 
     <mt:SetVarBlock name="mtappVars" key="author_permissions"><mt:SetVarBlock name="_author_permissions">${permissions}</mt:SetVarBlock>,<mt:Var name="_author_permissions" replace="'","">,</mt:SetVarBlock>
