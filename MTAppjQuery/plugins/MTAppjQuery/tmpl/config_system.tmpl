@@ -3,15 +3,33 @@
 <mtapp:setting
     id="blogs_json"
     show_label="1"
-    label="<__trans phrase="Enable Blogs JSON">">
+    label="<__trans phrase="Use a JSON of Websites/Blogs">">
     <ul>
         <li>
             <select name="blogs_json" id="blogs_json">
                 <option value="1"<mt:if name="blogs_json" eq="1"> selected="selected"</mt:if>><__trans phrase="Enable"></option>
                 <option value="0"<mt:if name="blogs_json" eq="0"> selected="selected"</mt:if>><__trans phrase="Disable"></option>
             </select>
+            <span id="blogs_json_detail_container" style="<mt:if name="blogs_json" eq="0">display:none;</mt:if>margin-left:5px;">
+                <label for="blogs_json_detail"><input type="checkbox" name="blogs_json_detail" id="blogs_json_detail" value="1"<mt:if name="blogs_json_detail" eq="1"> checked="checked"</mt:if>>&nbsp;<__trans phrase="Detail Mode"></label>
+            </span>
         </li>
     </ul>
+    <script type="text/javascript">
+    (function($){
+        $('#blogs_json').on('change', function(){
+            if ($(this).val() == 1) {
+                $('#blogs_json_detail_container').show();
+            }
+            else {
+                $('#blogs_json_detail_container').hide();
+                $('#blogs_json_detail').prop('checked', false);
+            }
+        });
+    })(jQuery);
+    </script>
+</mtapp:setting>
+
 <mtapp:setting
     id="common_free_area"
     label="<__trans phrase="Free textarea">">
@@ -303,6 +321,42 @@
                 return window.confirm('<__trans phrase="Setting jquery_ready.js">: <__trans phrase="Apply to all websites and blogs?">');
             }
         });
+
+        $('#mtapp-insert-MTAppSlideMenuV2').on('click', function(){
+            var script = [
+                '<script type="text/javascript">',
+                '(function($){',
+                '    $.MTAppSlideMenuV2({',
+                '        moveCreationMenu: false,',
+                '        hidePermissionMsg: false',
+                '    });',
+                '})(jQuery);',
+                '</script'
+            ];
+            appendValue('common_mtapp_end_body', script.join("\n") + '>')
+        });
+
+        function appendValue (id, str) {
+            var $target = $('#' + id);
+            var target = $target[0];
+            var targetValue = $target.val();
+            if (targetValue) {
+                targetValue += "\n\n";
+            }
+            target.style.backgroundColor = '#FFFFE0';
+            for (var i = 10, l = 30; i <= 30; i += 0.2) {
+                target.style.height = i + 'em';
+                target.scrollTop = target.scrollHeight;
+            }
+            setTimeout(function(){
+                target.value = targetValue + str;
+                target.scrollTop = target.scrollHeight;
+                target.style.backgroundColor = '#FFFFE0';
+            }, 100);
+            setTimeout(function(){
+                target.style.backgroundColor = '#FFFFFF';
+            }, 150);
+        }
     })(jQuery);
     // ]]>
     </script>

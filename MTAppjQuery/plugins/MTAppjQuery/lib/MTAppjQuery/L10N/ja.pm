@@ -35,6 +35,8 @@ use vars qw ( %Lexicon );
 # config_system.tmpl
     'System Settings' => 'システム設定',
     'Individual Settings' => '個別設定',
+    'Use a JSON of Websites/Blogs' => 'ウェブサイト/ブログのJSONを利用する',
+    'Detail Mode' => '詳細モード',
 # config.tmpl
     'active' => '有効にする',
     'Enable' => '有効',

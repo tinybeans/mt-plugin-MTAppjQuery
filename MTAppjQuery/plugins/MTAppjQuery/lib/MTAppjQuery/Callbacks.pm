@@ -5,7 +5,7 @@ use MT::Website;
 use MT::Blog;
 use MT::Util;
 use MTAppjQuery::Tmplset;
-
+use MT::Permission;
 sub template_source_dashboard {
     my ($cb, $app, $tmpl_ref) = @_;
 
@@ -191,6 +191,77 @@ __MTML__
         $perms_json = join ",", @perms_json;
     }
 
+    ### Set blogs JSON
+    my $can_access_blogs_json = '{}';
+    if ($op_blogs_json) {
+        # Get all permissions that you have.
+        my @perms = MT::Permission->load({author_id => $author_id})
+            or die "You don't have any permissions.";
+
+        # Get only blog ids from your permissions.
+        my @perms_blog_ids;
+        foreach my $perm (@perms) {
+            push(@perms_blog_ids, $perm->blog_id);
+        }
+
+        my @all_websites = MT::Website->load;
+        my @all_blogs = MT::Blog->load;
+        my $can_access_blogs = {
+            'website' => [],
+            'blog' => [],
+        };
+        my $parent_website = {
+            # 'website-1' => [ children blogs ],
+            # 'website-3' => [ children blogs ],
+        };
+
+        # my $parent_website_related = {};
+        foreach my $blog (@all_blogs) {
+            my $blog_id = $blog->id;
+            my $parent_website_key = 'website-' . $blog->parent_id if (defined $blog->parent_id);
+            foreach my $perms_blog_id (@perms_blog_ids) {
+                if ($is_superuser == 1 or $perms_blog_id eq $blog->id) {
+                    # Set into $can_access_blogs
+                    my $simple_blog = {};
+                    if ($op_blogs_json_detail ne '1') {
+                        $simple_blog->{id} = $blog_id;
+                        $simple_blog->{name} = $blog->name;
+                        push @{$can_access_blogs->{blog}}, $simple_blog;
+                        # Set into $parent_website
+                        push @{$parent_website->{$parent_website_key}}, $simple_blog;
+                    }
+                    else {
+                        push @{$can_access_blogs->{blog}}, $blog->{column_values};
+                        # Set into $parent_website
+                        push @{$parent_website->{$parent_website_key}}, $blog->{column_values};
+                    }
+                    last;
+                }
+            }
+        }
+        foreach my $website (@all_websites) {
+            my $website_id = $website->id;
+            foreach my $perms_blog_id (@perms_blog_ids) {
+                if ($is_superuser == 1 or $perms_blog_id eq $website_id) {
+                    my $simple_website = {};
+                    if ($op_blogs_json_detail ne '1') {
+                        $simple_website->{id} = $website_id;
+                        $simple_website->{name} = $website->name;
+                        $simple_website->{children} = $parent_website->{'website-' . $website_id} || [];
+                        push @{$can_access_blogs->{website}}, $simple_website;
+                    }
+                    else {
+                        $website->{column_values}->{children} = $parent_website->{'website-' . $website_id} || [];
+                        push @{$can_access_blogs->{website}}, $website->{column_values};
+                    }
+                    last;
+                }
+            }
+        }
+
+        # To JSON
+        $can_access_blogs_json = MT::Util::to_json($can_access_blogs);
+    }
     ### jQueryの読み込み前後にmtappVarsとjquery_ready.jsをセットする
     my $mtapp_vars = <<__MTML__;
     <mt:unless name="screen_id">
@@ -241,7 +312,8 @@ __MTML__
         "screen_id" : "<mt:var name="screen_id">",
         "body_class" : [<mt:SetVarBlock name="mtapp_body_class">"<mt:var name="screen_type" default="main-screen"> <mt:if name="scope_type" eq="user">user system<mt:else><mt:var name="scope_type"></mt:if><mt:if name="screen_class"> <mt:var name="screen_class"></mt:if><mt:if name="top_nav_loop"> has-menu-nav</mt:if><mt:if name="related_content"> has-related-content</mt:if><mt:if name="edit_screen"> edit-screen</mt:if><mt:if name="new_object"> create-new</mt:if><mt:if name="loaded_revision"> loaded-revision</mt:if><mt:if name="mt_beta"> mt-beta</mt:if>"</mt:SetVarBlock><mt:var name="mtapp_body_class" regex_replace='/ +/g',' ' regex_replace='/ /g','","'>],
         "template_filename" : '<mt:var name="template_filename">',
-        "json_can_create_post_blogs": [<mt:var name="json_can_create_post_blogs">]<mt:ignore>,
+        "json_can_create_post_blogs": [<mt:var name="json_can_create_post_blogs">],
+        "can_access_blogs_json" : ${can_access_blogs_json}<mt:ignore>,
         "website_json" : [${website_json}],
         "blog_json" : [${blog_json}],
         "perms_json" : [${perms_json}]
@@ -273,6 +345,7 @@ __MTML__
     <mt:SetVarBlock name="mtappVars" key="screen_id"><mt:var name="screen_id"></mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="template_filename"><mt:var name="template_filename"></mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="json_can_create_post_blogs"><mt:var name="json_can_create_post_blogs"></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="can_access_blogs">${can_access_blogs_json}</mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="body_class">,<mt:var name="mtapp_body_class" replace='"','' regex_replace="/ +/g",",">,</mt:SetVarBlock>
 
     <mt:SetVarBlock name="mtappVars" key="author_id"><mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if></mt:SetVarBlock>
