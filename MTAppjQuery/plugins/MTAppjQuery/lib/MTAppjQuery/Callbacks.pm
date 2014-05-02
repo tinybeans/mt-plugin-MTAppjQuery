@@ -83,16 +83,18 @@ sub template_source_header {
 
     ### プラグインの設定の値を取得する
     my $scope = (!$blog_id) ? 'system' : 'blog:'.$blog_id;
-    my $op_active         = $p->get_config_value('active', $scope);
+    my $op_active         = $p->get_config_value('active', $scope) || '1';
     return unless $op_active;
-    my $op_userjs         = $p->get_config_value('userjs', $scope);
-    my $op_userjs_url     = $p->get_config_value('userjs_url', $scope);
-    my $op_usercss        = $p->get_config_value('usercss', $scope);
-    my $op_usercss_url    = $p->get_config_value('usercss_url', $scope);
-    my $op_slidemenu      = $p->get_config_value('slidemenu', $scope);
-    my $op_superslidemenu = $p->get_config_value('superslidemenu', $scope);
-    my $op_jquery_ready     = $p->get_config_value('jquery_ready', $scope);
-    my $op_jquery_ready_url = $p->get_config_value('jquery_ready_url', $scope);
+    my $op_userjs         = $p->get_config_value('userjs', $scope) || '1';
+    my $op_userjs_url     = $p->get_config_value('userjs_url', $scope) || '';
+    my $op_usercss        = $p->get_config_value('usercss', $scope) || '1';
+    my $op_usercss_url    = $p->get_config_value('usercss_url', $scope) || '';
+    my $op_slidemenu      = $p->get_config_value('slidemenu', $scope) || '0';
+    my $op_superslidemenu = $p->get_config_value('superslidemenu', $scope) || '0';
+    my $op_jquery_ready     = $p->get_config_value('jquery_ready', $scope) || '0';
+    my $op_jquery_ready_url = $p->get_config_value('jquery_ready_url', $scope) || '';
+    my $op_blogs_json       = $p->get_config_value('blogs_json', 'system') || '0';
+    my $op_blogs_json_detail= $p->get_config_value('blogs_json_detail', 'system') || '0';
     my $op_jqselectable   = 0;#$p->get_config_value('jqselectable', $scope);
 
     # Free textarea / common
