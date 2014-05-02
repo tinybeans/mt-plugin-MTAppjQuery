@@ -579,6 +579,7 @@ div.mtapp-sortable span.mtapp-linebreak-field-item {
 body.mtapp-tabs div.mt-dialog {
   z-index: 9999 !important;
 }
+
 div.mtapp-tabs-container ul.mtapp-tabs-navi {
   margin-bottom: 0;
   border-bottom-style: none;
