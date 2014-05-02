@@ -18,31 +18,33 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
     system_config_template => 'config_system.tmpl',
     settings    => new MT::PluginSettings([
             # Set system scope
-            ['active',        {Default => 1,  Scope => 'system'}],
-            ['userjs',        {Default => 1,  Scope => 'system'}],
+            ['active',        {Default => '1',  Scope => 'system'}],
+            ['userjs',        {Default => '1',  Scope => 'system'}],
             ['userjs_url',    {Default => '', Scope => 'system'}],
-            ['usercss',       {Default => 1,  Scope => 'system'}],
+            ['usercss',       {Default => '1',  Scope => 'system'}],
             ['usercss_url',   {Default => '', Scope => 'system'}],
-            #['slidemenu',     {Default => 0,  Scope => 'system'}],
-            #['superslidemenu',{Default => 0,  Scope => 'system'}],
-            ['jquery_ready',    {Default => 0,  Scope => 'system'}],
+            #['slidemenu',     {Default => '0',  Scope => 'system'}],
+            #['superslidemenu',{Default => '0',  Scope => 'system'}],
+            ['jquery_ready',    {Default => '0',  Scope => 'system'}],
             ['jquery_ready_url',{Default => '', Scope => 'system'}],
-            ['jquery_ready_all',{Default => 0,  Scope => 'system'}],
+            ['jquery_ready_all',{Default => '0',  Scope => 'system'}],
+            ['blogs_json',       {Default => '0',  Scope => 'system'}],
+            ['blogs_json_detail',{Default => '0',  Scope => 'system'}],
 
-            #['jqselectable',  {Default => 0,  Scope => 'system'}],
+            #['jqselectable',  {Default => '0',  Scope => 'system'}],
 
             # Set blog scope
-            ['active',        {Default => 1,  Scope => 'blog'}],
-            ['userjs',        {Default => 1,  Scope => 'blog'}],
+            ['active',        {Default => '1',  Scope => 'blog'}],
+            ['userjs',        {Default => '1',  Scope => 'blog'}],
             ['userjs_url',    {Default => '', Scope => 'blog'}],
-            ['usercss',       {Default => 1,  Scope => 'blog'}],
+            ['usercss',       {Default => '1',  Scope => 'blog'}],
             ['usercss_url',   {Default => '', Scope => 'blog'}],
-            #['slidemenu',     {Default => 0,  Scope => 'blog'}],
-            #['superslidemenu',{Default => 0,  Scope => 'blog'}],
-            ['jquery_ready',    {Default => 0,  Scope => 'blog'}],
+            #['slidemenu',     {Default => '0',  Scope => 'blog'}],
+            #['superslidemenu',{Default => '0',  Scope => 'blog'}],
+            ['jquery_ready',    {Default => '0',  Scope => 'blog'}],
             ['jquery_ready_url',{Default => '', Scope => 'blog'}],
 
-            #['jqselectable',  {Default => 0,  Scope => 'blog'}],
+            #['jqselectable',  {Default => '0',  Scope => 'blog'}],
 
             # Free area common
             ['common_mtapp_top_head',  {Default => '', Scope => 'system'}],
