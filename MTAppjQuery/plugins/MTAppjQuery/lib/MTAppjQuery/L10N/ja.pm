@@ -32,6 +32,9 @@ use vars qw ( %Lexicon );
 	'Install [_1] and  [_2]' => '[_1]と[_2]をインストール',
 # Tmplset.pm
 	'structure' => '構造',
+# config_system.tmpl
+    'System Settings' => 'システム設定',
+    'Individual Settings' => '個別設定',
 # config.tmpl
 	'active' => '有効にする',
 	'Enable' => '有効',

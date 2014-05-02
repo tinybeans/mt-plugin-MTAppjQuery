@@ -44,7 +44,17 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
 
             #['jqselectable',  {Default => 0,  Scope => 'blog'}],
 
-            # Free area
+            # Free area common
+            ['common_mtapp_top_head',  {Default => '', Scope => 'system'}],
+            ['common_html_head',       {Default => '', Scope => 'system'}],
+            ['common_js_include',      {Default => '', Scope => 'system'}],
+            ['common_html_body',       {Default => '', Scope => 'system'}],
+            ['common_form_header',     {Default => '', Scope => 'system'}],
+            ['common_jq_js_include',   {Default => '', Scope => 'system'}],
+            ['common_mtapp_html_foot', {Default => '', Scope => 'system'}],
+            ['common_mtapp_end_body',  {Default => '', Scope => 'system'}],
+
+            # Free area individual
             ['fa_mtapp_top_head',  {Default => '', Scope => 'system'}],
             ['fa_html_head',       {Default => '', Scope => 'system'}],
             ['fa_js_include',      {Default => '', Scope => 'system'}],

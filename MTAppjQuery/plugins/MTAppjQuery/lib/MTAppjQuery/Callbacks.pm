@@ -94,7 +94,18 @@ sub template_source_header {
     my $op_jquery_ready     = $p->get_config_value('jquery_ready', $scope);
     my $op_jquery_ready_url = $p->get_config_value('jquery_ready_url', $scope);
     my $op_jqselectable   = 0;#$p->get_config_value('jqselectable', $scope);
-    # Free textarea
+
+    # Free textarea / common
+    my $op_common_mtapp_top_head  = $p->get_config_value('common_mtapp_top_head', 'system') || '<!-- mtapp_top_head (common) (MTAppjQuery) -->';
+    my $op_common_html_head       = $p->get_config_value('common_html_head', 'system') || '<!-- html_head (common) (MTAppjQuery) -->';
+    my $op_common_js_include      = $p->get_config_value('common_js_include', 'system') || '<!-- js_include (common) (MTAppjQuery) -->';
+    my $op_common_html_body       = $p->get_config_value('common_html_body', 'system') || '<!-- html_body (common) (MTAppjQuery) -->';
+    my $op_common_form_header     = $p->get_config_value('common_form_header', 'system') || '<!-- form_header (common) (MTAppjQuery) -->';
+    my $op_common_jq_js_include   = $p->get_config_value('common_jq_js_include', 'system') || '/* (jq_js_includecommon)  (MTAppjQuery) */';
+    my $op_common_mtapp_html_foot = $p->get_config_value('common_mtapp_html_foot', 'system') || '<!-- mtapp_html_foot (common) (MTAppjQuery) -->';
+    my $op_common_mtapp_end_body  = $p->get_config_value('common_mtapp_end_body', 'system') || '<!-- mtapp_end_body (common) (MTAppjQuery) -->';
+
+    # Free textarea / individual
     my $op_fa_mtapp_top_head  = $p->get_config_value('fa_mtapp_top_head', $scope) || '<!-- mtapp_top_head (MTAppjQuery) -->';
     my $op_fa_html_head       = $p->get_config_value('fa_html_head', $scope) || '<!-- html_head (MTAppjQuery) -->';
     my $op_fa_js_include      = $p->get_config_value('fa_js_include', $scope) || '<!-- js_include (MTAppjQuery) -->';
@@ -306,26 +317,33 @@ __MTML__
     <mt:SetVarBlock name="html_head" append="1">
     <link rel="stylesheet" href="${static_plugin_path}css/MTAppjQuery.css" type="text/css" />
     $user_css
+    $op_common_html_head
     $op_fa_html_head
     </mt:SetVarBlock>
     <mt:SetVarBlock name="js_include" append="1">
     $jqselectable
     <mt:var name="uploadify_source">
     <script type="text/javascript" src="${static_plugin_path}js/MTAppjQuery.js"></script>
+    $op_common_js_include
     $op_fa_js_include
     </mt:SetVarBlock>
+    <mt:SetVarBlock name="html_body" append="1">$op_common_html_body</mt:SetVarBlock>
     <mt:SetVarBlock name="html_body" append="1">$op_fa_html_body</mt:SetVarBlock>
+    <mt:SetVarBlock name="form_header" append="1">$op_common_form_header</mt:SetVarBlock>
     <mt:SetVarBlock name="form_header" append="1">$op_fa_form_header</mt:SetVarBlock>
+    <mt:SetVarBlock name="jq_js_include" append="1">$op_common_jq_js_include</mt:SetVarBlock>
     <mt:SetVarBlock name="jq_js_include" append="1">$op_fa_jq_js_include</mt:SetVarBlock>
     <mt:SetVarBlock name="mtapp_html_foot" append="1">
     <div id="mtapp-dialog-msg"></div>
+    $op_common_mtapp_html_foot
     $op_fa_mtapp_html_foot
     $user_js
     </mt:SetVarBlock>
+    <mt:SetVarBlock name="mtapp_end_body" append="1">$op_common_mtapp_end_body</mt:SetVarBlock>
     <mt:SetVarBlock name="mtapp_end_body" append="1">$op_fa_mtapp_end_body</mt:SetVarBlock>
 __MTML__
 
-    $$tmpl_ref =~ s/(<head>)/$1\n$op_fa_mtapp_top_head/g;
+    $$tmpl_ref =~ s/(<head>)/$1\n$op_common_mtapp_top_head\n$op_fa_mtapp_top_head/g;
     $$tmpl_ref =~ s/(<mt:var name="html_head">)/$prepend_html_head\n$1/g;
 }
 
