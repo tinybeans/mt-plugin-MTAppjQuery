@@ -600,7 +600,7 @@ __MTML__
 
 sub template_param_edit_template {
     my ($cb, $app, $param, $tmpl) = @_;
-    my $identifier = $param->{identifier};
+    my $identifier = $param->{identifier} || '';
     my $index_identifiers = $param->{index_identifiers};
     if ($identifier eq 'user_js' or $identifier eq 'user_css') {
         push(@$index_identifiers, {
