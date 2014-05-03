@@ -155,7 +155,7 @@
             crtUrl = location.href;
             crtUrl = crtUrl.replace(/&saved[^=]*=1/g, '');
             if (crtUrl.indexOf('blog_id=') != -1) {
-                crtUrl = crtUrl.replace(/blog_id=\d/, 'blog_id=' + blogId);
+                crtUrl = crtUrl.replace(/blog_id=\d+/, 'blog_id=' + blogId);
             }
             else {
                 crtUrl += '&blog_id=' + blogId;
