@@ -75,4 +75,10 @@ sub _fltr_compress {
   return $str;
 }
 
+sub _fltr_json_decode {
+    my ($str, $arg, $ctx) = @_;
+    return $str unless $arg;
+    return MT::Util::from_json($str);
+}
+
 1;
