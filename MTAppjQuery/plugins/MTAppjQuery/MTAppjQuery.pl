@@ -14,37 +14,49 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
     author_link => 'http://www.tinybeans.net/blog/',
     plugin_link => 'http://www.tinybeans.net/blog/download/mt-plugin/mtapp-jquery.html',
     l10n_class  => 'MTAppjQuery::L10N',
-    blog_config_template => 'config.tmpl',
-    system_config_template => 'config.tmpl',
+    blog_config_template => 'config_blog.tmpl',
+    system_config_template => 'config_system.tmpl',
     settings    => new MT::PluginSettings([
             # Set system scope
-            ['active',        {Default => 1,  Scope => 'system'}],
-            ['userjs',        {Default => 1,  Scope => 'system'}],
+            ['active',        {Default => '1',  Scope => 'system'}],
+            ['userjs',        {Default => '1',  Scope => 'system'}],
             ['userjs_url',    {Default => '', Scope => 'system'}],
-            ['usercss',       {Default => 1,  Scope => 'system'}],
+            ['usercss',       {Default => '1',  Scope => 'system'}],
             ['usercss_url',   {Default => '', Scope => 'system'}],
-            #['slidemenu',     {Default => 0,  Scope => 'system'}],
-            #['superslidemenu',{Default => 0,  Scope => 'system'}],
-            ['jquery_ready',    {Default => 0,  Scope => 'system'}],
+            #['slidemenu',     {Default => '0',  Scope => 'system'}],
+            #['superslidemenu',{Default => '0',  Scope => 'system'}],
+            ['jquery_ready',    {Default => '0',  Scope => 'system'}],
             ['jquery_ready_url',{Default => '', Scope => 'system'}],
-            ['jquery_ready_all',{Default => 0,  Scope => 'system'}],
+            ['jquery_ready_all',{Default => '0',  Scope => 'system'}],
+            ['blogs_json',       {Default => '0',  Scope => 'system'}],
+            ['blogs_json_detail',{Default => '0',  Scope => 'system'}],
 
-            #['jqselectable',  {Default => 0,  Scope => 'system'}],
+            #['jqselectable',  {Default => '0',  Scope => 'system'}],
 
             # Set blog scope
-            ['active',        {Default => 1,  Scope => 'blog'}],
-            ['userjs',        {Default => 1,  Scope => 'blog'}],
+            ['active',        {Default => '1',  Scope => 'blog'}],
+            ['userjs',        {Default => '1',  Scope => 'blog'}],
             ['userjs_url',    {Default => '', Scope => 'blog'}],
-            ['usercss',       {Default => 1,  Scope => 'blog'}],
+            ['usercss',       {Default => '1',  Scope => 'blog'}],
             ['usercss_url',   {Default => '', Scope => 'blog'}],
-            #['slidemenu',     {Default => 0,  Scope => 'blog'}],
-            #['superslidemenu',{Default => 0,  Scope => 'blog'}],
-            ['jquery_ready',    {Default => 0,  Scope => 'blog'}],
+            #['slidemenu',     {Default => '0',  Scope => 'blog'}],
+            #['superslidemenu',{Default => '0',  Scope => 'blog'}],
+            ['jquery_ready',    {Default => '0',  Scope => 'blog'}],
             ['jquery_ready_url',{Default => '', Scope => 'blog'}],
 
-            #['jqselectable',  {Default => 0,  Scope => 'blog'}],
+            #['jqselectable',  {Default => '0',  Scope => 'blog'}],
 
-            # Free area
+            # Free area common
+            ['common_mtapp_top_head',  {Default => '', Scope => 'system'}],
+            ['common_html_head',       {Default => '', Scope => 'system'}],
+            ['common_js_include',      {Default => '', Scope => 'system'}],
+            ['common_html_body',       {Default => '', Scope => 'system'}],
+            ['common_form_header',     {Default => '', Scope => 'system'}],
+            ['common_jq_js_include',   {Default => '', Scope => 'system'}],
+            ['common_mtapp_html_foot', {Default => '', Scope => 'system'}],
+            ['common_mtapp_end_body',  {Default => '', Scope => 'system'}],
+
+            # Free area individual
             ['fa_mtapp_top_head',  {Default => '', Scope => 'system'}],
             ['fa_html_head',       {Default => '', Scope => 'system'}],
             ['fa_js_include',      {Default => '', Scope => 'system'}],
@@ -106,12 +118,14 @@ sub init_registry {
         tags => {
             function => {
                 'UserFileAppendText' => '$mt_app_jquery::MTAppjQuery::Tags::_hdlr_user_file_append_text',
+                'dumper' => '$mt_app_jquery::MTAppjQuery::Tags::_hdlr_dumper',
             },
             modifier => {
                 'split' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_split',
                 'split_format' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_split_format',
                 'nengou' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_nengou',
                 'compress' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_compress',
+                'json_decode' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_json_decode',
             },
         },
         applications => {

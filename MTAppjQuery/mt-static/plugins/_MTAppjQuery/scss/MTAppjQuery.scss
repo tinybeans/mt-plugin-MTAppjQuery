@@ -44,6 +44,7 @@ textarea#sys_jqplugin {
     width: 98%;
     height: 100px;
 }
+div#common_free_area-field div.field-content textarea,
 div#free_area-field div.field-content textarea {
     margin-bottom: 20px;
 }
@@ -249,7 +250,24 @@ div#menu-bar div#selector-nav div.selector ul#fav-website-list.super-slide-menu 
 #selector-nav #fav-website-list.super-slide-menu .Blog a:hover {
     background-color: #5C909B;
 }
-
+/* ----------------------------------------
+   __$.MTAppSlideMenuV2()
+---------------------------------------- */
+#mtapp-slidemenu-v2 .scope-list.website > ul > li {
+    position: relative;
+    .scope-list.blog {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 320px;
+        min-width: 320px;
+        max-width: 100%;
+        border: 1px solid #adadad;
+        background-color: #f3f3f3;
+        border-radius: 3px;
+        box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+    }
+}
 /* ----------------------------------------
    __ストラクチャーダッシュボード
 ---------------------------------------- */
@@ -473,6 +491,9 @@ div.mtapp-sortable span.mtapp-linebreak-field-item {
     }
 }
 /* !MTAppTabs */
+body.mtapp-tabs div.mt-dialog {
+    z-index: 9999 !important;
+}
 div.mtapp-tabs-container {
     ul.mtapp-tabs-navi {
         margin-bottom: 0;

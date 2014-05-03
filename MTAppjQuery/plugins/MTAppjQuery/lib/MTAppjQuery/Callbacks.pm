@@ -5,7 +5,7 @@ use MT::Website;
 use MT::Blog;
 use MT::Util;
 use MTAppjQuery::Tmplset;
-
+use MT::Permission;
 sub template_source_dashboard {
     my ($cb, $app, $tmpl_ref) = @_;
 
@@ -24,6 +24,11 @@ sub template_source_header {
     my $blog = $app->blog;
     my $author = $app->user;
 
+    # システム管理者かどうか
+    my $is_superuser = 0;
+    if ($author->is_superuser) {
+        $is_superuser = 1;
+    }
     ### 各種情報を取得する
     my $_type   = $app->param('_type') || '_type';
     my $mode    = $app->param('__mode') || '';
@@ -83,18 +88,31 @@ sub template_source_header {
 
     ### プラグインの設定の値を取得する
     my $scope = (!$blog_id) ? 'system' : 'blog:'.$blog_id;
-    my $op_active         = $p->get_config_value('active', $scope);
+    my $op_active         = $p->get_config_value('active', $scope) || '1';
     return unless $op_active;
-    my $op_userjs         = $p->get_config_value('userjs', $scope);
-    my $op_userjs_url     = $p->get_config_value('userjs_url', $scope);
-    my $op_usercss        = $p->get_config_value('usercss', $scope);
-    my $op_usercss_url    = $p->get_config_value('usercss_url', $scope);
-    my $op_slidemenu      = $p->get_config_value('slidemenu', $scope);
-    my $op_superslidemenu = $p->get_config_value('superslidemenu', $scope);
-    my $op_jquery_ready     = $p->get_config_value('jquery_ready', $scope);
-    my $op_jquery_ready_url = $p->get_config_value('jquery_ready_url', $scope);
+    my $op_userjs         = $p->get_config_value('userjs', $scope) || '1';
+    my $op_userjs_url     = $p->get_config_value('userjs_url', $scope) || '';
+    my $op_usercss        = $p->get_config_value('usercss', $scope) || '1';
+    my $op_usercss_url    = $p->get_config_value('usercss_url', $scope) || '';
+    my $op_slidemenu      = $p->get_config_value('slidemenu', $scope) || '0';
+    my $op_superslidemenu = $p->get_config_value('superslidemenu', $scope) || '0';
+    my $op_jquery_ready     = $p->get_config_value('jquery_ready', $scope) || '0';
+    my $op_jquery_ready_url = $p->get_config_value('jquery_ready_url', $scope) || '';
+    my $op_blogs_json       = $p->get_config_value('blogs_json', 'system') || '0';
+    my $op_blogs_json_detail= $p->get_config_value('blogs_json_detail', 'system') || '0';
     my $op_jqselectable   = 0;#$p->get_config_value('jqselectable', $scope);
-    # Free textarea
+
+    # Free textarea / common
+    my $op_common_mtapp_top_head  = $p->get_config_value('common_mtapp_top_head', 'system') || '<!-- mtapp_top_head (common) (MTAppjQuery) -->';
+    my $op_common_html_head       = $p->get_config_value('common_html_head', 'system') || '<!-- html_head (common) (MTAppjQuery) -->';
+    my $op_common_js_include      = $p->get_config_value('common_js_include', 'system') || '<!-- js_include (common) (MTAppjQuery) -->';
+    my $op_common_html_body       = $p->get_config_value('common_html_body', 'system') || '<!-- html_body (common) (MTAppjQuery) -->';
+    my $op_common_form_header     = $p->get_config_value('common_form_header', 'system') || '<!-- form_header (common) (MTAppjQuery) -->';
+    my $op_common_jq_js_include   = $p->get_config_value('common_jq_js_include', 'system') || '/* (jq_js_includecommon)  (MTAppjQuery) */';
+    my $op_common_mtapp_html_foot = $p->get_config_value('common_mtapp_html_foot', 'system') || '<!-- mtapp_html_foot (common) (MTAppjQuery) -->';
+    my $op_common_mtapp_end_body  = $p->get_config_value('common_mtapp_end_body', 'system') || '<!-- mtapp_end_body (common) (MTAppjQuery) -->';
+
+    # Free textarea / individual
     my $op_fa_mtapp_top_head  = $p->get_config_value('fa_mtapp_top_head', $scope) || '<!-- mtapp_top_head (MTAppjQuery) -->';
     my $op_fa_html_head       = $p->get_config_value('fa_html_head', $scope) || '<!-- html_head (MTAppjQuery) -->';
     my $op_fa_js_include      = $p->get_config_value('fa_js_include', $scope) || '<!-- js_include (MTAppjQuery) -->';
@@ -173,6 +191,77 @@ __MTML__
         $perms_json = join ",", @perms_json;
     }
 
+    ### Set blogs JSON
+    my $can_access_blogs_json = '{}';
+    if ($op_blogs_json) {
+        # Get all permissions that you have.
+        my @perms = MT::Permission->load({author_id => $author_id})
+            or die "You don't have any permissions.";
+
+        # Get only blog ids from your permissions.
+        my @perms_blog_ids;
+        foreach my $perm (@perms) {
+            push(@perms_blog_ids, $perm->blog_id);
+        }
+
+        my @all_websites = MT::Website->load;
+        my @all_blogs = MT::Blog->load;
+        my $can_access_blogs = {
+            'website' => [],
+            'blog' => [],
+        };
+        my $parent_website = {
+            # 'website-1' => [ children blogs ],
+            # 'website-3' => [ children blogs ],
+        };
+
+        # my $parent_website_related = {};
+        foreach my $blog (@all_blogs) {
+            my $blog_id = $blog->id;
+            my $parent_website_key = 'website-' . $blog->parent_id if (defined $blog->parent_id);
+            foreach my $perms_blog_id (@perms_blog_ids) {
+                if ($is_superuser == 1 or $perms_blog_id eq $blog->id) {
+                    # Set into $can_access_blogs
+                    my $simple_blog = {};
+                    if ($op_blogs_json_detail ne '1') {
+                        $simple_blog->{id} = $blog_id;
+                        $simple_blog->{name} = $blog->name;
+                        push @{$can_access_blogs->{blog}}, $simple_blog;
+                        # Set into $parent_website
+                        push @{$parent_website->{$parent_website_key}}, $simple_blog;
+                    }
+                    else {
+                        push @{$can_access_blogs->{blog}}, $blog->{column_values};
+                        # Set into $parent_website
+                        push @{$parent_website->{$parent_website_key}}, $blog->{column_values};
+                    }
+                    last;
+                }
+            }
+        }
+        foreach my $website (@all_websites) {
+            my $website_id = $website->id;
+            foreach my $perms_blog_id (@perms_blog_ids) {
+                if ($is_superuser == 1 or $perms_blog_id eq $website_id) {
+                    my $simple_website = {};
+                    if ($op_blogs_json_detail ne '1') {
+                        $simple_website->{id} = $website_id;
+                        $simple_website->{name} = $website->name;
+                        $simple_website->{children} = $parent_website->{'website-' . $website_id} || [];
+                        push @{$can_access_blogs->{website}}, $simple_website;
+                    }
+                    else {
+                        $website->{column_values}->{children} = $parent_website->{'website-' . $website_id} || [];
+                        push @{$can_access_blogs->{website}}, $website->{column_values};
+                    }
+                    last;
+                }
+            }
+        }
+
+        # To JSON
+        $can_access_blogs_json = MT::Util::to_json($can_access_blogs);
+    }
     ### jQueryの読み込み前後にmtappVarsとjquery_ready.jsをセットする
     my $mtapp_vars = <<__MTML__;
     <mt:unless name="screen_id">
@@ -206,6 +295,7 @@ __MTML__
         "author_permissions" : [$permissions],
         "author_roles" : [$role_names],
         "user_name" : "<mt:var name="author_name" encode_js="1">",
+        "is_superuser" : $is_superuser,
         "curr_website_id" : <mt:if name="curr_website_id"><mt:var name="curr_website_id"><mt:else>0</mt:if>,
         "blog_id" : ${blog_id},
         "entry_id" : ${entry_id},
@@ -222,11 +312,16 @@ __MTML__
         "screen_id" : "<mt:var name="screen_id">",
         "body_class" : [<mt:SetVarBlock name="mtapp_body_class">"<mt:var name="screen_type" default="main-screen"> <mt:if name="scope_type" eq="user">user system<mt:else><mt:var name="scope_type"></mt:if><mt:if name="screen_class"> <mt:var name="screen_class"></mt:if><mt:if name="top_nav_loop"> has-menu-nav</mt:if><mt:if name="related_content"> has-related-content</mt:if><mt:if name="edit_screen"> edit-screen</mt:if><mt:if name="new_object"> create-new</mt:if><mt:if name="loaded_revision"> loaded-revision</mt:if><mt:if name="mt_beta"> mt-beta</mt:if>"</mt:SetVarBlock><mt:var name="mtapp_body_class" regex_replace='/ +/g',' ' regex_replace='/ /g','","'>],
         "template_filename" : '<mt:var name="template_filename">',
-        "json_can_create_post_blogs": [<mt:var name="json_can_create_post_blogs">]<mt:ignore>,
+        "json_can_create_post_blogs": [<mt:var name="json_can_create_post_blogs">],
+        "can_access_blogs_json" : ${can_access_blogs_json}<mt:ignore>,
         "website_json" : [${website_json}],
         "blog_json" : [${blog_json}],
         "perms_json" : [${perms_json}]
         </mt:ignore>
+    }
+    var mtappL10N = {
+        "User_Dashboard" : "<__trans phrase='User Dashboard'>",
+        "System" : "<__trans phrase='System'>"
     }
     /* ]]> */
     </script>
@@ -241,6 +336,7 @@ __MTML__
     <mt:SetVar name="template_id" value="${template_id}">
     <mt:SetVar name="blog_id" value="${blog_id}">
     <mt:SetVar name="static_plugin_path" value="${static_plugin_path}">
+    <mt:SetVar name="is_superuser" value="${is_superuser}">
     </mt:SetHashVar>
 
     <mt:SetVarBlock name="mtappVars" key="author_permissions"><mt:SetVarBlock name="_author_permissions">${permissions}</mt:SetVarBlock>,<mt:Var name="_author_permissions" replace="'","">,</mt:SetVarBlock>
@@ -253,6 +349,7 @@ __MTML__
     <mt:SetVarBlock name="mtappVars" key="screen_id"><mt:var name="screen_id"></mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="template_filename"><mt:var name="template_filename"></mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="json_can_create_post_blogs"><mt:var name="json_can_create_post_blogs"></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="can_access_blogs">${can_access_blogs_json}</mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="body_class">,<mt:var name="mtapp_body_class" replace='"','' regex_replace="/ +/g",",">,</mt:SetVarBlock>
 
     <mt:SetVarBlock name="mtappVars" key="author_id"><mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if></mt:SetVarBlock>
@@ -306,26 +403,33 @@ __MTML__
     <mt:SetVarBlock name="html_head" append="1">
     <link rel="stylesheet" href="${static_plugin_path}css/MTAppjQuery.css" type="text/css" />
     $user_css
+    $op_common_html_head
     $op_fa_html_head
     </mt:SetVarBlock>
     <mt:SetVarBlock name="js_include" append="1">
     $jqselectable
     <mt:var name="uploadify_source">
     <script type="text/javascript" src="${static_plugin_path}js/MTAppjQuery.js"></script>
+    $op_common_js_include
     $op_fa_js_include
     </mt:SetVarBlock>
+    <mt:SetVarBlock name="html_body" append="1">$op_common_html_body</mt:SetVarBlock>
     <mt:SetVarBlock name="html_body" append="1">$op_fa_html_body</mt:SetVarBlock>
+    <mt:SetVarBlock name="form_header" append="1">$op_common_form_header</mt:SetVarBlock>
     <mt:SetVarBlock name="form_header" append="1">$op_fa_form_header</mt:SetVarBlock>
+    <mt:SetVarBlock name="jq_js_include" append="1">$op_common_jq_js_include</mt:SetVarBlock>
     <mt:SetVarBlock name="jq_js_include" append="1">$op_fa_jq_js_include</mt:SetVarBlock>
     <mt:SetVarBlock name="mtapp_html_foot" append="1">
     <div id="mtapp-dialog-msg"></div>
+    $op_common_mtapp_html_foot
     $op_fa_mtapp_html_foot
     $user_js
     </mt:SetVarBlock>
+    <mt:SetVarBlock name="mtapp_end_body" append="1">$op_common_mtapp_end_body</mt:SetVarBlock>
     <mt:SetVarBlock name="mtapp_end_body" append="1">$op_fa_mtapp_end_body</mt:SetVarBlock>
 __MTML__
 
-    $$tmpl_ref =~ s/(<head>)/$1\n$op_fa_mtapp_top_head/g;
+    $$tmpl_ref =~ s/(<head>)/$1\n$op_common_mtapp_top_head\n$op_fa_mtapp_top_head/g;
     $$tmpl_ref =~ s/(<mt:var name="html_head">)/$prepend_html_head\n$1/g;
 }
 
@@ -496,7 +600,7 @@ __MTML__
 
 sub template_param_edit_template {
     my ($cb, $app, $param, $tmpl) = @_;
-    my $identifier = $param->{identifier};
+    my $identifier = $param->{identifier} || '';
     my $index_identifiers = $param->{index_identifiers};
     if ($identifier eq 'user_js' or $identifier eq 'user_css') {
         push(@$index_identifiers, {
@@ -625,6 +729,7 @@ sub save_config_filter {
 
 sub _config_replace {
     my ($str) = @_;
+    return '' if (! $str);
     $str =~ s!__filepath__!' + fileObj.filePath.replace(/\\/\\//g,"/") + '!g;
     $str =~ s!__filename__!' + fileObj.name + '!g;
     return $str;
