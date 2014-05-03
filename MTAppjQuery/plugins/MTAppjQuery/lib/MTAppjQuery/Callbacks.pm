@@ -6,18 +6,6 @@ use MT::Blog;
 use MT::Util;
 use MTAppjQuery::Tmplset;
 use MT::Permission;
-
-use MT::Log;
-use Data::Dumper;
-use File::Basename;
-sub doLog {
-    my ($msg, $code) = @_;
-    return unless defined($msg);
-    my $log = MT::Log->new;
-    $log->message($msg);
-    $log->metadata($code);
-    $log->save or die $log->errstr;
-}
 sub template_source_dashboard {
     my ($cb, $app, $tmpl_ref) = @_;
 
@@ -612,7 +600,7 @@ __MTML__
 
 sub template_param_edit_template {
     my ($cb, $app, $param, $tmpl) = @_;
-    my $identifier = $param->{identifier} || '';
+    my $identifier = $param->{identifier};
     my $index_identifiers = $param->{index_identifiers};
     if ($identifier eq 'user_js' or $identifier eq 'user_css') {
         push(@$index_identifiers, {
