@@ -118,6 +118,7 @@ sub init_registry {
         tags => {
             function => {
                 'UserFileAppendText' => '$mt_app_jquery::MTAppjQuery::Tags::_hdlr_user_file_append_text',
+                'dumper' => '$mt_app_jquery::MTAppjQuery::Tags::_hdlr_dumper',
             },
             modifier => {
                 'split' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_split',

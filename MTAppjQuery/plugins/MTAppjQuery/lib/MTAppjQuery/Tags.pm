@@ -1,10 +1,18 @@
 package MTAppjQuery::Tags;
 use strict;
+use Data::Dumper;
 
 # Function
 sub _hdlr_user_file_append_text {
     my ($ctx, $args) = @_;
     return '';
+}
+
+sub _hdlr_dumper {
+    my ($ctx, $args) = @_;
+    my $name = $args->{name};
+    return '' if (! $name);
+    return Dumper($ctx->{__stash}->{vars}->{$name});
 }
 
 # Modifiers
