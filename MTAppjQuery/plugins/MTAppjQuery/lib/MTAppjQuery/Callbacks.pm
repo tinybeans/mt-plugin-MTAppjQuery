@@ -1,6 +1,5 @@
 package MTAppjQuery::Callbacks;
 use strict;
-use warnings;
 use utf8;
 use MT::Website;
 use MT::Blog;
@@ -742,6 +741,7 @@ sub save_config_filter {
 
 sub _config_replace {
     my ($str) = @_;
+    return '' if (! $str);
     $str =~ s!__filepath__!' + fileObj.filePath.replace(/\\/\\//g,"/") + '!g;
     $str =~ s!__filename__!' + fileObj.name + '!g;
     return $str;
