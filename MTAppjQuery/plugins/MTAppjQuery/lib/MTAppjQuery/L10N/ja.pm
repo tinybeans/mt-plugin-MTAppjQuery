@@ -87,6 +87,7 @@ use vars qw ( %Lexicon );
 	'You can write that File name is __filename__, File path is __filepath__.' => 'ファイル名＝「__filename__」、ファイルのパス＝「__filepath__」',
 	'A multiple file upload' => 'マルチファイルアップロード',
 	'A multiple file upload meta' => 'マルチファイルアップロード　メタ情報',
+    'Append code' => 'コードを追加',
 );
 
 1;
