@@ -1,0 +1,363 @@
+<mt:Ignore>システム設定</mt:Ignore>
+<h3><__trans phrase="System Settings"></h3>
+<mtapp:setting
+    id="blogs_json"
+    show_label="1"
+    label="<__trans phrase="Use a JSON of Websites/Blogs">">
+    <ul>
+        <li>
+            <select name="blogs_json" id="blogs_json">
+                <option value="1"<mt:if name="blogs_json" eq="1"> selected="selected"</mt:if>><__trans phrase="Enable"></option>
+                <option value="0"<mt:if name="blogs_json" eq="0"> selected="selected"</mt:if>><__trans phrase="Disable"></option>
+            </select>
+            <span id="blogs_json_detail_container" style="<mt:if name="blogs_json" eq="0">display:none;</mt:if>margin-left:5px;">
+                <label for="blogs_json_detail"><input type="checkbox" name="blogs_json_detail" id="blogs_json_detail" value="1"<mt:if name="blogs_json_detail" eq="1"> checked="checked"</mt:if>>&nbsp;<__trans phrase="Detail Mode"></label>
+            </span>
+        </li>
+    </ul>
+    <script type="text/javascript">
+    (function($){
+        $('#blogs_json').on('change', function(){
+            if ($(this).val() == 1) {
+                $('#blogs_json_detail_container').show();
+            }
+            else {
+                $('#blogs_json_detail_container').hide();
+                $('#blogs_json_detail').prop('checked', false);
+            }
+        });
+    })(jQuery);
+    </script>
+</mtapp:setting>
+
+<mtapp:setting
+    id="common_free_area"
+    label="<__trans phrase="Free textarea">">
+    <p><__trans phrase="Set the source to be inserted at each of the template management screen. You can use MT tags for the management screen. be inserted into any position <br /> value of each, in the source code &lt;!-- Variable Name (MTAppjQuery) --&gt; You can check, etc. (only during initial configuration)."></p>
+    <hr />
+    <h5><__trans phrase="Inner head tag"></h5>
+
+    <p><__trans phrase="Append to variable mtapp_top_head"></p>
+    <textarea class="text full low" name="common_mtapp_top_head" id="common_mtapp_top_head"><mt:var name="common_mtapp_top_head" encode_html="1"></textarea>
+
+    <p><__trans phrase="Append to variable html_head"></p>
+    <textarea class="text full low" name="common_html_head" id="common_html_head"><mt:var name="common_html_head" encode_html="1"></textarea>
+
+    <p><__trans phrase="Append to variable js_include"></p>
+    <textarea class="text full low" name="common_js_include" id="common_js_include"><mt:var name="common_js_include" encode_html="1"></textarea>
+
+    <hr />
+    <h5><__trans phrase="The first half of the body tag"></h5>
+    <p><__trans phrase="Append to variable html_body"></p>
+    <textarea class="text full low" name="common_html_body" id="common_html_body"><mt:var name="common_html_body" encode_html="1"></textarea>
+
+    <p><__trans phrase="Append to variable form_header"></p>
+    <textarea class="text full low" name="common_form_header" id="common_form_header"><mt:var name="common_form_header" encode_html="1"></textarea>
+
+    <hr />
+    <h5><__trans phrase="Before &lt;/body&gt;"></h5>
+
+    <p><__trans phrase="Append to variable jq_js_include"></p>
+    <textarea class="text full low" name="common_jq_js_include" id="common_jq_js_include"><mt:var name="common_jq_js_include" encode_html="1"></textarea>
+
+    <p><__trans phrase="Append to variable mtapp_html_foot"></p>
+    <textarea class="text full low" name="common_mtapp_html_foot" id="common_mtapp_html_foot"><mt:var name="common_mtapp_html_foot" encode_html="1"></textarea>
+
+    <p><__trans phrase="Append to variable mtapp_end_body"></p>
+    <p><__trans phrase="Appned code"> : <a id="mtapp-insert-MTAppSlideMenuV2" href="javascript:void(0);" class="button">$.MTAppSlideMenuV2()</a></p>
+    <textarea class="text full low" name="common_mtapp_end_body" id="common_mtapp_end_body"><mt:var name="common_mtapp_end_body" encode_html="1"></textarea>
+</mtapp:setting>
+
+<hr style="margin-bottom:15px;">
+
+<h3><__trans phrase="Individual Settings"></h3>
+
+<mt:Ignore>全般設定</mt:Ignore>
+<input type="hidden" id="mtappjquery-setting-form">
+<mtapp:setting
+    id="active"
+    show_label="1"
+    label="<__trans phrase="General Settings">">
+    <ul>
+        <li>
+            <select name="active" id="active">
+                <option value="1"<mt:if name="active" eq="1"> selected="selected"</mt:if>><__trans phrase="Enable"></option>
+                <option value="0"<mt:if name="active" eq="0"> selected="selected"</mt:if>><__trans phrase="Disable"></option>
+            </select>
+        </li>
+    </ul>
+</mtapp:setting>
+
+<mt:Ignore>user.jsの設定</mt:Ignore>
+<mtapp:setting
+    id="userjs"
+    show_label="1"
+    label="<__trans phrase="Setting user.js">">
+    <ul>
+        <li>
+            <select name="userjs" id="userjs">
+                <option value="1"<mt:if name="userjs" eq="1"> selected="selected"</mt:if>><__trans phrase="Enable"></option>
+                <option value="0"<mt:if name="userjs" eq="0"> selected="selected"</mt:if>><__trans phrase="Disable"></option>
+            </select>
+            <mt:Unless name="userjs_url">
+            <a href="javascript:void(0);" class="change_user_file"><__trans phrase="Change URL"></a>
+            </mt:Unless>
+            <span<mt:Unless name="userjs_url"> style="display:none;"</mt:Unless>>
+                &nbsp;URL&nbsp;
+                <input type="text" value="<mt:If name="userjs_url"><$mt:Var name="userjs_url" encode_html="1"$></mt:If>" name="userjs_url" id="userjs_url" />
+            </span>
+        </li>
+    </ul>
+</mtapp:setting>
+
+<mt:Ignore>user.cssの設定</mt:Ignore>
+<mtapp:setting
+    id="usercss"
+    show_label="1"
+    label="<__trans phrase="Setting user.css">">
+    <ul>
+        <li>
+            <select name="usercss" id="usercss">
+                <option value="1"<mt:if name="usercss" eq="1"> selected="selected"</mt:if>><__trans phrase="Enable"></option>
+                <option value="0"<mt:if name="usercss" eq="0"> selected="selected"</mt:if>><__trans phrase="Disable"></option>
+            </select>
+            <mt:Unless name="usercss_url">
+            <a href="javascript:void(0);" class="change_user_file"><__trans phrase="Change URL"></a>
+            </mt:Unless>
+            <span<mt:Unless name="usercss_url"> style="display:none;"</mt:Unless>>
+                &nbsp;URL&nbsp;
+                <input type="text" value="<mt:If name="usercss_url"><$mt:Var name="usercss_url" encode_html="1"$></mt:If>" name="usercss_url" id="usercss_url" />
+            </span>
+        </li>
+    </ul>
+</mtapp:setting>
+
+<mtapp:setting
+    id="jquery_ready"
+    show_label="1"
+    label="<__trans phrase="Setting jquery_ready.js">">
+    <ul>
+        <li>
+            <select name="jquery_ready" id="jquery_ready">
+                <option value="1"<mt:if name="jquery_ready" eq="1"> selected="selected"</mt:if>><__trans phrase="Enable"></option>
+                <option value="0"<mt:if name="jquery_ready" eq="0"> selected="selected"</mt:if>><__trans phrase="Disable"></option>
+            </select>
+            <mt:Unless name="jquery_ready_url">
+            <a href="javascript:void(0);" class="change_user_file"><__trans phrase="Change URL"></a>
+            </mt:Unless>
+            <span<mt:Unless name="jquery_ready_url"> style="display:none;"</mt:Unless>>
+                &nbsp;URL&nbsp;
+                <input type="text" value="<mt:If name="jquery_ready_url"><$mt:Var name="jquery_ready_url" encode_html="1"$></mt:If>" name="jquery_ready_url" id="jquery_ready_url" />
+            </span>
+        </li>
+        <li id="jquery_ready_all_container">
+            <label for="jquery_ready_all"><input type="checkbox" name="jquery_ready_all" id="jquery_ready_all" value="1"<mt:If name="jquery_ready_all" class="mtapp-apply-all"> checked</mt:If>> <__trans phrase="Apply the setting to all websites and blogs."></label>
+        </li>
+    </ul>
+</mtapp:setting>
+
+<mt:Ignore>
+<mtapp:setting
+    id="jqselectable"
+    show_label="1"
+    label="<__trans phrase="Setting jQselectable.js">">
+    <ul>
+        <li>
+            <select name="jqselectable" id="jqselectable">
+                <option value="1"<mt:if name="jqselectable" eq="1"> selected="selected"</mt:if>><__trans phrase="Enable"></option>
+                <option value="0"<mt:if name="jqselectable" eq="0"> selected="selected"</mt:if>><__trans phrase="Disable"></option>
+            </select>
+        </li>
+    </ul>
+</mtapp:setting>
+</mt:Ignore>
+
+<mtapp:setting
+    id="free_area"
+    label="<__trans phrase="Free textarea">">
+    <p><__trans phrase="Set the source to be inserted at each of the template management screen. You can use MT tags for the management screen. be inserted into any position <br /> value of each, in the source code &lt;!-- Variable Name (MTAppjQuery) --&gt; You can check, etc. (only during initial configuration)."></p>
+    <hr />
+    <h5><__trans phrase="Inner head tag"></h5>
+
+    <p><__trans phrase="Append to variable mtapp_top_head"></p>
+    <textarea class="text full low" name="fa_mtapp_top_head" id="fa_mtapp_top_head"><mt:var name="fa_mtapp_top_head" encode_html="1"></textarea>
+
+    <p><__trans phrase="Append to variable html_head"></p>
+    <textarea class="text full low" name="fa_html_head" id="fa_html_head"><mt:var name="fa_html_head" encode_html="1"></textarea>
+
+    <p><__trans phrase="Append to variable js_include"></p>
+    <textarea class="text full low" name="fa_js_include" id="fa_js_include"><mt:var name="fa_js_include" encode_html="1"></textarea>
+
+    <hr />
+    <h5><__trans phrase="The first half of the body tag"></h5>
+    <p><__trans phrase="Append to variable html_body"></p>
+    <textarea class="text full low" name="fa_html_body" id="fa_html_body"><mt:var name="fa_html_body" encode_html="1"></textarea>
+
+    <p><__trans phrase="Append to variable form_header"></p>
+    <textarea class="text full low" name="fa_form_header" id="fa_form_header"><mt:var name="fa_form_header" encode_html="1"></textarea>
+
+    <hr />
+    <h5><__trans phrase="Before &lt;/body&gt;"></h5>
+
+    <p><__trans phrase="Append to variable jq_js_include"></p>
+    <textarea class="text full low" name="fa_jq_js_include" id="fa_jq_js_include"><mt:var name="fa_jq_js_include" encode_html="1"></textarea>
+
+    <p><__trans phrase="Append to variable mtapp_html_foot"></p>
+    <textarea class="text full low" name="fa_mtapp_html_foot" id="fa_mtapp_html_foot"><mt:var name="fa_mtapp_html_foot" encode_html="1"></textarea>
+
+    <p><__trans phrase="Append to variable mtapp_end_body"></p>
+    <textarea class="text full low" name="fa_mtapp_end_body" id="fa_mtapp_end_body"><mt:var name="fa_mtapp_end_body" encode_html="1"></textarea>
+
+</mtapp:setting>
+
+
+<mt:Ignore>
+    <!-- 不要 -->
+    <mtapp:setting
+        id="mtappjquery"
+        show_label="0"
+        label="MTAppjQuery.js">
+        <ul>
+            <li>
+                <input type="checkbox" value="1" name="mtappjquery" id="mtappjquery"<tmpl_if name=mtappjquery> checked="checked"</tmpl_if> />
+                &nbsp;<__trans phrase="Enable MTAppjQuery.js">&nbsp;
+                <strong>
+                    <__trans phrase="(JavasScript unless you are familiar with the contents of the file it is recommended that you disable it.)">
+                </strong>
+            </li>
+        </ul>
+    </mtapp:setting>
+
+    <!-- 廃止 -->
+    <mtapp:setting
+        id="slidemenu"
+        show_label="0"
+        label="Slide Menu">
+        <ul>
+            <li>
+                <input type="checkbox" value="1" name="slidemenu" id="slidemenu"<tmpl_if name=slidemenu> checked="checked"</tmpl_if> />
+                &nbsp;<__trans phrase="Enable Slide Menu">
+            </li>
+        </ul>
+    </mtapp:setting>
+
+    <!-- 廃止 -->
+    <mtapp:setting
+        id="superslidemenu"
+        show_label="0"
+        label="Enable Super Slide Menu">
+        <ul>
+        	<li>
+                <input type="checkbox" value="1" name="superslidemenu" id="superslidemenu"<tmpl_if name=superslidemenu> checked="checked"</tmpl_if> />
+                &nbsp;<__trans phrase="Enable Super Slide Menu">
+            </li>
+        </ul>
+    </mtapp:setting>
+</mt:Ignore>
+
+<div id="uploadify-container" style="display: none;">
+    <mtapp:settinggroup id="uploadify_setting" class="border" show="1">
+        <legend><__trans phrase="Uploadify"></legend>
+        <mtapp:setting
+            id="active_uploadify"
+            label="<__trans phrase="active Uploadify">">
+            <ul>
+                <li><input type="checkbox" name="active_uploadify" id="active_uploadify"<tmpl_if name=active_uploadify> checked="checked"</tmpl_if> /></li>
+            </ul>
+        </mtapp:setting>
+        <mtapp:setting
+            id="upload_folder"
+            label="<__trans phrase="Upload folder">"
+            hint="<__trans phrase="The path to the folder you would like to save the files to. Do not end the path with a ‘/’.">"
+            show_hint="1">
+            <ul>
+                <li><input type="text" value="<mt:var name="upload_folder" encode_html="1">" name="upload_folder" id="upload_folder" /></li>
+            </ul>
+            <script type="text/javascript">
+            /* <![CDATA[ */
+            (function($){
+                $("#upload_folder").blur(function(){
+                    var value = $(this).val().replace(/^\/|\/$/g,"");
+                    $(this).val(value);
+                });
+            })(jQuery);
+            /* ]]> */
+            </script>
+        </mtapp:setting>
+        <mtapp:setting
+            id="img_elm"
+            label="<__trans phrase="img element"><br />(.png .jpg .jpeg .gif)"
+            hint="<__trans phrase="You can write that File name is __filename__, File path is __filepath__.">"
+            show_hint="1">
+            <ul>
+                <li><input type="text" value="<mt:var name="img_elm" encode_html="1">" name="img_elm" id="img_elm" /></li>
+            </ul>
+        </mtapp:setting>
+<mt:Ignore>
+        <mtapp:setting
+            id="file_elm"
+            label="<__trans phrase="a element">"
+            hint="<__trans phrase="You can write that File name is __filename__, File path is __filepath__.">"
+            show_hint="1">
+            <ul>
+                <li><input type="text" value="<mt:var name="file_elm" encode_html="1">" name="file_elm" id="file_elm" /></li>
+            </ul>
+        </mtapp:setting>
+</mt:Ignore>
+    </mtapp:settinggroup>
+
+    <script type="text/javascript">
+    // <![CDATA[
+    (function($){
+        $('a.change_user_file').click(function(){
+            $(this).hide().next().show();
+        });
+        if (mtappVars.blog_id != 0) {
+            $('#jquery_ready_all_container').hide();
+        }
+        var $form = $('#mtappjquery-setting-form').closest('form');
+        $form.submit(function(){
+            if ($('#jquery_ready_all').is(':checked')) {
+                return window.confirm('<__trans phrase="Setting jquery_ready.js">: <__trans phrase="Apply to all websites and blogs?">');
+            }
+        });
+
+        $('#mtapp-insert-MTAppSlideMenuV2').on('click', function(){
+            var script = [
+                '<script type="text/javascript">',
+                '(function($){',
+                '    $.MTAppSlideMenuV2({',
+                '        moveCreationMenu: false,',
+                '        hidePermissionMsg: false',
+                '    });',
+                '})(jQuery);',
+                '</script'
+            ];
+            appendValue('common_mtapp_end_body', script.join("\n") + '>')
+        });
+
+        function appendValue (id, str) {
+            var $target = $('#' + id);
+            var target = $target[0];
+            var targetValue = $target.val();
+            if (targetValue) {
+                targetValue += "\n\n";
+            }
+            target.style.backgroundColor = '#FFFFE0';
+            for (var i = 10, l = 30; i <= 30; i += 0.2) {
+                target.style.height = i + 'em';
+                target.scrollTop = target.scrollHeight;
+            }
+            setTimeout(function(){
+                target.value = targetValue + str;
+                target.scrollTop = target.scrollHeight;
+                target.style.backgroundColor = '#FFFFE0';
+            }, 100);
+            setTimeout(function(){
+                target.style.backgroundColor = '#FFFFFF';
+            }, 150);
+        }
+    })(jQuery);
+    // ]]>
+    </script>
+</div>

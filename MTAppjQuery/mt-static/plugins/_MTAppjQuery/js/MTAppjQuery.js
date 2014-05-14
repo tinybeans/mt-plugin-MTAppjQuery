@@ -4,13 +4,183 @@
  * Copyright (c) Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-06-22
- * Update:  2014-02-03
- * for MTAppjQuery v1.2.0
+ * Update:  2014-04-22
  *
  */
 ;(function($){
 
     if (typeof mtappVars !== 'object') return;
+    mtappVars.adminScript = location.href.replace(/\?.*/, '');
+
+    // -------------------------------------------------
+    //  $.MTAppSlideMenuV2();
+    //
+    //  Description:
+    //    ログイン中のユーザーがアクセス可能なウェブサイトとブログをすべてスライドメニューで出力します
+    //
+    //  Usage:
+    //    $.MTAppSlideMenuV2(Options);
+    //
+    //  Options:
+    //    moveCreationMenu: {Boolean} ウェブサイト・ブログの作成リンクを「新規作成」に移動
+    //    hidePermissionMsg: {Boolean} 「アクセス権がありません。システム管理者へ連絡してください。」メッセージを非表示
+    // -------------------------------------------------
+    $.MTAppSlideMenuV2 = function(options){
+        var op = $.extend({}, $.MTAppSlideMenuV2.defaults, options);
+
+        if (typeof mtappVars.can_access_blogs_json.website === 'undefined' || !/^6\.0/.test(mtappVars.minor_version)) return;
+
+        var crtUrl = location.href;
+
+        var makeScopeSelectorLi = function (obj) {
+            if (typeof obj.child === 'undefined') {
+                obj.child = '';
+            }
+            if (typeof obj.dataBlogId === 'undefined') {
+                obj.dataBlogId = 0;
+            }
+            return '<li><a href="' + obj.link + '" class="scope-link" data-blog-id="' + obj.dataBlogId + '">' + obj.text + '</a>' + obj.child + '</li>';
+        };
+        var typeScopeList = function (type, content, style) {
+            style = (typeof style === 'undefined') ? '': ' style="' + style + '"';
+            return [
+                '<div class="scope-list ' + type + '"' + style + '>',
+                    '<ul>',
+                        content,
+                    '</ul>',
+                '</div>'
+            ].join('');
+        };
+
+        var li = {};
+
+        li.system = [];
+        li.system.push(
+            makeScopeSelectorLi({
+                link: mtappVars.adminScript + '?__mode=dashboard',
+                text: mtappL10N.User_Dashboard
+            })
+        );
+        if (mtappVars.is_superuser) {
+            li.system.push(
+                makeScopeSelectorLi({
+                    link: mtappVars.adminScript + '?blog_id=0&__mode=dashboard',
+                    text: mtappL10N.System
+                })
+            );
+        }
+
+        var scopeSelectorWidth = $('#scope-selector').width();
+        li.website = [];
+        for (var i = 0, l = mtappVars.can_access_blogs_json.website.length; i < l; i++) {
+            var blogs = mtappVars.can_access_blogs_json.website[i].children;
+            var blogUl = '';
+            if (blogs.length > 0) {
+                var blogLi = '';
+                for (var x = 0, y = blogs.length; x < y; x++) {
+                    var blog = {
+                        link: mtappVars.adminScript + '?blog_id=' + blogs[x].id + '&__mode=dashboard',
+                        dataBlogId: blogs[x].id,
+                        text: blogs[x].name
+                    }
+                    blogLi += makeScopeSelectorLi(blog);
+                }
+                blogUl = typeScopeList('blog', blogLi, 'width:' + scopeSelectorWidth + 'px;');
+            }
+            var website = {
+                link: mtappVars.adminScript + '?blog_id=' + mtappVars.can_access_blogs_json.website[i].id + '&__mode=dashboard',
+                dataBlogId: mtappVars.can_access_blogs_json.website[i].id,
+                text: mtappVars.can_access_blogs_json.website[i].name,
+                child: blogUl
+            };
+            li.website.push(
+                makeScopeSelectorLi(website)
+            );
+        }
+
+        // Move menus of creating website/blog
+        $('#fav-actions').width($('#fav-actions').width());
+
+        var makeFavActionLi = function (obj) {
+            return '<li id="fav-action-' + obj.type + '"><a href="' + obj.link + '" class="fav-action-link">' + obj.text + '</a></li>';
+        };
+
+        var $createWebsite = $('#create-website-action a');
+        var $createBlog = $('#create-blog-action a');
+
+        var creationMenus = '';
+        if ($createWebsite.length > 0) {
+            var createWebsiteAttr = {
+                type: 'website',
+                link: $createWebsite.attr('href'),
+                text: $createWebsite.text()
+            };
+            if (op.moveCreationMenu) {
+                creationMenus = makeFavActionLi(createWebsiteAttr);
+            }
+            else {
+                li.system.push(makeScopeSelectorLi(createWebsiteAttr));
+            }
+        }
+        if ($createBlog.length > 0) {
+            var createBlogAttr = {
+                type: 'blog',
+                link: $createBlog.attr('href'),
+                text: $createBlog.text()
+            };
+            if (op.moveCreationMenu) {
+                creationMenus = makeFavActionLi(createBlogAttr);
+            }
+            else {
+                li.system.push(makeScopeSelectorLi(createBlogAttr));
+            }
+        }
+        if (creationMenus) {
+            $('#fav-actions-list').append(creationMenus);
+        }
+
+        var scopeList = [];
+        scopeList.push(
+            typeScopeList('system', li.system.join(''))
+        );
+        scopeList.push(
+            typeScopeList('website', li.website.join(''))
+        );
+        $('#scope-selector').html('<ul id="mtapp-slidemenu-v2">' + scopeList.join('') + '</ul>');
+
+        // Attach an event handler function for events to the elements
+        $('#mtapp-slidemenu-v2 div.scope-list').not('.system').on('click', 'a', function(e){
+            e.preventDefault();
+            var blogId = $(this).data('blogId');
+            crtUrl = location.href;
+            crtUrl = crtUrl.replace(/&saved[^=]*=1/g, '');
+            if (crtUrl.indexOf('blog_id=') != -1) {
+                crtUrl = crtUrl.replace(/blog_id=\d+/, 'blog_id=' + blogId);
+            }
+            else {
+                crtUrl += '&blog_id=' + blogId;
+            }
+            location.href = crtUrl;
+        });
+        $('#mtapp-slidemenu-v2 div.scope-list.website li').on({
+            mouseenter: function(){
+                $(this).find('div.scope-list.blog').fadeIn('fast');
+            },
+            mouseleave: function(){
+                $(this).find('div.scope-list.blog').fadeOut();
+            }
+        });
+
+        if (op.hidePermissionMsg && crtUrl.indexOf('permission=1') != -1) {
+            $('#permissions.msg-error').hide();
+        }
+    };
+    $.MTAppSlideMenuV2.defaults = {
+        moveCreationMenu: false,
+        hidePermissionMsg: false
+    };
+    // end - $.MTAppSlideMenuV2()
+
     // -------------------------------------------------
     //  $.MTAppNoScrollRightSidebar();
     //
@@ -71,8 +241,8 @@
      * http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
      *
      * Since:   2010-06-22
-     * Update:  2014-01-27
-     * version: 0.2.0
+     * Update:  2014-04-22
+     * version: 0.2.1
      *
      * jQuery 1.7 later (maybe...)
      *
@@ -152,16 +322,20 @@
                 .on('click', 'input:checkbox', function(e){
                     var checkbox = e.target;
                     var checkValues = [];
-                    $container.find(':checked').each(function(){
-                        checkValues.push(this.value);
-                    });
+                    $container
+                        .find('label').removeClass('mcb-label-checked')
+                        .end()
+                        .find(':checked').each(function(){
+                            checkValues.push(this.value);
+                            $(this).parent().addClass('mcb-label-checked');
+                        });
                     $this.val(checkValues.join(','));
                 });
             if (savedItems.length > 0) {
                 $container.find(':checkbox').each(function(){
                     var v = this.value;
                     if ($.inArray(v, savedItems) !== -1) {
-                        $(this).prop('checked', true);
+                        $(this).prop('checked', true).parent().addClass('mcb-label-checked');
                     }
                 })
             }
@@ -1251,6 +1425,7 @@
         }
         var $elms = $(ids.join(','));
         $elms.removeClass('sort-enabled hidden').find('div.field-header').addClass('hidden');
+        $('body').addClass('mtapp-tabs');
         container
             .append($elms)
             .find('.mtapp-tabs-navi').html(li.join(''));
