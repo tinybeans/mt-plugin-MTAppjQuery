@@ -332,6 +332,10 @@ div#menu-bar div#selector-nav div.selector ul#fav-website-list.super-slide-menu 
 ---------------------------------------- */
 #mtapp-slidemenu-v2 .scope-list.website > ul > li {
   position: relative;
+  z-index: 1;
+}
+#mtapp-slidemenu-v2 .scope-list.website > ul > li:hover {
+  z-index: 2;
 }
 #mtapp-slidemenu-v2 .scope-list.website > ul > li .scope-list.blog {
   display: none;
