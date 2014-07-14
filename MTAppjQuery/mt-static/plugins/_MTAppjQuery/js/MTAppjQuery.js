@@ -4,13 +4,46 @@
  * Copyright (c) Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-06-22
- * Update:  2014-04-22
+ * Update:  2014-05-22
  *
  */
 ;(function($){
 
     if (typeof mtappVars !== 'object') return;
     mtappVars.adminScript = location.href.replace(/\?.*/, '');
+
+    // -------------------------------------------------
+    //  $.MTAppGetCategoryName();
+    //
+    //  Description:
+    //    記事の編集画面ではカテゴリ名を、ウェブページの編集画面ではフォルダ名を取得できます
+    //
+    //  Usage:
+    //    $.MTAppGetCategoryName();
+    //
+    //  Options:
+    //    categories: {Array} MT.App.categoryListを渡します
+    //    id: {Number} 調べたいカテゴリidを渡します
+    //    field: {String} label or basename
+    // -------------------------------------------------
+    $.MTAppGetCategoryName = function(options){
+        var op = $.extend({}, $.MTAppGetCategoryName.defaults, options);
+
+        if ($.varType(op.categories) !== 'array' || op.id == 0 || ! /^\d+$/.test(op.id)) {
+            return;
+        }
+        for (var i = 0, l = op.categories.length; i < l; i++) {
+            if (op.categories[i].id == op.id) {
+                return op.categories[i][op.field];
+            }
+        }
+    };
+    $.MTAppGetCategoryName.defaults = {
+        categories: null,
+        id: 0,
+        field: 'label'
+    };
+    // end - $.MTAppGetCategoryName()
 
     // -------------------------------------------------
     //  $.MTAppSlideMenuV2();
