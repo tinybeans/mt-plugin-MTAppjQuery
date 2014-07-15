@@ -109,6 +109,10 @@ sub init_registry {
                 handler => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_preview_strip',
                 priority => 10,
             },
+            'MT::App::CMS::template_source.preview_template_strip' => {
+                handler => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_preview_strip',
+                priority => 10,
+            },
             'MT::App::CMS::template_source.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_favorite_blogs',
             'MT::App::CMS::template_source.list_template' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_list_template',
             # 'template_param.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_favorite_blogs',
