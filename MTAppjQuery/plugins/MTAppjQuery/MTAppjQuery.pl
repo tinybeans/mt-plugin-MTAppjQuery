@@ -2,7 +2,7 @@ package MT::Plugin::MTAppjQuery;
 use strict;
 use base qw( MT::Plugin );
 
-our $VERSION = '1.4.0';
+our $VERSION = '1.5.0';
 
 my $plugin = MT::Plugin::MTAppjQuery->new({
     id          => 'mt_app_jquery',
@@ -103,6 +103,10 @@ sub init_registry {
             },
             'MT::App::CMS::template_source.footer' => {
                 handler => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_footer',
+                priority => 10,
+            },
+            'MT::App::CMS::template_source.preview_strip' => {
+                handler => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_preview_strip',
                 priority => 10,
             },
             'MT::App::CMS::template_source.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_favorite_blogs',

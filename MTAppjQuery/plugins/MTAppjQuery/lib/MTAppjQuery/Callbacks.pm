@@ -6,6 +6,7 @@ use MT::Blog;
 use MT::Util;
 use MTAppjQuery::Tmplset;
 use MT::Permission;
+
 sub template_source_dashboard {
     my ($cb, $app, $tmpl_ref) = @_;
 
@@ -461,6 +462,11 @@ sub template_source_favorite_blogs {
     my $fav_blogs_wdg_close     = MTAppjQuery::Tmplset::fav_blogs_wdg_close($version);
     $$tmpl_ref =~ s!$fav_blogs_wdg_close_org!$fav_blogs_wdg_close!g;
 
+}
+
+sub template_source_preview_strip {
+    &template_source_header(@_);
+    &template_source_footer(@_);
 }
 
 sub template_source_list_template {
