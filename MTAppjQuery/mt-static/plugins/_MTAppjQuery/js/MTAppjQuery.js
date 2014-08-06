@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-06-22
- * Update:  2014-05-22
+ * Update:  2014-08-06
  *
  */
 ;(function($){
@@ -628,6 +628,9 @@
 
             var thisVal = $this.val();
             var thisData = (thisVal) ? thisVal.split(',') : [];
+            for (var i = 0, l = thisData.length; i < l; i++) {
+                thisData[i] = thisData[i].replace(/^\s+|\s+$/, '');
+            }
             var thisId = $this.attr('id') ? 'mtappmltform-' + $this.attr('id') : '';
             if (thisId == '') {
                 var rand = '' + Math.random();
