@@ -291,6 +291,8 @@ __MTML__
     var mtappVars = {
         "version" : "${version}",
         "minor_version" : "${minor_version}",
+        "debug_mode" : "<mt:Var name="config.DebugMode">",
+        "language" : "<mt:Var name="config.DefaultLanguage">",
         "type" : "${_type}",
         "mode" : "${mode}",
         "author_id" : <mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if>,
@@ -341,6 +343,9 @@ __MTML__
     <mt:SetVar name="static_plugin_path" value="${static_plugin_path}">
     <mt:SetVar name="is_superuser" value="${is_superuser}">
     </mt:SetHashVar>
+
+    <mt:SetVarBlock name="mtappVars" key="debug_mode"><mt:Var name="config.DebugMode"></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="language"><mt:Var name="config.DefaultLanguage"></mt:SetVarBlock>
 
     <mt:SetVarBlock name="mtappVars" key="author_permissions"><mt:SetVarBlock name="_author_permissions">${permissions}</mt:SetVarBlock>,<mt:Var name="_author_permissions" replace="'","">,</mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="author_roles"><mt:SetVarBlock name="_author_roles">${role_names}</mt:SetVarBlock>,<mt:Var name="_author_roles" replace='"',''>,</mt:SetVarBlock>
