@@ -56,12 +56,14 @@ sub template_source_header {
     require MT::Association;
     require MT::Role;
     ### ログインユーザーのロールを取得する
+    my $role_join_terms = {
+        author_id => $author_id
+    };
+    if ($blog_id) {
+        $role_join_terms->{blog_id} = $blog_id;
+    }
     my @role = MT::Role->load(undef, {
-        join => MT::Association->join_on(
-            'role_id', {
-                'author_id' => $author_id,
-            }
-        )
+        join => MT::Association->join_on('role_id', $role_join_terms)
     });
     my @role_name;
     foreach my $role (@role) {
