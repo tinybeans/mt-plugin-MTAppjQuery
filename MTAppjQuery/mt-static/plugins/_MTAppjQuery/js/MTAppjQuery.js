@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-06-22
- * Update:  2014-08-06
+ * Update:  2014-09-19
  *
  */
 ;(function($){
@@ -1520,7 +1520,13 @@
 
         var $myMsg = $(myMsg.join(''));
 
-        $('#msg-block').append($myMsg);
+        var $msgBlock = $('#msg-block').append($myMsg);
+
+        if (mtappVars.template_filename === 'dialog/asset_list') {
+            $msgBlock.on('click', '.mt-close-msg', function(){
+                $(this).parent('.msg').remove();
+            });
+        }
 
         if (op.timeout > 0) {
             var animation = (op.animation === 'slideUp') ? 'slideUp' : 'fadeOut';
