@@ -57,10 +57,6 @@
             var $this = $(this);
             var jsonStr = $this.val();
             var json = /^\{/.test(jsonStr) ? JSON.parse(jsonStr) : {"items":[]};
-
-            // If json has the header property, set the value of json.header as op.header.
-            if (op.header !== null && 'header' in json) {
-                op.header = json.header;
             }
 
             // Check the order of properties
@@ -69,10 +65,8 @@
                 alert('Error in .MTAppJSONTable: Invalid option.order');
                 return;
             }
-            if ('order' in json && typeof json.order === 'string') {
-                op.order = json.order.split(',');
-            }
 console.log(order);
+console.log(op.header);
             var items = json.items;
 
             if (items.length === 0) {
@@ -241,23 +235,6 @@ console.log(order);
             if (op.edit) {
                 $('form[method="post"]').on('submit', function(){
                     var jsonSave = {"items":[]};
-
-                    // Set jsonSave.header and jsonSave.order
-                    var currentOrder = [];
-                    if (op.header !== null) {
-                        jsonSave.header = {};
-                        $table.find('thead th').each(function(){
-                            var propName = $(this).attr('data-name');
-                            jsonSave.header[propName] = $(this).text();
-                            currentOrder.push(propName);
-                        });
-                    }
-                    else {
-                        $table.find('tbody tr:first td').each(function(){
-                            currentOrder.push($(this).attr('data-name'));
-                        });
-                    }
-                    jsonSave.order = currentOrder.join(',');
 
                     var jsonSaveStr = JSON.stringify(jsonSave);
                     var itemsArray = [];
