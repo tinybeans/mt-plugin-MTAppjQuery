@@ -541,3 +541,42 @@ span.mtappmultiform-radio {
         }
     }
 }
+/* ----------------------------------------
+   __MTAppJSONTable
+---------------------------------------- */
+.mtapp-json-table {
+    table {
+        width: 100%;
+        margin-bottom: 1em;
+        border-collapse: collapse;
+        caption {
+            margin-top: 10px;
+            text-align: left;
+            font-weight: bold;
+        }
+        th, td {
+            padding: 0;
+            border: 1px solid #c0c6c9;
+            textarea {
+                width: 100%;
+                border: none;
+            }
+        }
+        th {
+            padding: 5px 0;
+            background-color: #e6e6e6;
+        }
+        td.uneditable {
+            padding: 0.2em 0.25em;
+        }
+        td.checkbox {
+            text-align: center;
+        }
+    }
+    .add-buttons {
+        text-align: right;
+        .last-child {
+            margin-right: 0;
+        }
+    }
+}

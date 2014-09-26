@@ -13,6 +13,281 @@
     mtappVars.adminScript = location.href.replace(/\?.*/, '');
 
     // -------------------------------------------------
+    //  $(foo).MTAppJSONTable();
+    //
+    //  Description:
+    //    fooに指定したtextareaのJSONから編集可能なtable要素を生成します。
+    //
+    //  Usage:
+    //    $(foo).MTAppJSONTable(options);
+    //
+    //    このメソッドで扱えるJSONのフォーマットは下記の通りです。
+    //    {"items":[
+    //        {"key1": "value1", "key2": "value2", "key3": "value3"},
+    //        {"key1": "value1", "key2": "value2", "key3": "value3"},
+    //        {"key1": "value1", "key2": "value2", "key3": "value3"}
+    //    ]}
+    //
+    //  Options:
+    //    order: {Array} JSONで扱うプロパティ名を列の並び順に列挙した配列を指定します。(Default : [])
+    //    caption: {String} キャプションを表示する場合はそのテキストを指定します。(Default : null)
+    //    header: {Object} thead要素を表示する場合は、{key1: 'key1の表示名', key2: 'key2の表示名'} になるように指定します。(Default : null)
+    //    footer: {Boolean} tfoot要素を表示する場合はtrue指定します。(Default : false)
+    //    add: '' {String} ユーザーが動的に行や列を増やせるようにする場合に、row、columnまたはbothを指定します。(Default : '')
+    // -------------------------------------------------
+    $.fn.MTAppJSONTable = function(options){
+        var op = $.extend({}, $.fn.MTAppJSONTable.defaults, options);
+
+        var l10n = {};
+        if (mtappVars.language === 'ja') {
+            l10n.addRow = '行を追加';
+            l10n.addColumn = '列を追加';
+            l10n.addColumnProperty = 'プロパティ名（例：title）';
+            l10n.addColumnPropertyDisplayName = 'プロパティ表示名（例：タイトル）';
+        }
+        else {
+            l10n.addRow = 'Add a row';
+            l10n.addColumn = 'Add a column';
+            l10n.addColumnProperty = 'Property Name (e.g. title)';
+            l10n.addColumnPropertyDisplayName = 'Property Display Name (e.g. Title)';
+        }
+
+        return this.each(function(){
+
+            var $this = $(this);
+            var jsonStr = $this.val();
+            var json = /^\{/.test(jsonStr) ? JSON.parse(jsonStr) : {"items":[]};
+
+            // If json has the header property, set the value of json.header as op.header.
+            if (op.header !== null && 'header' in json) {
+                op.header = json.header;
+            }
+
+            // Check the order of properties
+            var order = op.order;
+            if ($.isArray(order) && order.length === 0) {
+                alert('Error in .MTAppJSONTable: Invalid option.order');
+                return;
+            }
+            if ('order' in json && typeof json.order === 'string') {
+                op.order = json.order.split(',');
+            }
+console.log(order);
+            var items = json.items;
+
+            if (items.length === 0) {
+                items[0] = {};
+                for (var i = 0, l = order.length; i < l; i++) {
+                    items[0][order[i]] = '';
+                }
+            }
+
+            op.items = items;
+// console.log(json);
+// console.log(items);
+
+            // var order = op.order;
+            // if (order.length === 0) {
+            //     for (var key in items[0]) {
+            //         order.push(key);
+            //     }
+            // }
+
+            var tmpl = {};
+
+            tmpl.caption = '<caption>[#= caption #]</caption>';
+
+            tmpl.header = [
+                '<thead>',
+                  '<tr>',
+                      '[# for (var i = 0, l = order.length; i < l; i++) { #]',
+                      '<th class="[#= order[i] #]" data-name="[#= order[i] #]">[#= header[order[i]] #]</th>',
+                      '[# } #]',
+                  '</tr>',
+                '</thead>'
+            ].join("\n");
+
+            tmpl.footer = [
+                '<tfoot>',
+                  '<tr>',
+                      '[# for (var i = 0, l = order.length; i < l; i++) { #]',
+                      '<th class="[#= order[i] #]" data-name="[#= order[i] #]">[#= header[order[i]] #]</th>',
+                      '[# } #]',
+                  '</tr>',
+                '</tfoot>'
+            ].join("\n");
+
+            tmpl.tbody = [
+                '<tbody>',
+                    '[# for (var i = 0, l = items.length; i < l; i++) { #]',
+                    '<tr>',
+                        '[# for (var x = 0, y = order.length; x < y; x++) { #]',
+                        '<td class="[#= order[x] #]" data-name="[#= order[x] #]">',
+                            '[# if (edit) { #]',
+                            '<textarea data-name="[#= order[x] #]">',
+                            '[# } #]',
+                            '[#= items[i][order[x]] #]',
+                            '[# if (edit) { #]',
+                            '</textarea>',
+                            '[# } #]',
+                        '</td>',
+                        '[# } #]',
+                    '</tr>',
+                    '[# } #]',
+                '</tbody>'
+            ].join("");
+
+            tmpl.buttons = [
+                '<div class="add-btn">',
+                    '[# if (add === "row" || add === "both") { #]',
+                    '<a href="#" class="button add-row">' + l10n.addRow + '</a>',
+                    '[# } #]',
+                    '[# if (add === "column" || add === "both") { #]',
+                    '<a href="#" class="button add-column">' + l10n.addColumn + '</a>',
+                    '[# } #]',
+                '</div>'
+            ].join("");
+
+            tmpl.container = [
+                '<div class="mtapp-json-table">',
+                    '<table border="1">',
+                        // caption
+                        '[# if (typeof caption === "string") { #]',
+                            '[#= context.include("caption") #]',
+                        '[# } #]',
+
+                        // header
+                        '[# if (header !== null) { #]',
+                            '[#= context.include("header") #]',
+                        '[# } #]',
+
+                        // footer
+                        '[# if (footer) { #]',
+                            '[#= context.include("footer") #]',
+                        '[# } #]',
+
+                        // tbody
+                        '[# if (items.length > 0) { #]',
+                            '[#= context.include("tbody") #]',
+                        '[# } #]',
+
+                    '</table>',
+
+                    '[# if (add !== "") { #]',
+                        '[#= context.include("buttons") #]',
+                    '[# } #]',
+
+                '</div>'
+            ].join("\n");
+
+            var tableHtml = Template.process('container', op, tmpl);
+// console.log(tableHtml);
+            $(this).after(tableHtml);
+
+            var $container = $this.next('div');
+            var $table = $container.children('table');
+// console.log($container);
+// console.log($table);
+            // Check the value of add option
+            var add = op.add;
+            if (typeof add !== 'string') {
+                alert('Error in .MTAppJSONTable: Invalid option.add');
+                return;
+            }
+
+            // Add a row
+            if (add === 'row' || add === 'both') {
+                $container.on('click', 'a.add-row', function(){
+                    var $tbody = $table.find('tbody');
+                    var $clone = $tbody.find('tr').last().removeClass('last-child').clone();
+                    $clone.addClass('last-child').find('textarea').val('');
+                    $tbody.append($clone);
+                    return false;
+                });
+            }
+
+            // Add a column
+            if (add === 'column' || add === 'both') {
+                $container.on('click', 'a.add-column', function(){
+                    var propName = prompt('Type a ' + l10n.addColumnProperty, '');
+                    if (propName === '') {
+                        alert('Error in .MTAppJSONTable: Property Name is required.');
+                        return false;
+                    }
+                    var propDisplayName = prompt('Type a ' + l10n.addColumnPropertyDisplayName, '');
+                    if (propDisplayName === '') {
+                        alert('Error in .MTAppJSONTable: Property Display Name is required.');
+                        return false;
+                    }
+                    $table.find('tr').children(':last-child').each(function(){
+                        var $clone = $(this).removeClass('last-child').clone();
+                        $clone.attr({'class': propName + ' last-child', 'data-name': propName});
+                        switch ($clone[0].tagName.toLowerCase()) {
+                            case 'th':
+                                $clone.text(propDisplayName);
+                                break;
+                            case 'td':
+                                $clone.find('textarea').attr('data-name', propName).val('');
+                                break;
+                        }
+                        $(this).after($clone);
+                    });
+                    return false;
+                });
+
+            }
+
+            // Save values edited by user
+            if (op.edit) {
+                $('form[method="post"]').on('submit', function(){
+                    var jsonSave = {"items":[]};
+
+                    // Set jsonSave.header and jsonSave.order
+                    var currentOrder = [];
+                    if (op.header !== null) {
+                        jsonSave.header = {};
+                        $table.find('thead th').each(function(){
+                            var propName = $(this).attr('data-name');
+                            jsonSave.header[propName] = $(this).text();
+                            currentOrder.push(propName);
+                        });
+                    }
+                    else {
+                        $table.find('tbody tr:first td').each(function(){
+                            currentOrder.push($(this).attr('data-name'));
+                        });
+                    }
+                    jsonSave.order = currentOrder.join(',');
+
+                    var jsonSaveStr = JSON.stringify(jsonSave);
+                    var itemsArray = [];
+                    $table.find('tbody tr').each(function(){
+                        var item = {};
+                        $(this).find('textarea').each(function(){
+                            item[$(this).attr('data-name')] = $(this).val();
+                        });
+                        itemsArray.push(JSON.stringify(item));
+                    });
+                    jsonSaveStr = jsonSaveStr.replace('"[]"', '[' + itemsArray.join(',') + ']');
+                    console.log(jsonSave);
+                    $this.val(jsonSaveStr);
+                    // return confirm('submit ok?');
+                });
+            }
+        });
+    };
+    $.fn.MTAppJSONTable.defaults = {
+        order: [], // Array
+        caption: null, // String
+        header: null, // Object
+        footer: false, // Boolean
+        // items: [], // Array include Object
+        edit: true,
+        add: '' // row, column or both
+    };
+    // end - $.fn.MTAppJSONTable()
+
+    // -------------------------------------------------
     //  $.MTAppGetCategoryName();
     //
     //  Description:
