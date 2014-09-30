@@ -234,9 +234,6 @@ console.log(op.header);
             // Save values edited by user
             if (op.edit) {
                 $('form[method="post"]').on('submit', function(){
-                    var jsonSave = {"items":[]};
-
-                    var jsonSaveStr = JSON.stringify(jsonSave);
                     var itemsArray = [];
                     $table.find('tbody tr').each(function(){
                         var item = {};
@@ -245,10 +242,7 @@ console.log(op.header);
                         });
                         itemsArray.push(JSON.stringify(item));
                     });
-                    jsonSaveStr = jsonSaveStr.replace('"[]"', '[' + itemsArray.join(',') + ']');
-                    console.log(jsonSave);
-                    $this.val(jsonSaveStr);
-                    // return confirm('submit ok?');
+                    $this.val('{"items":[' + itemsArray.join(',') + ']}');
                 });
             }
         });
