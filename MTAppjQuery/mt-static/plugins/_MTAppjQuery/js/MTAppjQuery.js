@@ -62,7 +62,7 @@
             // Check the order of properties
             var order = op.order;
             if ($.isArray(order) && order.length === 0) {
-                alert('Error in .MTAppJSONTable: Invalid option.order');
+                alert('Error in .MTAppJSONTable: The "order" option is required.');
                 return;
             }
 console.log(order);
