@@ -56,7 +56,20 @@
 
             var $this = $(this);
             var jsonStr = $this.val();
-            var json = /^\{/.test(jsonStr) ? JSON.parse(jsonStr) : {"items":[]};
+            var json = null;
+            if (/^\{/.test(jsonStr)) {
+                try {
+                    json = JSON.parse(jsonStr);
+                }
+                catch(e) {
+                    alert(e.message);
+                }
+            }
+            else {
+                json = {"items":[]};
+            }
+            if (json === null) {
+                return;
             }
 
             // Check the order of properties
