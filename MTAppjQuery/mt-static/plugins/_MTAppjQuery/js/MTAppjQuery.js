@@ -73,7 +73,7 @@
             }
 
             // Check the order of properties
-            var order = op.order;
+            var order = op.headerOrder;
             if ($.isArray(order) && order.length === 0) {
                 alert('Error in .MTAppJSONTable: The "order" option is required.');
                 return;
@@ -107,8 +107,8 @@ console.log(op.header);
             tmpl.header = [
                 '<thead>',
                   '<tr>',
-                      '[# for (var i = 0, l = order.length; i < l; i++) { #]',
-                      '<th class="[#= order[i] #]" data-name="[#= order[i] #]">[#= header[order[i]] #]</th>',
+                      '[# for (var i = 0, l = headerOrder.length; i < l; i++) { #]',
+                      '<th class="[#= headerOrder[i] #]" data-name="[#= headerOrder[i] #]">[#= header[headerOrder[i]] #]</th>',
                       '[# } #]',
                   '</tr>',
                 '</thead>'
@@ -117,8 +117,8 @@ console.log(op.header);
             tmpl.footer = [
                 '<tfoot>',
                   '<tr>',
-                      '[# for (var i = 0, l = order.length; i < l; i++) { #]',
-                      '<th class="[#= order[i] #]" data-name="[#= order[i] #]">[#= header[order[i]] #]</th>',
+                      '[# for (var i = 0, l = headerOrder.length; i < l; i++) { #]',
+                      '<th class="[#= headerOrder[i] #]" data-name="[#= headerOrder[i] #]">[#= header[headerOrder[i]] #]</th>',
                       '[# } #]',
                   '</tr>',
                 '</tfoot>'
@@ -128,12 +128,12 @@ console.log(op.header);
                 '<tbody>',
                     '[# for (var i = 0, l = items.length; i < l; i++) { #]',
                     '<tr>',
-                        '[# for (var x = 0, y = order.length; x < y; x++) { #]',
-                        '<td class="[#= order[x] #]" data-name="[#= order[x] #]">',
+                        '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
+                        '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
                             '[# if (edit) { #]',
-                            '<textarea data-name="[#= order[x] #]">',
+                            '<textarea data-name="[#= headerOrder[x] #]">',
                             '[# } #]',
-                            '[#= items[i][order[x]] #]',
+                            '[#= items[i][headerOrder[x]] #]',
                             '[# if (edit) { #]',
                             '</textarea>',
                             '[# } #]',
@@ -261,9 +261,9 @@ console.log(op.header);
         });
     };
     $.fn.MTAppJSONTable.defaults = {
-        order: [], // Array
         caption: null, // String
         header: null, // Object
+        headerOrder: [], // Array
         footer: false, // Boolean
         // items: [], // Array include Object
         edit: true,
