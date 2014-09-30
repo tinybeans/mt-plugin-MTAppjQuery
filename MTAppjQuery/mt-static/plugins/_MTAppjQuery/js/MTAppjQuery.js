@@ -146,10 +146,10 @@ console.log(op.header);
 
             tmpl.buttons = [
                 '<div class="add-btn">',
-                    '[# if (add === "row" || add === "both") { #]',
+                    '[# if (add && headerPosition === "top") { #]',
                     '<a href="#" class="button add-row">' + l10n.addRow + '</a>',
                     '[# } #]',
-                    '[# if (add === "column" || add === "both") { #]',
+                    '[# if (add && headerPosition === "left") { #]',
                     '<a href="#" class="button add-column">' + l10n.addColumn + '</a>',
                     '[# } #]',
                 '</div>'
@@ -164,12 +164,12 @@ console.log(op.header);
                         '[# } #]',
 
                         // header
-                        '[# if (header !== null) { #]',
+                        '[# if (header && headerPosition === "top") { #]',
                             '[#= context.include("header") #]',
                         '[# } #]',
 
                         // footer
-                        '[# if (footer) { #]',
+                        '[# if (header && headerPosition === "top" && footer) { #]',
                             '[#= context.include("footer") #]',
                         '[# } #]',
 
@@ -180,7 +180,7 @@ console.log(op.header);
 
                     '</table>',
 
-                    '[# if (add !== "") { #]',
+                    '[# if (add) { #]',
                         '[#= context.include("buttons") #]',
                     '[# } #]',
 
@@ -264,10 +264,11 @@ console.log(op.header);
         caption: null, // String
         header: null, // Object
         headerOrder: [], // Array
+        headerPosition: 'top', // top or left
         footer: false, // Boolean
         // items: [], // Array include Object
         edit: true,
-        add: '' // row, column or both
+        add: false // Boolean
     };
     // end - $.fn.MTAppJSONTable()
 
