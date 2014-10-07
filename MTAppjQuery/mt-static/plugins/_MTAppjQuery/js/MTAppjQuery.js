@@ -124,11 +124,31 @@ console.log(op.header);
                 '</tfoot>'
             ].join("\n");
 
-            tmpl.tbody = [
+            tmpl.tbodyTop = [
                 '<tbody>',
                     '[# for (var i = 0, l = items.length; i < l; i++) { #]',
                     '<tr>',
                         '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
+                        '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
+                            '[# if (edit) { #]',
+                            '<textarea data-name="[#= headerOrder[x] #]">',
+                            '[# } #]',
+                            '[#= items[i][headerOrder[x]] #]',
+                            '[# if (edit) { #]',
+                            '</textarea>',
+                            '[# } #]',
+                        '</td>',
+                        '[# } #]',
+                    '</tr>',
+                    '[# } #]',
+                '</tbody>'
+            ].join("");
+
+            tmpl.tbodyLeft = [
+                '<tbody>',
+                    '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
+                    '<tr class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
+                        '[# for (var i = 0, l = items.length; i < l; i++) { #]',
                         '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
                             '[# if (edit) { #]',
                             '<textarea data-name="[#= headerOrder[x] #]">',
@@ -175,7 +195,11 @@ console.log(op.header);
 
                         // tbody
                         '[# if (items.length > 0) { #]',
-                            '[#= context.include("tbody") #]',
+                            '[# if (headerPosition === "top") { #]',
+                                '[#= context.include("tbodyTop") #]',
+                            '[# } else if (headerPosition === "left") { #]',
+                                '[#= context.include("tbodyLeft") #]',
+                            '[# } #]',
                         '[# } #]',
 
                     '</table>',
@@ -187,6 +211,7 @@ console.log(op.header);
                 '</div>'
             ].join("\n");
 
+            // Build HTML and insert a table.
             var tableHtml = Template.process('container', op, tmpl);
 // console.log(tableHtml);
             $(this).after(tableHtml);
@@ -195,6 +220,15 @@ console.log(op.header);
             var $table = $container.children('table');
 // console.log($container);
 // console.log($table);
+
+            // If the "headerPosition" option is "left", insert th to tr.
+            if (op.header && op.headerPosition === 'left') {
+                $table.find('tr').each(function(){
+                    var dataName = $(this).attr('data-name');
+                    $(this).prepend('<th class="' + dataName + '" data-name="' + dataName + '">' + op.header[dataName] + '</th>');
+                });
+            }
+
             // Check the value of add option
             var add = op.add;
             if (typeof add !== 'string') {
@@ -248,13 +282,32 @@ console.log(op.header);
             if (op.edit) {
                 $('form[method="post"]').on('submit', function(){
                     var itemsArray = [];
-                    $table.find('tbody tr').each(function(){
-                        var item = {};
-                        $(this).find('textarea').each(function(){
-                            item[$(this).attr('data-name')] = $(this).val();
+                    if (op.headerPosition === 'top') {
+                        $table.find('tbody tr').each(function(){
+                            var item = {};
+                            $(this).find('textarea').each(function(){
+                                item[$(this).attr('data-name')] = $(this).val();
+                            });
+                            itemsArray.push(JSON.stringify(item));
                         });
-                        itemsArray.push(JSON.stringify(item));
-                    });
+                    }
+                    else if (op.headerPosition === 'left') {
+                        var $tr = $table.find('tr');
+                        var textareaCount = $tr.eq(0).find('textarea').length;
+                        var itemsArrayObj = [];
+                        for (var i = 0; i < textareaCount; i++) {
+                            itemsArrayObj.push({});
+                        }
+                        $tr.each(function(i){
+                            $(this).find('textarea').each(function(j){
+                                itemsArrayObj[j][$(this).attr('data-name')] = $(this).val();
+                            });
+                        });
+                        for (var i = 0; i < textareaCount; i++) {
+                            itemsArray.push(JSON.stringify(itemsArrayObj[i]));
+                        }
+                        console.log(itemsArray);
+                    }
                     $this.val('{"items":[' + itemsArray.join(',') + ']}');
                 });
             }
