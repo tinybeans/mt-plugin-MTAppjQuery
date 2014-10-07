@@ -560,6 +560,7 @@ span.mtappmultiform-radio {
             textarea {
                 width: 100%;
                 border: none;
+                background-color: transparent;
             }
         }
         th {
@@ -571,6 +572,13 @@ span.mtappmultiform-radio {
         }
         td.checkbox {
             text-align: center;
+        }
+        .jsontable-clear-cell {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .jsontable-clear-data {
+            background-color: #e7e7eb;
         }
     }
     .add-buttons {
