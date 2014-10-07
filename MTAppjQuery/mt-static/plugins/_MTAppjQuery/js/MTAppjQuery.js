@@ -295,33 +295,43 @@
             // Save values edited by user
             if (op.edit) {
                 $('form[method="post"]').on('submit', function(){
+                    var values = '';
                     var itemsArray = [];
                     if (op.headerPosition === 'top') {
                         $table.find('tbody tr').each(function(){
                             var item = {};
                             $(this).find('textarea').each(function(){
-                                item[$(this).attr('data-name')] = $(this).val();
+                                var v = $(this).val();
+                                item[$(this).attr('data-name')] = v;
+                                values += v;
                             });
                             itemsArray.push(JSON.stringify(item));
                         });
                     }
                     else if (op.headerPosition === 'left') {
                         var $tr = $table.find('tr');
-                        var textareaCount = $tr.eq(0).find('textarea').length;
+                        var textareaCount = $tr.last().find('textarea').length;
                         var itemsArrayObj = [];
                         for (var i = 0; i < textareaCount; i++) {
                             itemsArrayObj.push({});
                         }
                         $tr.each(function(i){
                             $(this).find('textarea').each(function(j){
-                                itemsArrayObj[j][$(this).attr('data-name')] = $(this).val();
+                                var v = $(this).val();
+                                itemsArrayObj[j][$(this).attr('data-name')] = v;
+                                values += v;
                             });
                         });
                         for (var i = 0; i < textareaCount; i++) {
                             itemsArray.push(JSON.stringify(itemsArrayObj[i]));
                         }
                     }
-                    $this.val('{"items":[' + itemsArray.join(',') + ']}');
+                    if (values !== '') {
+                        $this.val('{"items":[' + itemsArray.join(',') + ']}');
+                    }
+                    else {
+                        $this.val('');
+                    }
                 });
             }
         });
