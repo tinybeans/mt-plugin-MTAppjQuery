@@ -42,12 +42,14 @@
         if (mtappVars.language === 'ja') {
             l10n.addRow = '行を追加';
             l10n.addColumn = '列を追加';
+            l10n.clearData = '削除';
             l10n.addColumnProperty = 'プロパティ名（例：title）';
             l10n.addColumnPropertyDisplayName = 'プロパティ表示名（例：タイトル）';
         }
         else {
             l10n.addRow = 'Add a row';
             l10n.addColumn = 'Add a column';
+            l10n.clearData = 'Delete';
             l10n.addColumnProperty = 'Property Name (e.g. title)';
             l10n.addColumnPropertyDisplayName = 'Property Display Name (e.g. Title)';
         }
@@ -172,6 +174,9 @@ console.log(op.header);
                     '[# if (add && headerPosition === "left") { #]',
                     '<a href="#" class="button jsontable-add-column">' + l10n.addColumn + '</a>',
                     '[# } #]',
+                    '[# if (clear) { #]',
+                    '<a href="#" class="button jsontable-clear">' + l10n.clearData + '</a>',
+                    '[# } #]',
                 '</div>'
             ].join("");
 
@@ -289,7 +294,8 @@ console.log(op.header);
         footer: false, // Boolean
         // items: [], // Array include Object
         edit: true,
-        add: false // Boolean
+        add: false, // Boolean
+        clear: true
     };
     // end - $.fn.MTAppJSONTable()
 
