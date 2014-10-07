@@ -80,8 +80,6 @@
                 alert('Error in .MTAppJSONTable: The "order" option is required.');
                 return;
             }
-console.log(order);
-console.log(op.header);
             var items = json.items;
 
             if (items.length === 0) {
@@ -92,15 +90,6 @@ console.log(op.header);
             }
 
             op.items = items;
-// console.log(json);
-// console.log(items);
-
-            // var order = op.order;
-            // if (order.length === 0) {
-            //     for (var key in items[0]) {
-            //         order.push(key);
-            //     }
-            // }
 
             var tmpl = {};
 
@@ -303,7 +292,6 @@ console.log(op.header);
                         for (var i = 0; i < textareaCount; i++) {
                             itemsArray.push(JSON.stringify(itemsArrayObj[i]));
                         }
-                        console.log(itemsArray);
                     }
                     $this.val('{"items":[' + itemsArray.join(',') + ']}');
                 });
