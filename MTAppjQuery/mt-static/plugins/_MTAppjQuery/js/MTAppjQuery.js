@@ -167,10 +167,10 @@ console.log(op.header);
             tmpl.buttons = [
                 '<div class="add-btn">',
                     '[# if (add && headerPosition === "top") { #]',
-                    '<a href="#" class="button add-row">' + l10n.addRow + '</a>',
+                    '<a href="#" class="button jsontable-add-row">' + l10n.addRow + '</a>',
                     '[# } #]',
                     '[# if (add && headerPosition === "left") { #]',
-                    '<a href="#" class="button add-column">' + l10n.addColumn + '</a>',
+                    '<a href="#" class="button jsontable-add-column">' + l10n.addColumn + '</a>',
                     '[# } #]',
                 '</div>'
             ].join("");
