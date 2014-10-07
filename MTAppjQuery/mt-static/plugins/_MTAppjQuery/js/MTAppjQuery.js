@@ -226,46 +226,24 @@ console.log(op.header);
                 });
             }
 
-            // Add a row
-            if (add === 'row' || add === 'both') {
-                $container.on('click', 'a.add-row', function(){
-                    var $tbody = $table.find('tbody');
-                    var $clone = $tbody.find('tr').last().removeClass('last-child').clone();
-                    $clone.addClass('last-child').find('textarea').val('');
-                    $tbody.append($clone);
+            // Add a row or column
+            if (op.add) {
+                $container.on('click', 'div.add-btn a', function(){
+                    if ($(this).hasClass('jsontable-add-row')) {
+                        var $tbody = $table.find('tbody');
+                        var $clone = $tbody.find('tr').last().removeClass('last-child').clone();
+                        $clone.addClass('last-child').find('textarea').val('');
+                        $tbody.append($clone);
+                    }
+                    else if ($(this).hasClass('jsontable-add-column')) {
+                        $table.find('tr').each(function(){
+                            var $td = $(this).children(':last-child').removeClass('last-child').clone();
+                            $td.find('textarea').val('');
+                            $(this).append($td);
+                        });
+                    }
                     return false;
                 });
-            }
-
-            // Add a column
-            if (add === 'column' || add === 'both') {
-                $container.on('click', 'a.add-column', function(){
-                    var propName = prompt('Type a ' + l10n.addColumnProperty, '');
-                    if (propName === '') {
-                        alert('Error in .MTAppJSONTable: Property Name is required.');
-                        return false;
-                    }
-                    var propDisplayName = prompt('Type a ' + l10n.addColumnPropertyDisplayName, '');
-                    if (propDisplayName === '') {
-                        alert('Error in .MTAppJSONTable: Property Display Name is required.');
-                        return false;
-                    }
-                    $table.find('tr').children(':last-child').each(function(){
-                        var $clone = $(this).removeClass('last-child').clone();
-                        $clone.attr({'class': propName + ' last-child', 'data-name': propName});
-                        switch ($clone[0].tagName.toLowerCase()) {
-                            case 'th':
-                                $clone.text(propDisplayName);
-                                break;
-                            case 'td':
-                                $clone.find('textarea').attr('data-name', propName).val('');
-                                break;
-                        }
-                        $(this).after($clone);
-                    });
-                    return false;
-                });
-
             }
 
             // Save values edited by user
