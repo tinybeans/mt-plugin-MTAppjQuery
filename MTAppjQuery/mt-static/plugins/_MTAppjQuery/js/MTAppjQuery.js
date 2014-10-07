@@ -155,7 +155,7 @@
                         '<th class="jsontable-clear-cell">&nbsp;</th>',
                         '[# } #]',
                         '[# for (var i = 0, l = items.length; i < l; i++) { #]',
-                        '<td class="jsontable-clear-cell">',
+                        '<td class="jsontable-clear-cell item-[#= i #]" data-item-index="[#= i #]">',
                             '<input type="checkbox" class="jsontable-clear-cb">',
                         '</td>',
                         '[# } #]',
@@ -164,7 +164,7 @@
                     '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
                     '<tr class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
                         '[# for (var i = 0, l = items.length; i < l; i++) { #]',
-                        '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
+                        '<td class="[#= headerOrder[x] #] item-[#= i #]" data-name="[#= headerOrder[x] #]">',
                             '[# if (edit) { #]',
                             '<textarea data-name="[#= headerOrder[x] #]">',
                             '[# } #]',
@@ -244,6 +244,31 @@
                 });
             }
 
+            // Click checkboxes for deleting data
+            if (op.clear) {
+                if (op.headerPosition === 'top') {
+                    $table.on('click', 'input.jsontable-clear-cb', function(){
+                        if ($(this).is(':checked')) {
+                            $(this).parent().parent().addClass('jsontable-clear-data');
+                        }
+                        else {
+                            $(this).parent().parent().removeClass('jsontable-clear-data');
+                        }
+                    });
+                }
+                else if (op.headerPosition === 'left') {
+                    $table.on('click', 'input.jsontable-clear-cb', function(){
+                        var itemIndex = $(this).parent().attr('data-item-index');
+                        if ($(this).is(':checked')) {
+                            $table.find('.item-' + itemIndex).addClass('jsontable-clear-data');
+                        }
+                        else {
+                            $table.find('.item-' + itemIndex).removeClass('jsontable-clear-data');
+                        }
+                    });
+                }
+            }
+
             // Add a row or column
             if (op.add) {
                 $container.on('click', 'div.add-btn a', function(){
@@ -259,6 +284,9 @@
                             $td.find('textarea').val('');
                             $(this).append($td);
                         });
+                    }
+                    else if ($(this).hasClass('jsontable-clear')) {
+                        $table.find('.jsontable-clear-data').remove();
                     }
                     return false;
                 });
