@@ -213,13 +213,10 @@ console.log(op.header);
 
             // Build HTML and insert a table.
             var tableHtml = Template.process('container', op, tmpl);
-// console.log(tableHtml);
             $(this).after(tableHtml);
 
             var $container = $this.next('div');
             var $table = $container.children('table');
-// console.log($container);
-// console.log($table);
 
             // If the "headerPosition" option is "left", insert th to tr.
             if (op.header && op.headerPosition === 'left') {
