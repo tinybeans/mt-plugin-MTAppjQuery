@@ -226,13 +226,6 @@ console.log(op.header);
                 });
             }
 
-            // Check the value of add option
-            var add = op.add;
-            if (typeof add !== 'string') {
-                alert('Error in .MTAppJSONTable: Invalid option.add');
-                return;
-            }
-
             // Add a row
             if (add === 'row' || add === 'both') {
                 $container.on('click', 'a.add-row', function(){
