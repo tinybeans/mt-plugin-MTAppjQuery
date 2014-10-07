@@ -111,7 +111,7 @@ console.log(op.header);
                   '<tr>',
                       // op.clear == true
                       '[# if (clear) { #]',
-                      '<th class="jsontable-clear-checkbox">&nbsp;</th>',
+                      '<th class="jsontable-clear-cell">&nbsp;</th>',
                       '[# } #]',
                       '[# for (var i = 0, l = headerOrder.length; i < l; i++) { #]',
                       '<th class="[#= headerOrder[i] #]" data-name="[#= headerOrder[i] #]">[#= header[headerOrder[i]] #]</th>',
@@ -124,7 +124,7 @@ console.log(op.header);
                 '<tfoot>',
                   '<tr>',
                       '[# if (clear) { #]',
-                      '<th class="jsontable-clear-checkbox">&nbsp;</th>',
+                      '<th class="jsontable-clear-cell">&nbsp;</th>',
                       '[# } #]',
                       '[# for (var i = 0, l = headerOrder.length; i < l; i++) { #]',
                       '<th class="[#= headerOrder[i] #]" data-name="[#= headerOrder[i] #]">[#= header[headerOrder[i]] #]</th>',
@@ -138,8 +138,8 @@ console.log(op.header);
                     '[# for (var i = 0, l = items.length; i < l; i++) { #]',
                     '<tr>',
                         '[# if (clear) { #]',
-                        '<td class="jsontable-clear-checkbox">',
-                            '<input type="checkbox">',
+                        '<td class="jsontable-clear-cell">',
+                            '<input type="checkbox" class="jsontable-clear-cb">',
                         '</td>',
                         '[# } #]',
                         '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
@@ -161,13 +161,13 @@ console.log(op.header);
             tmpl.tbodyLeft = [
                 '<tbody>',
                     '[# if (clear) { #]',
-                    '<tr class="jsontable-clear">',
+                    '<tr class="jsontable-clear-row">',
                         '[# if (header) { #]',
-                        '<th class="jsontable-clear-checkbox">&nbsp;</th>',
+                        '<th class="jsontable-clear-cell">&nbsp;</th>',
                         '[# } #]',
                         '[# for (var i = 0, l = items.length; i < l; i++) { #]',
-                        '<td class="jsontable-clear-checkbox">',
-                            '<input type="checkbox">',
+                        '<td class="jsontable-clear-cell">',
+                            '<input type="checkbox" class="jsontable-clear-cb">',
                         '</td>',
                         '[# } #]',
                     '</tr>',
@@ -249,7 +249,7 @@ console.log(op.header);
 
             // If the "headerPosition" option is "left", insert th to tr.
             if (op.header && op.headerPosition === 'left') {
-                $table.find('tr').not('.jsontable-clear').each(function(){
+                $table.find('tr').not('.jsontable-clear-row').each(function(){
                     var dataName = $(this).attr('data-name');
                     $(this).prepend('<th class="' + dataName + '" data-name="' + dataName + '">' + op.header[dataName] + '</th>');
                 });
