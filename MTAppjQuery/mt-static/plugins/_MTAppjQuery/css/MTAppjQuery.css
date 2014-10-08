@@ -646,3 +646,49 @@ span.mtappmultiform-radio input {
 #other-type-category-list label input {
   margin-right: 5px;
 }
+
+/* ----------------------------------------
+   __MTAppJSONTable
+---------------------------------------- */
+.mtapp-json-table table {
+  width: 100%;
+  margin-bottom: 1em;
+  border-collapse: collapse;
+}
+.mtapp-json-table table caption {
+  margin-top: 10px;
+  text-align: left;
+  font-weight: bold;
+}
+.mtapp-json-table table th, .mtapp-json-table table td {
+  padding: 0;
+  border: 1px solid #c0c6c9;
+}
+.mtapp-json-table table th textarea, .mtapp-json-table table td textarea {
+  width: 100%;
+  border: none;
+  background-color: transparent;
+}
+.mtapp-json-table table th {
+  padding: 5px 0;
+  background-color: #e6e6e6;
+}
+.mtapp-json-table table td.uneditable {
+  padding: 0.2em 0.25em;
+}
+.mtapp-json-table table td.checkbox {
+  text-align: center;
+}
+.mtapp-json-table table .jsontable-clear-cell {
+  text-align: center;
+  vertical-align: middle;
+}
+.mtapp-json-table table .jsontable-clear-data {
+  background-color: #e7e7eb;
+}
+.mtapp-json-table .add-buttons {
+  text-align: right;
+}
+.mtapp-json-table .add-buttons .last-child {
+  margin-right: 0;
+}

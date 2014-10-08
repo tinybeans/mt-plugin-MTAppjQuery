@@ -13,6 +13,343 @@
     mtappVars.adminScript = location.href.replace(/\?.*/, '');
 
     // -------------------------------------------------
+    //  $(foo).MTAppJSONTable();
+    //
+    //  Description:
+    //    fooに指定したtextareaのJSONから編集可能なtable要素を生成します。
+    //
+    //  Usage:
+    //    $(foo).MTAppJSONTable(options);
+    //
+    //    このメソッドで扱えるJSONのフォーマットは下記の通りです。
+    //    {"items":[
+    //        {"key1": "value1", "key2": "value2", "key3": "value3"},
+    //        {"key1": "value1", "key2": "value2", "key3": "value3"},
+    //        {"key1": "value1", "key2": "value2", "key3": "value3"}
+    //    ]}
+    //
+    //  Options:
+    //    order: {Array} JSONで扱うプロパティ名を列の並び順に列挙した配列を指定します。(Default : [])
+    //    caption: {String} キャプションを表示する場合はそのテキストを指定します。(Default : null)
+    //    header: {Object} thead要素を表示する場合は、{key1: 'key1の表示名', key2: 'key2の表示名'} になるように指定します。(Default : null)
+    //    footer: {Boolean} tfoot要素を表示する場合はtrue指定します。(Default : false)
+    //    add: '' {String} ユーザーが動的に行や列を増やせるようにする場合に、row、columnまたはbothを指定します。(Default : '')
+    // -------------------------------------------------
+    $.fn.MTAppJSONTable = function(options){
+        var op = $.extend({}, $.fn.MTAppJSONTable.defaults, options);
+
+        var l10n = {};
+        if (mtappVars.language === 'ja') {
+            l10n.addRow = '行を追加';
+            l10n.addColumn = '列を追加';
+            l10n.clearData = '削除';
+            l10n.addColumnProperty = 'プロパティ名（例：title）';
+            l10n.addColumnPropertyDisplayName = 'プロパティ表示名（例：タイトル）';
+        }
+        else {
+            l10n.addRow = 'Add a row';
+            l10n.addColumn = 'Add a column';
+            l10n.clearData = 'Delete';
+            l10n.addColumnProperty = 'Property Name (e.g. title)';
+            l10n.addColumnPropertyDisplayName = 'Property Display Name (e.g. Title)';
+        }
+
+        return this.each(function(){
+
+            var $this = $(this);
+            var jsonStr = $this.val();
+            var json = null;
+            if (/^\{/.test(jsonStr)) {
+                try {
+                    json = JSON.parse(jsonStr);
+                }
+                catch(e) {
+                    alert(e.message);
+                }
+            }
+            else {
+                json = {"items":[]};
+            }
+            if (json === null) {
+                return;
+            }
+
+            // Check the order of properties
+            var order = op.headerOrder;
+            if ($.isArray(order) && order.length === 0) {
+                alert('Error in .MTAppJSONTable: The "order" option is required.');
+                return;
+            }
+            var items = json.items;
+
+            if (items.length === 0) {
+                items[0] = {};
+                for (var i = 0, l = order.length; i < l; i++) {
+                    items[0][order[i]] = '';
+                }
+            }
+
+            op.items = items;
+
+            var tmpl = {};
+
+            tmpl.caption = '<caption>[#= caption #]</caption>';
+
+            tmpl.header = [
+                '<thead>',
+                  '<tr>',
+                      // op.clear == true
+                      '[# if (clear) { #]',
+                      '<th class="jsontable-clear-cell">&nbsp;</th>',
+                      '[# } #]',
+                      '[# for (var i = 0, l = headerOrder.length; i < l; i++) { #]',
+                      '<th class="[#= headerOrder[i] #]" data-name="[#= headerOrder[i] #]">[#= header[headerOrder[i]] #]</th>',
+                      '[# } #]',
+                  '</tr>',
+                '</thead>'
+            ].join("\n");
+
+            tmpl.footer = [
+                '<tfoot>',
+                  '<tr>',
+                      '[# if (clear) { #]',
+                      '<th class="jsontable-clear-cell">&nbsp;</th>',
+                      '[# } #]',
+                      '[# for (var i = 0, l = headerOrder.length; i < l; i++) { #]',
+                      '<th class="[#= headerOrder[i] #]" data-name="[#= headerOrder[i] #]">[#= header[headerOrder[i]] #]</th>',
+                      '[# } #]',
+                  '</tr>',
+                '</tfoot>'
+            ].join("\n");
+
+            tmpl.tbodyTop = [
+                '<tbody>',
+                    '[# for (var i = 0, l = items.length; i < l; i++) { #]',
+                    '<tr>',
+                        '[# if (clear) { #]',
+                        '<td class="jsontable-clear-cell">',
+                            '<input type="checkbox" class="jsontable-clear-cb">',
+                        '</td>',
+                        '[# } #]',
+                        '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
+                        '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
+                            '[# if (edit) { #]',
+                            '<textarea data-name="[#= headerOrder[x] #]">',
+                            '[# } #]',
+                            '[#= items[i][headerOrder[x]] #]',
+                            '[# if (edit) { #]',
+                            '</textarea>',
+                            '[# } #]',
+                        '</td>',
+                        '[# } #]',
+                    '</tr>',
+                    '[# } #]',
+                '</tbody>'
+            ].join("");
+
+            tmpl.tbodyLeft = [
+                '<tbody>',
+                    '[# if (clear) { #]',
+                    '<tr class="jsontable-clear-row">',
+                        '[# if (header) { #]',
+                        '<th class="jsontable-clear-cell">&nbsp;</th>',
+                        '[# } #]',
+                        '[# for (var i = 0, l = items.length; i < l; i++) { #]',
+                        '<td class="jsontable-clear-cell item-[#= i #]" data-item-index="[#= i #]">',
+                            '<input type="checkbox" class="jsontable-clear-cb">',
+                        '</td>',
+                        '[# } #]',
+                    '</tr>',
+                    '[# } #]',
+                    '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
+                    '<tr class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
+                        '[# for (var i = 0, l = items.length; i < l; i++) { #]',
+                        '<td class="[#= headerOrder[x] #] item-[#= i #]" data-name="[#= headerOrder[x] #]">',
+                            '[# if (edit) { #]',
+                            '<textarea data-name="[#= headerOrder[x] #]">',
+                            '[# } #]',
+                            '[#= items[i][headerOrder[x]] #]',
+                            '[# if (edit) { #]',
+                            '</textarea>',
+                            '[# } #]',
+                        '</td>',
+                        '[# } #]',
+                    '</tr>',
+                    '[# } #]',
+                '</tbody>'
+            ].join("");
+
+            tmpl.buttons = [
+                '<div class="add-btn">',
+                    '[# if (add && headerPosition === "top") { #]',
+                    '<a href="#" class="button jsontable-add-row">' + l10n.addRow + '</a>',
+                    '[# } #]',
+                    '[# if (add && headerPosition === "left") { #]',
+                    '<a href="#" class="button jsontable-add-column">' + l10n.addColumn + '</a>',
+                    '[# } #]',
+                    '[# if (clear) { #]',
+                    '<a href="#" class="button jsontable-clear">' + l10n.clearData + '</a>',
+                    '[# } #]',
+                '</div>'
+            ].join("");
+
+            tmpl.container = [
+                '<div class="mtapp-json-table">',
+                    '<table border="1">',
+                        // caption
+                        '[# if (typeof caption === "string") { #]',
+                            '[#= context.include("caption") #]',
+                        '[# } #]',
+
+                        // header
+                        '[# if (header && headerPosition === "top") { #]',
+                            '[#= context.include("header") #]',
+                        '[# } #]',
+
+                        // footer
+                        '[# if (header && headerPosition === "top" && footer) { #]',
+                            '[#= context.include("footer") #]',
+                        '[# } #]',
+
+                        // tbody
+                        '[# if (items.length > 0) { #]',
+                            '[# if (headerPosition === "top") { #]',
+                                '[#= context.include("tbodyTop") #]',
+                            '[# } else if (headerPosition === "left") { #]',
+                                '[#= context.include("tbodyLeft") #]',
+                            '[# } #]',
+                        '[# } #]',
+
+                    '</table>',
+
+                    '[# if (add) { #]',
+                        '[#= context.include("buttons") #]',
+                    '[# } #]',
+
+                '</div>'
+            ].join("\n");
+
+            // Build HTML and insert a table.
+            var tableHtml = Template.process('container', op, tmpl);
+            $(this).after(tableHtml);
+
+            var $container = $this.next('div');
+            var $table = $container.children('table');
+
+            // If the "headerPosition" option is "left", insert th to tr.
+            if (op.header && op.headerPosition === 'left') {
+                $table.find('tr').not('.jsontable-clear-row').each(function(){
+                    var dataName = $(this).attr('data-name');
+                    $(this).prepend('<th class="' + dataName + '" data-name="' + dataName + '">' + op.header[dataName] + '</th>');
+                });
+            }
+
+            // Click checkboxes for deleting data
+            if (op.clear) {
+                if (op.headerPosition === 'top') {
+                    $table.on('click', 'input.jsontable-clear-cb', function(){
+                        if ($(this).is(':checked')) {
+                            $(this).parent().parent().addClass('jsontable-clear-data');
+                        }
+                        else {
+                            $(this).parent().parent().removeClass('jsontable-clear-data');
+                        }
+                    });
+                }
+                else if (op.headerPosition === 'left') {
+                    $table.on('click', 'input.jsontable-clear-cb', function(){
+                        var itemIndex = $(this).parent().attr('data-item-index');
+                        if ($(this).is(':checked')) {
+                            $table.find('.item-' + itemIndex).addClass('jsontable-clear-data');
+                        }
+                        else {
+                            $table.find('.item-' + itemIndex).removeClass('jsontable-clear-data');
+                        }
+                    });
+                }
+            }
+
+            // Add a row or column
+            if (op.add) {
+                $container.on('click', 'div.add-btn a', function(){
+                    if ($(this).hasClass('jsontable-add-row')) {
+                        var $tbody = $table.find('tbody');
+                        var $clone = $tbody.find('tr').last().removeClass('last-child').clone();
+                        $clone.addClass('last-child').find('textarea').val('');
+                        $tbody.append($clone);
+                    }
+                    else if ($(this).hasClass('jsontable-add-column')) {
+                        $table.find('tr').each(function(){
+                            var $td = $(this).children(':last-child').removeClass('last-child').clone();
+                            $td.find('textarea').val('');
+                            $(this).append($td);
+                        });
+                    }
+                    else if ($(this).hasClass('jsontable-clear')) {
+                        $table.find('.jsontable-clear-data').remove();
+                    }
+                    return false;
+                });
+            }
+
+            // Save values edited by user
+            if (op.edit) {
+                $('form[method="post"]').on('submit', function(){
+                    var values = '';
+                    var itemsArray = [];
+                    if (op.headerPosition === 'top') {
+                        $table.find('tbody tr').each(function(){
+                            var item = {};
+                            $(this).find('textarea').each(function(){
+                                var v = $(this).val();
+                                item[$(this).attr('data-name')] = v;
+                                values += v;
+                            });
+                            itemsArray.push(JSON.stringify(item));
+                        });
+                    }
+                    else if (op.headerPosition === 'left') {
+                        var $tr = $table.find('tr');
+                        var textareaCount = $tr.last().find('textarea').length;
+                        var itemsArrayObj = [];
+                        for (var i = 0; i < textareaCount; i++) {
+                            itemsArrayObj.push({});
+                        }
+                        $tr.each(function(i){
+                            $(this).find('textarea').each(function(j){
+                                var v = $(this).val();
+                                itemsArrayObj[j][$(this).attr('data-name')] = v;
+                                values += v;
+                            });
+                        });
+                        for (var i = 0; i < textareaCount; i++) {
+                            itemsArray.push(JSON.stringify(itemsArrayObj[i]));
+                        }
+                    }
+                    if (values !== '') {
+                        $this.val('{"items":[' + itemsArray.join(',') + ']}');
+                    }
+                    else {
+                        $this.val('');
+                    }
+                });
+            }
+        });
+    };
+    $.fn.MTAppJSONTable.defaults = {
+        caption: null, // String
+        header: null, // Object
+        headerOrder: [], // Array
+        headerPosition: 'top', // top or left
+        footer: false, // Boolean
+        // items: [], // Array include Object
+        edit: true,
+        add: false, // Boolean
+        clear: true
+    };
+    // end - $.fn.MTAppJSONTable()
+
+    // -------------------------------------------------
     //  $.MTAppGetCategoryName();
     //
     //  Description:
