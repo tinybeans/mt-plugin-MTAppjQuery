@@ -664,11 +664,6 @@ span.mtappmultiform-radio input {
   padding: 0;
   border: 1px solid #c0c6c9;
 }
-.mtapp-json-table table th textarea, .mtapp-json-table table td textarea {
-  width: 100%;
-  border: none;
-  background-color: transparent;
-}
 .mtapp-json-table table th {
   padding: 5px 0;
   background-color: #e6e6e6;
@@ -685,6 +680,11 @@ span.mtappmultiform-radio input {
 }
 .mtapp-json-table table .jsontable-clear-data {
   background-color: #e7e7eb;
+}
+.mtapp-json-table table .jsontable-input {
+  width: 100%;
+  border: none;
+  background-color: transparent;
 }
 .mtapp-json-table .add-buttons {
   text-align: right;

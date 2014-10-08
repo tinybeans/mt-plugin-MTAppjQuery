@@ -134,11 +134,13 @@
                         '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
                         '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
                             '[# if (edit) { #]',
-                            '<textarea data-name="[#= headerOrder[x] #]">',
-                            '[# } #]',
-                            '[#= items[i][headerOrder[x]] #]',
-                            '[# if (edit) { #]',
-                            '</textarea>',
+                                '[# if (inputType === "input") { #]',
+                                    '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="[#= items[i][headerOrder[x]] #]">',
+                                '[# } else if (inputType === "textarea") { #]',
+                                    '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
+                                '[# } #]',
+                            '[# } else { #]',
+                                '[#= items[i][headerOrder[x]] #]',
                             '[# } #]',
                         '</td>',
                         '[# } #]',
@@ -166,11 +168,13 @@
                         '[# for (var i = 0, l = items.length; i < l; i++) { #]',
                         '<td class="[#= headerOrder[x] #] item-[#= i #]" data-name="[#= headerOrder[x] #]">',
                             '[# if (edit) { #]',
-                            '<textarea data-name="[#= headerOrder[x] #]">',
-                            '[# } #]',
-                            '[#= items[i][headerOrder[x]] #]',
-                            '[# if (edit) { #]',
-                            '</textarea>',
+                                '[# if (inputType === "input") { #]',
+                                    '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="[#= items[i][headerOrder[x]] #]">',
+                                '[# } else if (inputType === "textarea") { #]',
+                                    '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
+                                '[# } #]',
+                            '[# } else { #]',
+                                '[#= items[i][headerOrder[x]] #]',
                             '[# } #]',
                         '</td>',
                         '[# } #]',
@@ -275,13 +279,13 @@
                     if ($(this).hasClass('jsontable-add-row')) {
                         var $tbody = $table.find('tbody');
                         var $clone = $tbody.find('tr').last().removeClass('last-child').clone();
-                        $clone.addClass('last-child').find('textarea').val('');
+                        $clone.addClass('last-child').find('.jsontable-input').val('');
                         $tbody.append($clone);
                     }
                     else if ($(this).hasClass('jsontable-add-column')) {
                         $table.find('tr').each(function(){
                             var $td = $(this).children(':last-child').removeClass('last-child').clone();
-                            $td.find('textarea').val('');
+                            $td.find('.jsontable-input').val('');
                             $(this).append($td);
                         });
                     }
@@ -300,7 +304,7 @@
                     if (op.headerPosition === 'top') {
                         $table.find('tbody tr').each(function(){
                             var item = {};
-                            $(this).find('textarea').each(function(){
+                            $(this).find('.jsontable-input').each(function(){
                                 var v = $(this).val();
                                 item[$(this).attr('data-name')] = v;
                                 values += v;
@@ -310,13 +314,13 @@
                     }
                     else if (op.headerPosition === 'left') {
                         var $tr = $table.find('tr');
-                        var textareaCount = $tr.last().find('textarea').length;
+                        var textareaCount = $tr.last().find('.jsontable-input').length;
                         var itemsArrayObj = [];
                         for (var i = 0; i < textareaCount; i++) {
                             itemsArrayObj.push({});
                         }
                         $tr.each(function(i){
-                            $(this).find('textarea').each(function(j){
+                            $(this).find('.jsontable-input').each(function(j){
                                 var v = $(this).val();
                                 itemsArrayObj[j][$(this).attr('data-name')] = v;
                                 values += v;
@@ -337,6 +341,7 @@
         });
     };
     $.fn.MTAppJSONTable.defaults = {
+        inputType: 'textarea', // 'textarea' or 'input'
         caption: null, // String
         header: null, // Object
         headerOrder: [], // Array

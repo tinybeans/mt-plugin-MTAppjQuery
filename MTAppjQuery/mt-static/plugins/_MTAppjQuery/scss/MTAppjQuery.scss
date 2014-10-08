@@ -557,11 +557,6 @@ span.mtappmultiform-radio {
         th, td {
             padding: 0;
             border: 1px solid #c0c6c9;
-            textarea {
-                width: 100%;
-                border: none;
-                background-color: transparent;
-            }
         }
         th {
             padding: 5px 0;
@@ -579,6 +574,11 @@ span.mtappmultiform-radio {
         }
         .jsontable-clear-data {
             background-color: #e7e7eb;
+        }
+        .jsontable-input {
+            width: 100%;
+            border: none;
+            background-color: transparent;
         }
     }
     .add-buttons {
