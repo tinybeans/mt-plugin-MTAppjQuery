@@ -57,6 +57,9 @@
         return this.each(function(){
 
             var $this = $(this);
+            if (!op.debug) {
+                $this.hide();
+            }
             var jsonStr = $this.val();
             var json = null;
             if (/^\{/.test(jsonStr)) {
@@ -350,7 +353,8 @@
         // items: [], // Array include Object
         edit: true,
         add: false, // Boolean
-        clear: true
+        clear: true,
+        debug: false
     };
     // end - $.fn.MTAppJSONTable()
 
