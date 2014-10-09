@@ -308,6 +308,7 @@ __MTML__
         "status" : "<mt:Var name="status">",
         "category_id" : ${category_id},
         "template_id" : ${template_id},
+        "modified_by" : "<mt:Var name="modified_by">",
         "blog_url" : "<mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if>",
         "static_plugin_path" : "${static_plugin_path}",
         "html_title" : "<mt:var name="mtapp_html_title" trim="1" replace='"','\"'>",
@@ -356,6 +357,7 @@ __MTML__
     <mt:SetVarBlock name="mtappVars" key="scope_type"><mt:var name="scope_type"></mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="screen_id"><mt:var name="screen_id"></mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="template_filename"><mt:var name="template_filename"></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="modified_by"><mt:var name="modified_by"></mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="json_can_create_post_blogs"><mt:var name="json_can_create_post_blogs"></mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="can_access_blogs">${can_access_blogs_json}</mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="body_class">,<mt:var name="mtapp_body_class" replace='"','' regex_replace="/ +/g",",">,</mt:SetVarBlock>
