@@ -189,10 +189,10 @@
             tmpl.buttons = [
                 '<div class="add-btn">',
                     '[# if (add && headerPosition === "top") { #]',
-                    '<a href="#" class="button jsontable-add-row">' + l10n.addRow + '</a>',
+                    '<a href="#" class="button jsontable-add jsontable-add-row">' + l10n.addRow + '</a>',
                     '[# } #]',
                     '[# if (add && headerPosition === "left") { #]',
-                    '<a href="#" class="button jsontable-add-column">' + l10n.addColumn + '</a>',
+                    '<a href="#" class="button jsontable-add jsontable-add-column">' + l10n.addColumn + '</a>',
                     '[# } #]',
                     '[# if (clear) { #]',
                     '<a href="#" class="button jsontable-clear">' + l10n.clearData + '</a>',
@@ -281,14 +281,14 @@
                 $container.on('click', 'div.add-btn a', function(){
                     if ($(this).hasClass('jsontable-add-row')) {
                         var $tbody = $table.find('tbody');
-                        var $clone = $tbody.find('tr').last().removeClass('last-child').clone();
-                        $clone.addClass('last-child').find('.jsontable-input').val('');
-                        $tbody.append($clone);
+                        var $tr = $tbody.find('tr').last().removeClass('last-child').clone();
+                        $tr.addClass('last-child').find('.jsontable-input').val('').siblings().remove();
+                        $tbody.append($tr);
                     }
                     else if ($(this).hasClass('jsontable-add-column')) {
                         $table.find('tr').each(function(){
                             var $td = $(this).children(':last-child').removeClass('last-child').clone();
-                            $td.find('.jsontable-input').val('');
+                            $td.children('.jsontable-input').val('').siblings().remove();
                             $(this).append($td);
                         });
                     }
