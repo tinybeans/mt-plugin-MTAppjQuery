@@ -56,12 +56,14 @@ sub template_source_header {
     require MT::Association;
     require MT::Role;
     ### ログインユーザーのロールを取得する
+    my $role_join_terms = {
+        author_id => $author_id
+    };
+    if ($blog_id) {
+        $role_join_terms->{blog_id} = $blog_id;
+    }
     my @role = MT::Role->load(undef, {
-        join => MT::Association->join_on(
-            'role_id', {
-                'author_id' => $author_id,
-            }
-        )
+        join => MT::Association->join_on('role_id', $role_join_terms)
     });
     my @role_name;
     foreach my $role (@role) {
@@ -89,18 +91,18 @@ sub template_source_header {
 
     ### プラグインの設定の値を取得する
     my $scope = (!$blog_id) ? 'system' : 'blog:'.$blog_id;
-    my $op_active         = $p->get_config_value('active', $scope) || '1';
+    my $op_active         = $p->get_config_value('active', $scope);
     return unless $op_active;
-    my $op_userjs         = $p->get_config_value('userjs', $scope) || '1';
-    my $op_userjs_url     = $p->get_config_value('userjs_url', $scope) || '';
-    my $op_usercss        = $p->get_config_value('usercss', $scope) || '1';
-    my $op_usercss_url    = $p->get_config_value('usercss_url', $scope) || '';
+    my $op_userjs         = $p->get_config_value('userjs', $scope);
+    my $op_userjs_url     = $p->get_config_value('userjs_url', $scope);
+    my $op_usercss        = $p->get_config_value('usercss', $scope);
+    my $op_usercss_url    = $p->get_config_value('usercss_url', $scope);
     my $op_slidemenu      = $p->get_config_value('slidemenu', $scope) || '0';
     my $op_superslidemenu = $p->get_config_value('superslidemenu', $scope) || '0';
-    my $op_jquery_ready     = $p->get_config_value('jquery_ready', $scope) || '0';
-    my $op_jquery_ready_url = $p->get_config_value('jquery_ready_url', $scope) || '';
-    my $op_blogs_json       = $p->get_config_value('blogs_json', 'system') || '0';
-    my $op_blogs_json_detail= $p->get_config_value('blogs_json_detail', 'system') || '0';
+    my $op_jquery_ready     = $p->get_config_value('jquery_ready', $scope);
+    my $op_jquery_ready_url = $p->get_config_value('jquery_ready_url', $scope);
+    my $op_blogs_json       = $p->get_config_value('blogs_json', 'system');
+    my $op_blogs_json_detail= $p->get_config_value('blogs_json_detail', 'system');
     my $op_jqselectable   = 0;#$p->get_config_value('jqselectable', $scope);
 
     # Free textarea / common
@@ -289,6 +291,8 @@ __MTML__
     var mtappVars = {
         "version" : "${version}",
         "minor_version" : "${minor_version}",
+        "debug_mode" : "<mt:Var name="config.DebugMode">",
+        "language" : "<mt:Var name="config.DefaultLanguage">",
         "type" : "${_type}",
         "mode" : "${mode}",
         "author_id" : <mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if>,
@@ -304,6 +308,7 @@ __MTML__
         "status" : "<mt:Var name="status">",
         "category_id" : ${category_id},
         "template_id" : ${template_id},
+        "modified_by" : "<mt:Var name="modified_by">",
         "blog_url" : "<mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if>",
         "static_plugin_path" : "${static_plugin_path}",
         "html_title" : "<mt:var name="mtapp_html_title" trim="1" replace='"','\"'>",
@@ -340,6 +345,9 @@ __MTML__
     <mt:SetVar name="is_superuser" value="${is_superuser}">
     </mt:SetHashVar>
 
+    <mt:SetVarBlock name="mtappVars" key="debug_mode"><mt:Var name="config.DebugMode"></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="language"><mt:Var name="config.DefaultLanguage"></mt:SetVarBlock>
+
     <mt:SetVarBlock name="mtappVars" key="author_permissions"><mt:SetVarBlock name="_author_permissions">${permissions}</mt:SetVarBlock>,<mt:Var name="_author_permissions" replace="'","">,</mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="author_roles"><mt:SetVarBlock name="_author_roles">${role_names}</mt:SetVarBlock>,<mt:Var name="_author_roles" replace='"',''>,</mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="author_name"><mt:var name="author_name"></mt:SetVarBlock>
@@ -349,6 +357,7 @@ __MTML__
     <mt:SetVarBlock name="mtappVars" key="scope_type"><mt:var name="scope_type"></mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="screen_id"><mt:var name="screen_id"></mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="template_filename"><mt:var name="template_filename"></mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="modified_by"><mt:var name="modified_by"></mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="json_can_create_post_blogs"><mt:var name="json_can_create_post_blogs"></mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="can_access_blogs">${can_access_blogs_json}</mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="body_class">,<mt:var name="mtapp_body_class" replace='"','' regex_replace="/ +/g",",">,</mt:SetVarBlock>
