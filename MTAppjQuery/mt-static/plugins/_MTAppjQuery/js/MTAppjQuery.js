@@ -16,7 +16,7 @@
     //  $(foo).MTAppJSONTable();
     //
     //  Description:
-    //    fooに指定したtextareaのJSONから編集可能なtable要素を生成します。
+    //    fooに指定したtextareaを表形式の入力欄にし、表に入力された値をJSONで元のtextareaに保存します。
     //
     //  Usage:
     //    $(foo).MTAppJSONTable(options);
@@ -28,12 +28,6 @@
     //        {"key1": "value1", "key2": "value2", "key3": "value3"}
     //    ]}
     //
-    //  Options:
-    //    order: {Array} JSONで扱うプロパティ名を列の並び順に列挙した配列を指定します。(Default : [])
-    //    caption: {String} キャプションを表示する場合はそのテキストを指定します。(Default : null)
-    //    header: {Object} thead要素を表示する場合は、{key1: 'key1の表示名', key2: 'key2の表示名'} になるように指定します。(Default : null)
-    //    footer: {Boolean} tfoot要素を表示する場合はtrue指定します。(Default : false)
-    //    add: '' {String} ユーザーが動的に行や列を増やせるようにする場合に、row、columnまたはbothを指定します。(Default : '')
     // -------------------------------------------------
     $.fn.MTAppJSONTable = function(options){
         var op = $.extend({}, $.fn.MTAppJSONTable.defaults, options);
@@ -345,16 +339,16 @@
     };
     $.fn.MTAppJSONTable.defaults = {
         inputType: 'textarea', // 'textarea' or 'input'
-        caption: null, // String
-        header: null, // Object
-        headerOrder: [], // Array
-        headerPosition: 'top', // top or left
-        footer: false, // Boolean
+        caption: null, // String: Table caption
+        header: null, // Object: Table header
+        headerOrder: [], // Array: Order of table header
+        headerPosition: 'top', // 'top' or 'left'
+        footer: false, // If you use the table footer, set true.
         // items: [], // Array include Object
-        edit: true,
-        add: false, // Boolean
-        clear: true,
-        debug: false
+        edit: true, // Disable table
+        add: false, // true: A user can add rows or columns.
+        clear: true, // false: Hide a delete button.
+        debug: false // true: show the original textarea.
     };
     // end - $.fn.MTAppJSONTable()
 
