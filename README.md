@@ -11,7 +11,7 @@ MTAppjQuery is a Movable Type Plugin. This helps you easily customize dashboard 
 
 * Movable Type 6
 
-## Pricsing
+## Pricing
 
 ### Free plan
 
