@@ -3696,6 +3696,14 @@
         varType: function(obj) {
             return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
         },
+        // 数字を3桁ごとにカンマで区切る
+        numberFormat: function(num) {
+            num = '' + num;
+            var numArray = (num.indexOf('.') !== -1) ? num.split('.') : [num];
+            numArray[0] = numArray[0].replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+            return numArray.join('.');
+        }
+
 
     });
 
