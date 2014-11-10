@@ -17,34 +17,27 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
     blog_config_template => 'config_blog.tmpl',
     system_config_template => 'config_system.tmpl',
     settings    => new MT::PluginSettings([
+            # Common settings
+            ['active',              {Default => '1'}],
+            ['userjs',              {Default => '1'}],
+            ['userjs_url',          {Default => ''}],
+            ['usercss',             {Default => '1'}],
+            ['usercss_url',         {Default => ''}],
+            ['jquery_ready',        {Default => ''}],
+            ['jquery_ready_url',    {Default => ''}],
+            ['fa_mtapp_top_head',   {Default => ''}],
+            ['fa_html_head',        {Default => ''}],
+            ['fa_js_include',       {Default => ''}],
+            ['fa_html_body',        {Default => ''}],
+            ['fa_form_header',      {Default => ''}],
+            ['fa_jq_js_include',    {Default => ''}],
+            ['fa_mtapp_html_foot',  {Default => ''}],
+            ['fa_mtapp_end_body',   {Default => ''}],
+
             # Set system scope
-            ['active',        {Default => '1',  Scope => 'system'}],
-            ['userjs',        {Default => '1',  Scope => 'system'}],
-            ['userjs_url',    {Default => '', Scope => 'system'}],
-            ['usercss',       {Default => '1',  Scope => 'system'}],
-            ['usercss_url',   {Default => '', Scope => 'system'}],
-            #['slidemenu',     {Default => '0',  Scope => 'system'}],
-            #['superslidemenu',{Default => '0',  Scope => 'system'}],
-            ['jquery_ready',    {Default => '0',  Scope => 'system'}],
-            ['jquery_ready_url',{Default => '', Scope => 'system'}],
-            ['jquery_ready_all',{Default => '0',  Scope => 'system'}],
-            ['blogs_json',       {Default => '0',  Scope => 'system'}],
-            ['blogs_json_detail',{Default => '0',  Scope => 'system'}],
-
-            #['jqselectable',  {Default => '0',  Scope => 'system'}],
-
-            # Set blog scope
-            ['active',        {Default => '1',  Scope => 'blog'}],
-            ['userjs',        {Default => '1',  Scope => 'blog'}],
-            ['userjs_url',    {Default => '', Scope => 'blog'}],
-            ['usercss',       {Default => '1',  Scope => 'blog'}],
-            ['usercss_url',   {Default => '', Scope => 'blog'}],
-            #['slidemenu',     {Default => '0',  Scope => 'blog'}],
-            #['superslidemenu',{Default => '0',  Scope => 'blog'}],
-            ['jquery_ready',    {Default => '0',  Scope => 'blog'}],
-            ['jquery_ready_url',{Default => '', Scope => 'blog'}],
-
-            #['jqselectable',  {Default => '0',  Scope => 'blog'}],
+            ['jquery_ready_all',       {Default => '0', Scope => 'system'}],
+            ['blogs_json',             {Default => '0', Scope => 'system'}],
+            ['blogs_json_detail',      {Default => '0', Scope => 'system'}],
 
             # Free area common
             ['common_mtapp_top_head',  {Default => '', Scope => 'system'}],
@@ -55,31 +48,6 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             ['common_jq_js_include',   {Default => '', Scope => 'system'}],
             ['common_mtapp_html_foot', {Default => '', Scope => 'system'}],
             ['common_mtapp_end_body',  {Default => '', Scope => 'system'}],
-
-            # Free area individual
-            ['fa_mtapp_top_head',  {Default => '', Scope => 'system'}],
-            ['fa_html_head',       {Default => '', Scope => 'system'}],
-            ['fa_js_include',      {Default => '', Scope => 'system'}],
-            ['fa_html_body',       {Default => '', Scope => 'system'}],
-            ['fa_form_header',     {Default => '', Scope => 'system'}],
-            ['fa_jq_js_include',   {Default => '', Scope => 'system'}],
-            ['fa_mtapp_html_foot', {Default => '', Scope => 'system'}],
-            ['fa_mtapp_end_body',  {Default => '', Scope => 'system'}],
-
-            ['fa_mtapp_top_head',  {Default => '', Scope => 'blog'}],
-            ['fa_html_head',       {Default => '', Scope => 'blog'}],
-            ['fa_js_include',      {Default => '', Scope => 'blog'}],
-            ['fa_html_body',       {Default => '', Scope => 'blog'}],
-            ['fa_form_header',     {Default => '', Scope => 'blog'}],
-            ['fa_jq_js_include',   {Default => '', Scope => 'blog'}],
-            ['fa_mtapp_html_foot', {Default => '', Scope => 'blog'}],
-            ['fa_mtapp_end_body',  {Default => '', Scope => 'blog'}],
-
-            # Uploadify
-            #['active_uploadify',{Default => 0,  Scope => 'blog'}],
-            #['upload_folder',   {Default => '', Scope => 'blog'}],
-            #['img_elm',         {Default => '<img src="__filepath__" alt="__filename__" />', Scope => 'blog'}],
-            #['file_elm',        {Default => '<a href="__filepath__">__filename__</a>', Scope => 'blog'}],
     ]),
 });
 MT->add_plugin($plugin);
