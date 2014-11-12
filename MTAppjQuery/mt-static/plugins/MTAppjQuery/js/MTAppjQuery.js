@@ -277,14 +277,26 @@
                         var $tbody = $table.find('tbody');
                         var $tr = $tbody.find('tr').last().removeClass('last-child').clone();
                         $tr.addClass('last-child').find('.jsontable-input').val('').siblings().remove();
+                        if (op.addBefore !== null && typeof op.addBefore === 'function') {
+                            op.addBefore({name: 'addBefore', type: 'row'}, $tr);
+                        }
                         $tbody.append($tr);
+                        if (op.addAfter !== null && typeof op.addAfter === 'function') {
+                            op.addAfter({name: 'addAfter'}, $container);
+                        }
                     }
                     else if ($(this).hasClass('jsontable-add-column')) {
                         $table.find('tr').each(function(){
                             var $td = $(this).children(':last-child').removeClass('last-child').clone();
                             $td.children('.jsontable-input').val('').siblings().remove();
+                            if (op.addBefore !== null && typeof op.addBefore === 'function') {
+                                op.addBefore({name: 'addBefore', type: 'column'}, $td);
+                            }
                             $(this).append($td);
                         });
+                        if (op.addAfter !== null && typeof op.addAfter === 'function') {
+                            op.addAfter({name: 'addAfter'}, $container);
+                        }
                     }
                     else if ($(this).hasClass('jsontable-clear')) {
                         $table.find('.jsontable-clear-data').remove();
@@ -335,6 +347,9 @@
                     }
                 });
             }
+            if (op.buildAfter !== null && typeof op.buildAfter === 'function') {
+                op.buildAfter({name: 'buildAfter'}, $container);
+            }
         });
     };
     $.fn.MTAppJSONTable.defaults = {
@@ -348,7 +363,11 @@
         edit: true, // Disable table
         add: false, // true: A user can add rows or columns.
         clear: true, // false: Hide a delete button.
-        debug: false // true: show the original textarea.
+        debug: false, // true: show the original textarea.
+        // Callbacks
+        buildAfter: null,
+        addBefore: null,
+        addAfter: null
     };
     // end - $.fn.MTAppJSONTable()
 
