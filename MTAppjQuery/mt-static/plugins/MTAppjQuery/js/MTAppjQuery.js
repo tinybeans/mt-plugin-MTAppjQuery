@@ -191,6 +191,11 @@
                     '[# if (clear) { #]',
                     '<a href="#" class="button jsontable-clear">' + l10n.clearData + '</a>',
                     '[# } #]',
+                    '[# if (optionButtons) { #]',
+                        '[# for (var i = 0, l = optionButtons.length; i < l; i++) { #]',
+                        '<a href="#" class="button [#= optionButtons[i].classname #]">[#= optionButtons[i].text #]</a>',
+                        '[# } #]',
+                    '[# } #]',
                 '</div>'
             ].join("");
 
@@ -223,7 +228,7 @@
 
                     '</table>',
 
-                    '[# if (add || clear) { #]',
+                    '[# if (add || clear || optionButtons) { #]',
                         '[#= context.include("buttons") #]',
                     '[# } #]',
 
@@ -363,6 +368,7 @@
         edit: true, // Disable table
         add: false, // true: A user can add rows or columns.
         clear: true, // false: Hide a delete button.
+        optionButtons: null, // [{classname:"classname", text:"button text"}]
         debug: false, // true: show the original textarea.
         // Callbacks
         buildAfter: null,
