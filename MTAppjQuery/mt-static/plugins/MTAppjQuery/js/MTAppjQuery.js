@@ -223,7 +223,7 @@
 
                     '</table>',
 
-                    '[# if (add) { #]',
+                    '[# if (add || clear) { #]',
                         '[#= context.include("buttons") #]',
                     '[# } #]',
 
@@ -271,7 +271,7 @@
             }
 
             // Add a row or column
-            if (op.add) {
+            if (op.add || op.clear) {
                 $container.on('click', 'div.add-btn a', function(){
                     if ($(this).hasClass('jsontable-add-row')) {
                         var $tbody = $table.find('tbody');
