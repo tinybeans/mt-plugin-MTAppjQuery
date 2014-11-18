@@ -65,7 +65,13 @@
                 }
             }
             else {
-                json = {"items":[]};
+                if (op.items === null) {
+                    json = {};
+                    json[op.itemsRootKey] = [];
+                }
+                else {
+                    json = op.items;
+                }
             }
             if (json === null) {
                 return;
@@ -77,8 +83,8 @@
                 alert('Error in .MTAppJSONTable: The "order" option is required.');
                 return;
             }
-            var items = json.items;
 
+            var items = json[op.itemsRootKey];
             if (items.length === 0) {
                 items[0] = {};
                 for (var i = 0, l = order.length; i < l; i++) {
@@ -345,7 +351,7 @@
                         }
                     }
                     if (values !== '') {
-                        $this.val('{"items":[' + itemsArray.join(',') + ']}');
+                        $this.val('{"' + op.itemsRootKey + '":[' + itemsArray.join(',') + ']}');
                     }
                     else {
                         $this.val('');
@@ -364,7 +370,8 @@
         headerOrder: [], // Array: Order of table header
         headerPosition: 'top', // 'top' or 'left'
         footer: false, // If you use the table footer, set true.
-        // items: [], // Array include Object
+        items: null, // Array include Object
+        itemsRootKey: 'items', // String: The root key of items
         edit: true, // Disable table
         add: false, // true: A user can add rows or columns.
         clear: true, // false: Hide a delete button.
