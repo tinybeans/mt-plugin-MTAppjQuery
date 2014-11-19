@@ -1765,7 +1765,8 @@
                 var elm = document.getElementById(id);
                 container.insertBefore(elm, container.firstChild);
                 $(elm).removeClass('hidden').show();
-            } else if (window.console) {
+            }
+            if (op.debug && window.console) {
                 console.log('#' + id + ' が見つかりません');
             }
         }
@@ -1775,6 +1776,7 @@
         insertID: 'sortable',
         insert_id: 'sortable',// Deprecated
         otherFieldHide: false,
+        debug: false
     };
     // end - $.MTAppFieldSort
 
