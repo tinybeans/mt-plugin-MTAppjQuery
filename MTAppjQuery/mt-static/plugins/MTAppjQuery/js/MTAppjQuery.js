@@ -1755,6 +1755,10 @@
         }
         var container = document.getElementById(containerId);
         if (!container) return;
+        if (op.otherFieldHide) {
+            $(container).find('div.field').addClass('hidden');
+            $('#quickpost').addClass('hidden');
+        }
         for (var i = 0; i < l; i++) {
             var id = $.trim(field[i]).replace(/^c:/,'customfield_') + '-field';
             if (document.getElementById(id)) {
@@ -1768,8 +1772,9 @@
     };
     $.MTAppFieldSort.defaults = {
         sort: 'title,text,tags,excerpt,keywords',
-        insert_id: 'sortable',
-        insertID: 'sortable'
+        insertID: 'sortable',
+        insert_id: 'sortable',// Deprecated
+        otherFieldHide: false,
     };
     // end - $.MTAppFieldSort
 
