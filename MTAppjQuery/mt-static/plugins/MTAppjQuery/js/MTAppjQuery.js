@@ -48,6 +48,11 @@
             l10n.addColumnPropertyDisplayName = 'Property Display Name (e.g. Title)';
         }
 
+        // Auto settings
+        if (op.clear) {
+            op.listingCheckbox = true;
+        }
+
         return this.each(function(){
 
             var $this = $(this);
@@ -102,7 +107,7 @@
                 '<thead>',
                   '<tr>',
                       // op.clear == true
-                      '[# if (clear) { #]',
+                      '[# if (listingCheckbox) { #]',
                       '<th class="jsontable-clear-cell">&nbsp;</th>',
                       '[# } #]',
                       '[# for (var i = 0, l = headerOrder.length; i < l; i++) { #]',
@@ -115,7 +120,7 @@
             tmpl.footer = [
                 '<tfoot>',
                   '<tr>',
-                      '[# if (clear) { #]',
+                      '[# if (listingCheckbox) { #]',
                       '<th class="jsontable-clear-cell">&nbsp;</th>',
                       '[# } #]',
                       '[# for (var i = 0, l = headerOrder.length; i < l; i++) { #]',
@@ -129,9 +134,13 @@
                 '<tbody>',
                     '[# for (var i = 0, l = items.length; i < l; i++) { #]',
                     '<tr>',
-                        '[# if (clear) { #]',
+                        '[# if (listingCheckbox) { #]',
                         '<td class="jsontable-clear-cell">',
                             '<input type="checkbox" class="jsontable-clear-cb">',
+                            '[# if (listingCheckboxType === "radio") { #]',
+                            '<input type="radio" name="jsontable-radio" class="jsontable-cb">',
+                            '[# } else { #]',
+                            '[# } #]',
                         '</td>',
                         '[# } #]',
                         '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
@@ -142,6 +151,9 @@
                                 '[# } else if (inputType === "textarea") { #]',
                                     '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
                                 '[# } #]',
+                            '[# } else if (listingCheckbox) { #]',
+                                '<span class="jsontable-input-data">[#= items[i][headerOrder[x]] #]</span>',
+                                '<textarea class="jsontable-input-hidden hidden" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
                             '[# } else { #]',
                                 '[#= items[i][headerOrder[x]] #]',
                             '[# } #]',
@@ -154,7 +166,7 @@
 
             tmpl.tbodyLeft = [
                 '<tbody>',
-                    '[# if (clear) { #]',
+                    '[# if (listingCheckbox) { #]',
                     '<tr class="jsontable-clear-row">',
                         '[# if (header) { #]',
                         '<th class="jsontable-clear-cell">&nbsp;</th>',
@@ -257,7 +269,7 @@
             }
 
             // Click checkboxes for deleting data
-            if (op.clear) {
+            if (op.listingCheckbox) {
                 if (op.headerPosition === 'top') {
                     $table.on('click', 'input.jsontable-clear-cb', function(){
                         if ($(this).is(':checked')) {
@@ -375,6 +387,8 @@
         edit: true, // Disable table
         add: false, // true: A user can add rows or columns.
         clear: true, // false: Hide a delete button.
+        listingCheckbox: false, // or true
+        listingCheckboxType: 'checkbox', // or 'radio'
         optionButtons: null, // [{classname:"classname", text:"button text"}]
         debug: false, // true: show the original textarea.
         // Callbacks
