@@ -275,13 +275,19 @@
             if (op.listingCheckbox) {
                 if (op.headerPosition === 'top') {
                     $table.on('click', 'input.jsontable-cb', function(){
-                        $(this).parent().parent().toggleClass('jsontable-selected-data');
+                        var $tr = $(this).parent().parent().toggleClass('jsontable-selected-data');
+                        if (op.selectRow !== null && typeof op.selectRow === 'function') {
+                            op.selectRow({name: 'selectRow'}, $tr, $(this).is(':checked'));
+                        }
                     });
                 }
                 else if (op.headerPosition === 'left') {
                     $table.on('click', 'input.jsontable-cb', function(){
                         var itemIndex = $(this).parent().attr('data-item-index');
-                        $table.find('.item-' + itemIndex).toggleClass('jsontable-selected-data');
+                        var $td = $table.find('.item-' + itemIndex).toggleClass('jsontable-selected-data');
+                        if (op.selectColumn !== null && typeof op.selectColumn === 'function') {
+                            op.selectColumn({name: 'selectColumn'}, $td, $(this).is(':checked'));
+                        }
                     });
                 }
             }
@@ -384,11 +390,14 @@
         listingCheckboxType: 'checkbox', // or 'radio'
         listingTargetKey: null, // String: Target key  which is saved value when listing mode is applied
         optionButtons: null, // [{classname:"classname", text:"button text"}]
-        debug: false, // true: show the original textarea.
         // Callbacks
         buildAfter: null,
         addBefore: null,
-        addAfter: null
+        addAfter: null,
+        selectRow: null,
+        selectColumn: null,
+
+        debug: false // true: show the original textarea.
     };
     // end - $.fn.MTAppJSONTable()
 
