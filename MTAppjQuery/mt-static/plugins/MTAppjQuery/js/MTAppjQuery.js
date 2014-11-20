@@ -136,10 +136,10 @@
                     '<tr>',
                         '[# if (listingCheckbox) { #]',
                         '<td class="jsontable-clear-cell">',
-                            '<input type="checkbox" class="jsontable-clear-cb">',
                             '[# if (listingCheckboxType === "radio") { #]',
                             '<input type="radio" name="jsontable-radio" class="jsontable-cb">',
                             '[# } else { #]',
+                            '<input type="checkbox" class="jsontable-cb">',
                             '[# } #]',
                         '</td>',
                         '[# } #]',
@@ -173,7 +173,7 @@
                         '[# } #]',
                         '[# for (var i = 0, l = items.length; i < l; i++) { #]',
                         '<td class="jsontable-clear-cell item-[#= i #]" data-item-index="[#= i #]">',
-                            '<input type="checkbox" class="jsontable-clear-cb">',
+                            '<input type="checkbox" class="jsontable-cb">',
                         '</td>',
                         '[# } #]',
                     '</tr>',
@@ -271,23 +271,23 @@
             // Click checkboxes for deleting data
             if (op.listingCheckbox) {
                 if (op.headerPosition === 'top') {
-                    $table.on('click', 'input.jsontable-clear-cb', function(){
+                    $table.on('click', 'input.jsontable-cb', function(){
                         if ($(this).is(':checked')) {
-                            $(this).parent().parent().addClass('jsontable-clear-data');
+                            $(this).parent().parent().addClass('jsontable-selected-data');
                         }
                         else {
-                            $(this).parent().parent().removeClass('jsontable-clear-data');
+                            $(this).parent().parent().removeClass('jsontable-selected-data');
                         }
                     });
                 }
                 else if (op.headerPosition === 'left') {
-                    $table.on('click', 'input.jsontable-clear-cb', function(){
+                    $table.on('click', 'input.jsontable-cb', function(){
                         var itemIndex = $(this).parent().attr('data-item-index');
                         if ($(this).is(':checked')) {
-                            $table.find('.item-' + itemIndex).addClass('jsontable-clear-data');
+                            $table.find('.item-' + itemIndex).addClass('jsontable-selected-data');
                         }
                         else {
-                            $table.find('.item-' + itemIndex).removeClass('jsontable-clear-data');
+                            $table.find('.item-' + itemIndex).removeClass('jsontable-selected-data');
                         }
                     });
                 }
@@ -322,7 +322,7 @@
                         }
                     }
                     else if ($(this).hasClass('jsontable-clear')) {
-                        $table.find('.jsontable-clear-data').remove();
+                        $table.find('.jsontable-selected-data').remove();
                     }
                     return false;
                 });
