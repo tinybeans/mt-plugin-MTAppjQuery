@@ -545,7 +545,8 @@ span.mtappmultiform-radio {
    __MTAppJSONTable
 ---------------------------------------- */
 .mtapp-json-table {
-    table {
+    .jsontable-table {
+        table-layout: fixed;
         width: 100%;
         margin-bottom: 1em;
         border-collapse: collapse;
@@ -568,11 +569,12 @@ span.mtappmultiform-radio {
         td.checkbox {
             text-align: center;
         }
-        .jsontable-clear-cell {
+        .jsontable-cb-cell {
+            width: 2.6em;
             text-align: center;
             vertical-align: middle;
         }
-        .jsontable-clear-data {
+        .jsontable-selected-data {
             background-color: #e7e7eb;
         }
         .jsontable-input {
