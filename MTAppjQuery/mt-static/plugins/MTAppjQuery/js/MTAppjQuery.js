@@ -219,7 +219,7 @@
 
             tmpl.container = [
                 '<div class="mtapp-json-table">',
-                    '<table border="1">',
+                    '<table class="jsontable-table" border="1">',
                         // caption
                         '[# if (typeof caption === "string") { #]',
                             '[#= context.include("caption") #]',
