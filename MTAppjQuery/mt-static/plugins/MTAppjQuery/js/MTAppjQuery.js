@@ -189,7 +189,7 @@
                                     '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
                                 '[# } #]',
                             '[# } else { #]',
-                                '[#= items[i][headerOrder[x]] #]',
+                                '<span class="jsontable-input-data">[#= items[i][headerOrder[x]] #]</span>',
                                 '[# if (listingTargetKey && listingTargetKey === headerOrder[x]) { #]',
                                     '<textarea class="jsontable-input-hidden hidden" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
                                 '[# } #]',
