@@ -151,11 +151,11 @@
                                 '[# } else if (inputType === "textarea") { #]',
                                     '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
                                 '[# } #]',
-                            '[# } else if (listingCheckbox) { #]',
-                                '<span class="jsontable-input-data">[#= items[i][headerOrder[x]] #]</span>',
-                                '<textarea class="jsontable-input-hidden hidden" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
                             '[# } else { #]',
                                 '<span class="jsontable-input-data">[#= items[i][headerOrder[x]] #]</span>',
+                                '[# if (listingTargetKey && listingTargetKey === headerOrder[x]) { #]',
+                                    '<textarea class="jsontable-input-hidden hidden" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
+                                '[# } #]',
                             '[# } #]',
                         '</td>',
                         '[# } #]',
@@ -190,6 +190,9 @@
                                 '[# } #]',
                             '[# } else { #]',
                                 '[#= items[i][headerOrder[x]] #]',
+                                '[# if (listingTargetKey && listingTargetKey === headerOrder[x]) { #]',
+                                    '<textarea class="jsontable-input-hidden hidden" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
+                                '[# } #]',
                             '[# } #]',
                         '</td>',
                         '[# } #]',
@@ -379,6 +382,7 @@
         clear: true, // false: Hide a delete button.
         listingCheckbox: false, // or true
         listingCheckboxType: 'checkbox', // or 'radio'
+        listingTargetKey: null, // String: Target key  which is saved value when listing mode is applied
         optionButtons: null, // [{classname:"classname", text:"button text"}]
         debug: false, // true: show the original textarea.
         // Callbacks
