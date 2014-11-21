@@ -133,7 +133,11 @@
             tmpl.tbodyTop = [
                 '<tbody>',
                     '[# for (var i = 0, l = items.length; i < l; i++) { #]',
-                    '<tr>',
+                    '[# if (i % 2 === 0) { #]',
+                    '<tr class="even">',
+                    '[# } else { #]',
+                    '<tr class="odd">',
+                    '[# } #]',
                         '[# if (listingCheckbox) { #]',
                         '<td class="jsontable-cb-cell">',
                             '[# if (listingCheckboxType === "radio") { #]',
