@@ -276,8 +276,8 @@
                 if (op.headerPosition === 'top') {
                     $table.on('click', 'input.jsontable-cb', function(){
                         var $tr = $(this).parent().parent().toggleClass('jsontable-selected-data');
-                        if (op.selectRow !== null && typeof op.selectRow === 'function') {
-                            op.selectRow({name: 'selectRow'}, $tr, $(this).is(':checked'));
+                        if (op.cbAfterSelectRow !== null && typeof op.cbAfterSelectRow === 'function') {
+                            op.cbAfterSelectRow({name: 'cbAfterSelectRow'}, $tr, $(this).is(':checked'));
                         }
                     });
                 }
@@ -285,8 +285,8 @@
                     $table.on('click', 'input.jsontable-cb', function(){
                         var itemIndex = $(this).parent().attr('data-item-index');
                         var $td = $table.find('.item-' + itemIndex).toggleClass('jsontable-selected-data');
-                        if (op.selectColumn !== null && typeof op.selectColumn === 'function') {
-                            op.selectColumn({name: 'selectColumn'}, $td, $(this).is(':checked'));
+                        if (op.cbAfterSelectColumn !== null && typeof op.cbAfterSelectColumn === 'function') {
+                            op.cbAfterSelectColumn({name: 'cbAfterSelectColumn'}, $td, $(this).is(':checked'));
                         }
                     });
                 }
@@ -299,29 +299,30 @@
                         var $tbody = $table.find('tbody');
                         var $tr = $tbody.find('tr').last().removeClass('last-child').clone();
                         $tr.addClass('last-child').find('.jsontable-input').val('').siblings().remove();
-                        if (op.addBefore !== null && typeof op.addBefore === 'function') {
-                            op.addBefore({name: 'addBefore', type: 'row'}, $tr);
+                        if (op.cbBeforeAdd !== null && typeof op.cbBeforeAdd === 'function') {
+                            op.cbBeforeAdd({name: 'cbBeforeAdd', type: 'row'}, $tr);
                         }
                         $tbody.append($tr);
-                        if (op.addAfter !== null && typeof op.addAfter === 'function') {
-                            op.addAfter({name: 'addAfter'}, $container);
+                        if (op.cbAfterAdd !== null && typeof op.cbAfterAdd === 'function') {
+                            op.cbAfterAdd({name: 'cbAfterAdd'}, $container);
                         }
                     }
                     else if ($(this).hasClass('jsontable-add-column')) {
                         $table.find('tr').each(function(){
                             var $td = $(this).children(':last-child').removeClass('last-child').clone();
                             $td.children('.jsontable-input').val('').siblings().remove();
-                            if (op.addBefore !== null && typeof op.addBefore === 'function') {
-                                op.addBefore({name: 'addBefore', type: 'column'}, $td);
+                            if (op.cbBeforeAdd !== null && typeof op.cbBeforeAdd === 'function') {
+                                op.cbBeforeAdd({name: 'cbBeforeAdd', type: 'column'}, $td);
                             }
                             $(this).append($td);
                         });
-                        if (op.addAfter !== null && typeof op.addAfter === 'function') {
-                            op.addAfter({name: 'addAfter'}, $container);
+                        if (op.cbAfterAdd !== null && typeof op.cbAfterAdd === 'function') {
+                            op.cbAfterAdd({name: 'cbAfterAdd'}, $container);
                         }
                     }
                     else if ($(this).hasClass('jsontable-clear')) {
-                        $table.find('.jsontable-selected-data').remove();
+                        var result = $table.find('.jsontable-selected-data').remove();
+                        console.log(result);
                     }
                     return false;
                 });
@@ -334,8 +335,8 @@
                     $this.val(result);
                 });
             }
-            if (op.buildAfter !== null && typeof op.buildAfter === 'function') {
-                op.buildAfter({name: 'buildAfter'}, $container);
+            if (op.cbAfterBuild !== null && typeof op.cbAfterBuild === 'function') {
+                op.cbAfterBuild({name: 'cbAfterBuild'}, $container);
             }
         });
     };
@@ -393,11 +394,11 @@
         listingTargetKey: null, // String: Target key  which is saved value when listing mode is applied
         optionButtons: null, // [{classname:"classname", text:"button text"}]
         // Callbacks
-        buildAfter: null,
-        addBefore: null,
-        addAfter: null,
-        selectRow: null,
-        selectColumn: null,
+        cbAfterBuild: null,
+        cbBeforeAdd: null,
+        cbAfterAdd: null,
+        cbAfterSelectRow: null,
+        cbAfterSelectColumn: null,
 
         debug: false // true: show the original textarea.
     };
