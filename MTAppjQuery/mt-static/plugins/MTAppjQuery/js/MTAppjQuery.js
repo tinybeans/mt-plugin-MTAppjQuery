@@ -330,49 +330,51 @@
             // Save values edited by user
             if (op.edit) {
                 $('form[method="post"]').on('submit', function(){
-                    var values = '';
-                    var itemsArray = [];
-                    if (op.headerPosition === 'top') {
-                        $table.find('tbody tr').each(function(){
-                            var item = {};
-                            $(this).find('.jsontable-input').each(function(){
-                                var v = $(this).val();
-                                item[$(this).attr('data-name')] = v;
-                                values += v;
-                            });
-                            itemsArray.push(JSON.stringify(item));
-                        });
-                    }
-                    else if (op.headerPosition === 'left') {
-                        var $tr = $table.find('tr');
-                        var textareaCount = $tr.last().find('.jsontable-input').length;
-                        var itemsArrayObj = [];
-                        for (var i = 0; i < textareaCount; i++) {
-                            itemsArrayObj.push({});
-                        }
-                        $tr.each(function(i){
-                            $(this).find('.jsontable-input').each(function(j){
-                                var v = $(this).val();
-                                itemsArrayObj[j][$(this).attr('data-name')] = v;
-                                values += v;
-                            });
-                        });
-                        for (var i = 0; i < textareaCount; i++) {
-                            itemsArray.push(JSON.stringify(itemsArrayObj[i]));
-                        }
-                    }
-                    if (values !== '') {
-                        $this.val('{"' + op.itemsRootKey + '":[' + itemsArray.join(',') + ']}');
-                    }
-                    else {
-                        $this.val('');
-                    }
+                    var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")');
+                    $this.val(result);
                 });
             }
             if (op.buildAfter !== null && typeof op.buildAfter === 'function') {
                 op.buildAfter({name: 'buildAfter'}, $container);
             }
         });
+    };
+    $.fn.MTAppJSONTable.save = function(headerPosition, itemsRootKey, $table, filter){
+        var values = '';
+        var itemsArray = [];
+        if (typeof filter !== 'string') {
+            filter = '';
+        }
+        if (headerPosition === 'top') {
+            $table.find('tbody tr' + filter).each(function(){
+                var item = {};
+                $(this).find('.jsontable-input').each(function(){
+                    var v = $(this).val();
+                    item[$(this).attr('data-name')] = v;
+                    values += v;
+                });
+                itemsArray.push(JSON.stringify(item));
+            });
+        }
+        else if (headerPosition === 'left') {
+            var $tr = $table.find('tr' + filter);
+            var textareaCount = $tr.last().find('.jsontable-input').length;
+            var itemsArrayObj = [];
+            for (var i = 0; i < textareaCount; i++) {
+                itemsArrayObj.push({});
+            }
+            $tr.each(function(i){
+                $(this).find('.jsontable-input').each(function(j){
+                    var v = $(this).val();
+                    itemsArrayObj[j][$(this).attr('data-name')] = v;
+                    values += v;
+                });
+            });
+            for (var i = 0; i < textareaCount; i++) {
+                itemsArray.push(JSON.stringify(itemsArrayObj[i]));
+            }
+        }
+        return (values !== '') ? '{"' + itemsRootKey + '":[' + itemsArray.join(',') + ']}' : '';
     };
     $.fn.MTAppJSONTable.defaults = {
         inputType: 'textarea', // 'textarea' or 'input'
