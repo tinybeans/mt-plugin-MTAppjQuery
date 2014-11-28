@@ -412,6 +412,311 @@
     };
     // end - $.fn.MTAppJSONTable()
 
+
+    // -------------------------------------------------
+    //  $(foo).MTAppListing();
+    //
+    //  Description:
+    //    Ajaxで読み込んだJSONをテーブルにしてダイアログで表示する
+    //
+    //  Usage:
+    //    $(foo).MTAppListing(options);
+    //
+    // -------------------------------------------------
+    $.fn.MTAppListing = function(options){
+        var op = $.extend({}, $.fn.MTAppListing.defaults, options);
+
+        /* ==================================================
+            L10N
+        ================================================== */
+        var l10n = {};
+        if (mtappVars.language === 'ja') {
+            l10n.title = '項目を選択';
+            l10n.search = '検索';
+            l10n.reset = 'リセット';
+            l10n.cancel = 'キャンセル';
+            l10n.select = '選択';
+            l10n.selectedItems = '選択された項目';
+            l10n.returnDialogTop = 'ダイアログのトップへ戻る';
+        }
+        else {
+            l10n.title = 'Select items';
+            l10n.search = 'Search';
+            l10n.reset = 'Reset';
+            l10n.cancel = 'Cancel';
+            l10n.select = 'Select';
+            l10n.selectedItems = 'Selected items';
+            l10n.returnDialogTop = 'Dialog top';
+        }
+        /*  L10N  */
+
+        /* ==================================================
+            Template
+        ================================================== */
+        var tmpl = {};
+        tmpl.dialog = [
+            '<div class="mtapplisting-container">',
+                '<img class="mtapplisting-indicator hidden" src="' + StaticURI + 'images/indicator.gif">',
+                '<div class="mtapplisting-content hidden">',
+                    '<div class="mtapplisting-content-header">',
+                        '<h1 class="title page">[#= dialog.title #]</h1>',
+                    '</div>',
+                    '<div class="mtapplisting-content-body">',
+                        '<textarea id="mtapplisting-textarea1" class="mtapplisting-dummy-textarea hidden"></textarea>',
+                        '<div class="mtapplisting-search">',
+                            '<input id="mtapplisting-text-filter" type="text" class="text med" value="" placeholder="' + l10n.search + '">',
+                            '<input id="mtapplisting-text-search" type="image" src="' + StaticURI + '/images/search-submit-dialog.png">',
+                            '<a id="mtapplisting-search-reset" href="#" class="search-reset">' + l10n.reset + '</a>',
+                        '</div>',
+                        '<textarea id="mtapplisting-textarea2" class="mtapplisting-dummy-textarea hidden"></textarea>',
+                    '</div>',
+                '</div>',
+                '<div class="mtapplisting-actions actions-bar hidden">',
+                    '<a href="#" id="mtapplisting-dialog-ok" class="action button primary close ok">OK</a>',
+                    '<a href="#" id="mtapplisting-dialog-cansel" class="action button cancel">' + l10n.cancel + '</a>',
+                    '<a href="#" id="mtapplisting-dialog-top">' + l10n.returnDialogTop + '</a>',
+                '</div>',
+            '</div>',
+            ''
+        ].join('');
+        /*  Template  */
+
+        /* ==================================================
+            Insert a button to open dialog window
+            and Initialization
+        ================================================== */
+        var $dialog = $('#mtapplisting-dialog');
+        if (!$dialog.length) {
+            var dialogHTML =
+                '<div id="mtapplisting-dialog"></div>' +
+                '<div id="mtapplisting-overlay"></div>';
+            $('body').append(dialogHTML);
+            $dialog = $('#mtapplisting-dialog');
+        }
+        /*  Insert a button to open dialog window  */
+
+        /* ==================================================
+            Bind events to the dialog
+        ================================================== */
+        if (!$dialog.hasClass('bind-event')) {
+            $dialog
+                .addClass('bind-event')
+                // Cancel Button
+                .on('click', '#mtapplisting-dialog-cansel', function(e){
+                    $(e.delegateTarget).html('').removeClass('mt-dialog').hide();
+                    $('#mtapplisting-overlay').removeClass('mt-dialog-overlay').removeClass('overlay').hide();
+                    return false;
+                })
+                // OK Button
+                .on('click', '#mtapplisting-dialog-ok', function(e){
+                    var triggerId = $(e.delegateTarget).data('triggerId');
+                    if (!triggerId) {
+                        return false;
+                    }
+
+                    // Save selected values
+                    var values = [];
+                    var $tbody = $('#mtapplisting-tbody1');
+                    var $tr = $tbody.children('tr');
+                    if ($tr.length) {
+                        var targetKey = $tbody.data('target-key');
+                        $tr.each(function(){
+                            values.push($(this).find('td.' + targetKey + ' textarea.jsontable-input-hidden').val());
+                        });
+                    }
+                    if (values.length > 1) {
+                        $('#' + triggerId).val(',' + values.join(',') + ',');
+                    }
+                    else {
+                        $('#' + triggerId).val(values[0]);
+                    }
+
+                    // Reset trigger
+                    $(e.delegateTarget).data('triggerId', '');
+                    // Close the dialog
+                    $(this).next().trigger('click');
+                    return false;
+                })
+                .on('click', '#mtapplisting-text-search', function(e){
+                    var v = $('#mtapplisting-text-filter').val();
+                    $('#mtapplisting-tbody2 tr').each(function(){
+                        var html = this.innerHTML;
+                        var reg = new RegExp(v, 'i');
+                        if (reg.test(html)) {
+                            $(this).removeClass('hidden');
+                        }
+                        else {
+                            $(this).addClass('hidden');
+                        }
+                    });
+                    return false;
+                })
+                .on('keypress', '#mtapplisting-text-filter', function(e){
+                    if (e.which == 13 || op.incrementalSearch) {
+                        $(this).next().trigger('click');
+                    }
+                })
+                .on('click', '#mtapplisting-search-reset', function(e){
+                    $('#mtapplisting-text-filter').val('');
+                    $('#mtapplisting-text-search').trigger('click');
+                    return false;
+                })
+                .on('click', '#mtapplisting-dialog-top', function(e){
+                    $(e.delegateTarget)
+                        .find('div.mtapplisting-container')
+                        .animate({scrollTop: 0}, 600, 'swing');
+                    return false;
+                });
+        }
+        /*  Bind events to the dialog  */
+
+
+        return this.each(function(){
+
+            var $this = $(this);
+
+            /* ==================================================
+                Set IDs
+            ================================================== */
+            var $thisId = $this.attr('id');
+            if (!$thisId) {
+                $thisId = Math.floor(Math.random() * 10000000000000000).toString(36);
+                $this.attr('id', $thisId);
+            }
+            var tbodyId1 = 'mtapplisting-' + $thisId + '1';
+            var tbodyId2 = 'mtapplisting-' + $thisId + '2';
+            /*  Set IDs  */
+
+            $this
+                .after('<a href="#" class="button">' + l10n.select + '</a>')
+                .next('a')
+                /* ==================================================
+                    Event of opening the dialog window
+                ================================================== */
+                .on('click', function(){ // Don't use ".mtDialog()"
+
+                    // Set the trigger id
+                    var $dialog = $('#mtapplisting-dialog').addClass('mt-dialog');
+                    $dialog.data('triggerId', $thisId);
+
+                    // Show the overlay
+                    $('#mtapplisting-overlay').addClass('mt-dialog-overlay').addClass('overlay').css({minHeight: $(document).height()}).show();
+
+                    // MTAppListing template
+                    var tmplData = {
+                        dialog: {
+                            title: op.dialogTitle
+                        }
+                    };
+                    var html = Template.process('dialog', tmplData, tmpl);
+
+                    // Append MTAppListing template to the dialog, and show the dialog
+                    $dialog
+                        .html(html)
+                        .children('.mtapplisting-container')
+                            .height($(window).height() - 110)
+                        .end()
+                        .show();
+
+                    // Hide the indicator
+                    var $indicator = $dialog.find('img.mtapplisting-indicator').removeClass('hidden');
+
+                    // Options for ajax
+                    var ajaxOptions = {
+                        dataType: op.dataType,
+                        url: op.url,
+                        data: op.data
+                    };
+
+                    // Get JSON by ajax
+                    $.ajax(ajaxOptions).done(function(response){
+
+                        // Process the response
+                        if (op.cbProcessResponse !== null && typeof op.cbProcessResponse === 'function') {
+                            response = op.cbProcessResponse({name: 'cbProcessResponse'}, response);
+                        }
+
+                        // Show the dialog content
+                        $indicator.addClass('hidden');
+                        $dialog.find('div.mtapplisting-content').removeClass('hidden').next().removeClass('hidden');
+
+                        // Dummy textarea1 options
+                        op.jsontable.caption = l10n.selectedItems;
+                        op.jsontable.headerPosition = 'top';
+                        op.jsontable.footer = false;
+                        op.jsontable.items = null;
+                        op.jsontable.edit = false;
+                        op.jsontable.add = false;
+                        op.jsontable.clear = false;
+                        op.jsontable.listingCheckbox = true;
+                        op.jsontable.listingTargetKey = op.jsontable.listingTargetKey || 'id';
+                        op.jsontable.cbAfterSelectRow = function(cb, $tr, checked){
+                            if (!checked) {
+                                $tr.prependTo('#mtapplisting-tbody2');
+                            }
+                        };
+                        op.jsontable.cbAfterBuild = function(cb, $container){
+                            $container.find('tbody').attr('id', 'mtapplisting-tbody1');
+                        };
+                        $('#mtapplisting-textarea1').MTAppJSONTable(op.jsontable);
+                        $('#mtapplisting-tbody1')
+                            /*.hide()*/
+                            .data('target-key', op.jsontable.listingTargetKey)
+                            .html('')
+                            .sortable({
+                                items: 'tr',
+                                cursor: 'move',
+                                placeholder: 'mtapp-state-highlight'
+                            });
+
+                        // Dummy textarea2 options
+                        // The following options have be already set at dummy1
+                            // op.jsontable.headerPosition = 'top';
+                            // op.jsontable.edit = false;
+                            // op.jsontable.add = false;
+                            // op.jsontable.clear = false;
+                            // op.jsontable.listingCheckbox = true;
+                            // op.jsontable.listingTargetKey = op.jsontable.listingTargetKey || 'id';
+                        op.jsontable.caption = null; // overwrite
+                        op.jsontable.footer = true; // overwrite
+                        op.jsontable.items = response; // overwrite
+                        op.jsontable.cbAfterSelectRow = function(cb, $tr, checked){  // overwrite
+                            $('#mtapplisting-textarea1').next().show();
+                            if (checked) {
+                                $tr.find('td').each(function(){
+                                    var w = $(this).width();
+                                    $(this).width(w + 'px');
+                                });
+                                $tr.appendTo('#mtapplisting-tbody1');
+                            }
+                        };
+                        op.jsontable.cbAfterBuild = function(cb, $container){ // overwrite
+                            $container.find('tbody').attr('id', 'mtapplisting-tbody2');
+                            var savedValue = $this.val().replace(/^,|,$/g, '').split(',');
+                            for (var i = 0, l = savedValue.length; i < l; i++) {
+                                $('td[data-value="' + savedValue[i].replace(/\s*/g, '') + '"]').parent().find('td:first-child input.jsontable-cb').trigger('click');
+                            }
+                        };
+
+                        $('#mtapplisting-textarea2').MTAppJSONTable(op.jsontable);
+                    });
+
+                    return false;
+                });
+                /*  Event of opening the dialog window  */
+        });
+    };
+    $.fn.MTAppListing.defaults = {
+        dialogTitle: '', // Type the title of dialog window
+        url: null, // Data API Script URL (ex)http://your-host/mt/mt-data-api.cgi/v1/sites/1/entries
+        data: null, // PlainObject: Data to be sent to the server.
+        dataType: 'json', // Set this value to ajax options
+        incrementalSearch: true, // Set true if you wont to do incremental search
+        cbProcessResponse: null, // Process the response
+        jsontable: null // Set options for MTAppJSONTable
+    };
+    // end - $.fn.MTAppListing()
+
     // -------------------------------------------------
     //  $.MTAppGetCategoryName();
     //

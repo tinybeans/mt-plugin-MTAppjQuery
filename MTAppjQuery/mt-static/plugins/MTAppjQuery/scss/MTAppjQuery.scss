@@ -590,3 +590,49 @@ span.mtappmultiform-radio {
         }
     }
 }
+/* ==================================================
+    MTAppListing
+================================================== */
+.mtapplisting-container {
+    overflow: auto;
+    margin-bottom: 50px;
+    .mtapplisting-content {
+        margin: 15px 15px 20px;
+        .mtapplisting-content-header {
+            margin-bottom: 25px;
+        }
+        .mtapplisting-search {
+            margin-bottom: 15px;
+            input.text.med {
+                width: 50%;
+            }
+        }
+        .jsontable-table {
+            span.jsontable-input-data {
+                display: inline;
+            }
+        }
+        #mtapplisting-customfield_relatedentries1 {
+            cursor: move;
+            .hidden {
+                display: block;
+                display: table-row;
+            }
+        }
+    }
+    .actions-bar {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 630px;
+        padding: 10px 15px;
+        background-color: #ffffff;
+        #mtapplisting-dialog-top {
+            display: block;
+            position: absolute;
+            top: 10px;
+            right: 0;
+        }
+    }
+}
+/*  MTAppListing  */

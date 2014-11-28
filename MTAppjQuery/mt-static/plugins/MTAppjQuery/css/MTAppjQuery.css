@@ -694,3 +694,49 @@ span.mtappmultiform-radio input {
 .mtapp-json-table .add-buttons .last-child {
   margin-right: 0;
 }
+
+/* ==================================================
+    MTAppListing
+================================================== */
+.mtapplisting-container {
+  overflow: auto;
+  margin-bottom: 50px;
+}
+.mtapplisting-container .mtapplisting-content {
+  margin: 15px 15px 20px;
+}
+.mtapplisting-container .mtapplisting-content .mtapplisting-content-header {
+  margin-bottom: 25px;
+}
+.mtapplisting-container .mtapplisting-content .mtapplisting-search {
+  margin-bottom: 15px;
+}
+.mtapplisting-container .mtapplisting-content .mtapplisting-search input.text.med {
+  width: 50%;
+}
+.mtapplisting-container .mtapplisting-content .jsontable-table span.jsontable-input-data {
+  display: inline;
+}
+.mtapplisting-container .mtapplisting-content #mtapplisting-customfield_relatedentries1 {
+  cursor: move;
+}
+.mtapplisting-container .mtapplisting-content #mtapplisting-customfield_relatedentries1 .hidden {
+  display: block;
+  display: table-row;
+}
+.mtapplisting-container .actions-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 630px;
+  padding: 10px 15px;
+  background-color: #ffffff;
+}
+.mtapplisting-container .actions-bar #mtapplisting-dialog-top {
+  display: block;
+  position: absolute;
+  top: 10px;
+  right: 0;
+}
+
+/*  MTAppListing  */
