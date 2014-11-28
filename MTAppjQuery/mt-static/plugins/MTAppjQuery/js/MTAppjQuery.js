@@ -333,8 +333,7 @@
                         }
                     }
                     else if ($(this).hasClass('jsontable-clear')) {
-                        var result = $table.find('.jsontable-selected-data').remove();
-                        console.log(result);
+                        $table.find('.jsontable-selected-data').remove();
                     }
                     return false;
                 });
