@@ -2076,7 +2076,9 @@
     //
     //  Options:
     //    sort: {String} 上からの並び順通りにbasenameをカンマ区切りで並べる。カスタムフィールドはbasenameの先頭にはc:を付与。
-    //    insert_id: {String} フィールドを包含する要素のid属性の値
+    //    insertId: {String} フィールドを包含する要素のid属性の値
+    //    otherFieldHide: {Boolean} trueにすると並び順を指定したフィールド以外のフィールドを非表示する。
+    //    debug: {Boolean} trueにすると並び順に指定したフィールドがない場合はコンソールに通知する。
     // -------------------------------------------------
     $.MTAppFieldSort = function(options){
         var op = $.extend({}, $.MTAppFieldSort.defaults, options);
