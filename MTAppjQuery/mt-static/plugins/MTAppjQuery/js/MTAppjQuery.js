@@ -150,7 +150,11 @@
                         '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
                         '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]"',
                             '[# if (listingTargetKey && listingTargetKey === headerOrder[x]) { #]',
-                             'id="target-[#= items[i][headerOrder[x]] #]"',
+                                '[# if (listingTargetEscape) { #]',
+                                 'data-value="[#= encodeURIComponent(items[i][headerOrder[x]]) #]"',
+                                 '[# } else { #]',
+                                 'data-value="[#= items[i][headerOrder[x]] #]"',
+                                 '[# } #]',
                              '[# } #]',
                         '>',
                             '[# if (edit) { #]',
@@ -400,6 +404,7 @@
         listingCheckbox: false, // or true
         listingCheckboxType: 'checkbox', // or 'radio'
         listingTargetKey: null, // String: Target key  which is saved value when listing mode is applied
+        listingTargetEscape: false, // Boolean: encodeURIComponent(target value)
         optionButtons: null, // [{classname:"classname", text:"button text"}]
         // Callbacks
         cbAfterBuild: null,
