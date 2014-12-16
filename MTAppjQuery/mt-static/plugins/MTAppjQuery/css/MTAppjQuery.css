@@ -688,10 +688,10 @@ span.mtappmultiform-radio input {
   border: none;
   background-color: transparent;
 }
-.mtapp-json-table .add-buttons {
+.mtapp-json-table .add-btn {
   text-align: right;
 }
-.mtapp-json-table .add-buttons .last-child {
+.mtapp-json-table .add-btn .last-child {
   margin-right: 0;
 }
 
