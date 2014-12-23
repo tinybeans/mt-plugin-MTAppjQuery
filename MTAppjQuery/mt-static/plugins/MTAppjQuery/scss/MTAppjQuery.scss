@@ -582,11 +582,18 @@ span.mtappmultiform-radio {
             border: none;
             background-color: transparent;
         }
+        &.jsontable-cell-merge td:hover,
+        &.jsontable-cell-merge td.merge-target {
+            background-color: #FFD518;
+        }
     }
     .add-btn {
         text-align: right;
         .last-child {
             margin-right: 0;
+        }
+        .primary {
+            color: #FFFFFF;
         }
     }
 }
