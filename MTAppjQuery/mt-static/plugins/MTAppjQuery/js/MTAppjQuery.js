@@ -148,6 +148,9 @@
                     '[# } else { #]',
                     '<tr class="odd">',
                     '[# } #]',
+                        '[# if (sortable) { #]',
+                        '<td class="jsontable-sort-handle">&nbsp;</td>',
+                        '[# } #]',
                         '[# if (listingCheckbox) { #]',
                         '<td class="jsontable-cb-cell">',
                             '[# if (listingCheckboxType === "radio") { #]',
@@ -430,6 +433,12 @@
                     $this.val(result);
                 });
             }
+            if (op.sortable && op.headerPosition === 'top') {
+                $table.sortable({
+                    items: 'tr',
+                    cursor: 'move'
+                });
+            }
             if (op.cbAfterBuild !== null && typeof op.cbAfterBuild === 'function') {
                 op.cbAfterBuild({name: 'cbAfterBuild'}, $container);
             }
@@ -503,6 +512,7 @@
         add: false, // true: A user can add rows or columns.
         clear: true, // false: Hide a delete button.
         cellMerge: false,
+        sortable: false,
         listingCheckbox: false, // or true
         listingCheckboxType: 'checkbox', // or 'radio'
         listingTargetKey: null, // String: Target key  which is saved value when listing mode is applied

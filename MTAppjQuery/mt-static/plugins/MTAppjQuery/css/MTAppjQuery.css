@@ -691,6 +691,14 @@ span.mtappmultiform-radio input {
 .mtapp-json-table .jsontable-table.jsontable-cell-merge td:hover, .mtapp-json-table .jsontable-table.jsontable-cell-merge td.merge-target {
   background-color: #FFD518;
 }
+.mtapp-json-table .jsontable-table.ui-sortable td.jsontable-sort-handle {
+  width: 20px;
+  background: url(../images/arrow-move.png) no-repeat center center;
+  border-top-color: #FFFFFF;
+  border-bottom-color: #FFFFFF;
+  border-left-color: #FFFFFF;
+  cursor: move;
+}
 .mtapp-json-table .add-btn {
   text-align: right;
 }
