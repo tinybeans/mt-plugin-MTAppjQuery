@@ -39,6 +39,11 @@
             l10n.clearData = '削除';
             l10n.addColumnProperty = 'プロパティ名（例：title）';
             l10n.addColumnPropertyDisplayName = 'プロパティ表示名（例：タイトル）';
+            l10n.cellMerge = 'セルを結合';
+            l10n.cellMergeApply = '結合を適用';
+            l10n.colspanValueIs = '結合する列の数';
+            l10n.rowspanValueIs = '結合する行の数';
+            l10n.failedSelect = '連続したセルを選択してください';
         }
         else {
             l10n.addRow = 'Add a row';
@@ -46,6 +51,11 @@
             l10n.clearData = 'Delete';
             l10n.addColumnProperty = 'Property Name (e.g. title)';
             l10n.addColumnPropertyDisplayName = 'Property Display Name (e.g. Title)';
+            l10n.cellMerge = 'Merge cells';
+            l10n.cellMergeApply = 'Apply merge';
+            l10n.colspanValueIs = 'The value of colspan:';
+            l10n.rowspanValueIs = 'The value of rowspan:';
+            l10n.failedSelect = 'Failed to select';
         }
 
         // Auto settings
@@ -148,6 +158,7 @@
                         '</td>',
                         '[# } #]',
                         '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
+                            '[# if (!items[i].hasOwnProperty(headerOrder[x])) { continue; } #]',
                         '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]"',
                             '[# if (listingTargetKey && listingTargetKey === headerOrder[x]) { #]',
                                 '[# if (listingTargetEscape) { #]',
@@ -155,6 +166,13 @@
                                  '[# } else { #]',
                                  'data-value="[#= items[i][headerOrder[x]] #]"',
                                  '[# } #]',
+                             '[# } #]',
+                             // Cell Merge
+                             '[# if (items[i].hasOwnProperty(headerOrder[x] + "_colspan")) { #]',
+                                'colspan="[#= items[i][headerOrder[x] + "_colspan"] #]"',
+                             '[# } #]',
+                             '[# if (items[i].hasOwnProperty(headerOrder[x] + "_rowspan")) { #]',
+                                'rowspan="[#= items[i][headerOrder[x] + "_rowspan"] #]"',
                              '[# } #]',
                         '>',
                             '[# if (edit) { #]',
@@ -193,7 +211,16 @@
                     '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
                     '<tr class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
                         '[# for (var i = 0, l = items.length; i < l; i++) { #]',
-                        '<td class="[#= headerOrder[x] #] item-[#= i #]" data-name="[#= headerOrder[x] #]">',
+                            '[# if (!items[i].hasOwnProperty(headerOrder[x])) { continue; } #]',
+                        '<td class="[#= headerOrder[x] #] item-[#= i #]" data-name="[#= headerOrder[x] #]"',
+                            // Cell Merge
+                            '[# if (items[i].hasOwnProperty(headerOrder[x] + "_colspan")) { #]',
+                               'colspan="[#= items[i][headerOrder[x] + "_colspan"] #]"',
+                            '[# } #]',
+                            '[# if (items[i].hasOwnProperty(headerOrder[x] + "_rowspan")) { #]',
+                               'rowspan="[#= items[i][headerOrder[x] + "_rowspan"] #]"',
+                            '[# } #]',
+                        '>',
                             '[# if (edit) { #]',
                                 '[# if (inputType === "input") { #]',
                                     '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="[#= items[i][headerOrder[x]] #]">',
@@ -220,6 +247,9 @@
                     '[# } #]',
                     '[# if (add && headerPosition === "left") { #]',
                     '<a href="#" class="button jsontable-add jsontable-add-column">' + l10n.addColumn + '</a>',
+                    '[# } #]',
+                    '[# if (cellMerge) { #]',
+                    '<a href="#" class="button jsontable-cellMerge">' + l10n.cellMerge + '</a>',
                     '[# } #]',
                     '[# if (clear) { #]',
                     '<a href="#" class="button jsontable-clear">' + l10n.clearData + '</a>',
@@ -335,6 +365,60 @@
                     else if ($(this).hasClass('jsontable-clear')) {
                         $table.find('.jsontable-selected-data').remove();
                     }
+                    else if ($(this).hasClass('jsontable-cellMerge')) {
+                        $(this).toggleClass('primary');
+                        var firstSelect = true;
+                        var selectMergedCell = function(e){
+                            var $td = $(this);
+                            var $tr = $td.parent();
+                            var tdIndex = $td.index();
+                            $td.toggleClass('merge-target');
+                            firstSelect = false;
+                        };
+                        // Select merged cells
+                        if ($(this).hasClass('primary')) {
+                            // Clear classes
+                            $table.find('td.merge-target').removeClass('merge-target');
+                            $(this).text(l10n.cellMergeApply);
+                            $table.on('click', 'td', selectMergedCell);
+                        }
+                        // Apply merge
+                        else {
+                            $(this).text(l10n.cellMerge);
+                            $table.off('click', 'td');
+                            var $mergeTarget = $table.find('td.merge-target');
+                            var firstCell = {}, firstLine = {}, firstLineLastCell = {},
+                                lastCell  = {}, lastLine  = {};
+                            firstCell.obj = $mergeTarget.first();
+                            firstCell.idx = firstCell.obj.index();
+                            firstLine.obj = firstCell.obj.parent();
+                            firstLine.idx = firstLine.obj.index();
+                            firstLineLastCell.obj = firstLine.obj.children('.merge-target').last();
+                            firstLineLastCell.idx = firstLineLastCell.obj.index();
+                            lastCell.obj = $mergeTarget.last();
+                            lastCell.idx = lastCell.obj.index();
+                            lastLine.obj = lastCell.obj.parent();
+                            lastLine.idx = lastLine.obj.index();
+                            var colspan = firstLine.obj.children('.merge-target').length;
+                            var rowspan = lastLine.idx - firstLine.idx + 1;
+                            // Check existed colspan values
+                            var existedColspan = 0;
+                            firstLine.obj.children('.merge-target').filter('[colspan]').each(function(){
+                                existedColspan += Number($(this).attr('colspan'));
+                            });
+                            if (existedColspan) {
+                                colspan += (existedColspan - 1);
+                            }
+                            if (colspan > 1) {
+                                firstCell.obj.attr('colspan', colspan);
+                            }
+                            if (rowspan > 1) {
+                                firstCell.obj.attr('rowspan', rowspan);
+                            }
+                            $table.find('td.merge-target').not(':first').remove();
+                        }
+                        $table.toggleClass('jsontable-cell-merge');
+                    }
                     return false;
                 });
             }
@@ -363,6 +447,15 @@
                 $(this).find('.jsontable-input').each(function(){
                     var v = $(this).val();
                     item[$(this).attr('data-name')] = v;
+
+                    // cellMerge
+                    if ($(this).parent().attr('colspan')) {
+                        item[$(this).attr('data-name') + '_colspan'] = $(this).parent().attr('colspan');
+                    }
+                    if ($(this).parent().attr('rowspan')) {
+                        item[$(this).attr('data-name') + '_rowspan'] = $(this).parent().attr('rowspan');
+                    }
+
                     values += v;
                 });
                 itemsArray.push(JSON.stringify(item));
@@ -379,6 +472,15 @@
                 $(this).find('.jsontable-input').each(function(j){
                     var v = $(this).val();
                     itemsArrayObj[j][$(this).attr('data-name')] = v;
+
+                    // cellMerge
+                    if ($(this).parent().attr('colspan')) {
+                        itemsArrayObj[j][$(this).attr('data-name') + '_colspan'] = $(this).parent().attr('colspan');
+                    }
+                    if ($(this).parent().attr('rowspan')) {
+                        itemsArrayObj[j][$(this).attr('data-name') + '_rowspan'] = $(this).parent().attr('rowspan');
+                    }
+
                     values += v;
                 });
             });
@@ -400,6 +502,7 @@
         edit: true, // Disable table
         add: false, // true: A user can add rows or columns.
         clear: true, // false: Hide a delete button.
+        cellMerge: false,
         listingCheckbox: false, // or true
         listingCheckboxType: 'checkbox', // or 'radio'
         listingTargetKey: null, // String: Target key  which is saved value when listing mode is applied

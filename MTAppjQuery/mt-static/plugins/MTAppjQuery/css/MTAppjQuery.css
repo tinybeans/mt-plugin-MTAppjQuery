@@ -688,11 +688,17 @@ span.mtappmultiform-radio input {
   border: none;
   background-color: transparent;
 }
+.mtapp-json-table .jsontable-table.jsontable-cell-merge td:hover, .mtapp-json-table .jsontable-table.jsontable-cell-merge td.merge-target {
+  background-color: #FFD518;
+}
 .mtapp-json-table .add-btn {
   text-align: right;
 }
 .mtapp-json-table .add-btn .last-child {
   margin-right: 0;
+}
+.mtapp-json-table .add-btn .primary {
+  color: #FFFFFF;
 }
 
 /* ==================================================
