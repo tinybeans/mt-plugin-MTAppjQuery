@@ -681,6 +681,9 @@
                 .on('click', '#mtapplisting-dialog-cancel', function(e){
                     $(e.delegateTarget).html('').removeClass('mt-dialog').hide();
                     $('#mtapplisting-overlay').removeClass('mt-dialog-overlay').removeClass('overlay').hide();
+                    if (op.cbAfterCancel !== null && typeof op.cbAfterCancel === 'function') {
+                        op.cbAfterCancel({name: 'cbAfterCancel'}, e.delegateTarget);
+                    }
                     return false;
                 })
                 // OK Button
@@ -707,6 +710,10 @@
                         $('#' + triggerId).val(values[0]);
                     }
 
+                    if (op.cbAfterOK !== null && typeof op.cbAfterOK === 'function') {
+                        op.cbAfterOK({name: 'cbAfterOK'}, e.delegateTarget);
+                    }
+
                     // Reset trigger
                     $(e.delegateTarget).data('triggerId', '');
                     // Close the dialog
@@ -725,6 +732,9 @@
                             $(this).addClass('hidden');
                         }
                     });
+                    if (op.cbAfterSearch !== null && typeof op.cbAfterSearch === 'function') {
+                        op.cbAfterSearch({name: 'cbAfterSearch'}, e.delegateTarget);
+                    }
                     return false;
                 })
                 .on('keypress', '#mtapplisting-text-filter', function(e){
@@ -734,6 +744,9 @@
                 })
                 .on('click', '#mtapplisting-search-reset', function(e){
                     $('#mtapplisting-text-filter').val('');
+                    if (op.cbAfterSearchReset !== null && typeof op.cbAfterSearchReset === 'function') {
+                        op.cbAfterSearchReset({name: 'cbAfterSearchReset'}, e.delegateTarget);
+                    }
                     $('#mtapplisting-text-search').trigger('click');
                     return false;
                 })
@@ -889,6 +902,10 @@
         dataType: 'json', // Set this value to ajax options
         incrementalSearch: true, // Set true if you wont to do incremental search
         cbProcessResponse: null, // Process the response
+        cbAfterCancel: null, // After clicking the cancel button
+        cbAfterOK: null, // After clicking the OK button
+        cbAfterSearch: null, // After searching
+        cbAfterSearchReset: null, // After resetting the text filter
         jsontable: null // Set options for MTAppJSONTable
     };
     // end - $.fn.MTAppListing()
