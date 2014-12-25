@@ -146,6 +146,32 @@
                 '</tfoot>'
             ].join("\n");
 
+            tmpl.tbodyTopPlain = [
+                '<tr class="odd">',
+                    '[# if (sortable) { #]',
+                    '<td class="jsontable-sort-handle">&nbsp;</td>',
+                    '[# } #]',
+                    '[# if (listingCheckbox) { #]',
+                    '<td class="jsontable-cb-cell">',
+                        '[# if (listingCheckboxType === "radio") { #]',
+                        '<input type="radio" name="jsontable-radio" class="jsontable-cb">',
+                        '[# } else { #]',
+                        '<input type="checkbox" class="jsontable-cb">',
+                        '[# } #]',
+                    '</td>',
+                    '[# } #]',
+                    '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
+                    '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
+                        '[# if (inputType === "input") { #]',
+                            '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="">',
+                        '[# } else if (inputType === "textarea") { #]',
+                            '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]"></textarea>',
+                        '[# } #]',
+                    '</td>',
+                    '[# } #]',
+                '</tr>'
+            ].join("");
+
             tmpl.tbodyTop = [
                 '<tbody>',
                     '[# for (var i = 0, l = items.length; i < l; i++) { #]',
@@ -203,6 +229,16 @@
                 '</tbody>'
             ].join("");
 
+            tmpl.tbodyLeftPlain = [
+                '<td class="[#= headerOrder #] item-[#= i #] last-child" data-item-index="[#= i #]" data-name="[#= headerOrder #]">',
+                    '[# if (inputType === "input") { #]',
+                        '<input class="jsontable-input" type="text" data-name="[#= headerOrder #]" value="">',
+                    '[# } else if (inputType === "textarea") { #]',
+                        '<textarea class="jsontable-input" data-name="[#= headerOrder #]"></textarea>',
+                    '[# } #]',
+                '</td>'
+            ].join("");
+
             tmpl.tbodyLeft = [
                 '<tbody>',
                     '[# if (listingCheckbox) { #]',
@@ -221,7 +257,7 @@
                     '<tr class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
                         '[# for (var i = 0, l = items.length; i < l; i++) { #]',
                             '[# if (!items[i].hasOwnProperty(headerOrder[x])) { continue; } #]',
-                        '<td class="[#= headerOrder[x] #] item-[#= i #]" data-name="[#= headerOrder[x] #]"',
+                        '<td class="[#= headerOrder[x] #] item-[#= i #]" data-item-index="[#= i #]" data-name="[#= headerOrder[x] #]"',
                             // Cell Merge
                             '[# if (items[i].hasOwnProperty(headerOrder[x] + "_colspan")) { #]',
                                'colspan="[#= items[i][headerOrder[x] + "_colspan"] #]"',
@@ -347,21 +383,37 @@
             if (op.add || op.clear) {
                 $container.on('click', 'div.add-btn a', function(){
                     if ($(this).hasClass('jsontable-add-row')) {
-                        var $tbody = $table.find('tbody');
-                        var $tr = $tbody.find('tr').last().removeClass('last-child').clone();
-                        $tr.addClass('last-child').find('.jsontable-input').val('').siblings().remove();
-                        if (op.cbBeforeAdd !== null && typeof op.cbBeforeAdd === 'function') {
-                            op.cbBeforeAdd({name: 'cbBeforeAdd', type: 'row'}, $tr);
-                        }
-                        $tbody.append($tr);
+                        var plainTr = Template.process('tbodyTopPlain', op, tmpl);
+                        $table.find('tbody').append(plainTr);
                         if (op.cbAfterAdd !== null && typeof op.cbAfterAdd === 'function') {
                             op.cbAfterAdd({name: 'cbAfterAdd'}, $container);
                         }
                     }
                     else if ($(this).hasClass('jsontable-add-column')) {
+                        var headerOrderClone = $.extend(true, [], op.headerOrder);
+                        var inputType = op.inputType;
+                        var dataItemIndex = 0;
+                        $table.find('td:last-child').each(function(){
+                            var idx = $(this).index();
+                            if (idx > dataItemIndex) {
+                                dataItemIndex = idx;
+                            }
+                        });
                         $table.find('tr').each(function(){
-                            var $td = $(this).children(':last-child').removeClass('last-child').clone();
-                            $td.children('.jsontable-input').val('').siblings().remove();
+                            var $td = $(this).children(':last-child').removeClass('last-child').clone().removeClass(function(index, classname) {
+                                return (classname.match(/\bitem-\d+/g) || []).join(' ');
+                            });
+                            if ($(this).hasClass('jsontable-clear-row')) {
+                                $td.attr('data-item-index', dataItemIndex).addClass('item-' + dataItemIndex);
+                            }
+                            else {
+                                var data = {
+                                    headerOrder: headerOrderClone.shift(),
+                                    inputType: inputType,
+                                    i: dataItemIndex
+                                };
+                                $td = Template.process('tbodyLeftPlain', data, tmpl);
+                            }
                             if (op.cbBeforeAdd !== null && typeof op.cbBeforeAdd === 'function') {
                                 op.cbBeforeAdd({name: 'cbBeforeAdd', type: 'column'}, $td);
                             }
@@ -486,14 +538,15 @@
             $tr.each(function(i){
                 $(this).find('.jsontable-input').each(function(j){
                     var v = $(this).val();
-                    itemsArrayObj[j][$(this).attr('data-name')] = v;
+                    var idx = $(this).parent().attr('data-item-index');
+                    itemsArrayObj[idx][$(this).attr('data-name')] = v;
 
                     // cellMerge
                     if ($(this).parent().attr('colspan')) {
-                        itemsArrayObj[j][$(this).attr('data-name') + '_colspan'] = $(this).parent().attr('colspan');
+                        itemsArrayObj[idx][$(this).attr('data-name') + '_colspan'] = $(this).parent().attr('colspan');
                     }
                     if ($(this).parent().attr('rowspan')) {
-                        itemsArrayObj[j][$(this).attr('data-name') + '_rowspan'] = $(this).parent().attr('rowspan');
+                        itemsArrayObj[idx][$(this).attr('data-name') + '_rowspan'] = $(this).parent().attr('rowspan');
                     }
 
                     values += v;
