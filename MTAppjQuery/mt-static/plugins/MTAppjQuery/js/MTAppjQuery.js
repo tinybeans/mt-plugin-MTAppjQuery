@@ -649,7 +649,7 @@
                 '</div>',
                 '<div class="mtapplisting-actions actions-bar hidden">',
                     '<a href="#" id="mtapplisting-dialog-ok" class="action button primary close ok">OK</a>',
-                    '<a href="#" id="mtapplisting-dialog-cansel" class="action button cancel">' + l10n.cancel + '</a>',
+                    '<a href="#" id="mtapplisting-dialog-cancel" class="action button cancel">' + l10n.cancel + '</a>',
                     '<a href="#" id="mtapplisting-dialog-top">' + l10n.returnDialogTop + '</a>',
                 '</div>',
             '</div>',
@@ -678,7 +678,7 @@
             $dialog
                 .addClass('bind-event')
                 // Cancel Button
-                .on('click', '#mtapplisting-dialog-cansel', function(e){
+                .on('click', '#mtapplisting-dialog-cancel', function(e){
                     $(e.delegateTarget).html('').removeClass('mt-dialog').hide();
                     $('#mtapplisting-overlay').removeClass('mt-dialog-overlay').removeClass('overlay').hide();
                     return false;
