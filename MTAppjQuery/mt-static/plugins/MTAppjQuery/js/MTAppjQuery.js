@@ -1,7 +1,7 @@
 /*
  * MTAppjQuery.js
  *
- * Copyright (c) Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
+ * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010-06-22
  * Update:  2014-09-19
