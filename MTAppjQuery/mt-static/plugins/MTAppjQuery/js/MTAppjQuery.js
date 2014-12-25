@@ -2479,17 +2479,20 @@
         var op = $.extend({}, $.MTAppDialogMsg.defaults, options);
 
         op.hideEffect = op.hide_effect ? op.hide_effect : op.hideEffect;
+        var settings = {
+            autoOpen: false,
+            title: op.title,
+            width: op.width,
+            height: op.height,
+            modal: op.modal,
+            hide: op.hideEffect
+        };
+        if (op.close) {
+            settings.close = op.close;
+        }
         $('#mtapp-dialog-msg')
             .html(op.content)
-            .dialog({
-                autoOpen: false,
-                modal: true,
-                title: op.title,
-                width: op.width,
-                height: op.height,
-                modal: op.modal,
-                hide: op.hideEffect
-            });
+            .dialog(settings);
         $('#mtapp-dialog-msg').dialog('open');
     };
     $.MTAppDialogMsg.defaults = {
@@ -2498,7 +2501,8 @@
         width: 'auto',
         height: 'auto',
         modal: false,
-        hideEffect: ''
+        hideEffect: '',
+        close: null
     };
     // end - $.MTAppDialogMsg();
 
