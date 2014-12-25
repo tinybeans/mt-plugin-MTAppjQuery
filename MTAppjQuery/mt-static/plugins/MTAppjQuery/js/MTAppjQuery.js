@@ -716,8 +716,9 @@
 
                     // Reset trigger
                     $(e.delegateTarget).data('triggerId', '');
-                    // Close the dialog
-                    $(this).next().trigger('click');
+
+                    // Close the dialog by clicking the cancel button
+                    $('#mtapplisting-dialog-cancel').trigger('click');
                     return false;
                 })
                 .on('click', '#mtapplisting-text-search', function(e){
