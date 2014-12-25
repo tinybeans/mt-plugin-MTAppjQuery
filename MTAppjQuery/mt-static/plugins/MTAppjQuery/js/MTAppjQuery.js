@@ -116,6 +116,9 @@
             tmpl.header = [
                 '<thead>',
                   '<tr>',
+                      '[# if (sortable) { #]',
+                      '<td class="jsontable-sort-handle">&nbsp;</td>',
+                      '[# } #]',
                       // op.clear == true
                       '[# if (listingCheckbox) { #]',
                       '<th class="jsontable-cb-cell">&nbsp;</th>',
@@ -130,6 +133,9 @@
             tmpl.footer = [
                 '<tfoot>',
                   '<tr>',
+                      '[# if (sortable) { #]',
+                      '<td class="jsontable-sort-handle">&nbsp;</td>',
+                      '[# } #]',
                       '[# if (listingCheckbox) { #]',
                       '<th class="jsontable-cb-cell">&nbsp;</th>',
                       '[# } #]',

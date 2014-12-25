@@ -693,11 +693,15 @@ span.mtappmultiform-radio input {
 }
 .mtapp-json-table .jsontable-table.ui-sortable td.jsontable-sort-handle {
   width: 20px;
-  background: url(../images/arrow-move.png) no-repeat center center;
+  background: white url(../images/arrow-move.png) no-repeat center center;
   border-top-color: #FFFFFF;
   border-bottom-color: #FFFFFF;
   border-left-color: #FFFFFF;
   cursor: move;
+}
+.mtapp-json-table .jsontable-table.ui-sortable thead td.jsontable-sort-handle,
+.mtapp-json-table .jsontable-table.ui-sortable tfoot td.jsontable-sort-handle {
+  background-image: none;
 }
 .mtapp-json-table .add-btn {
   text-align: right;

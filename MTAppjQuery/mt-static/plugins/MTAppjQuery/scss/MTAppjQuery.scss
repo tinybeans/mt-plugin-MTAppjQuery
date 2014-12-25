@@ -591,11 +591,15 @@ span.mtappmultiform-radio {
         &.ui-sortable {
             td.jsontable-sort-handle {
                 width: 20px;
-                background: url(../images/arrow-move.png) no-repeat center center;
+                background: #FFFFFF url(../images/arrow-move.png) no-repeat center center;
                 border-top-color: #FFFFFF;
                 border-bottom-color: #FFFFFF;
                 border-left-color: #FFFFFF;
                 cursor: move;
+            }
+            thead td.jsontable-sort-handle,
+            tfoot td.jsontable-sort-handle {
+                background-image: none;
             }
         }
     }
