@@ -836,10 +836,18 @@
                             response = op.cbProcessResponse({name: 'cbProcessResponse'}, response);
                         }
 
+                        var filterJSONTable = true;
+                        if (op.cbAjaxDoneFilterJSONTable !== null && typeof op.cbAjaxDoneFilterJSONTable === 'function') {
+                            filterJSONTable = op.cbAjaxDoneFilterJSONTable({name: 'cbAjaxDoneFilterJSONTable'}, $dialog, response);
+                        }
+
                         // Show the dialog content
                         $indicator.addClass('hidden');
                         $dialog.find('div.mtapplisting-content').removeClass('hidden').next().removeClass('hidden');
 
+                        if (!filterJSONTable) {
+                            return false;
+                        }
                         // Dummy textarea1 options
                         op.jsontable.caption = l10n.selectedItems;
                         op.jsontable.headerPosition = 'top';
@@ -935,6 +943,7 @@
 
         // Callbacks
         cbProcessResponse: null, // Process the response
+        cbAjaxDoneFilterJSONTable: null, // Stop to execute JSONTable
         cbAjaxFail: null, // Be called when data could not be get
         cbAfterCancel: null, // After clicking the cancel button
         cbAfterOK: null, // After clicking the OK button
