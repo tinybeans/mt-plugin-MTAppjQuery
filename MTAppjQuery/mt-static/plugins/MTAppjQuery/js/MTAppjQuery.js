@@ -1,10 +1,10 @@
 /*
  * MTAppjQuery.js
  *
- * Copyright (c) Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
+ * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010-06-22
- * Update:  2014-09-19
+ * Update:  2014-12-29
  *
  */
 ;(function($){
@@ -39,6 +39,11 @@
             l10n.clearData = '削除';
             l10n.addColumnProperty = 'プロパティ名（例：title）';
             l10n.addColumnPropertyDisplayName = 'プロパティ表示名（例：タイトル）';
+            l10n.cellMerge = 'セルを結合';
+            l10n.cellMergeApply = '結合を適用';
+            l10n.colspanValueIs = '結合する列の数';
+            l10n.rowspanValueIs = '結合する行の数';
+            l10n.failedSelect = '連続したセルを選択してください';
         }
         else {
             l10n.addRow = 'Add a row';
@@ -46,6 +51,16 @@
             l10n.clearData = 'Delete';
             l10n.addColumnProperty = 'Property Name (e.g. title)';
             l10n.addColumnPropertyDisplayName = 'Property Display Name (e.g. Title)';
+            l10n.cellMerge = 'Merge cells';
+            l10n.cellMergeApply = 'Apply merge';
+            l10n.colspanValueIs = 'The value of colspan:';
+            l10n.rowspanValueIs = 'The value of rowspan:';
+            l10n.failedSelect = 'Failed to select';
+        }
+
+        // Auto settings
+        if (op.clear) {
+            op.listingCheckbox = true;
         }
 
         return this.each(function(){
@@ -65,7 +80,13 @@
                 }
             }
             else {
-                json = {"items":[]};
+                if (op.items === null) {
+                    json = {};
+                    json[op.itemsRootKey] = [];
+                }
+                else {
+                    json = op.items;
+                }
             }
             if (json === null) {
                 return;
@@ -77,8 +98,8 @@
                 alert('Error in .MTAppJSONTable: The "order" option is required.');
                 return;
             }
-            var items = json.items;
 
+            var items = json[op.itemsRootKey];
             if (items.length === 0) {
                 items[0] = {};
                 for (var i = 0, l = order.length; i < l; i++) {
@@ -95,9 +116,12 @@
             tmpl.header = [
                 '<thead>',
                   '<tr>',
+                      '[# if (sortable) { #]',
+                      '<td class="jsontable-sort-handle">&nbsp;</td>',
+                      '[# } #]',
                       // op.clear == true
-                      '[# if (clear) { #]',
-                      '<th class="jsontable-clear-cell">&nbsp;</th>',
+                      '[# if (listingCheckbox) { #]',
+                      '<th class="jsontable-cb-cell">&nbsp;</th>',
                       '[# } #]',
                       '[# for (var i = 0, l = headerOrder.length; i < l; i++) { #]',
                       '<th class="[#= headerOrder[i] #]" data-name="[#= headerOrder[i] #]">[#= header[headerOrder[i]] #]</th>',
@@ -109,8 +133,11 @@
             tmpl.footer = [
                 '<tfoot>',
                   '<tr>',
-                      '[# if (clear) { #]',
-                      '<th class="jsontable-clear-cell">&nbsp;</th>',
+                      '[# if (sortable) { #]',
+                      '<td class="jsontable-sort-handle">&nbsp;</td>',
+                      '[# } #]',
+                      '[# if (listingCheckbox) { #]',
+                      '<th class="jsontable-cb-cell">&nbsp;</th>',
                       '[# } #]',
                       '[# for (var i = 0, l = headerOrder.length; i < l; i++) { #]',
                       '<th class="[#= headerOrder[i] #]" data-name="[#= headerOrder[i] #]">[#= header[headerOrder[i]] #]</th>',
@@ -119,17 +146,70 @@
                 '</tfoot>'
             ].join("\n");
 
+            tmpl.tbodyTopPlain = [
+                '<tr class="odd">',
+                    '[# if (sortable) { #]',
+                    '<td class="jsontable-sort-handle">&nbsp;</td>',
+                    '[# } #]',
+                    '[# if (listingCheckbox) { #]',
+                    '<td class="jsontable-cb-cell">',
+                        '[# if (listingCheckboxType === "radio") { #]',
+                        '<input type="radio" name="jsontable-radio" class="jsontable-cb">',
+                        '[# } else { #]',
+                        '<input type="checkbox" class="jsontable-cb">',
+                        '[# } #]',
+                    '</td>',
+                    '[# } #]',
+                    '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
+                    '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
+                        '[# if (inputType === "input") { #]',
+                            '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="">',
+                        '[# } else if (inputType === "textarea") { #]',
+                            '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]"></textarea>',
+                        '[# } #]',
+                    '</td>',
+                    '[# } #]',
+                '</tr>'
+            ].join("");
+
             tmpl.tbodyTop = [
                 '<tbody>',
                     '[# for (var i = 0, l = items.length; i < l; i++) { #]',
-                    '<tr>',
-                        '[# if (clear) { #]',
-                        '<td class="jsontable-clear-cell">',
-                            '<input type="checkbox" class="jsontable-clear-cb">',
+                    '[# if (i % 2 === 0) { #]',
+                    '<tr class="even">',
+                    '[# } else { #]',
+                    '<tr class="odd">',
+                    '[# } #]',
+                        '[# if (sortable) { #]',
+                        '<td class="jsontable-sort-handle">&nbsp;</td>',
+                        '[# } #]',
+                        '[# if (listingCheckbox) { #]',
+                        '<td class="jsontable-cb-cell">',
+                            '[# if (listingCheckboxType === "radio") { #]',
+                            '<input type="radio" name="jsontable-radio" class="jsontable-cb">',
+                            '[# } else { #]',
+                            '<input type="checkbox" class="jsontable-cb">',
+                            '[# } #]',
                         '</td>',
                         '[# } #]',
                         '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
-                        '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
+                            '[# if (!items[i].hasOwnProperty(headerOrder[x])) { continue; } #]',
+                        '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]"',
+                            '[# if (listingTargetKey && listingTargetKey === headerOrder[x]) { #]',
+                                '[# if (listingTargetEscape) { #]',
+                                 'data-value="[#= encodeURIComponent(items[i][headerOrder[x]]) #]"',
+                                 '[# } else { #]',
+                                 'data-value="[#= items[i][headerOrder[x]] #]"',
+                                 '[# } #]',
+                             '[# } #]',
+                             // Cell Merge
+                             '[# if (items[i].hasOwnProperty(headerOrder[x] + "_colspan")) { #]',
+                                'colspan="[#= items[i][headerOrder[x] + "_colspan"] #]"',
+                             '[# } #]',
+                             '[# if (items[i].hasOwnProperty(headerOrder[x] + "_rowspan")) { #]',
+                                'rowspan="[#= items[i][headerOrder[x] + "_rowspan"] #]"',
+                             '[# } #]',
+                        '>',
                             '[# if (edit) { #]',
                                 '[# if (inputType === "input") { #]',
                                     '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="[#= items[i][headerOrder[x]] #]">',
@@ -137,7 +217,10 @@
                                     '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
                                 '[# } #]',
                             '[# } else { #]',
-                                '[#= items[i][headerOrder[x]] #]',
+                                '<span class="jsontable-input-data">[#= items[i][headerOrder[x]] #]</span>',
+                                '[# if (listingTargetKey && listingTargetKey === headerOrder[x]) { #]',
+                                    '<textarea class="jsontable-input-hidden hidden" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
+                                '[# } #]',
                             '[# } #]',
                         '</td>',
                         '[# } #]',
@@ -146,16 +229,26 @@
                 '</tbody>'
             ].join("");
 
+            tmpl.tbodyLeftPlain = [
+                '<td class="[#= headerOrder #] item-[#= i #] last-child" data-item-index="[#= i #]" data-name="[#= headerOrder #]">',
+                    '[# if (inputType === "input") { #]',
+                        '<input class="jsontable-input" type="text" data-name="[#= headerOrder #]" value="">',
+                    '[# } else if (inputType === "textarea") { #]',
+                        '<textarea class="jsontable-input" data-name="[#= headerOrder #]"></textarea>',
+                    '[# } #]',
+                '</td>'
+            ].join("");
+
             tmpl.tbodyLeft = [
                 '<tbody>',
-                    '[# if (clear) { #]',
+                    '[# if (listingCheckbox) { #]',
                     '<tr class="jsontable-clear-row">',
                         '[# if (header) { #]',
-                        '<th class="jsontable-clear-cell">&nbsp;</th>',
+                        '<th class="jsontable-cb-cell">&nbsp;</th>',
                         '[# } #]',
                         '[# for (var i = 0, l = items.length; i < l; i++) { #]',
-                        '<td class="jsontable-clear-cell item-[#= i #]" data-item-index="[#= i #]">',
-                            '<input type="checkbox" class="jsontable-clear-cb">',
+                        '<td class="jsontable-cb-cell item-[#= i #]" data-item-index="[#= i #]">',
+                            '<input type="checkbox" class="jsontable-cb">',
                         '</td>',
                         '[# } #]',
                     '</tr>',
@@ -163,7 +256,16 @@
                     '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
                     '<tr class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
                         '[# for (var i = 0, l = items.length; i < l; i++) { #]',
-                        '<td class="[#= headerOrder[x] #] item-[#= i #]" data-name="[#= headerOrder[x] #]">',
+                            '[# if (!items[i].hasOwnProperty(headerOrder[x])) { continue; } #]',
+                        '<td class="[#= headerOrder[x] #] item-[#= i #]" data-item-index="[#= i #]" data-name="[#= headerOrder[x] #]"',
+                            // Cell Merge
+                            '[# if (items[i].hasOwnProperty(headerOrder[x] + "_colspan")) { #]',
+                               'colspan="[#= items[i][headerOrder[x] + "_colspan"] #]"',
+                            '[# } #]',
+                            '[# if (items[i].hasOwnProperty(headerOrder[x] + "_rowspan")) { #]',
+                               'rowspan="[#= items[i][headerOrder[x] + "_rowspan"] #]"',
+                            '[# } #]',
+                        '>',
                             '[# if (edit) { #]',
                                 '[# if (inputType === "input") { #]',
                                     '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="[#= items[i][headerOrder[x]] #]">',
@@ -171,7 +273,10 @@
                                     '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
                                 '[# } #]',
                             '[# } else { #]',
-                                '[#= items[i][headerOrder[x]] #]',
+                                '<span class="jsontable-input-data">[#= items[i][headerOrder[x]] #]</span>',
+                                '[# if (listingTargetKey && listingTargetKey === headerOrder[x]) { #]',
+                                    '<textarea class="jsontable-input-hidden hidden" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
+                                '[# } #]',
                             '[# } #]',
                         '</td>',
                         '[# } #]',
@@ -188,15 +293,23 @@
                     '[# if (add && headerPosition === "left") { #]',
                     '<a href="#" class="button jsontable-add jsontable-add-column">' + l10n.addColumn + '</a>',
                     '[# } #]',
+                    '[# if (cellMerge) { #]',
+                    '<a href="#" class="button jsontable-cellMerge">' + l10n.cellMerge + '</a>',
+                    '[# } #]',
                     '[# if (clear) { #]',
                     '<a href="#" class="button jsontable-clear">' + l10n.clearData + '</a>',
+                    '[# } #]',
+                    '[# if (optionButtons) { #]',
+                        '[# for (var i = 0, l = optionButtons.length; i < l; i++) { #]',
+                        '<a href="#" class="button [#= optionButtons[i].classname #]">[#= optionButtons[i].text #]</a>',
+                        '[# } #]',
                     '[# } #]',
                 '</div>'
             ].join("");
 
             tmpl.container = [
                 '<div class="mtapp-json-table">',
-                    '<table border="1">',
+                    '<table class="jsontable-table" border="1">',
                         // caption
                         '[# if (typeof caption === "string") { #]',
                             '[#= context.include("caption") #]',
@@ -223,7 +336,7 @@
 
                     '</table>',
 
-                    '[# if (add) { #]',
+                    '[# if (add || clear || optionButtons) { #]',
                         '[#= context.include("buttons") #]',
                     '[# } #]',
 
@@ -246,48 +359,126 @@
             }
 
             // Click checkboxes for deleting data
-            if (op.clear) {
+            if (op.listingCheckbox) {
                 if (op.headerPosition === 'top') {
-                    $table.on('click', 'input.jsontable-clear-cb', function(){
-                        if ($(this).is(':checked')) {
-                            $(this).parent().parent().addClass('jsontable-clear-data');
-                        }
-                        else {
-                            $(this).parent().parent().removeClass('jsontable-clear-data');
+                    $table.on('click', 'input.jsontable-cb', function(){
+                        var $tr = $(this).parent().parent().toggleClass('jsontable-selected-data');
+                        if (op.cbAfterSelectRow !== null && typeof op.cbAfterSelectRow === 'function') {
+                            op.cbAfterSelectRow({name: 'cbAfterSelectRow'}, $tr, $(this).is(':checked'));
                         }
                     });
                 }
                 else if (op.headerPosition === 'left') {
-                    $table.on('click', 'input.jsontable-clear-cb', function(){
+                    $table.on('click', 'input.jsontable-cb', function(){
                         var itemIndex = $(this).parent().attr('data-item-index');
-                        if ($(this).is(':checked')) {
-                            $table.find('.item-' + itemIndex).addClass('jsontable-clear-data');
-                        }
-                        else {
-                            $table.find('.item-' + itemIndex).removeClass('jsontable-clear-data');
+                        var $td = $table.find('.item-' + itemIndex).toggleClass('jsontable-selected-data');
+                        if (op.cbAfterSelectColumn !== null && typeof op.cbAfterSelectColumn === 'function') {
+                            op.cbAfterSelectColumn({name: 'cbAfterSelectColumn'}, $td, $(this).is(':checked'));
                         }
                     });
                 }
             }
 
             // Add a row or column
-            if (op.add) {
+            if (op.add || op.clear) {
                 $container.on('click', 'div.add-btn a', function(){
                     if ($(this).hasClass('jsontable-add-row')) {
-                        var $tbody = $table.find('tbody');
-                        var $tr = $tbody.find('tr').last().removeClass('last-child').clone();
-                        $tr.addClass('last-child').find('.jsontable-input').val('').siblings().remove();
-                        $tbody.append($tr);
+                        var plainTr = Template.process('tbodyTopPlain', op, tmpl);
+                        $table.find('tbody').append(plainTr);
+                        if (op.cbAfterAdd !== null && typeof op.cbAfterAdd === 'function') {
+                            op.cbAfterAdd({name: 'cbAfterAdd'}, $container);
+                        }
                     }
                     else if ($(this).hasClass('jsontable-add-column')) {
+                        var headerOrderClone = $.extend(true, [], op.headerOrder);
+                        var inputType = op.inputType;
+                        var dataItemIndex = 0;
+                        $table.find('td:last-child').each(function(){
+                            var idx = $(this).index();
+                            if (idx > dataItemIndex) {
+                                dataItemIndex = idx;
+                            }
+                        });
                         $table.find('tr').each(function(){
-                            var $td = $(this).children(':last-child').removeClass('last-child').clone();
-                            $td.children('.jsontable-input').val('').siblings().remove();
+                            var $td = $(this).children(':last-child').removeClass('last-child').clone().removeClass(function(index, classname) {
+                                return (classname.match(/\bitem-\d+/g) || []).join(' ');
+                            });
+                            if ($(this).hasClass('jsontable-clear-row')) {
+                                $td.attr('data-item-index', dataItemIndex).addClass('item-' + dataItemIndex);
+                            }
+                            else {
+                                var data = {
+                                    headerOrder: headerOrderClone.shift(),
+                                    inputType: inputType,
+                                    i: dataItemIndex
+                                };
+                                $td = Template.process('tbodyLeftPlain', data, tmpl);
+                            }
+                            if (op.cbBeforeAdd !== null && typeof op.cbBeforeAdd === 'function') {
+                                op.cbBeforeAdd({name: 'cbBeforeAdd', type: 'column'}, $td);
+                            }
                             $(this).append($td);
                         });
+                        if (op.cbAfterAdd !== null && typeof op.cbAfterAdd === 'function') {
+                            op.cbAfterAdd({name: 'cbAfterAdd'}, $container);
+                        }
                     }
                     else if ($(this).hasClass('jsontable-clear')) {
-                        $table.find('.jsontable-clear-data').remove();
+                        $table.find('.jsontable-selected-data').remove();
+                    }
+                    else if ($(this).hasClass('jsontable-cellMerge')) {
+                        $(this).toggleClass('primary');
+                        var firstSelect = true;
+                        var selectMergedCell = function(e){
+                            var $td = $(this);
+                            var $tr = $td.parent();
+                            var tdIndex = $td.index();
+                            $td.toggleClass('merge-target');
+                            firstSelect = false;
+                        };
+                        // Select merged cells
+                        if ($(this).hasClass('primary')) {
+                            // Clear classes
+                            $table.find('td.merge-target').removeClass('merge-target');
+                            $(this).text(l10n.cellMergeApply);
+                            $table.on('click', 'td', selectMergedCell);
+                        }
+                        // Apply merge
+                        else {
+                            $(this).text(l10n.cellMerge);
+                            $table.off('click', 'td');
+                            var $mergeTarget = $table.find('td.merge-target');
+                            var firstCell = {}, firstLine = {}, firstLineLastCell = {},
+                                lastCell  = {}, lastLine  = {};
+                            firstCell.obj = $mergeTarget.first();
+                            firstCell.idx = firstCell.obj.index();
+                            firstLine.obj = firstCell.obj.parent();
+                            firstLine.idx = firstLine.obj.index();
+                            firstLineLastCell.obj = firstLine.obj.children('.merge-target').last();
+                            firstLineLastCell.idx = firstLineLastCell.obj.index();
+                            lastCell.obj = $mergeTarget.last();
+                            lastCell.idx = lastCell.obj.index();
+                            lastLine.obj = lastCell.obj.parent();
+                            lastLine.idx = lastLine.obj.index();
+                            var colspan = firstLine.obj.children('.merge-target').length;
+                            var rowspan = lastLine.idx - firstLine.idx + 1;
+                            // Check existed colspan values
+                            var existedColspan = 0;
+                            firstLine.obj.children('.merge-target').filter('[colspan]').each(function(){
+                                existedColspan += Number($(this).attr('colspan'));
+                            });
+                            if (existedColspan) {
+                                colspan += (existedColspan - 1);
+                            }
+                            if (colspan > 1) {
+                                firstCell.obj.attr('colspan', colspan);
+                            }
+                            if (rowspan > 1) {
+                                firstCell.obj.attr('rowspan', rowspan);
+                            }
+                            $table.find('td.merge-target').not(':first').remove();
+                        }
+                        $table.toggleClass('jsontable-cell-merge');
                     }
                     return false;
                 });
@@ -296,46 +487,76 @@
             // Save values edited by user
             if (op.edit) {
                 $('form[method="post"]').on('submit', function(){
-                    var values = '';
-                    var itemsArray = [];
-                    if (op.headerPosition === 'top') {
-                        $table.find('tbody tr').each(function(){
-                            var item = {};
-                            $(this).find('.jsontable-input').each(function(){
-                                var v = $(this).val();
-                                item[$(this).attr('data-name')] = v;
-                                values += v;
-                            });
-                            itemsArray.push(JSON.stringify(item));
-                        });
-                    }
-                    else if (op.headerPosition === 'left') {
-                        var $tr = $table.find('tr');
-                        var textareaCount = $tr.last().find('.jsontable-input').length;
-                        var itemsArrayObj = [];
-                        for (var i = 0; i < textareaCount; i++) {
-                            itemsArrayObj.push({});
-                        }
-                        $tr.each(function(i){
-                            $(this).find('.jsontable-input').each(function(j){
-                                var v = $(this).val();
-                                itemsArrayObj[j][$(this).attr('data-name')] = v;
-                                values += v;
-                            });
-                        });
-                        for (var i = 0; i < textareaCount; i++) {
-                            itemsArray.push(JSON.stringify(itemsArrayObj[i]));
-                        }
-                    }
-                    if (values !== '') {
-                        $this.val('{"items":[' + itemsArray.join(',') + ']}');
-                    }
-                    else {
-                        $this.val('');
-                    }
+                    var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")');
+                    $this.val(result);
                 });
             }
+            if (op.sortable && op.headerPosition === 'top') {
+                $table.sortable({
+                    items: 'tr',
+                    cursor: 'move'
+                });
+            }
+            if (op.cbAfterBuild !== null && typeof op.cbAfterBuild === 'function') {
+                op.cbAfterBuild({name: 'cbAfterBuild'}, $container);
+            }
         });
+    };
+    $.fn.MTAppJSONTable.save = function(headerPosition, itemsRootKey, $table, filter){
+        var values = '';
+        var itemsArray = [];
+        if (typeof filter !== 'string') {
+            filter = '';
+        }
+        if (headerPosition === 'top') {
+            $table.find('tbody tr' + filter).each(function(){
+                var item = {};
+                $(this).find('.jsontable-input').each(function(){
+                    var v = $(this).val();
+                    item[$(this).attr('data-name')] = v;
+
+                    // cellMerge
+                    if ($(this).parent().attr('colspan')) {
+                        item[$(this).attr('data-name') + '_colspan'] = $(this).parent().attr('colspan');
+                    }
+                    if ($(this).parent().attr('rowspan')) {
+                        item[$(this).attr('data-name') + '_rowspan'] = $(this).parent().attr('rowspan');
+                    }
+
+                    values += v;
+                });
+                itemsArray.push(JSON.stringify(item));
+            });
+        }
+        else if (headerPosition === 'left') {
+            var $tr = $table.find('tr' + filter);
+            var textareaCount = $tr.last().find('.jsontable-input').length;
+            var itemsArrayObj = [];
+            for (var i = 0; i < textareaCount; i++) {
+                itemsArrayObj.push({});
+            }
+            $tr.each(function(i){
+                $(this).find('.jsontable-input').each(function(j){
+                    var v = $(this).val();
+                    var idx = $(this).parent().attr('data-item-index');
+                    itemsArrayObj[idx][$(this).attr('data-name')] = v;
+
+                    // cellMerge
+                    if ($(this).parent().attr('colspan')) {
+                        itemsArrayObj[idx][$(this).attr('data-name') + '_colspan'] = $(this).parent().attr('colspan');
+                    }
+                    if ($(this).parent().attr('rowspan')) {
+                        itemsArrayObj[idx][$(this).attr('data-name') + '_rowspan'] = $(this).parent().attr('rowspan');
+                    }
+
+                    values += v;
+                });
+            });
+            for (var i = 0; i < textareaCount; i++) {
+                itemsArray.push(JSON.stringify(itemsArrayObj[i]));
+            }
+        }
+        return (values !== '') ? '{"' + itemsRootKey + '":[' + itemsArray.join(',') + ']}' : '';
     };
     $.fn.MTAppJSONTable.defaults = {
         inputType: 'textarea', // 'textarea' or 'input'
@@ -344,13 +565,403 @@
         headerOrder: [], // Array: Order of table header
         headerPosition: 'top', // 'top' or 'left'
         footer: false, // If you use the table footer, set true.
-        // items: [], // Array include Object
+        items: null, // Array include Object
+        itemsRootKey: 'items', // String: The root key of items
         edit: true, // Disable table
         add: false, // true: A user can add rows or columns.
         clear: true, // false: Hide a delete button.
+        cellMerge: false,
+        sortable: false,
+        listingCheckbox: false, // or true
+        listingCheckboxType: 'checkbox', // or 'radio'
+        listingTargetKey: null, // String: Target key  which is saved value when listing mode is applied
+        listingTargetEscape: false, // Boolean: encodeURIComponent(target value)
+        optionButtons: null, // [{classname:"classname", text:"button text"}]
+        // Callbacks
+        cbAfterBuild: null,
+        cbBeforeAdd: null,
+        cbAfterAdd: null,
+        cbAfterSelectRow: null,
+        cbAfterSelectColumn: null,
+
         debug: false // true: show the original textarea.
     };
     // end - $.fn.MTAppJSONTable()
+
+
+    // -------------------------------------------------
+    //  $(foo).MTAppListing();
+    //
+    //  Description:
+    //    Ajaxで読み込んだJSONをテーブルにしてダイアログで表示する
+    //
+    //  Usage:
+    //    $(foo).MTAppListing(options);
+    //
+    // -------------------------------------------------
+    $.fn.MTAppListing = function(options){
+        var op = $.extend({}, $.fn.MTAppListing.defaults, options);
+
+        /* ==================================================
+            L10N
+        ================================================== */
+        var l10n = {};
+        if (mtappVars.language === 'ja') {
+            l10n.title = '項目を選択';
+            l10n.search = '検索';
+            l10n.reset = 'リセット';
+            l10n.ok = 'OK';
+            l10n.cancel = 'キャンセル';
+            l10n.select = '選択';
+            l10n.selectedItems = '選択された項目';
+            l10n.returnDialogTop = 'ダイアログのトップへ戻る';
+            l10n.noItems = '該当するデータがありません';
+            l10n.ajaxFail = 'データが取得できませんでした';
+        }
+        else {
+            l10n.title = 'Select items';
+            l10n.search = 'Search';
+            l10n.reset = 'Reset';
+            l10n.ok = 'OK';
+            l10n.cancel = 'Cancel';
+            l10n.select = 'Select';
+            l10n.selectedItems = 'Selected items';
+            l10n.returnDialogTop = 'Dialog top';
+            l10n.noItems = 'A matched data was not found.';
+            l10n.ajaxFail = 'An error occurred while getting data.';
+        }
+        if (op.l10n) {
+            for (var key in op.l10n) {
+                l10n[key] = op.l10n[key];
+            }
+        }
+        /*  L10N  */
+
+        /* ==================================================
+            Template
+        ================================================== */
+        var tmpl = {};
+        tmpl.dialog = [
+            '<div class="mtapplisting-container">',
+                '<img class="mtapplisting-indicator hidden" src="' + StaticURI + 'images/indicator.gif">',
+                '<div class="mtapplisting-content hidden">',
+                    '<div class="mtapplisting-content-header">',
+                        '<h1 class="title page">[#= dialog.title #]</h1>',
+                    '</div>',
+                    '<div class="mtapplisting-content-body">',
+                        '<textarea id="mtapplisting-textarea1" class="mtapplisting-dummy-textarea hidden"></textarea>',
+                        '<div class="mtapplisting-search">',
+                            '<input id="mtapplisting-text-filter" type="text" class="text med" value="" placeholder="' + l10n.search + '">',
+                            '<input id="mtapplisting-text-search" type="image" src="' + StaticURI + '/images/search-submit-dialog.png">',
+                            '<a id="mtapplisting-search-reset" href="#" class="search-reset">' + l10n.reset + '</a>',
+                        '</div>',
+                        '<textarea id="mtapplisting-textarea2" class="mtapplisting-dummy-textarea hidden"></textarea>',
+                    '</div>',
+                '</div>',
+                '<div class="mtapplisting-actions actions-bar hidden">',
+                    '<a href="#" id="mtapplisting-dialog-ok" class="action button primary close ok">' + l10n.ok + '</a>',
+                    '<a href="#" id="mtapplisting-dialog-cancel" class="action button cancel">' + l10n.cancel + '</a>',
+                    '<a href="#" id="mtapplisting-dialog-top">' + l10n.returnDialogTop + '</a>',
+                '</div>',
+            '</div>',
+            ''
+        ].join('');
+        /*  Template  */
+
+        /* ==================================================
+            Insert a button to open dialog window
+            and Initialization
+        ================================================== */
+        var $dialog = $('#mtapplisting-dialog');
+        if (!$dialog.length) {
+            var dialogHTML =
+                '<div id="mtapplisting-dialog"></div>' +
+                '<div id="mtapplisting-overlay"></div>';
+            $('body').append(dialogHTML);
+            $dialog = $('#mtapplisting-dialog');
+        }
+        /*  Insert a button to open dialog window  */
+
+        /* ==================================================
+            Bind events to the dialog
+        ================================================== */
+        if (!$dialog.hasClass('bind-event')) {
+            $dialog
+                .addClass('bind-event')
+                // Cancel Button
+                .on('click', '#mtapplisting-dialog-cancel', function(e){
+                    $(e.delegateTarget).html('').removeClass('mt-dialog').hide();
+                    $('#mtapplisting-overlay').removeClass('mt-dialog-overlay').removeClass('overlay').hide();
+                    if (op.cbAfterCancel !== null && typeof op.cbAfterCancel === 'function') {
+                        op.cbAfterCancel({name: 'cbAfterCancel'}, e.delegateTarget);
+                    }
+                    return false;
+                })
+                // OK Button
+                .on('click', '#mtapplisting-dialog-ok', function(e){
+                    var triggerId = $(e.delegateTarget).data('triggerId');
+                    if (!triggerId) {
+                        return false;
+                    }
+
+                    // Save selected values
+                    var values = [];
+                    var $tbody = $('#mtapplisting-tbody1');
+                    var $tr = $tbody.children('tr');
+                    if ($tr.length) {
+                        var targetKey = $tbody.data('target-key');
+                        $tr.each(function(){
+                            values.push($(this).find('td.' + targetKey + ' textarea.jsontable-input-hidden').val());
+                        });
+                    }
+                    if (values.length > 1) {
+                        $('#' + triggerId).val(',' + values.join(',') + ',');
+                    }
+                    else {
+                        $('#' + triggerId).val(values[0]);
+                    }
+
+                    if (op.cbAfterOK !== null && typeof op.cbAfterOK === 'function') {
+                        op.cbAfterOK({name: 'cbAfterOK'}, e.delegateTarget);
+                    }
+
+                    // Reset trigger
+                    $(e.delegateTarget).data('triggerId', '');
+
+                    // Close the dialog by clicking the cancel button
+                    $('#mtapplisting-dialog-cancel').trigger('click');
+                    return false;
+                })
+                .on('click', '#mtapplisting-text-search', function(e){
+                    var v = $('#mtapplisting-text-filter').val();
+                    $('#mtapplisting-tbody2 tr').each(function(){
+                        var html = this.innerHTML;
+                        var reg = new RegExp(v, 'i');
+                        if (reg.test(html)) {
+                            $(this).removeClass('hidden');
+                        }
+                        else {
+                            $(this).addClass('hidden');
+                        }
+                    });
+                    if (op.cbAfterSearch !== null && typeof op.cbAfterSearch === 'function') {
+                        op.cbAfterSearch({name: 'cbAfterSearch'}, e.delegateTarget);
+                    }
+                    return false;
+                })
+                .on('keypress', '#mtapplisting-text-filter', function(e){
+                    if (e.which == 13 || op.incrementalSearch) {
+                        $(this).next().trigger('click');
+                    }
+                })
+                .on('click', '#mtapplisting-search-reset', function(e){
+                    $('#mtapplisting-text-filter').val('');
+                    if (op.cbAfterSearchReset !== null && typeof op.cbAfterSearchReset === 'function') {
+                        op.cbAfterSearchReset({name: 'cbAfterSearchReset'}, e.delegateTarget);
+                    }
+                    $('#mtapplisting-text-search').trigger('click');
+                    return false;
+                })
+                .on('click', '#mtapplisting-dialog-top', function(e){
+                    $(e.delegateTarget)
+                        .find('div.mtapplisting-container')
+                        .animate({scrollTop: 0}, 600, 'swing');
+                    return false;
+                });
+        }
+        /*  Bind events to the dialog  */
+
+
+        return this.each(function(){
+
+            var $this = $(this);
+
+            /* ==================================================
+                Set IDs
+            ================================================== */
+            var $thisId = $this.attr('id');
+            if (!$thisId) {
+                $thisId = Math.floor(Math.random() * 10000000000000000).toString(36);
+                $this.attr('id', $thisId);
+            }
+            var tbodyId1 = 'mtapplisting-' + $thisId + '1';
+            var tbodyId2 = 'mtapplisting-' + $thisId + '2';
+            /*  Set IDs  */
+
+            $this
+                .after('<a href="#" class="button">' + l10n.select + '</a>')
+                .next('a')
+                /* ==================================================
+                    Event of opening the dialog window
+                ================================================== */
+                .on('click', function(){ // Don't use ".mtDialog()"
+
+                    // Set the trigger id
+                    var $dialog = $('#mtapplisting-dialog').addClass('mt-dialog');
+                    $dialog.data('triggerId', $thisId);
+
+                    // Show the overlay
+                    $('#mtapplisting-overlay').addClass('mt-dialog-overlay').addClass('overlay').css({minHeight: $(document).height()}).show();
+
+                    // MTAppListing template
+                    var tmplData = {
+                        dialog: {
+                            title: op.dialogTitle
+                        }
+                    };
+                    var html = Template.process('dialog', tmplData, tmpl);
+
+                    // Append MTAppListing template to the dialog, and show the dialog
+                    $dialog
+                        .html(html)
+                        .children('.mtapplisting-container')
+                            .height($(window).height() - 110)
+                        .end()
+                        .show();
+
+                    // Hide the indicator
+                    var $indicator = $dialog.find('img.mtapplisting-indicator').removeClass('hidden');
+
+                    // Options for ajax
+                    var ajaxOptions = {
+                        dataType: op.dataType,
+                        url: op.url,
+                        data: op.data,
+                        cache: op.cache
+                    };
+
+                    // Get JSON by ajax
+                    $.ajax(ajaxOptions).done(function(response){
+
+                        // Process the response
+                        if (op.cbProcessResponse !== null && typeof op.cbProcessResponse === 'function') {
+                            response = op.cbProcessResponse({name: 'cbProcessResponse'}, response);
+                        }
+
+                        var filterJSONTable = true;
+                        if (op.cbAjaxDoneFilterJSONTable !== null && typeof op.cbAjaxDoneFilterJSONTable === 'function') {
+                            filterJSONTable = op.cbAjaxDoneFilterJSONTable({name: 'cbAjaxDoneFilterJSONTable'}, $dialog, response);
+                        }
+
+                        // Show the dialog content
+                        $indicator.addClass('hidden');
+                        $dialog.find('div.mtapplisting-content').removeClass('hidden').next().removeClass('hidden');
+
+                        if (!filterJSONTable) {
+                            $dialog
+                                .find('div.mtapplisting-content-body').text(l10n.noItems)
+                                .end()
+                                .find('div.mtapplisting-actions a.ok').replaceWith('<p class="action button disabled">挿入</p>')
+                                .end()
+                                .find('#mtapplisting-dialog-top').remove();
+                            return false;
+                        }
+                        // Dummy textarea1 options
+                        op.jsontable.caption = l10n.selectedItems;
+                        op.jsontable.headerPosition = 'top';
+                        op.jsontable.footer = false;
+                        op.jsontable.items = null;
+                        op.jsontable.edit = false;
+                        op.jsontable.add = false;
+                        op.jsontable.clear = false;
+                        op.jsontable.listingCheckbox = true;
+                        op.jsontable.listingTargetKey = op.jsontable.listingTargetKey || 'id';
+                        op.jsontable.cbAfterSelectRow = function(cb, $tr, checked){
+                            if (!checked) {
+                                $tr.prependTo('#mtapplisting-tbody2');
+                            }
+                        };
+                        op.jsontable.cbAfterBuild = function(cb, $container){
+                            $container.find('tbody').attr('id', 'mtapplisting-tbody1');
+                        };
+                        $('#mtapplisting-textarea1').MTAppJSONTable(op.jsontable);
+                        $('#mtapplisting-tbody1')
+                            /*.hide()*/
+                            .data('target-key', op.jsontable.listingTargetKey)
+                            .html('')
+                            .sortable({
+                                items: 'tr',
+                                cursor: 'move',
+                                placeholder: 'mtapp-state-highlight'
+                            });
+
+                        // Dummy textarea2 options
+                        // The following options have be already set at dummy1
+                            // op.jsontable.headerPosition = 'top';
+                            // op.jsontable.edit = false;
+                            // op.jsontable.add = false;
+                            // op.jsontable.clear = false;
+                            // op.jsontable.listingCheckbox = true;
+                            // op.jsontable.listingTargetKey = op.jsontable.listingTargetKey || 'id';
+                        op.jsontable.caption = null; // overwrite
+                        op.jsontable.footer = true; // overwrite
+                        op.jsontable.items = response; // overwrite
+                        op.jsontable.cbAfterSelectRow = function(cb, $tr, checked){  // overwrite
+                            $('#mtapplisting-textarea1').next().show();
+                            if (checked) {
+                                $tr.find('td').each(function(){
+                                    var w = $(this).width();
+                                    $(this).width(w + 'px');
+                                });
+                                $tr.appendTo('#mtapplisting-tbody1');
+                            }
+                        };
+                        op.jsontable.cbAfterBuild = function(cb, $container){ // overwrite
+                            $container.find('tbody').attr('id', 'mtapplisting-tbody2');
+                            var savedValue = $this.val().replace(/^,|,$/g, '').split(',');
+                            for (var i = 0, l = savedValue.length; i < l; i++) {
+                                $('td[data-value="' + savedValue[i].replace(/\s*/g, '') + '"]').parent().find('td:first-child input.jsontable-cb').trigger('click');
+                            }
+                        };
+
+                        $('#mtapplisting-textarea2').MTAppJSONTable(op.jsontable);
+                    })
+                    .fail(function(jqXHR, status){
+                        $indicator.addClass('hidden');
+                        if (jqXHR.status && jqXHR.status == 404) {
+                            $dialog.find('div.mtapplisting-content-body').text(jqXHR.status + ' : ' + l10n.ajaxFail);
+                        }
+                        if (op.cbAjaxFail !== null && typeof op.cbAjaxFail === 'function') {
+                            op.cbAjaxFail({name: 'cbAjaxFail'}, $dialog, jqXHR, status);
+                        }
+                        $dialog
+                            .find('div.mtapplisting-actions').removeClass('hidden')
+                            .find('a.ok').replaceWith('<p class="action button disabled">挿入</p>')
+                            .end()
+                            .find('#mtapplisting-dialog-top').remove();
+                        $dialog.find('div.mtapplisting-content').removeClass('hidden');
+                    });
+
+                    return false;
+                });
+                /*  Event of opening the dialog window  */
+        });
+    };
+    $.fn.MTAppListing.defaults = {
+        // Ajax Options
+        url: null, // Data API Script URL (ex)http://your-host/mt/mt-data-api.cgi/v1/sites/1/entries
+        data: null, // PlainObject: Data to be sent to the server.
+        dataType: 'json', // Set this value to ajax options
+        cache: false,
+
+        // Dialog
+        dialogTitle: '', // Type the title of dialog window
+        incrementalSearch: true, // Set true if you wont to do incremental search
+        l10n: null, // Plain Object
+
+        // Callbacks
+        cbProcessResponse: null, // Process the response
+        cbAjaxDoneFilterJSONTable: null, // Stop to execute JSONTable
+        cbAjaxFail: null, // Be called when data could not be get
+        cbAfterCancel: null, // After clicking the cancel button
+        cbAfterOK: null, // After clicking the OK button
+        cbAfterSearch: null, // After searching
+        cbAfterSearchReset: null, // After resetting the text filter
+
+        // JSONTable
+        jsontable: null // Set options for MTAppJSONTable
+    };
+    // end - $.fn.MTAppListing()
 
     // -------------------------------------------------
     //  $.MTAppGetCategoryName();
@@ -1707,7 +2318,9 @@
     //
     //  Options:
     //    sort: {String} 上からの並び順通りにbasenameをカンマ区切りで並べる。カスタムフィールドはbasenameの先頭にはc:を付与。
-    //    insert_id: {String} フィールドを包含する要素のid属性の値
+    //    insertId: {String} フィールドを包含する要素のid属性の値
+    //    otherFieldHide: {Boolean} trueにすると並び順を指定したフィールド以外のフィールドを非表示する。
+    //    debug: {Boolean} trueにすると並び順に指定したフィールドがない場合はコンソールに通知する。
     // -------------------------------------------------
     $.MTAppFieldSort = function(options){
         var op = $.extend({}, $.MTAppFieldSort.defaults, options);
@@ -1723,21 +2336,28 @@
         }
         var container = document.getElementById(containerId);
         if (!container) return;
+        if (op.otherFieldHide) {
+            $(container).find('div.field').addClass('hidden');
+            $('#quickpost').addClass('hidden');
+        }
         for (var i = 0; i < l; i++) {
             var id = $.trim(field[i]).replace(/^c:/,'customfield_') + '-field';
             if (document.getElementById(id)) {
                 var elm = document.getElementById(id);
                 container.insertBefore(elm, container.firstChild);
                 $(elm).removeClass('hidden').show();
-            } else if (window.console) {
+            }
+            if (op.debug && window.console) {
                 console.log('#' + id + ' が見つかりません');
             }
         }
     };
     $.MTAppFieldSort.defaults = {
         sort: 'title,text,tags,excerpt,keywords',
-        insert_id: 'sortable',
-        insertID: 'sortable'
+        insertID: 'sortable',
+        insert_id: 'sortable',// Deprecated
+        otherFieldHide: false,
+        debug: false
     };
     // end - $.MTAppFieldSort
 
@@ -1911,17 +2531,20 @@
         var op = $.extend({}, $.MTAppDialogMsg.defaults, options);
 
         op.hideEffect = op.hide_effect ? op.hide_effect : op.hideEffect;
+        var settings = {
+            autoOpen: false,
+            title: op.title,
+            width: op.width,
+            height: op.height,
+            modal: op.modal,
+            hide: op.hideEffect
+        };
+        if (op.close) {
+            settings.close = op.close;
+        }
         $('#mtapp-dialog-msg')
             .html(op.content)
-            .dialog({
-                autoOpen: false,
-                modal: true,
-                title: op.title,
-                width: op.width,
-                height: op.height,
-                modal: op.modal,
-                hide: op.hideEffect
-            });
+            .dialog(settings);
         $('#mtapp-dialog-msg').dialog('open');
     };
     $.MTAppDialogMsg.defaults = {
@@ -1930,7 +2553,8 @@
         width: 'auto',
         height: 'auto',
         modal: false,
-        hideEffect: ''
+        hideEffect: '',
+        close: null
     };
     // end - $.MTAppDialogMsg();
 
@@ -2516,30 +3140,31 @@
         var type = mtappVars.type;
         if (!(type == 'entry' || type == 'page')) return;
         var reqCats = (op.requiredIds) ? op.requiredIds.split(',') : [];
-        $form.on('click', ':submit.primary', function(){
+        var dialogOptions = {
+            modal: true,
+            close: function(){
+                $('div.actions-bar :disabled').prop('disabled', false);
+                $form.removeAttr('mt:once');
+            }
+        };
+        $form.on('submit', function(){
             var categoryIds = $("input[name='category_ids']").val() ? $("input[name='category_ids']").val().split(',') : [];
             var count = 0;
             var eerror = false;
             if (reqCats.length) {
                 for (var i = 0, l = reqCats.length; i < l; i++) {
                     if ($.inArray(reqCats[i], categoryIds) == -1) {
-                        $.MTAppDialogMsg({
-                            title: op.idErrorTitle,
-                            content: op.idErrorContent,
-                            modal: true
-                        });
-                        $form.find('button:submit:disabled').prop('disabled', false);
+                        dialogOptions.title = op.idErrorTitle;
+                        dialogOptions.content = op.idErrorContent;
+                        $.MTAppDialogMsg(dialogOptions);
                         return false;
                     }
                 }
             }
             if (op.requiredCount && op.requiredCount > categoryIds.length) {
-                $.MTAppDialogMsg({
-                    title: op.countErrorTitle,
-                    content: op.countErrorContent,
-                    modal: true
-                });
-                $form.find('button:submit:disabled').prop('disabled', false);
+                dialogOptions.title = op.countErrorTitle;
+                dialogOptions.content = op.countErrorContent;
+                $.MTAppDialogMsg(dialogOptions);
                 return false;
             }
         });
@@ -3696,6 +4321,14 @@
         varType: function(obj) {
             return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
         },
+        // 数字を3桁ごとにカンマで区切る
+        numberFormat: function(num) {
+            num = '' + num;
+            var numArray = (num.indexOf('.') !== -1) ? num.split('.') : [num];
+            numArray[0] = numArray[0].replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+            return numArray.join('.');
+        }
+
 
     });
 

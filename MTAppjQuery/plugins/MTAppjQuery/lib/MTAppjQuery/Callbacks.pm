@@ -308,6 +308,7 @@ __MTML__
         "status" : "<mt:Var name="status">",
         "category_id" : ${category_id},
         "template_id" : ${template_id},
+        "template_identifier" : '<mt:Var name="identifier">',
         "modified_by" : "<mt:Var name="modified_by">",
         "blog_url" : "<mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if>",
         "static_plugin_path" : "${static_plugin_path}",
@@ -617,16 +618,30 @@ sub template_param_edit_template {
     my ($cb, $app, $param, $tmpl) = @_;
     my $identifier = $param->{identifier} || '';
     my $index_identifiers = $param->{index_identifiers};
+    my $identifier_match = 0;
+    foreach my $index_identifier (@$index_identifiers) {
+        if ($index_identifier->{key} eq $identifier) {
+            $identifier_match = 1;
+            last;
+        }
+    }
     if ($identifier eq 'user_js' or $identifier eq 'user_css') {
         push(@$index_identifiers, {
             'label' => 'user.js',
             'selected' => $identifier eq 'user_js',
             'key' => 'user_js'
-          },{
+        },{
             'label' => 'user.css',
             'selected' => $identifier eq 'user_css',
             'key' => 'user_css'
-          });
+        });
+    }
+    elsif (!$identifier_match) {
+        push(@$index_identifiers, {
+            'label' => $identifier,
+            'selected' => 1,
+            'key' => $identifier
+        });
     }
 }
 
@@ -716,6 +731,13 @@ sub cms_post_save_entry {
         $obj_asset->object_id($entry_id);
         $obj_asset->save or die 'Failed to save the objectasset.';
     }
+}
+
+sub cms_post_save_template {
+    my ($eh, $app, $obj, $orig_obj) = @_;
+    my $identifier_custom = $app->param('identifier_custom');
+    $obj->identifier($identifier_custom) if $identifier_custom;
+    $obj->save;
 }
 
 sub save_config_filter {

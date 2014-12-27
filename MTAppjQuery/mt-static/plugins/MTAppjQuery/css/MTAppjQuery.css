@@ -650,45 +650,111 @@ span.mtappmultiform-radio input {
 /* ----------------------------------------
    __MTAppJSONTable
 ---------------------------------------- */
-.mtapp-json-table table {
+.mtapp-json-table .jsontable-table {
+  table-layout: fixed;
   width: 100%;
   margin-bottom: 1em;
   border-collapse: collapse;
 }
-.mtapp-json-table table caption {
+.mtapp-json-table .jsontable-table caption {
   margin-top: 10px;
   text-align: left;
   font-weight: bold;
 }
-.mtapp-json-table table th, .mtapp-json-table table td {
+.mtapp-json-table .jsontable-table th, .mtapp-json-table .jsontable-table td {
   padding: 0;
   border: 1px solid #c0c6c9;
 }
-.mtapp-json-table table th {
+.mtapp-json-table .jsontable-table th {
   padding: 5px 0;
   background-color: #e6e6e6;
 }
-.mtapp-json-table table td.uneditable {
+.mtapp-json-table .jsontable-table td.uneditable {
   padding: 0.2em 0.25em;
 }
-.mtapp-json-table table td.checkbox {
+.mtapp-json-table .jsontable-table td.checkbox {
   text-align: center;
 }
-.mtapp-json-table table .jsontable-clear-cell {
+.mtapp-json-table .jsontable-table .jsontable-cb-cell {
+  width: 2.6em;
   text-align: center;
   vertical-align: middle;
 }
-.mtapp-json-table table .jsontable-clear-data {
+.mtapp-json-table .jsontable-table .jsontable-selected-data {
   background-color: #e7e7eb;
 }
-.mtapp-json-table table .jsontable-input {
+.mtapp-json-table .jsontable-table .jsontable-input {
   width: 100%;
   border: none;
   background-color: transparent;
 }
-.mtapp-json-table .add-buttons {
+.mtapp-json-table .jsontable-table.jsontable-cell-merge td:hover, .mtapp-json-table .jsontable-table.jsontable-cell-merge td.merge-target {
+  background-color: #FFD518;
+}
+.mtapp-json-table .jsontable-table.ui-sortable td.jsontable-sort-handle {
+  width: 20px;
+  background: white url(../images/arrow-move.png) no-repeat center center;
+  border-top-color: #FFFFFF;
+  border-bottom-color: #FFFFFF;
+  border-left-color: #FFFFFF;
+  cursor: move;
+}
+.mtapp-json-table .jsontable-table.ui-sortable thead td.jsontable-sort-handle,
+.mtapp-json-table .jsontable-table.ui-sortable tfoot td.jsontable-sort-handle {
+  background-image: none;
+}
+.mtapp-json-table .add-btn {
   text-align: right;
 }
-.mtapp-json-table .add-buttons .last-child {
+.mtapp-json-table .add-btn .last-child {
   margin-right: 0;
 }
+.mtapp-json-table .add-btn .primary {
+  color: #FFFFFF;
+}
+
+/* ==================================================
+    MTAppListing
+================================================== */
+.mtapplisting-container {
+  overflow: auto;
+  margin-bottom: 50px;
+}
+.mtapplisting-container .mtapplisting-content {
+  margin: 15px 15px 20px;
+}
+.mtapplisting-container .mtapplisting-content .mtapplisting-content-header {
+  margin-bottom: 25px;
+}
+.mtapplisting-container .mtapplisting-content .mtapplisting-search {
+  margin-bottom: 15px;
+}
+.mtapplisting-container .mtapplisting-content .mtapplisting-search input.text.med {
+  width: 50%;
+}
+.mtapplisting-container .mtapplisting-content .jsontable-table span.jsontable-input-data {
+  display: inline;
+}
+.mtapplisting-container .mtapplisting-content #mtapplisting-customfield_relatedentries1 {
+  cursor: move;
+}
+.mtapplisting-container .mtapplisting-content #mtapplisting-customfield_relatedentries1 .hidden {
+  display: block;
+  display: table-row;
+}
+.mtapplisting-container .actions-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 630px;
+  padding: 10px 15px;
+  background-color: #ffffff;
+}
+.mtapplisting-container .actions-bar #mtapplisting-dialog-top {
+  display: block;
+  position: absolute;
+  top: 10px;
+  right: 0;
+}
+
+/*  MTAppListing  */

@@ -545,7 +545,8 @@ span.mtappmultiform-radio {
    __MTAppJSONTable
 ---------------------------------------- */
 .mtapp-json-table {
-    table {
+    .jsontable-table {
+        table-layout: fixed;
         width: 100%;
         margin-bottom: 1em;
         border-collapse: collapse;
@@ -562,17 +563,20 @@ span.mtappmultiform-radio {
             padding: 5px 0;
             background-color: #e6e6e6;
         }
-        td.uneditable {
-            padding: 0.2em 0.25em;
+        td {
+            &.uneditable {
+                padding: 0.2em 0.25em;
+            }
+            &.checkbox {
+                text-align: center;
+            }
         }
-        td.checkbox {
-            text-align: center;
-        }
-        .jsontable-clear-cell {
+        .jsontable-cb-cell {
+            width: 2.6em;
             text-align: center;
             vertical-align: middle;
         }
-        .jsontable-clear-data {
+        .jsontable-selected-data {
             background-color: #e7e7eb;
         }
         .jsontable-input {
@@ -580,11 +584,78 @@ span.mtappmultiform-radio {
             border: none;
             background-color: transparent;
         }
+        &.jsontable-cell-merge td:hover,
+        &.jsontable-cell-merge td.merge-target {
+            background-color: #FFD518;
+        }
+        &.ui-sortable {
+            td.jsontable-sort-handle {
+                width: 20px;
+                background: #FFFFFF url(../images/arrow-move.png) no-repeat center center;
+                border-top-color: #FFFFFF;
+                border-bottom-color: #FFFFFF;
+                border-left-color: #FFFFFF;
+                cursor: move;
+            }
+            thead td.jsontable-sort-handle,
+            tfoot td.jsontable-sort-handle {
+                background-image: none;
+            }
+        }
     }
-    .add-buttons {
+    .add-btn {
         text-align: right;
         .last-child {
             margin-right: 0;
         }
+        .primary {
+            color: #FFFFFF;
+        }
     }
 }
+/* ==================================================
+    MTAppListing
+================================================== */
+.mtapplisting-container {
+    overflow: auto;
+    margin-bottom: 50px;
+    .mtapplisting-content {
+        margin: 15px 15px 20px;
+        .mtapplisting-content-header {
+            margin-bottom: 25px;
+        }
+        .mtapplisting-search {
+            margin-bottom: 15px;
+            input.text.med {
+                width: 50%;
+            }
+        }
+        .jsontable-table {
+            span.jsontable-input-data {
+                display: inline;
+            }
+        }
+        #mtapplisting-customfield_relatedentries1 {
+            cursor: move;
+            .hidden {
+                display: block;
+                display: table-row;
+            }
+        }
+    }
+    .actions-bar {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 630px;
+        padding: 10px 15px;
+        background-color: #ffffff;
+        #mtapplisting-dialog-top {
+            display: block;
+            position: absolute;
+            top: 10px;
+            right: 0;
+        }
+    }
+}
+/*  MTAppListing  */
