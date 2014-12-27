@@ -615,6 +615,7 @@
             l10n.select = '選択';
             l10n.selectedItems = '選択された項目';
             l10n.returnDialogTop = 'ダイアログのトップへ戻る';
+            l10n.ajaxFail = 'データが取得できませんでした';
         }
         else {
             l10n.title = 'Select items';
@@ -625,6 +626,7 @@
             l10n.select = 'Select';
             l10n.selectedItems = 'Selected items';
             l10n.returnDialogTop = 'Dialog top';
+            l10n.ajaxFail = 'An error occurred while getting data.';
         }
         if (op.l10n) {
             for (var key in op.l10n) {
@@ -822,7 +824,8 @@
                     var ajaxOptions = {
                         dataType: op.dataType,
                         url: op.url,
-                        data: op.data
+                        data: op.data,
+                        cache: op.cache
                     };
 
                     // Get JSON by ajax
@@ -896,6 +899,21 @@
                         };
 
                         $('#mtapplisting-textarea2').MTAppJSONTable(op.jsontable);
+                    })
+                    .fail(function(jqXHR, status){
+                        $indicator.addClass('hidden');
+                        if (jqXHR.status && jqXHR.status == 404) {
+                            $dialog.find('div.mtapplisting-content-body').text(jqXHR.status + ' : ' + l10n.ajaxFail);
+                        }
+                        if (op.cbAjaxFail !== null && typeof op.cbAjaxFail === 'function') {
+                            op.cbAjaxFail({name: 'cbAjaxFail'}, $dialog, jqXHR, status);
+                        }
+                        $dialog
+                            .find('div.mtapplisting-actions').removeClass('hidden')
+                            .find('a.ok').replaceWith('<p class="action button disabled">挿入</p>')
+                            .end()
+                            .find('#mtapplisting-dialog-top').remove();
+                        $dialog.find('div.mtapplisting-content').removeClass('hidden');
                     });
 
                     return false;
@@ -908,9 +926,11 @@
         url: null, // Data API Script URL (ex)http://your-host/mt/mt-data-api.cgi/v1/sites/1/entries
         data: null, // PlainObject: Data to be sent to the server.
         dataType: 'json', // Set this value to ajax options
+        cache: false,
         incrementalSearch: true, // Set true if you wont to do incremental search
         l10n: null, // Plain Object
         cbProcessResponse: null, // Process the response
+        cbAjaxFail: null, // Be called when data could not be get
         cbAfterCancel: null, // After clicking the cancel button
         cbAfterOK: null, // After clicking the OK button
         cbAfterSearch: null, // After searching
