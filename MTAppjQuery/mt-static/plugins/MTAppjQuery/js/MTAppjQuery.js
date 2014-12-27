@@ -610,6 +610,7 @@
             l10n.title = '項目を選択';
             l10n.search = '検索';
             l10n.reset = 'リセット';
+            l10n.ok = 'OK';
             l10n.cancel = 'キャンセル';
             l10n.select = '選択';
             l10n.selectedItems = '選択された項目';
@@ -619,6 +620,7 @@
             l10n.title = 'Select items';
             l10n.search = 'Search';
             l10n.reset = 'Reset';
+            l10n.ok = 'OK';
             l10n.cancel = 'Cancel';
             l10n.select = 'Select';
             l10n.selectedItems = 'Selected items';
@@ -648,7 +650,7 @@
                     '</div>',
                 '</div>',
                 '<div class="mtapplisting-actions actions-bar hidden">',
-                    '<a href="#" id="mtapplisting-dialog-ok" class="action button primary close ok">OK</a>',
+                    '<a href="#" id="mtapplisting-dialog-ok" class="action button primary close ok">' + l10n.ok + '</a>',
                     '<a href="#" id="mtapplisting-dialog-cancel" class="action button cancel">' + l10n.cancel + '</a>',
                     '<a href="#" id="mtapplisting-dialog-top">' + l10n.returnDialogTop + '</a>',
                 '</div>',
