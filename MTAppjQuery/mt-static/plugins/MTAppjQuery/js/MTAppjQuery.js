@@ -615,6 +615,7 @@
             l10n.select = '選択';
             l10n.selectedItems = '選択された項目';
             l10n.returnDialogTop = 'ダイアログのトップへ戻る';
+            l10n.noItems = '該当するデータがありません';
             l10n.ajaxFail = 'データが取得できませんでした';
         }
         else {
@@ -626,6 +627,7 @@
             l10n.select = 'Select';
             l10n.selectedItems = 'Selected items';
             l10n.returnDialogTop = 'Dialog top';
+            l10n.noItems = 'A matched data was not found.';
             l10n.ajaxFail = 'An error occurred while getting data.';
         }
         if (op.l10n) {
@@ -846,6 +848,12 @@
                         $dialog.find('div.mtapplisting-content').removeClass('hidden').next().removeClass('hidden');
 
                         if (!filterJSONTable) {
+                            $dialog
+                                .find('div.mtapplisting-content-body').text(l10n.noItems)
+                                .end()
+                                .find('div.mtapplisting-actions a.ok').replaceWith('<p class="action button disabled">挿入</p>')
+                                .end()
+                                .find('#mtapplisting-dialog-top').remove();
                             return false;
                         }
                         // Dummy textarea1 options
