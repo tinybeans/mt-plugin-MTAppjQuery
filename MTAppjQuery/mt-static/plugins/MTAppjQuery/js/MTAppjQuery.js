@@ -626,6 +626,11 @@
             l10n.selectedItems = 'Selected items';
             l10n.returnDialogTop = 'Dialog top';
         }
+        if (op.l10n) {
+            for (var key in op.l10n) {
+                l10n[key] = op.l10n[key];
+            }
+        }
         /*  L10N  */
 
         /* ==================================================
@@ -904,6 +909,7 @@
         data: null, // PlainObject: Data to be sent to the server.
         dataType: 'json', // Set this value to ajax options
         incrementalSearch: true, // Set true if you wont to do incremental search
+        l10n: null, // Plain Object
         cbProcessResponse: null, // Process the response
         cbAfterCancel: null, // After clicking the cancel button
         cbAfterOK: null, // After clicking the OK button
