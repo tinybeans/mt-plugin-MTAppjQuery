@@ -922,19 +922,26 @@
         });
     };
     $.fn.MTAppListing.defaults = {
-        dialogTitle: '', // Type the title of dialog window
+        // Ajax Options
         url: null, // Data API Script URL (ex)http://your-host/mt/mt-data-api.cgi/v1/sites/1/entries
         data: null, // PlainObject: Data to be sent to the server.
         dataType: 'json', // Set this value to ajax options
         cache: false,
+
+        // Dialog
+        dialogTitle: '', // Type the title of dialog window
         incrementalSearch: true, // Set true if you wont to do incremental search
         l10n: null, // Plain Object
+
+        // Callbacks
         cbProcessResponse: null, // Process the response
         cbAjaxFail: null, // Be called when data could not be get
         cbAfterCancel: null, // After clicking the cancel button
         cbAfterOK: null, // After clicking the OK button
         cbAfterSearch: null, // After searching
         cbAfterSearchReset: null, // After resetting the text filter
+
+        // JSONTable
         jsontable: null // Set options for MTAppJSONTable
     };
     // end - $.fn.MTAppListing()
