@@ -3140,30 +3140,31 @@
         var type = mtappVars.type;
         if (!(type == 'entry' || type == 'page')) return;
         var reqCats = (op.requiredIds) ? op.requiredIds.split(',') : [];
-        $form.on('click', ':submit.primary', function(){
+        var dialogOptions = {
+            modal: true,
+            close: function(){
+                $('div.actions-bar :disabled').prop('disabled', false);
+                $form.removeAttr('mt:once');
+            }
+        };
+        $form.on('submit', function(){
             var categoryIds = $("input[name='category_ids']").val() ? $("input[name='category_ids']").val().split(',') : [];
             var count = 0;
             var eerror = false;
             if (reqCats.length) {
                 for (var i = 0, l = reqCats.length; i < l; i++) {
                     if ($.inArray(reqCats[i], categoryIds) == -1) {
-                        $.MTAppDialogMsg({
-                            title: op.idErrorTitle,
-                            content: op.idErrorContent,
-                            modal: true
-                        });
-                        $form.find('button:submit:disabled').prop('disabled', false);
+                        dialogOptions.title = op.idErrorTitle;
+                        dialogOptions.content = op.idErrorContent;
+                        $.MTAppDialogMsg(dialogOptions);
                         return false;
                     }
                 }
             }
             if (op.requiredCount && op.requiredCount > categoryIds.length) {
-                $.MTAppDialogMsg({
-                    title: op.countErrorTitle,
-                    content: op.countErrorContent,
-                    modal: true
-                });
-                $form.find('button:submit:disabled').prop('disabled', false);
+                dialogOptions.title = op.countErrorTitle;
+                dialogOptions.content = op.countErrorContent;
+                $.MTAppDialogMsg(dialogOptions);
                 return false;
             }
         });
