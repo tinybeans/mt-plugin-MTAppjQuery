@@ -386,7 +386,7 @@
                         var plainTr = Template.process('tbodyTopPlain', op, tmpl);
                         $table.find('tbody').append(plainTr);
                         if (op.cbAfterAdd !== null && typeof op.cbAfterAdd === 'function') {
-                            op.cbAfterAdd({name: 'cbAfterAdd'}, $container);
+                            op.cbAfterAdd({name: 'cbAfterAdd', type: 'row'}, $container);
                         }
                     }
                     else if ($(this).hasClass('jsontable-add-column')) {
@@ -420,7 +420,7 @@
                             $(this).append($td);
                         });
                         if (op.cbAfterAdd !== null && typeof op.cbAfterAdd === 'function') {
-                            op.cbAfterAdd({name: 'cbAfterAdd'}, $container);
+                            op.cbAfterAdd({name: 'cbAfterAdd', type: 'column'}, $container);
                         }
                     }
                     else if ($(this).hasClass('jsontable-clear')) {
