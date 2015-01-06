@@ -578,11 +578,11 @@
         listingTargetEscape: false, // Boolean: encodeURIComponent(target value)
         optionButtons: null, // [{classname:"classname", text:"button text"}]
         // Callbacks
-        cbAfterBuild: null,
-        cbBeforeAdd: null,
-        cbAfterAdd: null,
-        cbAfterSelectRow: null,
-        cbAfterSelectColumn: null,
+        cbAfterBuild: null, // function({name: 'cbAfterBuild'}, $container){}
+        cbBeforeAdd: null, // function({name: 'cbBeforeAdd', type: 'column'}, $td){}
+        cbAfterAdd: null, // function({name: 'cbAfterAdd', type: 'row or column'}, $container){}
+        cbAfterSelectRow: null, // function({name: 'cbAfterSelectRow'}, $tr, $(this).is(':checked')){}
+        cbAfterSelectColumn: null, // function({name: 'cbAfterSelectColumn'}, $td, $(this).is(':checked')){}
 
         debug: false // true: show the original textarea.
     };
