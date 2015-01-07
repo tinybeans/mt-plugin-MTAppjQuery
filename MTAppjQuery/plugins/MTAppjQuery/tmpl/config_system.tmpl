@@ -68,6 +68,48 @@
     <textarea class="text full low" name="common_mtapp_end_body" id="common_mtapp_end_body"><mt:var name="common_mtapp_end_body" encode_html="1"></textarea>
 </mtapp:setting>
 
+<script type="text/javascript">
+// <![CDATA[
+(function($){
+    $('#mtapp-insert-MTAppSlideMenuV2').on('click', function(){
+        var script = [
+            '<script type="text/javascript">',
+            '(function($){',
+            '    $.MTAppSlideMenuV2({',
+            '        moveCreationMenu: false,',
+            '        hidePermissionMsg: false',
+            '    });',
+            '})(jQuery);',
+            '</script'
+        ];
+        appendValue('common_mtapp_end_body', script.join("\n") + '>')
+    });
+
+    function appendValue (id, str) {
+        var $target = $('#' + id);
+        var target = $target[0];
+        var targetValue = $target.val();
+        if (targetValue) {
+            targetValue += "\n\n";
+        }
+        target.style.backgroundColor = '#FFFFE0';
+        for (var i = 10, l = 30; i <= 30; i += 0.2) {
+            target.style.height = i + 'em';
+            target.scrollTop = target.scrollHeight;
+        }
+        setTimeout(function(){
+            target.value = targetValue + str;
+            target.scrollTop = target.scrollHeight;
+            target.style.backgroundColor = '#FFFFE0';
+        }, 100);
+        setTimeout(function(){
+            target.style.backgroundColor = '#FFFFFF';
+        }, 150);
+    }
+})(jQuery);
+// ]]>
+</script>
+
 <hr style="margin-bottom:15px;">
 
 <h3><__trans phrase="Individual Settings"></h3>
@@ -247,7 +289,7 @@
         show_label="0"
         label="Enable Super Slide Menu">
         <ul>
-        	<li>
+            <li>
                 <input type="checkbox" value="1" name="superslidemenu" id="superslidemenu"<tmpl_if name=superslidemenu> checked="checked"</tmpl_if> />
                 &nbsp;<__trans phrase="Enable Super Slide Menu">
             </li>
@@ -321,42 +363,6 @@
                 return window.confirm('<__trans phrase="Setting jquery_ready.js">: <__trans phrase="Apply to all websites and blogs?">');
             }
         });
-
-        $('#mtapp-insert-MTAppSlideMenuV2').on('click', function(){
-            var script = [
-                '<script type="text/javascript">',
-                '(function($){',
-                '    $.MTAppSlideMenuV2({',
-                '        moveCreationMenu: false,',
-                '        hidePermissionMsg: false',
-                '    });',
-                '})(jQuery);',
-                '</script'
-            ];
-            appendValue('common_mtapp_end_body', script.join("\n") + '>')
-        });
-
-        function appendValue (id, str) {
-            var $target = $('#' + id);
-            var target = $target[0];
-            var targetValue = $target.val();
-            if (targetValue) {
-                targetValue += "\n\n";
-            }
-            target.style.backgroundColor = '#FFFFE0';
-            for (var i = 10, l = 30; i <= 30; i += 0.2) {
-                target.style.height = i + 'em';
-                target.scrollTop = target.scrollHeight;
-            }
-            setTimeout(function(){
-                target.value = targetValue + str;
-                target.scrollTop = target.scrollHeight;
-                target.style.backgroundColor = '#FFFFE0';
-            }, 100);
-            setTimeout(function(){
-                target.style.backgroundColor = '#FFFFFF';
-            }, 150);
-        }
     })(jQuery);
     // ]]>
     </script>
