@@ -806,7 +806,7 @@
                     // MTAppListing template
                     var tmplData = {
                         dialog: {
-                            title: op.dialogTitle
+                            title: op.dialogTitle ? op.dialogTitle : l10n.title
                         }
                     };
                     var html = Template.process('dialog', tmplData, tmpl);
