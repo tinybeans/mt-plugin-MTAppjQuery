@@ -959,7 +959,7 @@
         cbAfterSearchReset: null, // After resetting the text filter
 
         // JSONTable
-        jsontable: null // Set options for MTAppJSONTable
+        jsontable: {} // Set options for MTAppJSONTable
     };
     // end - $.fn.MTAppListing()
 
