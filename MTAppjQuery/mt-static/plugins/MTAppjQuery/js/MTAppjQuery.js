@@ -616,7 +616,7 @@
             l10n.selectedItems = '選択された項目';
             l10n.returnDialogTop = 'ダイアログのトップへ戻る';
             l10n.noItems = '該当するデータがありません';
-            l10n.ajaxFail = 'データが取得できませんでした';
+            l10n.ajaxFail = 'データを取得できませんでした';
         }
         else {
             l10n.title = 'Select items';
@@ -750,7 +750,7 @@
                     return false;
                 })
                 .on('keypress', '#mtapplisting-text-filter', function(e){
-                    if (e.which == 13 || op.incrementalSearch) {
+                    if (e.which == 13) {
                         $(this).next().trigger('click');
                     }
                 })
@@ -806,7 +806,7 @@
                     // MTAppListing template
                     var tmplData = {
                         dialog: {
-                            title: op.dialogTitle
+                            title: op.dialogTitle ? op.dialogTitle : l10n.title
                         }
                     };
                     var html = Template.process('dialog', tmplData, tmpl);
@@ -864,8 +864,12 @@
                         op.jsontable.edit = false;
                         op.jsontable.add = false;
                         op.jsontable.clear = false;
+                        op.jsontable.cellMerge = false;
+                        op.jsontable.sortable = false;
+                        op.jsontable.listingCheckboxType = 'checkbox'; // Maybe enable to set "radio" from v1.7.1.
                         op.jsontable.listingCheckbox = true;
                         op.jsontable.listingTargetKey = op.jsontable.listingTargetKey || 'id';
+                        op.jsontable.optionButtons = null;
                         op.jsontable.cbAfterSelectRow = function(cb, $tr, checked){
                             if (!checked) {
                                 $tr.prependTo('#mtapplisting-tbody2');
@@ -886,7 +890,7 @@
                             });
 
                         // Dummy textarea2 options
-                        // The following options have be already set at dummy1
+                            // The following options have be already set at dummy1
                             // op.jsontable.headerPosition = 'top';
                             // op.jsontable.edit = false;
                             // op.jsontable.add = false;
@@ -913,6 +917,7 @@
                                 $('td[data-value="' + savedValue[i].replace(/\s*/g, '') + '"]').parent().find('td:first-child input.jsontable-cb').trigger('click');
                             }
                         };
+                        op.jsontable.debug = false;
 
                         $('#mtapplisting-textarea2').MTAppJSONTable(op.jsontable);
                     })
@@ -939,19 +944,23 @@
     };
     $.fn.MTAppListing.defaults = {
         // Ajax Options
-        url: null, // Data API Script URL (ex)http://your-host/mt/mt-data-api.cgi/v1/sites/1/entries
+        url: null, // [required] Data API Script URL (ex)http://your-host/mt/mt-data-api.cgi/v1/sites/1/entries
         data: null, // PlainObject: Data to be sent to the server.
         dataType: 'json', // Set this value to ajax options
         cache: false,
 
         // Dialog
         dialogTitle: '', // Type the title of dialog window
-        incrementalSearch: true, // Set true if you wont to do incremental search
-        l10n: null, // Plain Object
+        l10n: null, // Plain Object. Please check the code of l10n section.
 
         // Callbacks
         cbProcessResponse: null, // Process the response
-        cbAjaxDoneFilterJSONTable: null, // Stop to execute JSONTable
+        cbAjaxDoneFilterJSONTable: null, // Stop executing JSONTable by returning false from this function.
+        // If you get JSON from Data API, you might want to set the following function to this option:
+        //
+        // cbAjaxDoneFilterJSONTable: function(cb, $dialog, response){
+        //     return (response.items && response.items.length > 0);
+        // },
         cbAjaxFail: null, // Be called when data could not be get
         cbAfterCancel: null, // After clicking the cancel button
         cbAfterOK: null, // After clicking the OK button
@@ -959,7 +968,13 @@
         cbAfterSearchReset: null, // After resetting the text filter
 
         // JSONTable
-        jsontable: null // Set options for MTAppJSONTable
+        jsontable: { // You can set the following options of MTAppJSONTable
+            header: null, // [required] Object: Table header
+            headerOrder: [], // [required] Array: Order of table header
+            itemsRootKey: 'items', // [required] String: The root key of items
+            listingTargetKey: 'id', // [required] String: Target key  which is saved value when listing mode is applied
+            listingTargetEscape: false // [required] Boolean: encodeURIComponent(target value)
+        }
     };
     // end - $.fn.MTAppListing()
 
