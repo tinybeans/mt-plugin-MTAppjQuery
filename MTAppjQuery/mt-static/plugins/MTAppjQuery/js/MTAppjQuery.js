@@ -866,6 +866,7 @@
                         op.jsontable.clear = false;
                         op.jsontable.cellMerge = false;
                         op.jsontable.sortable = false;
+                        op.jsontable.listingCheckboxType = 'checkbox'; // Maybe enable to set "radio" from v1.7.1.
                         op.jsontable.listingCheckbox = true;
                         op.jsontable.listingTargetKey = op.jsontable.listingTargetKey || 'id';
                         op.jsontable.optionButtons = null;
