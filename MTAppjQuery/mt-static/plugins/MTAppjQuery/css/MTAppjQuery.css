@@ -733,7 +733,8 @@ span.mtappmultiform-radio input {
   width: 50%;
 }
 .mtapplisting-container .mtapplisting-content .jsontable-table span.jsontable-input-data {
-  display: inline;
+  display: inline-block;
+  padding: 2px 4px;
 }
 .mtapplisting-container .mtapplisting-content #mtapplisting-customfield_relatedentries1 {
   cursor: move;

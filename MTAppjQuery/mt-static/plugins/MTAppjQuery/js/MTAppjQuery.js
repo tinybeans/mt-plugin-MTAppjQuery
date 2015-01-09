@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010-06-22
- * Update:  2014-12-29
+ * Update:  2015-01-10
  *
  */
 ;(function($){
@@ -109,6 +109,7 @@
 
             op.items = items;
 
+            var itemLength = op.items.length;
             var tmpl = {};
 
             tmpl.caption = '<caption>[#= caption #]</caption>';
@@ -349,6 +350,7 @@
 
             var $container = $this.next('div');
             var $table = $container.children('table');
+            $table.data('item-length', itemLength);
 
             // If the "headerPosition" option is "left", insert th to tr.
             if (op.header && op.headerPosition === 'left') {
@@ -386,31 +388,31 @@
                         var plainTr = Template.process('tbodyTopPlain', op, tmpl);
                         $table.find('tbody').append(plainTr);
                         if (op.cbAfterAdd !== null && typeof op.cbAfterAdd === 'function') {
-                            op.cbAfterAdd({name: 'cbAfterAdd'}, $container);
+                            op.cbAfterAdd({name: 'cbAfterAdd', type: 'row'}, $container);
                         }
                     }
                     else if ($(this).hasClass('jsontable-add-column')) {
+                        alert('itemLength = ' + itemLength);
                         var headerOrderClone = $.extend(true, [], op.headerOrder);
                         var inputType = op.inputType;
-                        var dataItemIndex = 0;
-                        $table.find('td:last-child').each(function(){
-                            var idx = $(this).index();
-                            if (idx > dataItemIndex) {
-                                dataItemIndex = idx;
-                            }
-                        });
+                        // $table.find('td:last-child').each(function(){
+                        //     var idx = $(this).index();
+                        //     if (idx > dataItemIndex) {
+                        //         dataItemIndex = idx;
+                        //     }
+                        // });
                         $table.find('tr').each(function(){
                             var $td = $(this).children(':last-child').removeClass('last-child').clone().removeClass(function(index, classname) {
                                 return (classname.match(/\bitem-\d+/g) || []).join(' ');
                             });
                             if ($(this).hasClass('jsontable-clear-row')) {
-                                $td.attr('data-item-index', dataItemIndex).addClass('item-' + dataItemIndex);
+                                $td.attr('data-item-index', itemLength).addClass('item-' + itemLength);
                             }
                             else {
                                 var data = {
                                     headerOrder: headerOrderClone.shift(),
                                     inputType: inputType,
-                                    i: dataItemIndex
+                                    i: itemLength
                                 };
                                 $td = Template.process('tbodyLeftPlain', data, tmpl);
                             }
@@ -419,12 +421,18 @@
                             }
                             $(this).append($td);
                         });
+                        itemLength++;
+                        $table.data('item-length', itemLength);
                         if (op.cbAfterAdd !== null && typeof op.cbAfterAdd === 'function') {
-                            op.cbAfterAdd({name: 'cbAfterAdd'}, $container);
+                            op.cbAfterAdd({name: 'cbAfterAdd', type: 'column'}, $container);
                         }
                     }
                     else if ($(this).hasClass('jsontable-clear')) {
                         $table.find('.jsontable-selected-data').remove();
+                        if (op.headerPosition === 'left') {
+                            itemLength--;
+                            $table.data('item-length', itemLength);
+                        }
                     }
                     else if ($(this).hasClass('jsontable-cellMerge')) {
                         $(this).toggleClass('primary');
@@ -530,9 +538,9 @@
         }
         else if (headerPosition === 'left') {
             var $tr = $table.find('tr' + filter);
-            var textareaCount = $tr.last().find('.jsontable-input').length;
             var itemsArrayObj = [];
-            for (var i = 0; i < textareaCount; i++) {
+            var itemLength = $table.data('item-length');
+            for (var i = 0; i < itemLength; i++) {
                 itemsArrayObj.push({});
             }
             $tr.each(function(i){
@@ -552,7 +560,7 @@
                     values += v;
                 });
             });
-            for (var i = 0; i < textareaCount; i++) {
+            for (var i = 0; i < itemLength; i++) {
                 itemsArray.push(JSON.stringify(itemsArrayObj[i]));
             }
         }
@@ -578,11 +586,11 @@
         listingTargetEscape: false, // Boolean: encodeURIComponent(target value)
         optionButtons: null, // [{classname:"classname", text:"button text"}]
         // Callbacks
-        cbAfterBuild: null,
-        cbBeforeAdd: null,
-        cbAfterAdd: null,
-        cbAfterSelectRow: null,
-        cbAfterSelectColumn: null,
+        cbAfterBuild: null, // function({name: 'cbAfterBuild'}, $container){}
+        cbBeforeAdd: null, // function({name: 'cbBeforeAdd', type: 'column'}, $td){}
+        cbAfterAdd: null, // function({name: 'cbAfterAdd', type: 'row or column'}, $container){}
+        cbAfterSelectRow: null, // function({name: 'cbAfterSelectRow'}, $tr, $(this).is(':checked')){}
+        cbAfterSelectColumn: null, // function({name: 'cbAfterSelectColumn'}, $td, $(this).is(':checked')){}
 
         debug: false // true: show the original textarea.
     };
@@ -2540,6 +2548,7 @@
     //    height: {Number} ダイアログの高さ（初期値 'auto'）pxの単位は不要。
     //    modal: {Boolean} true を設定するとモーダルダイアログになります。
     //    hideEffect: {String} 閉じる時のエフェクト 'explode', 'slide', 'drop'
+    //    close: {Function} 閉じる時に呼ばれる関数を設定します。この関数にはjQueryのイベントオブジェクトが渡されます。
     // ---------------------------------------------------------------------
 
     $.MTAppDialogMsg = function(options){
@@ -2555,7 +2564,9 @@
             hide: op.hideEffect
         };
         if (op.close) {
-            settings.close = op.close;
+            settings.close = function(event, ui){
+                op.close(event, ui);
+            };
         }
         $('#mtapp-dialog-msg')
             .html(op.content)

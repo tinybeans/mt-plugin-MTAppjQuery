@@ -632,7 +632,8 @@ span.mtappmultiform-radio {
         }
         .jsontable-table {
             span.jsontable-input-data {
-                display: inline;
+                display: inline-block;
+                padding: 2px 4px;
             }
         }
         #mtapplisting-customfield_relatedentries1 {
