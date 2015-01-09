@@ -2548,6 +2548,7 @@
     //    height: {Number} ダイアログの高さ（初期値 'auto'）pxの単位は不要。
     //    modal: {Boolean} true を設定するとモーダルダイアログになります。
     //    hideEffect: {String} 閉じる時のエフェクト 'explode', 'slide', 'drop'
+    //    close: {Function} 閉じる時に呼ばれる関数を設定します。この関数にはjQueryのイベントオブジェクトが渡されます。
     // ---------------------------------------------------------------------
 
     $.MTAppDialogMsg = function(options){
@@ -2563,7 +2564,9 @@
             hide: op.hideEffect
         };
         if (op.close) {
-            settings.close = op.close;
+            settings.close = function(event, ui){
+                op.close(event, ui);
+            };
         }
         $('#mtapp-dialog-msg')
             .html(op.content)
