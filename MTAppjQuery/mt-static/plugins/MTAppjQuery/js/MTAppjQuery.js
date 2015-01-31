@@ -945,6 +945,9 @@
                         $dialog.find('div.mtapplisting-content').removeClass('hidden');
                     });
 
+                    if (op.cbAfterOpenDialogLast !== null && typeof op.cbAfterOpenDialogLast === 'function') {
+                        op.cbAfterOpenDialogLast({name: 'cbAfterOpenDialogLast'}, $dialog, $this);
+                    }
                     return false;
                 });
                 /*  Event of opening the dialog window  */
@@ -974,6 +977,7 @@
         cbAfterOK: null, // After clicking the OK button
         cbAfterSearch: null, // After searching
         cbAfterSearchReset: null, // After resetting the text filter
+        cbAfterOpenDialogLast: null, // After opening the dialog
 
         // JSONTable
         jsontable: { // You can set the following options of MTAppJSONTable
