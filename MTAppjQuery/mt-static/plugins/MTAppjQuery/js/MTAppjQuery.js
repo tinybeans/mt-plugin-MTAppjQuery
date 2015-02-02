@@ -802,11 +802,15 @@
                 /* ==================================================
                     Event of opening the dialog window
                 ================================================== */
-                .on('click', function(){ // Don't use ".mtDialog()"
+                .on('click', function(e){ // Don't use ".mtDialog()"
 
                     // Set the trigger id
                     var $dialog = $('#mtapplisting-dialog').addClass('mt-dialog');
                     $dialog.data('triggerId', $thisId);
+
+                    if (op.cbAfterOpenDialogFirst !== null && typeof op.cbAfterOpenDialogFirst === 'function') {
+                        op.cbAfterOpenDialogFirst({name: 'cbAfterOpenDialogFirst'}, $dialog, $this, $(e.target));
+                    }
 
                     // Show the overlay
                     $('#mtapplisting-overlay').addClass('mt-dialog-overlay').addClass('overlay').css({minHeight: $(document).height()}).show();
@@ -965,6 +969,7 @@
         l10n: null, // Plain Object. Please check the code of l10n section.
 
         // Callbacks
+        cbAfterOpenDialogFirst: null, // Called just after opening the dialog
         cbProcessResponse: null, // Process the response
         cbAjaxDoneFilterJSONTable: null, // Stop executing JSONTable by returning false from this function.
         // If you get JSON from Data API, you might want to set the following function to this option:
