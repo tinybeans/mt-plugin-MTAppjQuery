@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010-06-22
- * Update:  2015-01-10
+ * Update:  2015-02-03
  *
  */
 ;(function($){
@@ -932,6 +932,9 @@
                         op.jsontable.debug = false;
 
                         $('#mtapplisting-textarea2').MTAppJSONTable(op.jsontable);
+                        if (op.cbAjaxDone !== null && typeof op.cbAjaxDone === 'function') {
+                            op.cbAjaxDone({name: 'cbAjaxDone'}, $dialog);
+                        }
                     })
                     .fail(function(jqXHR, status){
                         $indicator.addClass('hidden');
@@ -977,6 +980,7 @@
         // cbAjaxDoneFilterJSONTable: function(cb, $dialog, response){
         //     return (response.items && response.items.length > 0);
         // },
+        cbAjaxDone: null, // Be called when data is loaded
         cbAjaxFail: null, // Be called when data could not be get
         cbAfterCancel: null, // After clicking the cancel button
         cbAfterOK: null, // After clicking the OK button
