@@ -701,7 +701,7 @@
                     $(e.delegateTarget).html('').removeClass('mt-dialog').hide();
                     $('#mtapplisting-overlay').removeClass('mt-dialog-overlay').removeClass('overlay').hide();
                     if (op.cbAfterCancel !== null && typeof op.cbAfterCancel === 'function') {
-                        op.cbAfterCancel({name: 'cbAfterCancel'}, e.delegateTarget);
+                        op.cbAfterCancel({name: 'cbAfterCancel'}, $(e.delegateTarget));
                     }
                     return false;
                 })
@@ -730,7 +730,7 @@
                     }
 
                     if (op.cbAfterOK !== null && typeof op.cbAfterOK === 'function') {
-                        op.cbAfterOK({name: 'cbAfterOK'}, e.delegateTarget);
+                        op.cbAfterOK({name: 'cbAfterOK'}, $(e.delegateTarget));
                     }
 
                     // Reset trigger
@@ -753,7 +753,7 @@
                         }
                     });
                     if (op.cbAfterSearch !== null && typeof op.cbAfterSearch === 'function') {
-                        op.cbAfterSearch({name: 'cbAfterSearch'}, e.delegateTarget);
+                        op.cbAfterSearch({name: 'cbAfterSearch'}, $(e.delegateTarget));
                     }
                     return false;
                 })
@@ -765,7 +765,7 @@
                 .on('click', '#mtapplisting-search-reset', function(e){
                     $('#mtapplisting-text-filter').val('');
                     if (op.cbAfterSearchReset !== null && typeof op.cbAfterSearchReset === 'function') {
-                        op.cbAfterSearchReset({name: 'cbAfterSearchReset'}, e.delegateTarget);
+                        op.cbAfterSearchReset({name: 'cbAfterSearchReset'}, $(e.delegateTarget));
                     }
                     $('#mtapplisting-text-search').trigger('click');
                     return false;
