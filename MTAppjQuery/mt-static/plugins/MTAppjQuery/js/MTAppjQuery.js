@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010-06-22
- * Update:  2015-01-10
+ * Update:  2015-02-03
  *
  */
 ;(function($){
@@ -701,7 +701,7 @@
                     $(e.delegateTarget).html('').removeClass('mt-dialog').hide();
                     $('#mtapplisting-overlay').removeClass('mt-dialog-overlay').removeClass('overlay').hide();
                     if (op.cbAfterCancel !== null && typeof op.cbAfterCancel === 'function') {
-                        op.cbAfterCancel({name: 'cbAfterCancel'}, e.delegateTarget);
+                        op.cbAfterCancel({name: 'cbAfterCancel'}, $(e.delegateTarget));
                     }
                     return false;
                 })
@@ -730,7 +730,7 @@
                     }
 
                     if (op.cbAfterOK !== null && typeof op.cbAfterOK === 'function') {
-                        op.cbAfterOK({name: 'cbAfterOK'}, e.delegateTarget);
+                        op.cbAfterOK({name: 'cbAfterOK'}, $(e.delegateTarget));
                     }
 
                     // Reset trigger
@@ -753,7 +753,7 @@
                         }
                     });
                     if (op.cbAfterSearch !== null && typeof op.cbAfterSearch === 'function') {
-                        op.cbAfterSearch({name: 'cbAfterSearch'}, e.delegateTarget);
+                        op.cbAfterSearch({name: 'cbAfterSearch'}, $(e.delegateTarget));
                     }
                     return false;
                 })
@@ -765,7 +765,7 @@
                 .on('click', '#mtapplisting-search-reset', function(e){
                     $('#mtapplisting-text-filter').val('');
                     if (op.cbAfterSearchReset !== null && typeof op.cbAfterSearchReset === 'function') {
-                        op.cbAfterSearchReset({name: 'cbAfterSearchReset'}, e.delegateTarget);
+                        op.cbAfterSearchReset({name: 'cbAfterSearchReset'}, $(e.delegateTarget));
                     }
                     $('#mtapplisting-text-search').trigger('click');
                     return false;
@@ -802,11 +802,15 @@
                 /* ==================================================
                     Event of opening the dialog window
                 ================================================== */
-                .on('click', function(){ // Don't use ".mtDialog()"
+                .on('click', function(e){ // Don't use ".mtDialog()"
 
                     // Set the trigger id
                     var $dialog = $('#mtapplisting-dialog').addClass('mt-dialog');
                     $dialog.data('triggerId', $thisId);
+
+                    if (op.cbAfterOpenDialogFirst !== null && typeof op.cbAfterOpenDialogFirst === 'function') {
+                        op.cbAfterOpenDialogFirst({name: 'cbAfterOpenDialogFirst'}, $dialog, $this, $(e.target));
+                    }
 
                     // Show the overlay
                     $('#mtapplisting-overlay').addClass('mt-dialog-overlay').addClass('overlay').css({minHeight: $(document).height()}).show();
@@ -928,6 +932,9 @@
                         op.jsontable.debug = false;
 
                         $('#mtapplisting-textarea2').MTAppJSONTable(op.jsontable);
+                        if (op.cbAjaxDone !== null && typeof op.cbAjaxDone === 'function') {
+                            op.cbAjaxDone({name: 'cbAjaxDone'}, $dialog);
+                        }
                     })
                     .fail(function(jqXHR, status){
                         $indicator.addClass('hidden');
@@ -945,6 +952,9 @@
                         $dialog.find('div.mtapplisting-content').removeClass('hidden');
                     });
 
+                    if (op.cbAfterOpenDialogLast !== null && typeof op.cbAfterOpenDialogLast === 'function') {
+                        op.cbAfterOpenDialogLast({name: 'cbAfterOpenDialogLast'}, $dialog, $this);
+                    }
                     return false;
                 });
                 /*  Event of opening the dialog window  */
@@ -962,6 +972,7 @@
         l10n: null, // Plain Object. Please check the code of l10n section.
 
         // Callbacks
+        cbAfterOpenDialogFirst: null, // Called just after opening the dialog
         cbProcessResponse: null, // Process the response
         cbAjaxDoneFilterJSONTable: null, // Stop executing JSONTable by returning false from this function.
         // If you get JSON from Data API, you might want to set the following function to this option:
@@ -969,11 +980,13 @@
         // cbAjaxDoneFilterJSONTable: function(cb, $dialog, response){
         //     return (response.items && response.items.length > 0);
         // },
+        cbAjaxDone: null, // Be called when data is loaded
         cbAjaxFail: null, // Be called when data could not be get
         cbAfterCancel: null, // After clicking the cancel button
         cbAfterOK: null, // After clicking the OK button
         cbAfterSearch: null, // After searching
         cbAfterSearchReset: null, // After resetting the text filter
+        cbAfterOpenDialogLast: null, // After opening the dialog
 
         // JSONTable
         jsontable: { // You can set the following options of MTAppJSONTable
