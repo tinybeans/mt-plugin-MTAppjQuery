@@ -73,16 +73,27 @@ sub template_source_header {
 
     ### ログインユーザーのパーミッションを取得する
     my $perm_blog_id = $blog_id > 0 ? [0, $blog_id]: 0;
-    my @permission = MT::Permission->load({author_id => $author_id, blog_id => $perm_blog_id});
+    my @permission = MT::Permission->load({author_id => $author_id});
     my $permissions = '';
+    my $permissions_json = '';
     if (scalar @permission > 0) {
         my @perms;
+        my %perms;
         foreach my $permission (@permission) {
             if ($permission->permissions) {
-                push @perms, $permission->permissions;
+                my $perm = $permission->permissions;
+                # For mtappVars.author_permissions
+                if ($blog_id == 0 or $blog_id == $permission->blog_id) {
+                    push @perms, $perm;
+                }
+                # For mtappVars.author_permissions_json
+                $perm =~ s/'//g;
+                my @perms_array = split /,/, $perm;
+                $perms{'blog:' . $permission->blog_id} = \@perms_array;
             }
         }
         $permissions = join ',', @perms;
+        $permissions_json = MT::Util::to_json(\%perms);
     }
 
     ### 各種パスを取得する（スラッシュで終わる）
@@ -298,6 +309,7 @@ __MTML__
         "author_id" : <mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if>,
         "author_name" : "<mt:var name="author_name" encode_js="1">",
         "author_permissions" : [$permissions],
+        "author_permissions_json" : $permissions_json,
         "author_roles" : [$role_names],
         "user_name" : "<mt:var name="author_name" encode_js="1">",
         "is_superuser" : $is_superuser,
