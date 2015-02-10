@@ -700,8 +700,9 @@
                 .on('click', '#mtapplisting-dialog-cancel', function(e){
                     $(e.delegateTarget).html('').removeClass('mt-dialog').hide();
                     $('#mtapplisting-overlay').removeClass('mt-dialog-overlay').removeClass('overlay').hide();
+                    var triggerId = $(e.delegateTarget).data('triggerId');
                     if (op.cbAfterCancel !== null && typeof op.cbAfterCancel === 'function') {
-                        op.cbAfterCancel({name: 'cbAfterCancel'}, $(e.delegateTarget));
+                        op.cbAfterCancel({name: 'cbAfterCancel'}, $(e.delegateTarget), $('#' + triggerId));
                     }
                     return false;
                 })
@@ -730,7 +731,7 @@
                     }
 
                     if (op.cbAfterOK !== null && typeof op.cbAfterOK === 'function') {
-                        op.cbAfterOK({name: 'cbAfterOK'}, $(e.delegateTarget));
+                        op.cbAfterOK({name: 'cbAfterOK'}, $(e.delegateTarget), $('#' + triggerId));
                     }
 
                     // Reset trigger
