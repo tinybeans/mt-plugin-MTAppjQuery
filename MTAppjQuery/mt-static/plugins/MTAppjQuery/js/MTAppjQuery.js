@@ -1001,6 +1001,146 @@
     // end - $.fn.MTAppListing()
 
     // -------------------------------------------------
+    //  $(foo).MTAppShowListEntries();
+    //
+    //  Description:
+    //    フィールドに保存されているIDの記事のタイトルをData APIで取得して表示する
+    //
+    //  Usage:
+    //    $(foo).MTAppShowListEntries(options);
+    //
+    // -------------------------------------------------
+    $.fn.MTAppShowListEntries = function(options){
+        var op = $.extend({}, $.fn.MTAppShowListEntries.defaults, options);
+
+        if (op.api === null || op.siteId === 0) {
+            return;
+        }
+        return this.each(function(){
+
+            // Hide the field applied MTAppListing
+            if (!op.debug) {
+                $(this).hide();
+            }
+
+            $(this).on('showListEntries', function(){
+
+                var $this = $(this);
+
+                $this.data('api-obj', op.api);
+
+                // Get value of the field applied MTAppListing
+                var ids = $this.val().replace(/^,|,$/g, '');
+                var idsArray = ids.split(',');
+
+                // Get div.mtapplisting-item-list by id
+                var $itemListContainer = $this.prev('.mtapplisting-item-list');
+                if ($itemListContainer.length < 1) {
+                    // <div class="mtapplisting-item-list">
+                    //   <div class="mtapplisting-item-list-content"></div>
+                    //   <img src="indicator-login.gif" alt="">
+                    // </div>
+                    var itemList = [
+                        '<div class="mtapplisting-item-list">',
+                            '<div class="mtapplisting-item-list-content"></div>',
+                            '<img class="mtapplisting-item-list-loading" src="' + StaticURI + 'images/indicator-login.gif" alt="" style="display:none;">',
+                        '</div>'
+                    ].join("");
+                    $(this).before(itemList);
+                    $itemListContainer = $this.prev('.mtapplisting-item-list');
+                }
+                $itemListContainer.find('.mtapplisting-item-list-content').html('');
+                if (!ids) {
+                    return;
+                }
+                $itemListContainer.find('.mtapplisting-item-list-loading').show();
+
+
+                var entries = {};
+                var tmpl = {};
+                tmpl.ul = function(li){
+                   return '<ul>' + li + '</ul>';
+                };
+                if (op.canEditAllPosts) {
+                    tmpl.li = function(obj){
+                        return [
+                            '<li>',
+                                '<span class="title">',
+                                  '<a href="' + CMSScriptURI + '?__mode=view&_type=entry&blog_id=' + op.siteId + '&id=' + obj.id + '" target="_blank">' + obj.title + '</a>',
+                                '</span>',
+                                '<span class="view-link">',
+                                  '<a href="' + obj.permalink + '" target="_blank">',
+                                    '<img alt="記事を見る" src="' + StaticURI + 'images/status_icons/view.gif">',
+                                  '</a>',
+                                '</span>',
+                            '</li>',
+                            ''
+                        ].join("");
+                    };
+                }
+                else {
+                    tmpl.li = function(obj){
+                        return [
+                            '<li>',
+                                '<span class="title">' + obj.title + '</span>',
+                                '<span class="view-link">',
+                                  '<a href="' + obj.permalink + '" target="_blank">',
+                                    '<img alt="記事を見る" src="' + StaticURI + 'images/status_icons/view.gif">',
+                                  '</a>',
+                                '</span>',
+                            '</li>',
+                            ''
+                        ].join("");
+                    };
+                }
+                var tmplOut = {};
+                for (var key in tmpl) {
+                    tmplOut[key] = [];
+                }
+
+                op.params = op.params || {};
+                op.params.includeIds = ids;
+                if ('limit' in op.params) {
+                    op.params.limit = 9999;
+                }
+                if ('fields' in op.params) {
+                    op.params.fields = 'id,title,permalink';
+                }
+                op.api.listEntries(op.siteId, op.params, function(response) {
+                    if (response.error) {
+                        return;
+                    }
+                    if (response.items.length > 0) {
+                        for (var i = 0, l = response.items.length; i < l; i++) {
+                            if (!response.items[i].title) {
+                                response.items[i].title = 'id:' + response.items[i].id;
+                            }
+                            entries[ 'id-' + response.items[i].id ] = response.items[i];
+                        }
+                        for (var i = 0, l = idsArray.length; i < l; i++) {
+                            tmplOut.li.push( tmpl.li( entries[ 'id-' + idsArray[i] ] ) );
+                        }
+                    }
+                    $itemListContainer
+                        .find('.mtapplisting-item-list-content').html(tmpl.ul(tmplOut.li.join("")))
+                        .end()
+                        .find('.mtapplisting-item-list-loading').hide();
+                });
+            });
+        });
+    };
+    $.fn.MTAppShowListEntries.defaults = {
+        // For Data API
+        api: null,
+        siteId: 0,
+        params: null,
+        // Permissions
+        canEditAllPosts: true,
+        debug: false
+    };
+    /*  end - $.fn.MTAppShowListEntries()  */
+
+    // -------------------------------------------------
     //  $.MTAppGetCategoryName();
     //
     //  Description:
