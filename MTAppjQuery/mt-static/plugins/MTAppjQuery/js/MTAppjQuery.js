@@ -163,9 +163,9 @@
                     '[# } #]',
                     '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
                     '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
-                        '[# if (inputType === "input") { #]',
+                        '[# if (inputType === "input" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "input") ) { #]',
                             '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="">',
-                        '[# } else if (inputType === "textarea") { #]',
+                        '[# } else if (inputType === "textarea" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "textarea") ) { #]',
                             '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]"></textarea>',
                         '[# } #]',
                     '</td>',
@@ -212,9 +212,9 @@
                              '[# } #]',
                         '>',
                             '[# if (edit) { #]',
-                                '[# if (inputType === "input") { #]',
+                                '[# if (inputType === "input" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "input") ) { #]',
                                     '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="[#= items[i][headerOrder[x]] #]">',
-                                '[# } else if (inputType === "textarea") { #]',
+                                '[# } else if (inputType === "textarea" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "textarea") ) { #]',
                                     '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
                                 '[# } #]',
                             '[# } else { #]',
@@ -232,9 +232,9 @@
 
             tmpl.tbodyLeftPlain = [
                 '<td class="[#= headerOrder #] item-[#= i #] last-child" data-item-index="[#= i #]" data-name="[#= headerOrder #]">',
-                    '[# if (inputType === "input") { #]',
+                    '[# if (inputType === "input" || (inputType === "object" && inputTypeObj[headerOrder] && inputTypeObj[headerOrder] === "input") ) { #]',
                         '<input class="jsontable-input" type="text" data-name="[#= headerOrder #]" value="">',
-                    '[# } else if (inputType === "textarea") { #]',
+                    '[# } else if (inputType === "textarea" || (inputType === "object" && inputTypeObj[headerOrder] && inputTypeObj[headerOrder] === "textarea") ) { #]',
                         '<textarea class="jsontable-input" data-name="[#= headerOrder #]"></textarea>',
                     '[# } #]',
                 '</td>'
@@ -268,9 +268,9 @@
                             '[# } #]',
                         '>',
                             '[# if (edit) { #]',
-                                '[# if (inputType === "input") { #]',
+                                '[# if (inputType === "input" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "input") ) { #]',
                                     '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="[#= items[i][headerOrder[x]] #]">',
-                                '[# } else if (inputType === "textarea") { #]',
+                                '[# } else if (inputType === "textarea" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "textarea") ) { #]',
                                     '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
                                 '[# } #]',
                             '[# } else { #]',
@@ -345,6 +345,11 @@
             ].join("\n");
 
             // Build HTML and insert a table.
+            if ($.varType(op.inputType) === 'object') {
+                op.inputTypeObj = op.inputType;
+                op.inputType = 'object';
+            }
+
             var tableHtml = Template.process('container', op, tmpl);
             $(this).after(tableHtml);
 
@@ -392,9 +397,7 @@
                         }
                     }
                     else if ($(this).hasClass('jsontable-add-column')) {
-                        alert('itemLength = ' + itemLength);
                         var headerOrderClone = $.extend(true, [], op.headerOrder);
-                        var inputType = op.inputType;
                         // $table.find('td:last-child').each(function(){
                         //     var idx = $(this).index();
                         //     if (idx > dataItemIndex) {
@@ -411,7 +414,8 @@
                             else {
                                 var data = {
                                     headerOrder: headerOrderClone.shift(),
-                                    inputType: inputType,
+                                    inputType: op.inputType,
+                                    inputTypeObj: op.inputTypeObj,
                                     i: itemLength
                                 };
                                 $td = Template.process('tbodyLeftPlain', data, tmpl);
