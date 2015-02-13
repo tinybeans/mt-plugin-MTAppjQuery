@@ -446,59 +446,68 @@
                             $table.data('item-length', itemLength);
                         }
                     }
-                    else if ($(this).hasClass('jsontable-cellMerge')) {
-                        $(this).toggleClass('primary');
-                        var firstSelect = true;
-                        var selectMergedCell = function(e){
-                            var $td = $(this);
-                            var $tr = $td.parent();
-                            var tdIndex = $td.index();
-                            $td.toggleClass('merge-target');
-                            firstSelect = false;
-                        };
-                        // Select merged cells
-                        if ($(this).hasClass('primary')) {
-                            // Clear classes
-                            $table.find('td.merge-target').removeClass('merge-target');
-                            $(this).text(l10n.cellMergeApply);
-                            $table.on('click', 'td', selectMergedCell);
+                    return false;
+                });
+            }
+
+            if (op.cellMerge) {
+                $container.on('click', 'a.jsontable-cellMerge', function(){
+                    $(this).toggleClass('primary');
+                    var firstSelect = true;
+                    var selectMergedCell = function(e){
+                        var $td = $(this);
+                        var $tr = $td.parent();
+                        var tdIndex = $td.index();
+                        $td.toggleClass('merge-target');
+                        firstSelect = false;
+                    };
+                    // Select merged cells
+                    if ($(this).hasClass('primary')) {
+                        // Clear classes
+                        $table.find('td.merge-target').removeClass('merge-target');
+                        $(this).text(l10n.cellMergeApply);
+                        $table.on('click', 'td', selectMergedCell);
+                    }
+                    // Apply merge
+                    else {
+                        $(this).text(l10n.cellMerge);
+                        $table.off('click', 'td');
+                        var $mergeTarget = $table.find('td.merge-target');
+                        var firstCell = {}, firstLine = {}, firstLineLastCell = {},
+                            lastCell  = {}, lastLine  = {};
+                        firstCell.obj = $mergeTarget.first();
+                        firstCell.idx = firstCell.obj.index();
+                        firstLine.obj = firstCell.obj.parent();
+                        firstLine.idx = firstLine.obj.index();
+                        firstLineLastCell.obj = firstLine.obj.children('.merge-target').last();
+                        firstLineLastCell.idx = firstLineLastCell.obj.index();
+                        lastCell.obj = $mergeTarget.last();
+                        lastCell.idx = lastCell.obj.index();
+                        lastLine.obj = lastCell.obj.parent();
+                        lastLine.idx = lastLine.obj.index();
+                        var colspan = firstLine.obj.children('.merge-target').length;
+                        var rowspan = lastLine.idx - firstLine.idx + 1;
+                        // Check existed colspan values
+                        var existedColspan = 0;
+                        firstLine.obj.children('.merge-target').filter('[colspan]').each(function(){
+                            existedColspan += Number($(this).attr('colspan'));
+                        });
+                        if (existedColspan) {
+                            colspan += (existedColspan - 1);
                         }
-                        // Apply merge
-                        else {
-                            $(this).text(l10n.cellMerge);
-                            $table.off('click', 'td');
-                            var $mergeTarget = $table.find('td.merge-target');
-                            var firstCell = {}, firstLine = {}, firstLineLastCell = {},
-                                lastCell  = {}, lastLine  = {};
-                            firstCell.obj = $mergeTarget.first();
-                            firstCell.idx = firstCell.obj.index();
-                            firstLine.obj = firstCell.obj.parent();
-                            firstLine.idx = firstLine.obj.index();
-                            firstLineLastCell.obj = firstLine.obj.children('.merge-target').last();
-                            firstLineLastCell.idx = firstLineLastCell.obj.index();
-                            lastCell.obj = $mergeTarget.last();
-                            lastCell.idx = lastCell.obj.index();
-                            lastLine.obj = lastCell.obj.parent();
-                            lastLine.idx = lastLine.obj.index();
-                            var colspan = firstLine.obj.children('.merge-target').length;
-                            var rowspan = lastLine.idx - firstLine.idx + 1;
-                            // Check existed colspan values
-                            var existedColspan = 0;
-                            firstLine.obj.children('.merge-target').filter('[colspan]').each(function(){
-                                existedColspan += Number($(this).attr('colspan'));
-                            });
-                            if (existedColspan) {
-                                colspan += (existedColspan - 1);
-                            }
-                            if (colspan > 1) {
-                                firstCell.obj.attr('colspan', colspan);
-                            }
-                            if (rowspan > 1) {
-                                firstCell.obj.attr('rowspan', rowspan);
-                            }
-                            $table.find('td.merge-target').not(':first').remove();
+                        if (colspan > 1) {
+                            firstCell.obj.attr('colspan', colspan);
                         }
-                        $table.toggleClass('jsontable-cell-merge');
+                        if (rowspan > 1) {
+                            firstCell.obj.attr('rowspan', rowspan);
+                        }
+                        $table.find('td.merge-target').not(':first').remove();
+                    }
+                    $table.toggleClass('jsontable-cell-merge');
+                    return false;
+                });
+            }
+
                     }
                     return false;
                 });
