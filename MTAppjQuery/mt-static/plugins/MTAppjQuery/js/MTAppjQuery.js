@@ -106,6 +106,14 @@
                     items[0][order[i]] = '';
                 }
             }
+            // Merge headerOrder to JSON
+            for (var i = 0, l = order.length; i < l; i++) {
+                for (var x = 0, y = items.length; x < y; x++) {
+                    if (!items[x].hasOwnProperty(order[i])) {
+                        items[x][order[i]] = '';
+                    }
+                }
+            }
 
             op.items = items;
 
