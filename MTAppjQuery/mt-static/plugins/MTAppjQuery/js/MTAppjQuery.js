@@ -65,6 +65,13 @@
 
         return this.each(function(){
 
+            // Check the headerOrder of properties
+            var order = op.headerOrder;
+            if ($.isArray(order) && order.length === 0) {
+                alert('Error in .MTAppJSONTable: The "headerOrder" option is required.');
+                return;
+            }
+
             var $this = $(this);
             if (!op.debug) {
                 $this.hide();
@@ -89,13 +96,6 @@
                 }
             }
             if (json === null) {
-                return;
-            }
-
-            // Check the order of properties
-            var order = op.headerOrder;
-            if ($.isArray(order) && order.length === 0) {
-                alert('Error in .MTAppJSONTable: The "order" option is required.');
                 return;
             }
 
