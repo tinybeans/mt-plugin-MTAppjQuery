@@ -37,6 +37,10 @@
             l10n.addRow = '行を追加';
             l10n.addColumn = '列を追加';
             l10n.clearData = '削除';
+            l10n.showJSON = 'JSONを表示';
+            l10n.hideJSON = 'JSONを非表示';
+            l10n.debugMessage = 'フィールドが表示されているときはテーブル内の値は無視され、フィールド内の JSON がそのまま保存されます。';
+            l10n.checkSyntax = 'JSONの文法をチェック';
             l10n.addColumnProperty = 'プロパティ名（例：title）';
             l10n.addColumnPropertyDisplayName = 'プロパティ表示名（例：タイトル）';
             l10n.cellMerge = 'セルを結合';
@@ -49,6 +53,10 @@
             l10n.addRow = 'Add a row';
             l10n.addColumn = 'Add a column';
             l10n.clearData = 'Delete';
+            l10n.showJSON = 'Show JSON';
+            l10n.hideJSON = 'Hide JSON';
+            l10n.debugMessage = 'When the field is visible, ignore table values and save JSON.';
+            l10n.checkSyntax = 'Check JSON syntax';
             l10n.addColumnProperty = 'Property Name (e.g. title)';
             l10n.addColumnPropertyDisplayName = 'Property Display Name (e.g. Title)';
             l10n.cellMerge = 'Merge cells';
@@ -65,10 +73,18 @@
 
         return this.each(function(){
 
-            var $this = $(this);
-            if (!op.debug) {
-                $this.hide();
+            // Check the headerOrder of properties
+            var order = op.headerOrder;
+            if ($.isArray(order) && order.length === 0) {
+                alert('Error in .MTAppJSONTable: The "headerOrder" option is required.');
+                return;
             }
+
+            var $this = $(this);
+            $this.addClass('hidden').css({
+                marginBottom: '10px'
+            });
+
             var jsonStr = $this.val();
             var json = null;
             if (/^\{/.test(jsonStr)) {
@@ -92,18 +108,19 @@
                 return;
             }
 
-            // Check the order of properties
-            var order = op.headerOrder;
-            if ($.isArray(order) && order.length === 0) {
-                alert('Error in .MTAppJSONTable: The "order" option is required.');
-                return;
-            }
-
             var items = json[op.itemsRootKey];
             if (items.length === 0) {
                 items[0] = {};
                 for (var i = 0, l = order.length; i < l; i++) {
                     items[0][order[i]] = '';
+                }
+            }
+            // Merge headerOrder to JSON
+            for (var i = 0, l = order.length; i < l; i++) {
+                for (var x = 0, y = items.length; x < y; x++) {
+                    if (!items[x].hasOwnProperty(order[i])) {
+                        items[x][order[i]] = '';
+                    }
                 }
             }
 
@@ -163,9 +180,9 @@
                     '[# } #]',
                     '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
                     '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
-                        '[# if (inputType === "input") { #]',
+                        '[# if (inputType === "input" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "input") ) { #]',
                             '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="">',
-                        '[# } else if (inputType === "textarea") { #]',
+                        '[# } else if (inputType === "textarea" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "textarea") ) { #]',
                             '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]"></textarea>',
                         '[# } #]',
                     '</td>',
@@ -212,9 +229,9 @@
                              '[# } #]',
                         '>',
                             '[# if (edit) { #]',
-                                '[# if (inputType === "input") { #]',
+                                '[# if (inputType === "input" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "input") ) { #]',
                                     '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="[#= items[i][headerOrder[x]] #]">',
-                                '[# } else if (inputType === "textarea") { #]',
+                                '[# } else if (inputType === "textarea" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "textarea") ) { #]',
                                     '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
                                 '[# } #]',
                             '[# } else { #]',
@@ -232,9 +249,9 @@
 
             tmpl.tbodyLeftPlain = [
                 '<td class="[#= headerOrder #] item-[#= i #] last-child" data-item-index="[#= i #]" data-name="[#= headerOrder #]">',
-                    '[# if (inputType === "input") { #]',
+                    '[# if (inputType === "input" || (inputType === "object" && inputTypeObj[headerOrder] && inputTypeObj[headerOrder] === "input") ) { #]',
                         '<input class="jsontable-input" type="text" data-name="[#= headerOrder #]" value="">',
-                    '[# } else if (inputType === "textarea") { #]',
+                    '[# } else if (inputType === "textarea" || (inputType === "object" && inputTypeObj[headerOrder] && inputTypeObj[headerOrder] === "textarea") ) { #]',
                         '<textarea class="jsontable-input" data-name="[#= headerOrder #]"></textarea>',
                     '[# } #]',
                 '</td>'
@@ -268,9 +285,9 @@
                             '[# } #]',
                         '>',
                             '[# if (edit) { #]',
-                                '[# if (inputType === "input") { #]',
+                                '[# if (inputType === "input" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "input") ) { #]',
                                     '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="[#= items[i][headerOrder[x]] #]">',
-                                '[# } else if (inputType === "textarea") { #]',
+                                '[# } else if (inputType === "textarea" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "textarea") ) { #]',
                                     '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
                                 '[# } #]',
                             '[# } else { #]',
@@ -300,12 +317,20 @@
                     '[# if (clear) { #]',
                     '<a href="#" class="button jsontable-clear">' + l10n.clearData + '</a>',
                     '[# } #]',
+                    '[# if (debug) { #]',
+                    '<a href="#" class="button jsontable-debug">' + l10n.showJSON + '</a>',
+                    '<a href="#" class="button jsontable-check-json primary hidden">' + l10n.checkSyntax + '</a>',
+                    '[# } #]',
                     '[# if (optionButtons) { #]',
                         '[# for (var i = 0, l = optionButtons.length; i < l; i++) { #]',
                         '<a href="#" class="button [#= optionButtons[i].classname #]">[#= optionButtons[i].text #]</a>',
                         '[# } #]',
                     '[# } #]',
                 '</div>'
+            ].join("");
+
+            tmpl.debugMessage = [
+                '<div class="msg msg-error jsontable-debug-message hidden">' + l10n.debugMessage + '</div>'
             ].join("");
 
             tmpl.container = [
@@ -337,7 +362,7 @@
 
                     '</table>',
 
-                    '[# if (add || clear || optionButtons) { #]',
+                    '[# if (add || clear || optionButtons || debug) { #]',
                         '[#= context.include("buttons") #]',
                     '[# } #]',
 
@@ -345,6 +370,11 @@
             ].join("\n");
 
             // Build HTML and insert a table.
+            if ($.varType(op.inputType) === 'object') {
+                op.inputTypeObj = op.inputType;
+                op.inputType = 'object';
+            }
+
             var tableHtml = Template.process('container', op, tmpl);
             $(this).after(tableHtml);
 
@@ -392,9 +422,7 @@
                         }
                     }
                     else if ($(this).hasClass('jsontable-add-column')) {
-                        alert('itemLength = ' + itemLength);
                         var headerOrderClone = $.extend(true, [], op.headerOrder);
-                        var inputType = op.inputType;
                         // $table.find('td:last-child').each(function(){
                         //     var idx = $(this).index();
                         //     if (idx > dataItemIndex) {
@@ -411,7 +439,8 @@
                             else {
                                 var data = {
                                     headerOrder: headerOrderClone.shift(),
-                                    inputType: inputType,
+                                    inputType: op.inputType,
+                                    inputTypeObj: op.inputTypeObj,
                                     i: itemLength
                                 };
                                 $td = Template.process('tbodyLeftPlain', data, tmpl);
@@ -434,67 +463,100 @@
                             $table.data('item-length', itemLength);
                         }
                     }
-                    else if ($(this).hasClass('jsontable-cellMerge')) {
-                        $(this).toggleClass('primary');
-                        var firstSelect = true;
-                        var selectMergedCell = function(e){
-                            var $td = $(this);
-                            var $tr = $td.parent();
-                            var tdIndex = $td.index();
-                            $td.toggleClass('merge-target');
-                            firstSelect = false;
-                        };
-                        // Select merged cells
-                        if ($(this).hasClass('primary')) {
-                            // Clear classes
-                            $table.find('td.merge-target').removeClass('merge-target');
-                            $(this).text(l10n.cellMergeApply);
-                            $table.on('click', 'td', selectMergedCell);
-                        }
-                        // Apply merge
-                        else {
-                            $(this).text(l10n.cellMerge);
-                            $table.off('click', 'td');
-                            var $mergeTarget = $table.find('td.merge-target');
-                            var firstCell = {}, firstLine = {}, firstLineLastCell = {},
-                                lastCell  = {}, lastLine  = {};
-                            firstCell.obj = $mergeTarget.first();
-                            firstCell.idx = firstCell.obj.index();
-                            firstLine.obj = firstCell.obj.parent();
-                            firstLine.idx = firstLine.obj.index();
-                            firstLineLastCell.obj = firstLine.obj.children('.merge-target').last();
-                            firstLineLastCell.idx = firstLineLastCell.obj.index();
-                            lastCell.obj = $mergeTarget.last();
-                            lastCell.idx = lastCell.obj.index();
-                            lastLine.obj = lastCell.obj.parent();
-                            lastLine.idx = lastLine.obj.index();
-                            var colspan = firstLine.obj.children('.merge-target').length;
-                            var rowspan = lastLine.idx - firstLine.idx + 1;
-                            // Check existed colspan values
-                            var existedColspan = 0;
-                            firstLine.obj.children('.merge-target').filter('[colspan]').each(function(){
-                                existedColspan += Number($(this).attr('colspan'));
-                            });
-                            if (existedColspan) {
-                                colspan += (existedColspan - 1);
-                            }
-                            if (colspan > 1) {
-                                firstCell.obj.attr('colspan', colspan);
-                            }
-                            if (rowspan > 1) {
-                                firstCell.obj.attr('rowspan', rowspan);
-                            }
-                            $table.find('td.merge-target').not(':first').remove();
-                        }
-                        $table.toggleClass('jsontable-cell-merge');
+                    return false;
+                });
+            }
+
+            if (op.cellMerge) {
+                $container.on('click', 'a.jsontable-cellMerge', function(){
+                    $(this).toggleClass('primary');
+                    var firstSelect = true;
+                    var selectMergedCell = function(e){
+                        var $td = $(this);
+                        var $tr = $td.parent();
+                        var tdIndex = $td.index();
+                        $td.toggleClass('merge-target');
+                        firstSelect = false;
+                    };
+                    // Select merged cells
+                    if ($(this).hasClass('primary')) {
+                        // Clear classes
+                        $table.find('td.merge-target').removeClass('merge-target');
+                        $(this).text(l10n.cellMergeApply);
+                        $table.on('click', 'td', selectMergedCell);
                     }
+                    // Apply merge
+                    else {
+                        $(this).text(l10n.cellMerge);
+                        $table.off('click', 'td');
+                        var $mergeTarget = $table.find('td.merge-target');
+                        var firstCell = {}, firstLine = {}, firstLineLastCell = {},
+                            lastCell  = {}, lastLine  = {};
+                        firstCell.obj = $mergeTarget.first();
+                        firstCell.idx = firstCell.obj.index();
+                        firstLine.obj = firstCell.obj.parent();
+                        firstLine.idx = firstLine.obj.index();
+                        firstLineLastCell.obj = firstLine.obj.children('.merge-target').last();
+                        firstLineLastCell.idx = firstLineLastCell.obj.index();
+                        lastCell.obj = $mergeTarget.last();
+                        lastCell.idx = lastCell.obj.index();
+                        lastLine.obj = lastCell.obj.parent();
+                        lastLine.idx = lastLine.obj.index();
+                        var colspan = firstLine.obj.children('.merge-target').length;
+                        var rowspan = lastLine.idx - firstLine.idx + 1;
+                        // Check existed colspan values
+                        var existedColspan = 0;
+                        firstLine.obj.children('.merge-target').filter('[colspan]').each(function(){
+                            existedColspan += Number($(this).attr('colspan'));
+                        });
+                        if (existedColspan) {
+                            colspan += (existedColspan - 1);
+                        }
+                        if (colspan > 1) {
+                            firstCell.obj.attr('colspan', colspan);
+                        }
+                        if (rowspan > 1) {
+                            firstCell.obj.attr('rowspan', rowspan);
+                        }
+                        $table.find('td.merge-target').not(':first').remove();
+                    }
+                    $table.toggleClass('jsontable-cell-merge');
+                    return false;
+                });
+            }
+
+            if (op.debug) {
+                $this.before(Template.process('debugMessage', {}, tmpl));
+                $container.on('click', 'a.jsontable-debug', function(){
+                    if ($(this).hasClass('showed-json')) {
+                        $(this).removeClass('showed-json').text(l10n.showJSON).next().addClass('hidden');
+                        $this.addClass('hidden').prev().addClass('hidden');
+                    }
+                    else {
+                        $(this).addClass('showed-json').text(l10n.hideJSON).next().removeClass('hidden');
+                        $this.removeClass('hidden').prev().removeClass('hidden');
+                    }
+                    return false;
+                });
+                $container.on('click', 'a.jsontable-check-json', function(){
+                    try {
+                        json = JSON.parse($this.val());
+                    }
+                    catch(e) {
+                        alert(e.message);
+                        return false;
+                    }
+                    alert('Valid');
                     return false;
                 });
             }
 
             // Save values edited by user
             if (op.edit) {
-                $('form[method="post"]').on('submit', function(){
+                $('form[method="post"]').on('submit.MTAppJSONTable', function(){
+                    if ($this.is(':visible')) {
+                        return true;
+                    }
                     var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")');
                     $this.val(result);
                 });
