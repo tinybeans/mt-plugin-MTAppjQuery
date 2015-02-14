@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010-06-22
- * Update:  2015-02-03
+ * Update:  2015-02-14
  *
  */
 ;(function($){
@@ -1201,6 +1201,73 @@
         debug: false
     };
     /*  end - $.fn.MTAppShowListEntries()  */
+
+    // -------------------------------------------------
+    //  $.MTAppApplyTinyMCE();
+    //
+    //  Description:
+    //    概要欄やテキスト（複数行）のカスタムフィールドをリッチテキストエディタに変更する
+    //
+    //  Usage:
+    //    $.MTAppApplyTinyMCE(Options);
+    //
+    //  Options:
+    //    target: {Array} リッチテキストエディタに変更するtextareaのidの配列
+    //    sortable: {Boolean} ドラッグアンドドロップのソートに対応させる場合はtrue
+    // -------------------------------------------------
+    $.MTAppApplyTinyMCE = function(options){
+        var op = $.extend({}, $.MTAppApplyTinyMCE.defaults, options);
+        if (mtappVars.template_filename !== 'edit_entry') return;
+        var target = op.target;
+            // target = ['excerpt', 'customfield_document_textarea']
+        var targetTrim = {};
+            // targetTrim = {
+            //     'excerpt': 'excerpt',
+            //     'customfield_document_textarea': 'document_textarea'
+            // }
+        var targetMce = {};
+            // targetMce = {
+            //     'excerpt': {id: "excerpt", options: Object, editors: Object, parentElement: null, currentEditor: MT.Editor.TinyMCE…},
+            //     'customfield_document_textarea': {id: "document_textarea", options: Object, editors: Object, parentElement: null, currentEditor: MT.Editor.TinyMCE…}
+            // }
+        for (var i = 0, l = target.length; i < l; i++) {
+            if (target[i].indexOf('customfield_') !== -1) {
+                targetTrim[target[i]] = target[i].replace('customfield_', '');
+                document.getElementById(target[i]).id = targetTrim[target[i]];
+            }
+            else {
+                targetTrim[target[i]] = target[i];
+            }
+            targetMce[target[i]] = new MT.EditorManager(targetTrim[target[i]]);
+        }
+        $('#entry_form').submit(function() {
+            for (var i = 0, l = target.length; i < l; i++) {
+                targetMce[target[i]].currentEditor.save();
+            }
+        });
+        if (op.sortable) {
+            $('#sortable').sortable({
+                start: function(event, ui){
+                    var id = ui.item[0].id.replace(/-field/,'');
+                    if ($.inArray(id, target) !== -1) {
+                        targetMce[id].currentEditor.save();
+                    }
+                },
+                stop: function(event, ui){
+                    var id = ui.item[0].id.replace(/-field/g,'');
+                    if ($.inArray(id, target) !== -1) {
+                        $('#' + targetTrim[id]).removeAttr('style').next().remove();
+                        targetMce[id] = new MT.EditorManager(targetTrim[id]);
+                    }
+                }
+            });
+        }
+    };
+    $.MTAppApplyTinyMCE.defaults = {
+        target: [],
+        sortable: true
+    };
+    // end - $.MTAppApplyTinyMCE()
 
     // -------------------------------------------------
     //  $.MTAppGetCategoryName();
