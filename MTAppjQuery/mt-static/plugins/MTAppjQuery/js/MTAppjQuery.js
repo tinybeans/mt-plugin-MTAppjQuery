@@ -37,6 +37,10 @@
             l10n.addRow = '行を追加';
             l10n.addColumn = '列を追加';
             l10n.clearData = '削除';
+            l10n.showJSON = 'JSONを表示';
+            l10n.hideJSON = 'JSONを非表示';
+            l10n.debugMessage = 'フィールドが表示されているときはテーブル内の値は無視され、フィールド内の JSON がそのまま保存されます。';
+            l10n.checkSyntax = 'JSONの文法をチェック';
             l10n.addColumnProperty = 'プロパティ名（例：title）';
             l10n.addColumnPropertyDisplayName = 'プロパティ表示名（例：タイトル）';
             l10n.cellMerge = 'セルを結合';
@@ -49,6 +53,10 @@
             l10n.addRow = 'Add a row';
             l10n.addColumn = 'Add a column';
             l10n.clearData = 'Delete';
+            l10n.showJSON = 'Show JSON';
+            l10n.hideJSON = 'Hide JSON';
+            l10n.debugMessage = 'When the field is visible, ignore table values and save JSON.';
+            l10n.checkSyntax = 'Check JSON syntax';
             l10n.addColumnProperty = 'Property Name (e.g. title)';
             l10n.addColumnPropertyDisplayName = 'Property Display Name (e.g. Title)';
             l10n.cellMerge = 'Merge cells';
@@ -73,9 +81,10 @@
             }
 
             var $this = $(this);
-            if (!op.debug) {
-                $this.hide();
-            }
+            $this.addClass('hidden').css({
+                marginBottom: '10px'
+            });
+
             var jsonStr = $this.val();
             var json = null;
             if (/^\{/.test(jsonStr)) {
@@ -308,12 +317,20 @@
                     '[# if (clear) { #]',
                     '<a href="#" class="button jsontable-clear">' + l10n.clearData + '</a>',
                     '[# } #]',
+                    '[# if (debug) { #]',
+                    '<a href="#" class="button jsontable-debug">' + l10n.showJSON + '</a>',
+                    '<a href="#" class="button jsontable-check-json primary hidden">' + l10n.checkSyntax + '</a>',
+                    '[# } #]',
                     '[# if (optionButtons) { #]',
                         '[# for (var i = 0, l = optionButtons.length; i < l; i++) { #]',
                         '<a href="#" class="button [#= optionButtons[i].classname #]">[#= optionButtons[i].text #]</a>',
                         '[# } #]',
                     '[# } #]',
                 '</div>'
+            ].join("");
+
+            tmpl.debugMessage = [
+                '<div class="msg msg-error jsontable-debug-message hidden">' + l10n.debugMessage + '</div>'
             ].join("");
 
             tmpl.container = [
@@ -345,7 +362,7 @@
 
                     '</table>',
 
-                    '[# if (add || clear || optionButtons) { #]',
+                    '[# if (add || clear || optionButtons || debug) { #]',
                         '[#= context.include("buttons") #]',
                     '[# } #]',
 
@@ -508,7 +525,28 @@
                 });
             }
 
+            if (op.debug) {
+                $this.before(Template.process('debugMessage', {}, tmpl));
+                $container.on('click', 'a.jsontable-debug', function(){
+                    if ($(this).hasClass('showed-json')) {
+                        $(this).removeClass('showed-json').text(l10n.showJSON).next().addClass('hidden');
+                        $this.addClass('hidden').prev().addClass('hidden');
                     }
+                    else {
+                        $(this).addClass('showed-json').text(l10n.hideJSON).next().removeClass('hidden');
+                        $this.removeClass('hidden').prev().removeClass('hidden');
+                    }
+                    return false;
+                });
+                $container.on('click', 'a.jsontable-check-json', function(){
+                    try {
+                        json = JSON.parse($this.val());
+                    }
+                    catch(e) {
+                        alert(e.message);
+                        return false;
+                    }
+                    alert('Valid');
                     return false;
                 });
             }
@@ -516,6 +554,9 @@
             // Save values edited by user
             if (op.edit) {
                 $('form[method="post"]').on('submit', function(){
+                    if ($this.is(':visible')) {
+                        return true;
+                    }
                     var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")');
                     $this.val(result);
                 });
