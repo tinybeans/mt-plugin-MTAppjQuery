@@ -553,7 +553,7 @@
 
             // Save values edited by user
             if (op.edit) {
-                $('form[method="post"]').on('submit', function(){
+                $('form[method="post"]').on('submit.MTAppJSONTable', function(){
                     if ($this.is(':visible')) {
                         return true;
                     }
