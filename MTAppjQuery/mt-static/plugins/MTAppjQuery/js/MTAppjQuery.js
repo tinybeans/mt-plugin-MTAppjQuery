@@ -1357,27 +1357,23 @@
                 // Make the multiple attribute
                 var multiple = op.multiple ? ' multiple' : '';
 
+                // Make upload form
+                var uploadFromHtml = [
+                    '<p class="mtapp-multifileupload-file"><input type="file" id="' + inputFileId + '"' + multiple + '></p>',
+                    '<p class="mtapp-multifileupload-items" id="' + inputUploadItemsId + '"></p>'
+                    // '<p><input id="' + inputUploadBtnId + '" type="button" value="Upload" class="button"></p>'
+                ].join("");
                 // Widget Type
                 if (op.type === 'widget') {
                     var itemUploadWidget = $.MTAppMakeWidget({
                         label: l10n.widgetTitle,
-                        content: [
-                            '<form id="mtapp-multifileupload">',
-                                '<p><input type="file" id="' + inputFileId + '" style="width:100%;"' + multiple + '></p>',
-                                // '<p><input id="' + inputUploadBtnId + '" type="button" value="Upload" class="button"></p>',
-                            '</form>',
-                            '<p id="' + inputUploadItemsId + '" class="mtapp-multifileupload-items"></p>'
-                        ].join("")
+                        content: uploadFromHtml
                     });
                     $("#related-content").prepend(itemUploadWidget);
                 }
                 // Input Type
                 else {
-                    $this.after(
-                        '<p id="' + inputUploadItemsId + '" class="mtapp-multifileupload-items"></p>' +
-                        '<p><input type="file" id="' + inputFileId + '"' + multiple + '></span>'
-                        // '<p><input id="' + inputUploadBtnId + '" type="button" value="Upload" class="button"></p>'
-                    );
+                    $this.css(op.targetInputStyle).after(uploadFromHtml);
                 }
 
                 // Get the element for appending upload items
