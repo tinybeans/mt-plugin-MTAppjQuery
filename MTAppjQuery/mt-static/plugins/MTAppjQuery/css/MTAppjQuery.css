@@ -764,12 +764,18 @@ span.mtappmultiform-radio input {
 ================================================== */
 .mtapp-multifileupload-file {
   display: inline;
-  margin-left: 1em;
 }
 
-.mtapp-multifileupload-items a {
-  display: inline-block;
-  margin: 10px 15px 10px 0;
+.mtapp-multifileupload-items p.mtapp-upload-item {
+  margin: 5px 0 10px;
+}
+.mtapp-multifileupload-items p.mtapp-upload-item a.mtapp-item-type-image,
+.mtapp-multifileupload-items p.mtapp-upload-item a.mtapp-item-type-file {
+  margin-right: 5px;
+}
+.mtapp-multifileupload-items p.mtapp-upload-item a.mtapp-item-type-image img,
+.mtapp-multifileupload-items p.mtapp-upload-item a.mtapp-item-type-file img {
+  max-width: 100px;
 }
 
 /*  MTAppMultiFileUpload  */

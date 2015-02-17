@@ -666,10 +666,17 @@ span.mtappmultiform-radio {
 ================================================== */
 .mtapp-multifileupload-file {
     display: inline;
-    margin-left: 1em;
 }
-.mtapp-multifileupload-items a {
-    display: inline-block;
-    margin: 10px 15px 10px 0;
+.mtapp-multifileupload-items {
+    p.mtapp-upload-item {
+        margin: 5px 0 10px;
+        a.mtapp-item-type-image,
+        a.mtapp-item-type-file {
+            margin-right: 5px;
+            img {
+                max-width: 100px;
+            }
+        }
+    }
 }
 /*  MTAppMultiFileUpload  */

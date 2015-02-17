@@ -1296,9 +1296,11 @@
         var l10n = {};
         if (mtappVars.language === 'ja') {
             l10n.widgetTitle = 'ファイルアップロード';
+            l10n.remove = '削除';
         }
         else {
             l10n.widgetTitle = 'Upload File';
+            l10n.remove = 'Remove';
         }
         // Overwrite existing l10n
         if (op.l10n) {
@@ -1321,6 +1323,9 @@
             var inputFileId = 'mtapp-multifileupload-file-' + rand;
             var inputUploadBtnId = 'mtapp-multifileupload-btn-' + rand;
             var inputUploadItemsId = 'mtapp-multifileupload-items-' + rand;
+
+            // Make remove button
+            var removeHtml = '<a class="mtapp-item-remove" href="#">' + l10n.remove + '</a>';
 
             // Use api.authenticate
             if (typeof mtappVars.DataAPIFileUploadUser === 'string' && typeof mtappVars.DataAPIFileUploadUserPassword === 'string') {
@@ -1359,8 +1364,8 @@
 
                 // Make upload form
                 var uploadFromHtml = [
-                    '<p class="mtapp-multifileupload-file"><input type="file" id="' + inputFileId + '"' + multiple + '></p>',
-                    '<p class="mtapp-multifileupload-items" id="' + inputUploadItemsId + '"></p>'
+                    '<div class="mtapp-multifileupload-file"><input type="file" id="' + inputFileId + '"' + multiple + '></div>',
+                    '<div class="mtapp-multifileupload-items" id="' + inputUploadItemsId + '" style="display:none;"></div>'
                     // '<p><input id="' + inputUploadBtnId + '" type="button" value="Upload" class="button"></p>'
                 ].join("");
                 // Widget Type
@@ -1377,7 +1382,18 @@
                 }
 
                 // Get the element for appending upload items
-                var $itemUploadItems = $('#' + inputUploadItemsId);
+                var $itemUploadItems = $('#' + inputUploadItemsId).on('click', 'a.mtapp-item-remove', function(e){
+                    var $remove = $(e.target);
+                    var $item = $remove.prev();
+                    var itemSavedValue = $item.data('itemvalue');
+                    var valueArray = $this.val().split(',');
+                    valueArray = $.grep(valueArray, function(v, i){
+                        return v != itemSavedValue;
+                    });
+                    $this.val(valueArray.join(','));
+                    $remove.parent('.mtapp-upload-item').remove();
+                    return false;
+                });
 
                 // When the edit entry screen is loading, set upload items to the p element nearby the target element of MTAppMultiFileUpload
                 var itemUploadItemsHtml = '';
@@ -1387,29 +1403,29 @@
                     if (op.type === 'input' && $this.val() !== '' && $assetList.length) {
                         for (var i = 0, l = thisValueArray.length; i < l; i++) {
                             // If saved value is ID
-                            if (/^\d+$/.test(thisValueArray[i])) {
+                            if (op.saveData === 'id') {
                                 var $listAsset = $('#list-asset-' + thisValueArray[i]);
                                 if ($listAsset.hasClass('asset-type-image')) {
-                                    itemUploadItemsHtml += '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + thisValueArray[i] + '" target="_blank"><img src="' + $listAsset.find('img').attr('src') + '"></a>';
+                                    itemUploadItemsHtml += '<p class="mtapp-upload-item"><a class="mtapp-item-type-image" href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + thisValueArray[i] + '" target="_blank" data-itemvalue="' + thisValueArray[i] + '"><img src="' + $listAsset.find('img').attr('src') + '"></a>' + removeHtml + '</p>';
                                 }
                                 else if ($listAsset.hasClass('asset-type-file')) {
-                                    itemUploadItemsHtml += '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + thisValueArray[i] + '" target="_blank">' + $listAsset.find('a.asset-title').text() + '</a>';
+                                    itemUploadItemsHtml += '<p class="mtapp-upload-item"><a class="mtapp-item-type-file" href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + thisValueArray[i] + '" target="_blank" data-itemvalue="' + thisValueArray[i] + '">' + $listAsset.find('a.asset-title').text() + '</a>' + removeHtml + '</p>';
                                 }
                             }
                             // If saved value is URL
-                            else if (/^http/.test(thisValueArray[i])) {
+                            else if (op.saveData === 'url') {
                                 // Image's URL
                                 if (/(jpg|jpeg|gif|png|bmp|ico|tif|tiff)$/i.test(thisValueArray[i])) {
-                                    itemUploadItemsHtml += '<a href="' + thisValueArray[i] + '" target="_blank"><img src="' + thisValueArray[i] + '" style="width:100px;"></a>';
+                                    itemUploadItemsHtml += '<p class="mtapp-upload-item"><a class="mtapp-item-type-image" href="' + thisValueArray[i] + '" target="_blank" data-itemvalue="' + thisValueArray[i] + '"><img src="' + thisValueArray[i] + '"></a>' + removeHtml + '</p>';
                                 }
                                 // Other type file URL
                                 else {
-                                    itemUploadItemsHtml += '<a href="' + thisValueArray[i] + '" target="_blank">' + thisValueArray[i] + '</a>';
+                                    itemUploadItemsHtml += '<p class="mtapp-upload-item"><a class="mtapp-item-type-file" href="' + thisValueArray[i] + '" target="_blank" data-itemvalue="' + thisValueArray[i] + '">' + thisValueArray[i] + '</a>' + removeHtml + '</p>';
                                 }
                             }
                         }
                         // Set items
-                        $itemUploadItems[0].innerHTML = itemUploadItemsHtml;
+                        $itemUploadItems.html(itemUploadItemsHtml).show();
                     }
                 }
 
@@ -1442,7 +1458,7 @@
                             data.path = op.uploadFilesPath;
                         }
                         // Show a loading image
-                        $itemUploadItems.append('<img class="loading" src="' + StaticURI + 'images/indicator-login.gif" alt="">');
+                        $itemUploadItems.append('<img class="loading" src="' + StaticURI + 'images/indicator-login.gif" alt="">').show();
                         // Upload a file
                         api.uploadAsset(op.siteId, data, function(response) {
                             // An error occurred
@@ -1461,25 +1477,39 @@
                                 }
                             }
                             // Set upload items to the p element nearby the target element of MTAppMultiFileUpload
-                            var imageHtml = '';
-                            if (response.mimeType.indexOf("image") !== -1) {
-                                imageHtml = '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" target="_blank"><img src="' + response.url + '" style="display:block;max-width:215px;margin-bottom:5px;"></a>';
-                                // imageHtml = '<a href="' + response.url + '" target="_blank"><img src="' + response.url + '" style="display:block;max-width:215px;margin-bottom:5px;"></a>';
-                                // imageHtml = '<img src="' + response.url + '" style="display:block;max-width:100px;margin-bottom:5px;">';
+                            var itemHtml = '';
+                            // If saved value is ID
+                            if (op.saveData === 'id') {
+                                if (response.mimeType.indexOf("image") !== -1) {
+                                    itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-image" href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" target="_blank" data-itemvalue="' + response.id + '"><img src="' + response.url + '"></a>' + removeHtml + '</p>';
+                                    // itemHtml = '<a href="' + response.url + '" target="_blank"><img src="' + response.url + '" style="display:block;max-width:215px;margin-bottom:5px;"></a>';
+                                    // itemHtml = '<img src="' + response.url + '" style="display:block;max-width:100px;margin-bottom:5px;">';
+                                }
+                                else {
+                                    itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-file" href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" target="_blank" data-itemvalue="' + response.id + '">' + response.filename + '</a>' + removeHtml + '</p>';
+                                    // itemHtml = '<a href="' + response.url + '" target="_blank">' + response.filename + '</a>';
+                                    // itemHtml = '<span style="display:block;">' + response.filename + '</span>';
+                                }
                             }
-                            else {
-                                imageHtml = '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" target="_blank">' + response.filename + '</a>';
-                                // imageHtml = '<a href="' + response.url + '" target="_blank">' + response.filename + '</a>';
-                                // imageHtml = '<span style="display:block;">' + response.filename + '</span>';
+                            // If saved value is URL
+                            else if (op.saveData === 'url') {
+                                // Image's URL
+                                if (response.mimeType.indexOf("image") !== -1) {
+                                    itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-image" href="' + response.url + '" target="_blank" data-itemvalue="' + response.url + '"><img src="' + response.url + '"></a>' + removeHtml + '</p>';
+                                }
+                                // Other type file URL
+                                else {
+                                    itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-file" href="' + response.url + '" target="_blank" data-itemvalue="' + response.url + '">' + response.url + '</a>' + removeHtml + '</p>';
+                                }
                             }
                             // Remove a loading image
                             $itemUploadItems.find('img.loading').remove();
                             // Insert upload items
                             if (op.multiple) {
-                                $itemUploadItems.append(imageHtml);
+                                $itemUploadItems.append(itemHtml).show();
                             }
                             else {
-                                $itemUploadItems.html(imageHtml);
+                                $itemUploadItems.html(itemHtml).show();
                             }
                             // If edit entry screen is open, set upload items to entry assets
                             if (mtappVars.screen_id === 'edit-entry') {
@@ -1490,7 +1520,7 @@
                                         '<li id="list-asset-' + response.id + '" class="asset-type-image" onmouseover="show(\'list-image-' + response.id + '\', window.parent.document)" onmouseout="hide(\'list-image-' + response.id + '\', window.parent.document)">',
                                             '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" class="asset-title">' + response.filename + '</a>',
                                             '<a href="javascript:removeAssetFromList(' + response.id + ')" title="Remove this asset." class="remove-asset icon-remove icon16 action-icon">Remove</a>',
-                                            '<img id="list-image-' + response.id + '" src="' + response.url + '" class="list-image hidden">',
+                                            '<img id="list-image-' + response.id + '" src="' + response.url + '" class="list-image hidden" style="max-width:100px;">',
                                         '</li>'
                                     ].join("");
                                 }
@@ -1536,6 +1566,8 @@
         type: 'input',
         // If you set input to the type option, this value is added to style of the target element.
         targetInputStyle: {
+            display: 'inline',
+            marginRight: '1em',
             width: '20em'
         },
         // If this value is true, the multiple attribute is edded to input:file.
