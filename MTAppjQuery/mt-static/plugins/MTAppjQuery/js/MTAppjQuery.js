@@ -1357,27 +1357,23 @@
                 // Make the multiple attribute
                 var multiple = op.multiple ? ' multiple' : '';
 
+                // Make upload form
+                var uploadFromHtml = [
+                    '<p class="mtapp-multifileupload-file"><input type="file" id="' + inputFileId + '"' + multiple + '></p>',
+                    '<p class="mtapp-multifileupload-items" id="' + inputUploadItemsId + '"></p>'
+                    // '<p><input id="' + inputUploadBtnId + '" type="button" value="Upload" class="button"></p>'
+                ].join("");
                 // Widget Type
                 if (op.type === 'widget') {
                     var itemUploadWidget = $.MTAppMakeWidget({
                         label: l10n.widgetTitle,
-                        content: [
-                            '<form id="mtapp-multifileupload">',
-                                '<p><input type="file" id="' + inputFileId + '" style="width:100%;"' + multiple + '></p>',
-                                // '<p><input id="' + inputUploadBtnId + '" type="button" value="Upload" class="button"></p>',
-                            '</form>',
-                            '<p id="' + inputUploadItemsId + '" class="mtapp-multifileupload-items"></p>'
-                        ].join("")
+                        content: uploadFromHtml
                     });
                     $("#related-content").prepend(itemUploadWidget);
                 }
                 // Input Type
                 else {
-                    $this.after(
-                        '<p id="' + inputUploadItemsId + '" class="mtapp-multifileupload-items"></p>' +
-                        '<p><input type="file" id="' + inputFileId + '"' + multiple + '></span>'
-                        // '<p><input id="' + inputUploadBtnId + '" type="button" value="Upload" class="button"></p>'
-                    );
+                    $this.css(op.targetInputStyle).after(uploadFromHtml);
                 }
 
                 // Get the element for appending upload items
@@ -1403,7 +1399,7 @@
                             // If saved value is URL
                             else if (/^http/.test(thisValueArray[i])) {
                                 // Image's URL
-                                if (/(jpg|jpeg|gif|png|bmp|ico)$/i.test(thisValueArray[i])) {
+                                if (/(jpg|jpeg|gif|png|bmp|ico|tif|tiff)$/i.test(thisValueArray[i])) {
                                     itemUploadItemsHtml += '<a href="' + thisValueArray[i] + '" target="_blank"><img src="' + thisValueArray[i] + '" style="width:100px;"></a>';
                                 }
                                 // Other type file URL
@@ -1538,6 +1534,10 @@
         autoRenameIfExists: true,
         // 'input' or 'widget'
         type: 'input',
+        // If you set input to the type option, this value is added to style of the target element.
+        targetInputStyle: {
+            width: '20em'
+        },
         // If this value is true, the multiple attribute is edded to input:file.
         multiple: true,
         // Set 'id' or 'url'. This value is a propaty name of assets resource.
