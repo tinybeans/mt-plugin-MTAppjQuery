@@ -1538,6 +1538,10 @@
         autoRenameIfExists: true,
         // 'input' or 'widget'
         type: 'input',
+        // If you set input to the type option, this value is added to style of the target element.
+        targetInputStyle: {
+            width: '20em'
+        },
         // If this value is true, the multiple attribute is edded to input:file.
         multiple: true,
         // Set 'id' or 'url'. This value is a propaty name of assets resource.
