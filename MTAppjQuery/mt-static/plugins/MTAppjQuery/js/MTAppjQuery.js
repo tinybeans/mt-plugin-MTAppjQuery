@@ -1270,6 +1270,291 @@
     // end - $.MTAppApplyTinyMCE()
 
     // -------------------------------------------------
+    //  $(foo).MTAppMultiFileUpload();
+    //
+    //  Description:
+    //    Data API を利用してファイルをアップロードします
+    //
+    //  Usage:
+    //    $(foo).MTAppMultiFileUpload(options);
+    //
+    // -------------------------------------------------
+    $.fn.MTAppMultiFileUpload = function(options){
+        var op = $.extend({}, $.fn.MTAppMultiFileUpload.defaults, options);
+
+        // Check some required variables
+        if (op.api === null) {
+            return $.errorMessage('MTAppMultiFileUpload', 'The "api" option is required.', 'alert', false);
+        }
+        if (op.siteId === 0) {
+            return $.errorMessage('MTAppMultiFileUpload', 'The "siteId" option is required.', 'alert', false);
+        }
+        if (typeof api.uploadAsset !== 'function') {
+            return $.errorMessage('MTAppMultiFileUpload', 'mt-data-api.js is required.', 'alert', false);
+        }
+
+        var l10n = {};
+        if (mtappVars.language === 'ja') {
+            l10n.widgetTitle = 'ファイルアップロード';
+        }
+        else {
+            l10n.widgetTitle = 'Upload File';
+        }
+        // Overwrite existing l10n
+        if (op.l10n) {
+            for (var key in op.l10n) {
+                l10n[key] = op.l10n[key];
+            }
+        }
+
+        return this.each(function(){
+            // Get the value of target element
+            var $this = $(this);
+            var thisValue = op.type === 'input' ? $this.val() : '';
+            var thisValueArray = thisValue !== '' ? thisValue.split(',') : [];
+
+            // Set a random number
+            var rand = '' + Math.random();
+            rand = rand.replace('.','');
+
+            // Set ids
+            var inputFileId = 'mtapp-multifileupload-file-' + rand;
+            var inputUploadBtnId = 'mtapp-multifileupload-btn-' + rand;
+            var inputUploadItemsId = 'mtapp-multifileupload-items-' + rand;
+
+            // Use api.authenticate
+            if (typeof mtappVars.DataAPIFileUploadUser === 'string' && typeof mtappVars.DataAPIFileUploadUserPassword === 'string') {
+                api.authenticate({
+                    username: mtappVars.DataAPIFileUploadUser,
+                    password: mtappVars.DataAPIFileUploadUserPassword,
+                    remember: true
+                }, function(authResponse){
+                    successAuthenticattion(authResponse);
+                });
+            }
+            // Use api.getToken
+            else {
+                api.getToken(function(authResponse) {
+                    successAuthenticattion(authResponse, true);
+                });
+            }
+
+            // Core function
+            function successAuthenticattion(authResponse, useDataAPIAuth) {
+                // An error occurred
+                if (authResponse.error) {
+                    if (authResponse.error.code === 401 && useDataAPIAuth) {
+                        location.href = api.getAuthorizationUrl(location.href);
+                    }
+                    else if (authResponse.error.message) {
+                        return $.errorMessage('MTAppMultiFileUpload', authResponse.error.message, 'alert', false);
+                    }
+                    else {
+                        return $.errorMessage('MTAppMultiFileUpload', 'An error occurred while authenticating.', 'alert', false);
+                    }
+                }
+
+                // Make the multiple attribute
+                var multiple = op.multiple ? ' multiple' : '';
+
+                // Widget Type
+                if (op.type === 'widget') {
+                    var itemUploadWidget = $.MTAppMakeWidget({
+                        label: l10n.widgetTitle,
+                        content: [
+                            '<form id="mtapp-multifileupload">',
+                                '<p><input type="file" id="' + inputFileId + '" style="width:100%;"' + multiple + '></p>',
+                                // '<p><input id="' + inputUploadBtnId + '" type="button" value="Upload" class="button"></p>',
+                            '</form>',
+                            '<p id="' + inputUploadItemsId + '" class="mtapp-multifileupload-items"></p>'
+                        ].join("")
+                    });
+                    $("#related-content").prepend(itemUploadWidget);
+                }
+                // Input Type
+                else {
+                    $this.after(
+                        '<p id="' + inputUploadItemsId + '" class="mtapp-multifileupload-items"></p>' +
+                        '<p><input type="file" id="' + inputFileId + '"' + multiple + '></span>'
+                        // '<p><input id="' + inputUploadBtnId + '" type="button" value="Upload" class="button"></p>'
+                    );
+                }
+
+                // Get the element for appending upload items
+                var $itemUploadItems = $('#' + inputUploadItemsId);
+
+                // When the edit entry screen is loading, set upload items to the p element nearby the target element of MTAppMultiFileUpload
+                var itemUploadItemsHtml = '';
+                if (mtappVars.screen_id === 'edit-entry') {
+                    var $assetList = $("#asset-list");
+                    var $includeAssetIds = $("#include_asset_ids");
+                    if (op.type === 'input' && $this.val() !== '' && $assetList.length) {
+                        for (var i = 0, l = thisValueArray.length; i < l; i++) {
+                            // If saved value is ID
+                            if (/^\d+$/.test(thisValueArray[i])) {
+                                var $listAsset = $('#list-asset-' + thisValueArray[i]);
+                                if ($listAsset.hasClass('asset-type-image')) {
+                                    itemUploadItemsHtml += '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + thisValueArray[i] + '" target="_blank"><img src="' + $listAsset.find('img').attr('src') + '"></a>';
+                                }
+                                else if ($listAsset.hasClass('asset-type-file')) {
+                                    itemUploadItemsHtml += '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + thisValueArray[i] + '" target="_blank">' + $listAsset.find('a.asset-title').text() + '</a>';
+                                }
+                            }
+                            // If saved value is URL
+                            else if (/^http/.test(thisValueArray[i])) {
+                                // Image's URL
+                                if (/(jpg|jpeg|gif|png|bmp|ico)$/i.test(thisValueArray[i])) {
+                                    itemUploadItemsHtml += '<a href="' + thisValueArray[i] + '" target="_blank"><img src="' + thisValueArray[i] + '" style="width:100px;"></a>';
+                                }
+                                // Other type file URL
+                                else {
+                                    itemUploadItemsHtml += '<a href="' + thisValueArray[i] + '" target="_blank">' + thisValueArray[i] + '</a>';
+                                }
+                            }
+                        }
+                        // Set items
+                        $itemUploadItems[0].innerHTML = itemUploadItemsHtml;
+                    }
+                }
+
+                // When some files are selected at input:file element, upload those files by Data API.
+                $('#' + inputFileId).on('change', function(){
+                    // Get the HTML element which selected files.
+                    var inputFile = $(this)[0];
+                    // Get the count of selected files.
+                    var l = inputFile.files.length;
+                    // Remove a element for showing "No Assets".
+                    if (mtappVars.screen_id === 'edit-entry') {
+                        $("#empty-asset-list").remove();
+                    }
+                    // Repeat the number of selected files.
+                    for (var i = 0; i < l; i++) {
+                        var fileObj = inputFile.files[i];
+                        // Make data to upload
+                        var data = {
+                            file: fileObj,
+                            path: op.uploadPath,
+                            autoRenameIfExists: op.autoRenameIfExists,
+                            normalizeOrientation: op.normalizeOrientation
+                        };
+                        // The path of uploading images is defined
+                        if (typeof op.uploadImagesPath === 'string' && fileObj.type.indexOf("image") !== -1) {
+                            data.path = op.uploadImagesPath;
+                        }
+                        // The path of uploading files excluding images is defined
+                        else if (typeof op.uploadFilesPath === 'string') {
+                            data.path = op.uploadFilesPath;
+                        }
+                        // Show a loading image
+                        $itemUploadItems.append('<img class="loading" src="' + StaticURI + 'images/indicator-login.gif" alt="">');
+                        // Upload a file
+                        api.uploadAsset(op.siteId, data, function(response) {
+                            // An error occurred
+                            if (response.error) {
+                                var errorMessage = response.error.message ? ': ' + response.error.message : 'An error occurred while uploading.';
+                                return $.errorMessage('MTAppMultiFileUpload', errorMessage, 'alert', false);
+                            }
+                            // Input Type
+                            if (op.type === 'input') {
+                                var val = $this.val();
+                                if (val && op.multiple) {
+                                    $this.val(val + ',' + response[op.saveData]);
+                                }
+                                else {
+                                    $this.val(response[op.saveData]);
+                                }
+                            }
+                            // Set upload items to the p element nearby the target element of MTAppMultiFileUpload
+                            var imageHtml = '';
+                            if (response.mimeType.indexOf("image") !== -1) {
+                                imageHtml = '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" target="_blank"><img src="' + response.url + '" style="display:block;max-width:215px;margin-bottom:5px;"></a>';
+                                // imageHtml = '<a href="' + response.url + '" target="_blank"><img src="' + response.url + '" style="display:block;max-width:215px;margin-bottom:5px;"></a>';
+                                // imageHtml = '<img src="' + response.url + '" style="display:block;max-width:100px;margin-bottom:5px;">';
+                            }
+                            else {
+                                imageHtml = '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" target="_blank">' + response.filename + '</a>';
+                                // imageHtml = '<a href="' + response.url + '" target="_blank">' + response.filename + '</a>';
+                                // imageHtml = '<span style="display:block;">' + response.filename + '</span>';
+                            }
+                            // Remove a loading image
+                            $itemUploadItems.find('img.loading').remove();
+                            // Insert upload items
+                            if (op.multiple) {
+                                $itemUploadItems.append(imageHtml);
+                            }
+                            else {
+                                $itemUploadItems.html(imageHtml);
+                            }
+                            // If edit entry screen is open, set upload items to entry assets
+                            if (mtappVars.screen_id === 'edit-entry') {
+                                var entryItemHtml = "";
+                                // Images
+                                if (response.mimeType.indexOf("image") !== -1) {
+                                    entryItemHtml = [
+                                        '<li id="list-asset-' + response.id + '" class="asset-type-image" onmouseover="show(\'list-image-' + response.id + '\', window.parent.document)" onmouseout="hide(\'list-image-' + response.id + '\', window.parent.document)">',
+                                            '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" class="asset-title">' + response.filename + '</a>',
+                                            '<a href="javascript:removeAssetFromList(' + response.id + ')" title="Remove this asset." class="remove-asset icon-remove icon16 action-icon">Remove</a>',
+                                            '<img id="list-image-' + response.id + '" src="' + response.url + '" class="list-image hidden">',
+                                        '</li>'
+                                    ].join("");
+                                }
+                                // Other type files excluding images
+                                else {
+                                    entryItemHtml = [
+                                        '<li id="list-asset-' + response.id + '" class="asset-type-file">',
+                                            '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" class="asset-title">' + response.filename + '</a>',
+                                            '<a href="javascript:removeAssetFromList(' + response.id + ')" title="Remove this asset." class="remove-asset icon-remove icon16 action-icon">Remove</a>',
+                                        '</li>'
+                                    ].join("");
+                                }
+                                // Insert upload items to entry assets
+                                $assetList.append(entryItemHtml);
+                                var _ids = $includeAssetIds.val();
+                                if (_ids === "") {
+                                    $includeAssetIds.val(response.id);
+                                }
+                                else {
+                                    $includeAssetIds.val(_ids + "," + response.id);
+                                }
+                            }
+                        });
+                    }
+                });
+            } // Core function
+        });
+    };
+    $.fn.MTAppMultiFileUpload.defaults = {
+        // Plain Object. Please check the code of l10n section.
+        l10n: null,
+        // For Data API and api.uploadAsset()
+        api: null, // Set Data API Object
+        // Upload items to this ID's blog
+        siteId: mtappVars.blog_id,
+        // If this value is true and the file with the same filename exists,
+        // the uploaded file is automatically renamed to the random generated name.
+        normalizeOrientation: true,  /
+        // If this value is true and the uploaded file has a orientation information in Exif,
+        // this file's orientation is automatically normalized.
+        autoRenameIfExists: true,
+        // 'input' or 'widget'
+        type: 'input',
+        // If this value is true, the multiple attribute is edded to input:file.
+        multiple: true,
+        // Set 'id' or 'url'. This value is a propaty name of assets resource.
+        saveData: 'id',
+        // Set the basic upload directory path from a root of blog url.
+        uploadPath: 'upload',
+        // Set the upload directory path from a root of blog url for images.
+        // e.g. 'upload/images'
+        uploadImagesPath: null,
+        // Set the upload directory path from a root of blog url for other type files excluding images.
+        // e.g. 'upload/files'
+        uploadFilesPath: null,
+        debug: false
+    };
+    /*  end - $.fn.MTAppMultiFileUpload()  */
+
+    // -------------------------------------------------
     //  $.MTAppGetCategoryName();
     //
     //  Description:
