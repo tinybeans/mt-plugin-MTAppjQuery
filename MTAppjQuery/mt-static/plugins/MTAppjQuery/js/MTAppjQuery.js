@@ -4636,6 +4636,26 @@
             var numArray = (num.indexOf('.') !== -1) ? num.split('.') : [num];
             numArray[0] = numArray[0].replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
             return numArray.join('.');
+        },
+        errorMessage: function(methodName, message, output, returnValue) {
+            if (!output) {
+                output = null;
+            }
+            var text = 'You have an error in ' + methodName + ': ' + message;
+            switch (output) {
+                case 'alert':
+                    alert(text);
+                    break;
+                case 'console':
+                    if (this.console && typeof console.log != "undefined"){
+                        console.log(text);
+                    }
+                    break;
+            }
+            if (typeof returnValue === 'boolean') {
+                return returnValue;
+            }
+            return text;
         }
 
 
