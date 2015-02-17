@@ -1360,7 +1360,7 @@
                 // Make upload form
                 var uploadFromHtml = [
                     '<p class="mtapp-multifileupload-file"><input type="file" id="' + inputFileId + '"' + multiple + '></p>',
-                    '<p class="mtapp-multifileupload-items" id="' + inputUploadItemsId + '"></p>'
+                    '<p class="mtapp-multifileupload-items" id="' + inputUploadItemsId + '" style="display:none;"></p>'
                     // '<p><input id="' + inputUploadBtnId + '" type="button" value="Upload" class="button"></p>'
                 ].join("");
                 // Widget Type
@@ -1409,7 +1409,7 @@
                             }
                         }
                         // Set items
-                        $itemUploadItems[0].innerHTML = itemUploadItemsHtml;
+                        $itemUploadItems.html(itemUploadItemsHtml).show();
                     }
                 }
 
@@ -1442,7 +1442,7 @@
                             data.path = op.uploadFilesPath;
                         }
                         // Show a loading image
-                        $itemUploadItems.append('<img class="loading" src="' + StaticURI + 'images/indicator-login.gif" alt="">');
+                        $itemUploadItems.append('<img class="loading" src="' + StaticURI + 'images/indicator-login.gif" alt="">').show();
                         // Upload a file
                         api.uploadAsset(op.siteId, data, function(response) {
                             // An error occurred
