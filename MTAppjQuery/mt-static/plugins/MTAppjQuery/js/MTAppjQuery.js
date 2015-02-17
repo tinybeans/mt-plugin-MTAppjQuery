@@ -1463,7 +1463,7 @@
                             // Set upload items to the p element nearby the target element of MTAppMultiFileUpload
                             var imageHtml = '';
                             if (response.mimeType.indexOf("image") !== -1) {
-                                imageHtml = '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" target="_blank"><img src="' + response.url + '" style="display:block;max-width:215px;margin-bottom:5px;"></a>';
+                                imageHtml = '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" target="_blank"><img src="' + response.url + '" style="display:block;max-width:100px;margin-bottom:5px;"></a>';
                                 // imageHtml = '<a href="' + response.url + '" target="_blank"><img src="' + response.url + '" style="display:block;max-width:215px;margin-bottom:5px;"></a>';
                                 // imageHtml = '<img src="' + response.url + '" style="display:block;max-width:100px;margin-bottom:5px;">';
                             }
@@ -1476,10 +1476,10 @@
                             $itemUploadItems.find('img.loading').remove();
                             // Insert upload items
                             if (op.multiple) {
-                                $itemUploadItems.append(imageHtml);
+                                $itemUploadItems.append(imageHtml).show();
                             }
                             else {
-                                $itemUploadItems.html(imageHtml);
+                                $itemUploadItems.html(imageHtml).show();
                             }
                             // If edit entry screen is open, set upload items to entry assets
                             if (mtappVars.screen_id === 'edit-entry') {

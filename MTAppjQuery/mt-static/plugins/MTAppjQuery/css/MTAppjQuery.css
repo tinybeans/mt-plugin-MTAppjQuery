@@ -771,5 +771,8 @@ span.mtappmultiform-radio input {
   display: inline-block;
   margin: 10px 15px 10px 0;
 }
+.mtapp-multifileupload-items img {
+  max-width: 100px;
+}
 
 /*  MTAppMultiFileUpload  */

@@ -668,8 +668,13 @@ span.mtappmultiform-radio {
     display: inline;
     margin-left: 1em;
 }
-.mtapp-multifileupload-items a {
-    display: inline-block;
-    margin: 10px 15px 10px 0;
+.mtapp-multifileupload-items {
+    a {
+        display: inline-block;
+        margin: 10px 15px 10px 0;
+    }
+    img {
+        max-width: 100px;
+    }
 }
 /*  MTAppMultiFileUpload  */
