@@ -1403,7 +1403,7 @@
                             // If saved value is URL
                             else if (/^http/.test(thisValueArray[i])) {
                                 // Image's URL
-                                if (/(jpg|jpeg|gif|png|bmp|ico)$/i.test(thisValueArray[i])) {
+                                if (/(jpg|jpeg|gif|png|bmp|ico|tif|tiff)$/i.test(thisValueArray[i])) {
                                     itemUploadItemsHtml += '<a href="' + thisValueArray[i] + '" target="_blank"><img src="' + thisValueArray[i] + '" style="width:100px;"></a>';
                                 }
                                 // Other type file URL
