@@ -762,6 +762,11 @@ span.mtappmultiform-radio input {
 /* ==================================================
     MTAppMultiFileUpload
 ================================================== */
+.mtapp-multifileupload-file {
+  display: inline;
+  margin-left: 1em;
+}
+
 .mtapp-multifileupload-items a {
   display: inline-block;
   margin: 10px 15px 10px 0;
