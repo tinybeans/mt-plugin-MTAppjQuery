@@ -1848,14 +1848,27 @@
      * http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
      *
      * Since:   2010-06-22
-     * Update:  2014-04-22
-     * version: 0.2.1
+     * Update:  2015-02-18
+     * version: 0.3.0
      *
      * jQuery 1.7 later (maybe...)
      *
      */
     $.fn.multicheckbox = function(options){
         var op = $.extend({}, $.fn.multicheckbox.defaults, options);
+
+        var l10n = {};
+        if (mtappVars.language === 'ja') {
+            l10n.maxCountMessage = '選択出来る上限数を超えました。';
+        }
+        else {
+            l10n.maxCountMessage = 'Exceed the check limit.';
+        }
+        if (op.l10n) {
+            for (var key in op.l10n) {
+                l10n[key] = op.l10n[key];
+            }
+        }
 
         return this.each(function(idx){
 
@@ -1929,6 +1942,16 @@
                 .on('click', 'input:checkbox', function(e){
                     var checkbox = e.target;
                     var checkValues = [];
+                    var checkedCount = $container.find(':checked').length;
+                    if (checkedCount > op.maxCount) {
+                        if (op.maxCountMessage) {
+                            alert(op.maxCountMessage);
+                        }
+                        else {
+                            alert(l10n.maxCountMessage);
+                        }
+                        return false;
+                    }
                     $container
                         .find('label').removeClass('mcb-label-checked')
                         .end()
@@ -2007,8 +2030,11 @@
         });
     };
     $.fn.multicheckbox.defaults = {
+        l10n: null,
         show: 'hide', // 'hide' or 'show' 元のテキストフィールドを非表示にするか否か
         label: '', // カンマ区切りの文字列か{'key1':'value1','key2':'value2'}のハッシュ
+        maxCount: 999999999, // チェックできる最大値を設定
+        maxCountMessage: '', // チェックできる最大値を超えたときにエラーメッセージ
         insert: 'before', // 'before' or 'after'
         add: false, // ユーザーがチェックボックスを追加できるようにする場合はtrue
         skin: false, // タグデザインを適用する場合は'tags'
@@ -2030,6 +2056,8 @@
     //  Options:
     //    basename: {String} 各フォーム要素のベースネーム
     //    label: {String, Object} カンマ区切りの文字列か{'key1':'value1','key2':'value2'}のハッシュ
+    //    maxCount: {Number} チェックできる最大値を設定
+    //    maxCountMessage: {String} チェックできる最大値を超えたときにエラーメッセージ
     //    insert: {String} 元のテキストエリアの前に挿入するか('before')、後ろに挿入するか('after')
     //    custom: {boolean} カスタムフィールドの場合(true)
     //    add: {boolean} ユーザーが項目を追加できるようにする(true)
@@ -2043,18 +2071,24 @@
         var fieldID = (op.custom) ? '#customfield_' + op.basename: '#' + op.basename;
         var optionShow = (op.debug) ? 'show' : 'hide';
         $(fieldID).multicheckbox({
+            l10n: op.l10n,
             show: optionShow,
             insert: op.insert,
             add: op.add,
             skin: op.skin,
             label: op.label,
+            maxCount: op.maxCount,
+            maxCountMessage: op.maxCountMessage,
             sort: op.sort
         });
         return $(fieldID + '-field');
     };
     $.MTAppMultiCheckbox.defaults = {
+        l10n: null,
         basename: '',
         label: '',
+        maxCount: 999999999,
+        maxCountMessage: '',
         insert: 'before',
         custom: false,
         add: false,
