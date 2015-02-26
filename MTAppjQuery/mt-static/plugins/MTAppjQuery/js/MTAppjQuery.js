@@ -946,8 +946,14 @@
                         op.jsontable.listingTargetKey = op.jsontable.listingTargetKey || 'id';
                         op.jsontable.optionButtons = null;
                         op.jsontable.cbAfterSelectRow = function(cb, $tr, checked){
-                            if (!checked) {
-                                $tr.prependTo('#mtapplisting-tbody2');
+                            var defaultAction = true;
+                            if (op.cbAfterSelectRowUpperTable !== null && typeof op.cbAfterSelectRowUpperTable === 'function') {
+                                defaultAction = op.cbAfterSelectRowUpperTable({name: 'cbAfterSelectRowUpperTable'}, $tr, checked);
+                            }
+                            if (defaultAction) {
+                                if (!checked) {
+                                    $tr.prependTo('#mtapplisting-tbody2');
+                                }
                             }
                         };
                         op.jsontable.cbAfterBuild = function(cb, $container){
@@ -976,13 +982,19 @@
                         op.jsontable.footer = true; // overwrite
                         op.jsontable.items = response; // overwrite
                         op.jsontable.cbAfterSelectRow = function(cb, $tr, checked){  // overwrite
-                            $('#mtapplisting-textarea1').next().show();
-                            if (checked) {
-                                $tr.find('td').each(function(){
-                                    var w = $(this).width();
-                                    $(this).width(w + 'px');
-                                });
-                                $tr.appendTo('#mtapplisting-tbody1');
+                            var defaultAction = true;
+                            if (op.cbAfterSelectRowLowerTable !== null && typeof op.cbAfterSelectRowLowerTable === 'function') {
+                                defaultAction = op.cbAfterSelectRowLowerTable({name: 'cbAfterSelectRowLowerTable'}, $tr, checked);
+                            }
+                            if (defaultAction) {
+                                $('#mtapplisting-textarea1').next().show();
+                                if (checked) {
+                                    $tr.find('td').each(function(){
+                                        var w = $(this).width();
+                                        $(this).width(w + 'px');
+                                    });
+                                    $tr.appendTo('#mtapplisting-tbody1');
+                                }
                             }
                         };
                         op.jsontable.cbAfterBuild = function(cb, $container){ // overwrite
@@ -1050,6 +1062,8 @@
         cbAfterSearch: null, // After searching
         cbAfterSearchReset: null, // After resetting the text filter
         cbAfterOpenDialogLast: null, // After opening the dialog
+        cbAfterSelectRowUpperTable: null, // function({name: 'cbAfterSelectRowUpperTable'}, $tr, $(this).is(':checked')){}
+        cbAfterSelectRowLowerTable: null, // function({name: 'cbAfterSelectRowLowerTable'}, $tr, $(this).is(':checked')){}
 
         // JSONTable
         jsontable: { // You can set the following options of MTAppJSONTable
