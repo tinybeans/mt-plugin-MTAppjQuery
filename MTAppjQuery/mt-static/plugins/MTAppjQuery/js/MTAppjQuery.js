@@ -3351,6 +3351,25 @@
 
         if (mtappVars.type === 'entry' || mtappVars.screen_id === 'edit-entry') {
             var newCategoryWidgetType = op.type;
+        /* ==================================================
+            L10N
+        ================================================== */
+        var l10n = {};
+        if (mtappVars.language === 'ja') {
+            l10n.add = '追加';
+            l10n.addMessage = '追加するカテゴリのラベルを入力してください';
+        }
+        else {
+            l10n.add = 'Add';
+            l10n.addMessage = "Please enter a new category's label";
+        }
+        if (op.l10n) {
+            for (var key in op.l10n) {
+                l10n[key] = op.l10n[key];
+            }
+        }
+        /*  L10N  */
+
             var newCategoryWidgetHtml = $.MTAppMakeWidget({
                 label: op.label,
                 content: '<div id="other-type-category-list"></div>'
