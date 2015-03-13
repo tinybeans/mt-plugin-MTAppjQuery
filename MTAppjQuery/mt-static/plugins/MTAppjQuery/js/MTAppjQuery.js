@@ -3349,8 +3349,6 @@
     $.MTAppOtherTypeCategories = function(options){
         var op = $.extend({}, $.MTAppOtherTypeCategories.defaults, options);
 
-        if (mtappVars.type === 'entry' || mtappVars.screen_id === 'edit-entry') {
-            var newCategoryWidgetType = op.type;
         /* ==================================================
             L10N
         ================================================== */
@@ -3370,6 +3368,17 @@
         }
         /*  L10N  */
 
+        if (mtappVars.type !== 'entry' || mtappVars.screen_id !== 'edit-entry') {
+            return;
+        }
+        var _MTAppOtherTypeCategories = setInterval(function(){
+            // Confirm the existance of the category selector
+            if ($('#category-selector-list div.list-item').length > 0) {
+                clearInterval(_MTAppOtherTypeCategories);
+            }
+            else {
+                return;
+            }
             var newCategoryWidgetHtml = $.MTAppMakeWidget({
                 label: op.label,
                 content: '<div id="other-type-category-list"></div>',
@@ -3423,7 +3432,7 @@
                 return false;
             });
             var $anotherCategoryList = $('#other-type-category-list');
-            $(window).load(function(){
+            // $(window).load(function(){
                 if (!op.debug) {
                     $('#category-field').addClass('mtapp-other-type-categories');
                 }
@@ -3484,8 +3493,8 @@
                             });
                         break;
                 }
-            });
-        }
+            // });
+        }, 500);
     };
     $.MTAppOtherTypeCategories.defaults = {
         type: 'radio', // or 'select'
