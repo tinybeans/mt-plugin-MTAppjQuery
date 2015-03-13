@@ -800,7 +800,7 @@ span.mtappmultiform-radio input {
 ================================================== */
 .mtappmaxlength-wrapper {
   position: relative;
-  display: inline-block;
+  display: block;
 }
 
 .mtappmaxlength-status {

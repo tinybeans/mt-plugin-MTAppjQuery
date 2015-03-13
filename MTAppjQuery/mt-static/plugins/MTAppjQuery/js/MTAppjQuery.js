@@ -1661,7 +1661,6 @@
             }
             var maxLength = op.maxLength;
             var $this = $(this);
-            var width = $this.outerWidth(true);
             var label = $this.closest('div.field').find('div.field-header label').text();
 
             var underStyle = {};
@@ -1672,7 +1671,7 @@
             var $parentSpan = null;
             var $statusSpan = null;
             var hidden = op.viewCount ? '' : ' hidden';
-            $parentSpan = $this.wrap('<span class="mtappmaxlength-wrapper"></span>').parent().width(width);
+            $parentSpan = $this.wrap('<span class="mtappmaxlength-wrapper"></span>').parent();
             $statusSpan = $parentSpan.append('<span class="mtappmaxlength-status' + hidden + '">' + (maxLength - $this.val().length) + '</span>').find('.mtappmaxlength-status');
             $this
                 .addClass('mtappmaxlength-item')
