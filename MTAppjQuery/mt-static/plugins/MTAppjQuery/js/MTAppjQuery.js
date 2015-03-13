@@ -1055,8 +1055,8 @@
         // cbAjaxDoneFilterJSONTable: function(cb, $dialog, response){
         //     return (response.items && response.items.length > 0);
         // },
-        cbAjaxDone: null, // Be called when data is loaded
-        cbAjaxFail: null, // Be called when data could not be get
+        cbAjaxDone: null, // Called when data is loaded
+        cbAjaxFail: null, // Called when data could not be get
         cbAfterCancel: null, // After clicking the cancel button
         cbAfterOK: null, // After clicking the OK button
         cbAfterSearch: null, // After searching
