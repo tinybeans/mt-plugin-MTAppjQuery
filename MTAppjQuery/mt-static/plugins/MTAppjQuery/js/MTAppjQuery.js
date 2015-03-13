@@ -1601,6 +1601,119 @@
     /*  end - $.fn.MTAppMultiFileUpload()  */
 
     // -------------------------------------------------
+    //  $(foo).MTAppMaxLength();
+    //
+    //  Description:
+    //    フィールドに最大文字数を設定します
+    //
+    //  Usage:
+    //    $(foo).MTAppMaxLength(options);
+    //
+    // -------------------------------------------------
+    $.fn.MTAppMaxLength = function(options){
+        var op = $.extend({}, $.fn.MTAppMaxLength.defaults, options);
+
+        if (op.maxLength < 1) {
+            return;
+        }
+        /* ==================================================
+            L10N
+        ================================================== */
+        var l10n = {};
+        if (mtappVars.language === 'ja') {
+            l10n.alertMessageEach = '最大文字数を超えています。';
+            l10n.alertMessageTotal = '最大文字数を超えているフィールドがあります。';
+        }
+        else {
+            l10n.alertMessageEach = 'Number of characters exceeds maximum allowed.';
+            l10n.alertMessageTotal = 'There are fields whose number of characters exceeds maximum allowed.';
+        }
+        if (op.l10n) {
+            for (var key in op.l10n) {
+                l10n[key] = op.l10n[key];
+            }
+        }
+        /*  L10N  */
+
+        var $form = null;
+        var $submit = null;
+        return this.each(function(i){
+
+            if (i === 0) {
+                $form = $(this).closest('form').off('submit.MTAppMaxLength').on('submit.MTAppMaxLength', function(){
+                    var $items = $('.mtappmaxlength-item');
+                    var itemsCount = $items.length;
+                    $items.each(function(){
+                        if ($(this).val().length <= $(this).data('mtappmaxlength')) {
+                            itemsCount--;
+                        }
+                    });
+                    if (itemsCount < 1) {
+                        $form.off('submit.MTAppMaxLength').submit();
+                    }
+                    else {
+                        alert(l10n.alertMessageTotal);
+                    }
+                    return false;
+
+                });
+                $submit = $form.find(':submit');
+            }
+            var maxLength = op.maxLength;
+            var $this = $(this);
+            var width = $this.outerWidth(true);
+            var label = $this.closest('div.field').find('div.field-header label').text();
+
+            var underStyle = {};
+            for (var key in op.overStyle) {
+                underStyle[key] = '';
+            }
+
+            var $parentSpan = null;
+            var $statusSpan = null;
+            var hidden = op.viewCount ? '' : ' hidden';
+            $parentSpan = $this.wrap('<span class="mtappmaxlength-wrapper"></span>').parent().width(width);
+            $statusSpan = $parentSpan.append('<span class="mtappmaxlength-status' + hidden + '">' + (maxLength - $this.val().length) + '</span>').find('.mtappmaxlength-status');
+            $this
+                .addClass('mtappmaxlength-item')
+                .data('mtappmaxlength', maxLength)
+                .on('keyup', function(){
+                    var count = $(this).val().length;
+                    $statusSpan.text(maxLength - count);
+                    if (count > op.maxLength) {
+                        $this.css(op.overStyle);
+                        $statusSpan.css(op.overStatusStyle);
+                    }
+                    else {
+                        $this.css(underStyle);
+                        $statusSpan.removeAttr('style');
+                        $form.removeAttr('mt:once');
+                        $submit.prop('disabled', false);
+                    }
+                }).trigger('keyup');
+        });
+    };
+    $.fn.MTAppMaxLength.defaults = {
+        l10n: null,
+        // The maxLength option is required. You have to set not less than 1.
+        maxLength: 0,
+        // An object of the CSS property-value pairs to set.
+        // This CSS is applied to the input elements when number of characters get grater than maxLength.
+        overStyle: {
+            border: '1px solid #ff0000',
+            color: '#ff0000'
+        },
+        // An object of the CSS property-value pairs to set.
+        // This CSS is applied to the elements when number of characters get grater than maxLength.
+        overStatusStyle: {
+            color: '#ff0000'
+        },
+        // If set to false, hide the count status element.
+        viewCount: true
+    };
+    /*  end - $.fn.MTAppMaxLength()  */
+
+    // -------------------------------------------------
     //  $.MTAppGetCategoryName();
     //
     //  Description:
