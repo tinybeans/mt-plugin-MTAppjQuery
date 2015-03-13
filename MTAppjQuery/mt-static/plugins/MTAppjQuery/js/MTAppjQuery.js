@@ -5036,6 +5036,12 @@
     });
 
     $.extend({
+        // ローディング画像の表示・非表示を切り替える
+        MTAppLoadingImage: function(type){
+            type = (type === 'show') ? 'block' : 'none';
+            document.getElementById('mtapp-loading-image').style.display = type;
+            return;
+        },
         // 1桁の整数の場合、頭に0を付ける
         digit: function(num, space) {
             var prefix = (space) ? ' ' : '0';
