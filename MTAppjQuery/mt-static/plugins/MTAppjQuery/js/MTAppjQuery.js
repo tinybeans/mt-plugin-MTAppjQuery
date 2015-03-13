@@ -3379,11 +3379,13 @@
             else {
                 return;
             }
+            // Make the other type category container
             var newCategoryWidgetHtml = $.MTAppMakeWidget({
                 label: op.label,
                 content: '<div id="other-type-category-list"></div>',
                 action: (op.add) ? '<a id="other-type-category-add" href="#">' + l10n.add + '</a>' : ''
             });
+            // Insert it next the category widget
             $('#category-field').after(newCategoryWidgetHtml);
             // Add a click event to a#other-type-category-add
             $('#other-type-category-add').on('click', function(){
@@ -3449,7 +3451,7 @@
                     else {
                         return true;
                     }
-                    switch (newCategoryWidgetType) {
+                    switch (op.type) {
                         case 'radio':
                             var AttrDefChecked = categoryIds ? '': ' checked="checked"';
                             var AttrChecked = (categoryIds == catId) ? ' checked="checked"': '';
@@ -3470,12 +3472,11 @@
                     }
                     radioCatList.push(_html.join(''));
                 });
-                switch (newCategoryWidgetType) {
+                switch (op.type) {
                     case 'radio':
                         $anotherCategoryList.html(radioCatList.join(''));
                         $anotherCategoryList
-                            .find('input[name="other-type-category"]')
-                            .on('click', function(){
+                            .on('click', 'input[name="other-type-category"]', function(){
                                 if ($(this).is(':checked')) {
                                     $('#category-ids').val($(this).val());
                                 }
@@ -3487,8 +3488,7 @@
                     case 'select':
                         $anotherCategoryList.html(radioCatList.join('') + '</select>');
                         $anotherCategoryList
-                            .find('select')
-                            .on('change', function(){
+                            .on('change', 'select', function(){
                                 $('#category-ids').val($(this).find('option:selected').val());
                             });
                         break;
