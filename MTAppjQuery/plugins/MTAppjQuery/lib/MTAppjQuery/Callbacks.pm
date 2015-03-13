@@ -139,6 +139,7 @@ sub template_source_header {
     ### ツールチップ用ボックスをページに追加する
     my $preset = <<__MTML__;
     <mt:SetVarBlock name="html_body_footer" append="1">
+    <div id="mtapp-loading-image" style="display: none;"><img src="<mt:var name="static_uri">images/indicator.gif" alt="loading"></div>
     <div id="mtapp-tooltip" style="display: none;"></div>
     </mt:SetVarBlock>
 __MTML__
