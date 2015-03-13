@@ -3372,9 +3372,56 @@
 
             var newCategoryWidgetHtml = $.MTAppMakeWidget({
                 label: op.label,
-                content: '<div id="other-type-category-list"></div>'
+                content: '<div id="other-type-category-list"></div>',
+                action: (op.add) ? '<a id="other-type-category-add" href="#">' + l10n.add + '</a>' : ''
             });
             $('#category-field').after(newCategoryWidgetHtml);
+            // Add a click event to a#other-type-category-add
+            $('#other-type-category-add').on('click', function(){
+                var newCatLabel = prompt(l10n.addMessage, '');
+                if (newCatLabel) {
+                    $.MTAppLoadingImage('show');
+                    $.ajax({
+                        url: CMSScriptURI,
+                        data: {
+                            __mode: 'js_add_category',
+                            magic_token: document.getElementById('m_t').value,
+                            blog_id: mtappVars.blog_id,
+                            parent: 0, //parseInt( this.parentID ),
+                            _type: 'category',
+                            label: newCatLabel
+                        },
+                        type: 'POST'
+                    }).done(function(response){
+                        if (response.error) {
+                            $.errorMessage('MTAppOtherTypeCategories', response.error, 'alert');
+                        }
+                        var newCatId = response.result.id;
+                        switch (op.type) {
+                            case 'radio':
+                                $anotherCategoryList.find('label:first').after(
+                                    '<label for="another-cat-' + newCatId + '">' +
+                                        '<input id="another-cat-' + newCatId + '" type="radio" name="other-type-category" value="' + newCatId + '" checked="checked">' +
+                                        newCatLabel +
+                                    '</label>'
+                                );
+                                break;
+                            case 'select':
+                                $anotherCategoryList.find('option:first').after(
+                                    '<option value="' + newCatId + '" selected>' + newCatLabel + '</option>'
+                                );
+                                break;
+                            default: return false;
+                        }
+                        $('#category-ids').val(newCatId);
+                        $.MTAppLoadingImage('hide');
+                    }).fail(function(){
+                        $.errorMessage('MTAppOtherTypeCategories', 'Adding category failed', 'alert');
+                        $.MTAppLoadingImage('hide');
+                    });
+                }
+                return false;
+            });
             var $anotherCategoryList = $('#other-type-category-list');
             $(window).load(function(){
                 if (!op.debug) {
@@ -3444,6 +3491,8 @@
         type: 'radio', // or 'select'
         label: 'カテゴリ',
         notSelectedText: '未選択',
+        // Set "true" to the add option if you would like to be able to add a new category.
+        add: false,
         debug: false
     };
     // end - $.MTAppOtherTypeCategories();
