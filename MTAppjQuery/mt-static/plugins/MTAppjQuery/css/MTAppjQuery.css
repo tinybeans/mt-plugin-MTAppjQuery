@@ -57,6 +57,22 @@
 }
 
 /* ----------------------------------------
+   __Loading Image
+---------------------------------------- */
+#mtapp-loading-image {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  z-index: 99999;
+}
+
+/* ----------------------------------------
    __管理画面のスタイル
 ---------------------------------------- */
 textarea#jqplugin,
@@ -779,3 +795,21 @@ span.mtappmultiform-radio input {
 }
 
 /*  MTAppMultiFileUpload  */
+/* ==================================================
+    MTAppMaxLength
+================================================== */
+.mtappmaxlength-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.mtappmaxlength-status {
+  position: absolute;
+  display: block;
+  width: 10em;
+  top: -1em;
+  right: 0;
+  text-align: right;
+}
+
+/*  MTAppMaxLength  */

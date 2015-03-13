@@ -1055,8 +1055,8 @@
         // cbAjaxDoneFilterJSONTable: function(cb, $dialog, response){
         //     return (response.items && response.items.length > 0);
         // },
-        cbAjaxDone: null, // Be called when data is loaded
-        cbAjaxFail: null, // Be called when data could not be get
+        cbAjaxDone: null, // Called when data is loaded
+        cbAjaxFail: null, // Called when data could not be get
         cbAfterCancel: null, // After clicking the cancel button
         cbAfterOK: null, // After clicking the OK button
         cbAfterSearch: null, // After searching
@@ -1599,6 +1599,119 @@
         debug: false
     };
     /*  end - $.fn.MTAppMultiFileUpload()  */
+
+    // -------------------------------------------------
+    //  $(foo).MTAppMaxLength();
+    //
+    //  Description:
+    //    フィールドに最大文字数を設定します
+    //
+    //  Usage:
+    //    $(foo).MTAppMaxLength(options);
+    //
+    // -------------------------------------------------
+    $.fn.MTAppMaxLength = function(options){
+        var op = $.extend({}, $.fn.MTAppMaxLength.defaults, options);
+
+        if (op.maxLength < 1) {
+            return;
+        }
+        /* ==================================================
+            L10N
+        ================================================== */
+        var l10n = {};
+        if (mtappVars.language === 'ja') {
+            l10n.alertMessageEach = '最大文字数を超えています。';
+            l10n.alertMessageTotal = '最大文字数を超えているフィールドがあります。';
+        }
+        else {
+            l10n.alertMessageEach = 'Number of characters exceeds maximum allowed.';
+            l10n.alertMessageTotal = 'There are fields whose number of characters exceeds maximum allowed.';
+        }
+        if (op.l10n) {
+            for (var key in op.l10n) {
+                l10n[key] = op.l10n[key];
+            }
+        }
+        /*  L10N  */
+
+        var $form = null;
+        var $submit = null;
+        return this.each(function(i){
+
+            if (i === 0) {
+                $form = $(this).closest('form').off('submit.MTAppMaxLength').on('submit.MTAppMaxLength', function(){
+                    var $items = $('.mtappmaxlength-item');
+                    var itemsCount = $items.length;
+                    $items.each(function(){
+                        if ($(this).val().length <= $(this).data('mtappmaxlength')) {
+                            itemsCount--;
+                        }
+                    });
+                    if (itemsCount < 1) {
+                        $form.off('submit.MTAppMaxLength').submit();
+                    }
+                    else {
+                        alert(l10n.alertMessageTotal);
+                    }
+                    return false;
+
+                });
+                $submit = $form.find(':submit');
+            }
+            var maxLength = op.maxLength;
+            var $this = $(this);
+            var width = $this.outerWidth(true);
+            var label = $this.closest('div.field').find('div.field-header label').text();
+
+            var underStyle = {};
+            for (var key in op.overStyle) {
+                underStyle[key] = '';
+            }
+
+            var $parentSpan = null;
+            var $statusSpan = null;
+            var hidden = op.viewCount ? '' : ' hidden';
+            $parentSpan = $this.wrap('<span class="mtappmaxlength-wrapper"></span>').parent().width(width);
+            $statusSpan = $parentSpan.append('<span class="mtappmaxlength-status' + hidden + '">' + (maxLength - $this.val().length) + '</span>').find('.mtappmaxlength-status');
+            $this
+                .addClass('mtappmaxlength-item')
+                .data('mtappmaxlength', maxLength)
+                .on('keyup', function(){
+                    var count = $(this).val().length;
+                    $statusSpan.text(maxLength - count);
+                    if (count > op.maxLength) {
+                        $this.css(op.overStyle);
+                        $statusSpan.css(op.overStatusStyle);
+                    }
+                    else {
+                        $this.css(underStyle);
+                        $statusSpan.removeAttr('style');
+                        $form.removeAttr('mt:once');
+                        $submit.prop('disabled', false);
+                    }
+                }).trigger('keyup');
+        });
+    };
+    $.fn.MTAppMaxLength.defaults = {
+        l10n: null,
+        // The maxLength option is required. You have to set not less than 1.
+        maxLength: 0,
+        // An object of the CSS property-value pairs to set.
+        // This CSS is applied to the input elements when number of characters get grater than maxLength.
+        overStyle: {
+            border: '1px solid #ff0000',
+            color: '#ff0000'
+        },
+        // An object of the CSS property-value pairs to set.
+        // This CSS is applied to the elements when number of characters get grater than maxLength.
+        overStatusStyle: {
+            color: '#ff0000'
+        },
+        // If set to false, hide the count status element.
+        viewCount: true
+    };
+    /*  end - $.fn.MTAppMaxLength()  */
 
     // -------------------------------------------------
     //  $.MTAppGetCategoryName();
@@ -3349,15 +3462,92 @@
     $.MTAppOtherTypeCategories = function(options){
         var op = $.extend({}, $.MTAppOtherTypeCategories.defaults, options);
 
-        if (mtappVars.type === 'entry' || mtappVars.screen_id === 'edit-entry') {
-            var newCategoryWidgetType = op.type;
+        /* ==================================================
+            L10N
+        ================================================== */
+        var l10n = {};
+        if (mtappVars.language === 'ja') {
+            l10n.add = '追加';
+            l10n.addMessage = '追加するカテゴリのラベルを入力してください';
+        }
+        else {
+            l10n.add = 'Add';
+            l10n.addMessage = "Please enter a new category's label";
+        }
+        if (op.l10n) {
+            for (var key in op.l10n) {
+                l10n[key] = op.l10n[key];
+            }
+        }
+        /*  L10N  */
+
+        if (mtappVars.type !== 'entry' || mtappVars.screen_id !== 'edit-entry') {
+            return;
+        }
+        var _MTAppOtherTypeCategories = setInterval(function(){
+            // Confirm the existance of the category selector
+            if ($('#category-selector-list div.list-item').length > 0) {
+                clearInterval(_MTAppOtherTypeCategories);
+            }
+            else {
+                return;
+            }
+            // Make the other type category container
             var newCategoryWidgetHtml = $.MTAppMakeWidget({
                 label: op.label,
-                content: '<div id="other-type-category-list"></div>'
+                content: '<div id="other-type-category-list"></div>',
+                action: (op.add) ? '<a id="other-type-category-add" href="#">' + l10n.add + '</a>' : ''
             });
+            // Insert it next the category widget
             $('#category-field').after(newCategoryWidgetHtml);
+            // Add a click event to a#other-type-category-add
+            $('#other-type-category-add').on('click', function(){
+                var newCatLabel = prompt(l10n.addMessage, '');
+                if (newCatLabel) {
+                    $.MTAppLoadingImage('show');
+                    $.ajax({
+                        url: CMSScriptURI,
+                        data: {
+                            __mode: 'js_add_category',
+                            magic_token: document.getElementById('m_t').value,
+                            blog_id: mtappVars.blog_id,
+                            parent: 0, //parseInt( this.parentID ),
+                            _type: 'category',
+                            label: newCatLabel
+                        },
+                        type: 'POST'
+                    }).done(function(response){
+                        if (response.error) {
+                            $.errorMessage('MTAppOtherTypeCategories', response.error, 'alert');
+                        }
+                        var newCatId = response.result.id;
+                        switch (op.type) {
+                            case 'radio':
+                                $anotherCategoryList.find('label:first').after(
+                                    '<label for="another-cat-' + newCatId + '">' +
+                                        '<input id="another-cat-' + newCatId + '" type="radio" name="other-type-category" value="' + newCatId + '" checked="checked">' +
+                                        newCatLabel +
+                                    '</label>'
+                                );
+                                break;
+                            case 'select':
+                                $anotherCategoryList.find('option:first').after(
+                                    '<option value="' + newCatId + '" selected>' + newCatLabel + '</option>'
+                                );
+                                break;
+                            default: return false;
+                        }
+                        $('#category-ids').val(newCatId);
+                        $.MTAppLoadingImage('hide');
+                    }).fail(function(){
+                        $.errorMessage('MTAppOtherTypeCategories', 'Adding category failed', 'alert');
+                        $.MTAppLoadingImage('hide');
+                    });
+                }
+                return false;
+            });
             var $anotherCategoryList = $('#other-type-category-list');
-            $(window).load(function(){
+            // $(window).load(function(){
                 if (!op.debug) {
                     $('#category-field').addClass('mtapp-other-type-categories');
                 }
@@ -3374,7 +3564,7 @@
                     else {
                         return true;
                     }
-                    switch (newCategoryWidgetType) {
+                    switch (op.type) {
                         case 'radio':
                             var AttrDefChecked = categoryIds ? '': ' checked="checked"';
                             var AttrChecked = (categoryIds == catId) ? ' checked="checked"': '';
@@ -3395,12 +3585,11 @@
                     }
                     radioCatList.push(_html.join(''));
                 });
-                switch (newCategoryWidgetType) {
+                switch (op.type) {
                     case 'radio':
                         $anotherCategoryList.html(radioCatList.join(''));
                         $anotherCategoryList
-                            .find('input[name="other-type-category"]')
-                            .on('click', function(){
+                            .on('click', 'input[name="other-type-category"]', function(){
                                 if ($(this).is(':checked')) {
                                     $('#category-ids').val($(this).val());
                                 }
@@ -3412,19 +3601,20 @@
                     case 'select':
                         $anotherCategoryList.html(radioCatList.join('') + '</select>');
                         $anotherCategoryList
-                            .find('select')
-                            .on('change', function(){
+                            .on('change', 'select', function(){
                                 $('#category-ids').val($(this).find('option:selected').val());
                             });
                         break;
                 }
-            });
-        }
+            // });
+        }, 500);
     };
     $.MTAppOtherTypeCategories.defaults = {
         type: 'radio', // or 'select'
         label: 'カテゴリ',
         notSelectedText: '未選択',
+        // Set "true" to the add option if you would like to be able to add a new category.
+        add: false,
         debug: false
     };
     // end - $.MTAppOtherTypeCategories();
@@ -4959,6 +5149,12 @@
     });
 
     $.extend({
+        // ローディング画像の表示・非表示を切り替える
+        MTAppLoadingImage: function(type){
+            type = (type === 'show') ? 'block' : 'none';
+            document.getElementById('mtapp-loading-image').style.display = type;
+            return;
+        },
         // 1桁の整数の場合、頭に0を付ける
         digit: function(num, space) {
             var prefix = (space) ? ' ' : '0';
