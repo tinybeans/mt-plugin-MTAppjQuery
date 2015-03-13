@@ -695,3 +695,20 @@ span.mtappmultiform-radio {
     }
 }
 /*  MTAppMultiFileUpload  */
+
+/* ==================================================
+    MTAppMaxLength
+================================================== */
+.mtappmaxlength-wrapper {
+    position: relative;
+    display: inline-block;
+}
+.mtappmaxlength-status {
+    position: absolute;
+    display: block;
+    width: 10em;
+    top: -1em;
+    right: 0;
+    text-align: right;
+}
+/*  MTAppMaxLength  */
