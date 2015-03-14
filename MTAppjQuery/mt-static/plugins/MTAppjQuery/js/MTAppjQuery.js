@@ -1621,10 +1621,20 @@
         ================================================== */
         var l10n = {};
         if (mtappVars.language === 'ja') {
+            l10n.characters = '文字';
+            l10n.maximumCharacters = '最大文字数';
+            l10n.remainingCharacters = '残り文字数';
+            l10n.overCharacters = '最大文字数を[_1]文字超えています';
+            l10n.field = '欄';
             l10n.alertMessageEach = '最大文字数を超えています。';
-            l10n.alertMessageTotal = '最大文字数を超えているフィールドがあります。';
+            l10n.alertMessageTotal = '最大文字数を超えている入力欄があります。';
         }
         else {
+            l10n.characters = '';
+            l10n.maximumCharacters = 'Maximum characters';
+            l10n.remainingCharacters = 'Remaining characters';
+            l10n.overCharacters = '[_1] characters over';
+            l10n.field = 'field';
             l10n.alertMessageEach = 'Number of characters exceeds maximum allowed.';
             l10n.alertMessageTotal = 'There are fields whose number of characters exceeds maximum allowed.';
         }
@@ -1644,14 +1654,23 @@
                     var $items = $('.mtappmaxlength-item');
                     var itemsCount = $items.length;
                     $items.each(function(){
-                        if ($(this).val().length <= $(this).data('mtappmaxlength')) {
+                        var label = text = '';
+                        if ($(this).val().length > $(this).data('mtappmaxlength')) {
+                            if (op.eachAlert) {
+                                label = $(this).closest('div.field').find('div.field-header label').text();
+                                text = label ? label + l10n.field + ' : ' + l10n.alertMessageEach: l10n.alertMessageEach;
+                                alert(text);
+                                label = text = '';
+                            }
+                        }
+                        else {
                             itemsCount--;
                         }
                     });
                     if (itemsCount < 1) {
                         $form.off('submit.MTAppMaxLength').submit();
                     }
-                    else {
+                    else if (!op.eachAlert) {
                         alert(l10n.alertMessageTotal);
                     }
                     return false;
@@ -1662,7 +1681,6 @@
             var maxLength = op.maxLength;
             var $this = $(this);
             var width = $this.outerWidth(true);
-            var label = $this.closest('div.field').find('div.field-header label').text();
 
             var underStyle = {};
             for (var key in op.overStyle) {
@@ -1673,13 +1691,13 @@
             var $statusSpan = null;
             var hidden = op.viewCount ? '' : ' hidden';
             $parentSpan = $this.wrap('<span class="mtappmaxlength-wrapper"></span>').parent().width(width);
-            $statusSpan = $parentSpan.append('<span class="mtappmaxlength-status' + hidden + '">' + (maxLength - $this.val().length) + '</span>').find('.mtappmaxlength-status');
+            $statusSpan = $parentSpan.append('<span class="mtappmaxlength-status' + hidden + '"></span>').find('.mtappmaxlength-status');
             $this
                 .addClass('mtappmaxlength-item')
                 .data('mtappmaxlength', maxLength)
                 .on('keyup', function(){
                     var count = $(this).val().length;
-                    $statusSpan.text(maxLength - count);
+                    setStatus($statusSpan, maxLength, count, l10n);
                     if (count > op.maxLength) {
                         $this.css(op.overStyle);
                         $statusSpan.css(op.overStatusStyle);
@@ -1692,6 +1710,18 @@
                     }
                 }).trigger('keyup');
         });
+        function setStatus($statusSpan, maxLength, count, l10n){
+            if (!count) {
+                $statusSpan.text(l10n.maximumCharacters + ' : ' + maxLength + l10n.characters);
+            }
+            else if (count <= maxLength) {
+                $statusSpan.text(l10n.remainingCharacters + ' : ' + (maxLength - count) + l10n.characters);
+            }
+            else if (count > maxLength) {
+                var overCount = count - maxLength;
+                $statusSpan.text(l10n.overCharacters.replace(/\[_1\]/, overCount));
+            }
+        }
     };
     $.fn.MTAppMaxLength.defaults = {
         l10n: null,
@@ -1709,7 +1739,9 @@
             color: '#ff0000'
         },
         // If set to false, hide the count status element.
-        viewCount: true
+        viewCount: true,
+        // If set to true, alert at each field
+        eachAlert: false
     };
     /*  end - $.fn.MTAppMaxLength()  */
 
