@@ -786,10 +786,10 @@
                         });
                     }
                     if (values.length > 1) {
-                        $('#' + triggerId).val(',' + values.join(',') + ',');
+                        $('#' + triggerId).val(',' + values.join(',') + ',').trigger('change.MTAppListing');
                     }
                     else {
-                        $('#' + triggerId).val(values[0]);
+                        $('#' + triggerId).val(values[0]).trigger('change.MTAppListing');
                     }
 
                     if (op.cbAfterOK !== null && typeof op.cbAfterOK === 'function') {
