@@ -1687,11 +1687,13 @@
                 underStyle[key] = '';
             }
 
-            var $parentSpan = null;
-            var $statusSpan = null;
+            var $parentSpan = $this.parent('.mtappmaxlength-wrapper');
             var hidden = op.viewCount ? '' : ' hidden';
-            $parentSpan = $this.wrap('<span class="mtappmaxlength-wrapper"></span>').parent().width(width);
-            $statusSpan = $parentSpan.append('<span class="mtappmaxlength-status' + hidden + '"></span>').find('.mtappmaxlength-status');
+            if (!$parentSpan.length) {
+                $parentSpan = $this.wrap('<span class="mtappmaxlength-wrapper"></span>').parent().width(width);
+                $parentSpan.append('<span class="mtappmaxlength-status' + hidden + '"></span>');
+            }
+            var $statusSpan = $parentSpan.find('.mtappmaxlength-status');
             $this
                 .addClass('mtappmaxlength-item')
                 .data('mtappmaxlength', maxLength)
