@@ -1694,6 +1694,9 @@
                 $parentSpan.append('<span class="mtappmaxlength-status' + hidden + '"></span>');
             }
             var $statusSpan = $parentSpan.find('.mtappmaxlength-status');
+            if (op.addAttr) {
+                $this.attr('maxlength', maxLength);
+            }
             $this
                 .addClass('mtappmaxlength-item')
                 .data('mtappmaxlength', maxLength)
@@ -1729,6 +1732,8 @@
         l10n: null,
         // The maxLength option is required. You have to set not less than 1.
         maxLength: 0,
+        // If set to true, add the maxlength attribute to the target element.
+        addAttr: false,
         // An object of the CSS property-value pairs to set.
         // This CSS is applied to the input elements when number of characters get grater than maxLength.
         overStyle: {
