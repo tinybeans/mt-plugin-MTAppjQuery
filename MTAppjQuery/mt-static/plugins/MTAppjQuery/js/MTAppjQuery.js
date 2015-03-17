@@ -1801,7 +1801,7 @@
     $.MTAppSlideMenuV2 = function(options){
         var op = $.extend({}, $.MTAppSlideMenuV2.defaults, options);
 
-        if (typeof mtappVars.can_access_blogs_json.website === 'undefined' || !/^6\.0/.test(mtappVars.minor_version)) return;
+        if (typeof mtappVars.can_access_blogs_json.website === 'undefined' || !/^6\./.test(mtappVars.minor_version)) return;
 
         var crtUrl = location.href;
 
