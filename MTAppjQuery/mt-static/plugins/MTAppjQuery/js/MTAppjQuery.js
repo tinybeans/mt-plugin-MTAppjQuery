@@ -1377,11 +1377,19 @@
                 var multiple = op.multiple ? ' multiple' : '';
 
                 // Make upload form
-                var uploadFromHtml = [
-                    '<div class="mtapp-multifileupload-file"><input type="file" id="' + inputFileId + '"' + multiple + '></div>',
-                    '<div class="mtapp-multifileupload-items" id="' + inputUploadItemsId + '" style="display:none;"></div>'
-                    // '<p><input id="' + inputUploadBtnId + '" type="button" value="Upload" class="button"></p>'
-                ].join("");
+                var uploadFromHtml = '';
+                if (op.uploadButton) {
+                    uploadFromHtml =
+                        '<div class="mtapp-multifileupload-file">' +
+                            '<input type="file" id="' + inputFileId + '"' + multiple + ' style="display:none;">' +
+                            op.uploadButton +
+                        '</div>';
+                }
+                else {
+                    uploadFromHtml =
+                        '<div class="mtapp-multifileupload-file"><input type="file" id="' + inputFileId + '"' + multiple + '></div>';
+                }
+                uploadFromHtml += '<div class="mtapp-multifileupload-items" id="' + inputUploadItemsId + '" style="display:none;"></div>';
                 // Widget Type
                 if (op.type === 'widget') {
                     var itemUploadWidget = $.MTAppMakeWidget({
@@ -1393,6 +1401,13 @@
                 // Input Type
                 else {
                     $this.css(op.targetInputStyle).after(uploadFromHtml);
+                }
+                // When an original button is clicked
+                if (op.uploadButton) {
+                    $('#' + inputFileId).next().on('click', function(){
+                        $('#' + inputFileId).trigger('click');
+                        return false;
+                    });
                 }
 
                 // Get the element for appending upload items
@@ -1596,6 +1611,8 @@
         // Set the upload directory path from a root of blog url for other type files excluding images.
         // e.g. 'upload/files'
         uploadFilesPath: null,
+        // If you would like to use an original file button, set HTML to this option.
+        uploadButton: null,
         debug: false
     };
     /*  end - $.fn.MTAppMultiFileUpload()  */
