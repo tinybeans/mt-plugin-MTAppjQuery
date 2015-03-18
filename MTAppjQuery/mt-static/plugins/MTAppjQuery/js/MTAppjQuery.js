@@ -1572,6 +1572,9 @@
                                     $includeAssetIds.val(_ids + "," + response.id);
                                 }
                             }
+                            if (op.cbAfterUpload !== null && typeof op.cbAfterUpload === 'function') {
+                                op.cbAfterUpload({name: 'cbAfterUpload'}, $this, response);
+                            }
                         });
                     }
                 });
@@ -1613,6 +1616,15 @@
         uploadFilesPath: null,
         // If you would like to use an original file button, set HTML to this option.
         uploadButton: null,
+        // Called after upload files.
+        // e.g.
+        // cbAfterUpload: function(cb, $this, response){
+        //     do something
+        // }
+        // - cb : {name: 'cbAfterUpload'}
+        // - $this : The target element applying .MTAppMultiFileUpload()
+        // - response : The respunse from uploadAsset()
+        cbAfterUpload: null,
         debug: false
     };
     /*  end - $.fn.MTAppMultiFileUpload()  */
