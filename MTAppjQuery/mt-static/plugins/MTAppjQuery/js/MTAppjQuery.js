@@ -1764,13 +1764,13 @@
         // If set to true, add the maxlength attribute to the target element.
         addAttr: false,
         // An object of the CSS property-value pairs to set.
-        // This CSS is applied to the input elements when number of characters get grater than maxLength.
+        // This CSS is applied to the input elements when number of characters become greater than maxLength.
         overStyle: {
             border: '1px solid #ff0000',
             color: '#ff0000'
         },
         // An object of the CSS property-value pairs to set.
-        // This CSS is applied to the elements when number of characters get grater than maxLength.
+        // This CSS is applied to the status elements when number of characters become greater than maxLength.
         overStatusStyle: {
             color: '#ff0000'
         },
