@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010-06-22
- * Update:  2015-03-13
+ * Update:  2015-03-23
  *
  */
 ;(function($){
@@ -1377,11 +1377,19 @@
                 var multiple = op.multiple ? ' multiple' : '';
 
                 // Make upload form
-                var uploadFromHtml = [
-                    '<div class="mtapp-multifileupload-file"><input type="file" id="' + inputFileId + '"' + multiple + '></div>',
-                    '<div class="mtapp-multifileupload-items" id="' + inputUploadItemsId + '" style="display:none;"></div>'
-                    // '<p><input id="' + inputUploadBtnId + '" type="button" value="Upload" class="button"></p>'
-                ].join("");
+                var uploadFromHtml = '';
+                if (op.uploadButton) {
+                    uploadFromHtml =
+                        '<div class="mtapp-multifileupload-file">' +
+                            '<input type="file" id="' + inputFileId + '"' + multiple + ' style="display:none;">' +
+                            op.uploadButton +
+                        '</div>';
+                }
+                else {
+                    uploadFromHtml =
+                        '<div class="mtapp-multifileupload-file"><input type="file" id="' + inputFileId + '"' + multiple + '></div>';
+                }
+                uploadFromHtml += '<div class="mtapp-multifileupload-items" id="' + inputUploadItemsId + '" style="display:none;"></div>';
                 // Widget Type
                 if (op.type === 'widget') {
                     var itemUploadWidget = $.MTAppMakeWidget({
@@ -1393,6 +1401,13 @@
                 // Input Type
                 else {
                     $this.css(op.targetInputStyle).after(uploadFromHtml);
+                }
+                // When an original button is clicked
+                if (op.uploadButton) {
+                    $('#' + inputFileId).next().on('click', function(){
+                        $('#' + inputFileId).trigger('click');
+                        return false;
+                    });
                 }
 
                 // Get the element for appending upload items
@@ -1557,6 +1572,9 @@
                                     $includeAssetIds.val(_ids + "," + response.id);
                                 }
                             }
+                            if (op.cbAfterUpload !== null && typeof op.cbAfterUpload === 'function') {
+                                op.cbAfterUpload({name: 'cbAfterUpload'}, $this, response);
+                            }
                         });
                     }
                 });
@@ -1572,10 +1590,10 @@
         siteId: mtappVars.blog_id,
         // If this value is true and the file with the same filename exists,
         // the uploaded file is automatically renamed to the random generated name.
-        normalizeOrientation: true,
+        autoRenameIfExists: true,
         // If this value is true and the uploaded file has a orientation information in Exif,
         // this file's orientation is automatically normalized.
-        autoRenameIfExists: true,
+        normalizeOrientation: true,
         // 'input' or 'widget'
         type: 'input',
         // If you set input to the type option, this value is added to style of the target element.
@@ -1596,6 +1614,17 @@
         // Set the upload directory path from a root of blog url for other type files excluding images.
         // e.g. 'upload/files'
         uploadFilesPath: null,
+        // If you would like to use an original file button, set HTML to this option.
+        uploadButton: null,
+        // Called after upload files.
+        // e.g.
+        // cbAfterUpload: function(cb, $this, response){
+        //     do something
+        // }
+        // - cb : {name: 'cbAfterUpload'}
+        // - $this : The target element applying .MTAppMultiFileUpload()
+        // - response : The respunse from uploadAsset()
+        cbAfterUpload: null,
         debug: false
     };
     /*  end - $.fn.MTAppMultiFileUpload()  */
@@ -1687,11 +1716,16 @@
                 underStyle[key] = '';
             }
 
-            var $parentSpan = null;
-            var $statusSpan = null;
+            var $parentSpan = $this.parent('.mtappmaxlength-wrapper');
             var hidden = op.viewCount ? '' : ' hidden';
-            $parentSpan = $this.wrap('<span class="mtappmaxlength-wrapper"></span>').parent().width(width);
-            $statusSpan = $parentSpan.append('<span class="mtappmaxlength-status' + hidden + '"></span>').find('.mtappmaxlength-status');
+            if (!$parentSpan.length) {
+                $parentSpan = $this.wrap('<span class="mtappmaxlength-wrapper"></span>').parent().width(width);
+                $parentSpan.append('<span class="mtappmaxlength-status' + hidden + '"></span>');
+            }
+            var $statusSpan = $parentSpan.find('.mtappmaxlength-status');
+            if (op.addAttr) {
+                $this.attr('maxlength', maxLength);
+            }
             $this
                 .addClass('mtappmaxlength-item')
                 .data('mtappmaxlength', maxLength)
@@ -1727,14 +1761,16 @@
         l10n: null,
         // The maxLength option is required. You have to set not less than 1.
         maxLength: 0,
+        // If set to true, add the maxlength attribute to the target element.
+        addAttr: false,
         // An object of the CSS property-value pairs to set.
-        // This CSS is applied to the input elements when number of characters get grater than maxLength.
+        // This CSS is applied to the input elements when number of characters become greater than maxLength.
         overStyle: {
             border: '1px solid #ff0000',
             color: '#ff0000'
         },
         // An object of the CSS property-value pairs to set.
-        // This CSS is applied to the elements when number of characters get grater than maxLength.
+        // This CSS is applied to the status elements when number of characters become greater than maxLength.
         overStatusStyle: {
             color: '#ff0000'
         },
@@ -1794,7 +1830,7 @@
     $.MTAppSlideMenuV2 = function(options){
         var op = $.extend({}, $.MTAppSlideMenuV2.defaults, options);
 
-        if (typeof mtappVars.can_access_blogs_json.website === 'undefined' || !/^6\.0/.test(mtappVars.minor_version)) return;
+        if (typeof mtappVars.can_access_blogs_json.website === 'undefined' || !/^6\./.test(mtappVars.minor_version)) return;
 
         var crtUrl = location.href;
 
