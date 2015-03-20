@@ -37,6 +37,21 @@
 .mtapp-clear-b  { clear: both;  }
 
 /* ----------------------------------------
+   __Loading Image
+---------------------------------------- */
+#mtapp-loading-image {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    margin: auto;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    z-index: 99999;
+}
+/* ----------------------------------------
    __管理画面のスタイル
 ---------------------------------------- */
 textarea#jqplugin,
@@ -660,3 +675,40 @@ span.mtappmultiform-radio {
     }
 }
 /*  MTAppListing  */
+
+/* ==================================================
+    MTAppMultiFileUpload
+================================================== */
+.mtapp-multifileupload-file {
+    display: inline;
+}
+.mtapp-multifileupload-items {
+    p.mtapp-upload-item {
+        margin: 5px 0 10px;
+        a.mtapp-item-type-image,
+        a.mtapp-item-type-file {
+            margin-right: 5px;
+            img {
+                max-width: 100px;
+            }
+        }
+    }
+}
+/*  MTAppMultiFileUpload  */
+
+/* ==================================================
+    MTAppMaxLength
+================================================== */
+.mtappmaxlength-wrapper {
+    position: relative;
+    display: block;
+}
+.mtappmaxlength-status {
+    position: absolute;
+    display: block;
+    width: 18em;
+    top: -1.2em;
+    right: 0;
+    text-align: right;
+}
+/*  MTAppMaxLength  */

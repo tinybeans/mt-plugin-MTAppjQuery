@@ -2,13 +2,13 @@ package MT::Plugin::MTAppjQuery;
 use strict;
 use base qw( MT::Plugin );
 
-our $VERSION = '1.7.0';
+our $VERSION = '1.8.0';
 
 my $plugin = MT::Plugin::MTAppjQuery->new({
     id          => 'mt_app_jquery',
     key         => __PACKAGE__,
     name        => 'MTAppjQuery',
-    description => '<__trans phrase="Customize the management screen of MT5 to use jQuery.">',
+    description => '<__trans phrase="Customize the management screen of Movable Type to use jQuery.">',
     version     => $VERSION,
     author_name => 'Tomohiro Okuwaki',
     author_link => 'http://www.tinybeans.net/blog/',

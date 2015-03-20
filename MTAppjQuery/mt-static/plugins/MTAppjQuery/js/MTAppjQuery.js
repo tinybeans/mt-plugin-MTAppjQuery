@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010-06-22
- * Update:  2015-01-10
+ * Update:  2015-03-23
  *
  */
 ;(function($){
@@ -37,6 +37,10 @@
             l10n.addRow = '行を追加';
             l10n.addColumn = '列を追加';
             l10n.clearData = '削除';
+            l10n.showJSON = 'JSONを表示';
+            l10n.hideJSON = 'JSONを非表示';
+            l10n.debugMessage = 'フィールドが表示されているときはテーブル内の値は無視され、フィールド内の JSON がそのまま保存されます。';
+            l10n.checkSyntax = 'JSONの文法をチェック';
             l10n.addColumnProperty = 'プロパティ名（例：title）';
             l10n.addColumnPropertyDisplayName = 'プロパティ表示名（例：タイトル）';
             l10n.cellMerge = 'セルを結合';
@@ -49,6 +53,10 @@
             l10n.addRow = 'Add a row';
             l10n.addColumn = 'Add a column';
             l10n.clearData = 'Delete';
+            l10n.showJSON = 'Show JSON';
+            l10n.hideJSON = 'Hide JSON';
+            l10n.debugMessage = 'When the field is visible, ignore table values and save JSON.';
+            l10n.checkSyntax = 'Check JSON syntax';
             l10n.addColumnProperty = 'Property Name (e.g. title)';
             l10n.addColumnPropertyDisplayName = 'Property Display Name (e.g. Title)';
             l10n.cellMerge = 'Merge cells';
@@ -65,10 +73,18 @@
 
         return this.each(function(){
 
-            var $this = $(this);
-            if (!op.debug) {
-                $this.hide();
+            // Check the headerOrder of properties
+            var order = op.headerOrder;
+            if ($.isArray(order) && order.length === 0) {
+                alert('Error in .MTAppJSONTable: The "headerOrder" option is required.');
+                return;
             }
+
+            var $this = $(this);
+            $this.addClass('hidden').css({
+                marginBottom: '10px'
+            });
+
             var jsonStr = $this.val();
             var json = null;
             if (/^\{/.test(jsonStr)) {
@@ -92,18 +108,19 @@
                 return;
             }
 
-            // Check the order of properties
-            var order = op.headerOrder;
-            if ($.isArray(order) && order.length === 0) {
-                alert('Error in .MTAppJSONTable: The "order" option is required.');
-                return;
-            }
-
             var items = json[op.itemsRootKey];
             if (items.length === 0) {
                 items[0] = {};
                 for (var i = 0, l = order.length; i < l; i++) {
                     items[0][order[i]] = '';
+                }
+            }
+            // Merge headerOrder to JSON
+            for (var i = 0, l = order.length; i < l; i++) {
+                for (var x = 0, y = items.length; x < y; x++) {
+                    if (!items[x].hasOwnProperty(order[i])) {
+                        items[x][order[i]] = '';
+                    }
                 }
             }
 
@@ -163,9 +180,9 @@
                     '[# } #]',
                     '[# for (var x = 0, y = headerOrder.length; x < y; x++) { #]',
                     '<td class="[#= headerOrder[x] #]" data-name="[#= headerOrder[x] #]">',
-                        '[# if (inputType === "input") { #]',
+                        '[# if (inputType === "input" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "input") ) { #]',
                             '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="">',
-                        '[# } else if (inputType === "textarea") { #]',
+                        '[# } else if (inputType === "textarea" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "textarea") ) { #]',
                             '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]"></textarea>',
                         '[# } #]',
                     '</td>',
@@ -212,9 +229,9 @@
                              '[# } #]',
                         '>',
                             '[# if (edit) { #]',
-                                '[# if (inputType === "input") { #]',
+                                '[# if (inputType === "input" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "input") ) { #]',
                                     '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="[#= items[i][headerOrder[x]] #]">',
-                                '[# } else if (inputType === "textarea") { #]',
+                                '[# } else if (inputType === "textarea" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "textarea") ) { #]',
                                     '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
                                 '[# } #]',
                             '[# } else { #]',
@@ -232,9 +249,9 @@
 
             tmpl.tbodyLeftPlain = [
                 '<td class="[#= headerOrder #] item-[#= i #] last-child" data-item-index="[#= i #]" data-name="[#= headerOrder #]">',
-                    '[# if (inputType === "input") { #]',
+                    '[# if (inputType === "input" || (inputType === "object" && inputTypeObj[headerOrder] && inputTypeObj[headerOrder] === "input") ) { #]',
                         '<input class="jsontable-input" type="text" data-name="[#= headerOrder #]" value="">',
-                    '[# } else if (inputType === "textarea") { #]',
+                    '[# } else if (inputType === "textarea" || (inputType === "object" && inputTypeObj[headerOrder] && inputTypeObj[headerOrder] === "textarea") ) { #]',
                         '<textarea class="jsontable-input" data-name="[#= headerOrder #]"></textarea>',
                     '[# } #]',
                 '</td>'
@@ -268,9 +285,9 @@
                             '[# } #]',
                         '>',
                             '[# if (edit) { #]',
-                                '[# if (inputType === "input") { #]',
+                                '[# if (inputType === "input" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "input") ) { #]',
                                     '<input class="jsontable-input" type="text" data-name="[#= headerOrder[x] #]" value="[#= items[i][headerOrder[x]] #]">',
-                                '[# } else if (inputType === "textarea") { #]',
+                                '[# } else if (inputType === "textarea" || (inputType === "object" && inputTypeObj[headerOrder[x]] && inputTypeObj[headerOrder[x]] === "textarea") ) { #]',
                                     '<textarea class="jsontable-input" data-name="[#= headerOrder[x] #]">[#= items[i][headerOrder[x]] #]</textarea>',
                                 '[# } #]',
                             '[# } else { #]',
@@ -300,12 +317,20 @@
                     '[# if (clear) { #]',
                     '<a href="#" class="button jsontable-clear">' + l10n.clearData + '</a>',
                     '[# } #]',
+                    '[# if (debug) { #]',
+                    '<a href="#" class="button jsontable-debug">' + l10n.showJSON + '</a>',
+                    '<a href="#" class="button jsontable-check-json primary hidden">' + l10n.checkSyntax + '</a>',
+                    '[# } #]',
                     '[# if (optionButtons) { #]',
                         '[# for (var i = 0, l = optionButtons.length; i < l; i++) { #]',
                         '<a href="#" class="button [#= optionButtons[i].classname #]">[#= optionButtons[i].text #]</a>',
                         '[# } #]',
                     '[# } #]',
                 '</div>'
+            ].join("");
+
+            tmpl.debugMessage = [
+                '<div class="msg msg-error jsontable-debug-message hidden">' + l10n.debugMessage + '</div>'
             ].join("");
 
             tmpl.container = [
@@ -337,7 +362,7 @@
 
                     '</table>',
 
-                    '[# if (add || clear || optionButtons) { #]',
+                    '[# if (add || clear || optionButtons || debug) { #]',
                         '[#= context.include("buttons") #]',
                     '[# } #]',
 
@@ -345,6 +370,11 @@
             ].join("\n");
 
             // Build HTML and insert a table.
+            if ($.varType(op.inputType) === 'object') {
+                op.inputTypeObj = op.inputType;
+                op.inputType = 'object';
+            }
+
             var tableHtml = Template.process('container', op, tmpl);
             $(this).after(tableHtml);
 
@@ -392,9 +422,7 @@
                         }
                     }
                     else if ($(this).hasClass('jsontable-add-column')) {
-                        alert('itemLength = ' + itemLength);
                         var headerOrderClone = $.extend(true, [], op.headerOrder);
-                        var inputType = op.inputType;
                         // $table.find('td:last-child').each(function(){
                         //     var idx = $(this).index();
                         //     if (idx > dataItemIndex) {
@@ -411,7 +439,8 @@
                             else {
                                 var data = {
                                     headerOrder: headerOrderClone.shift(),
-                                    inputType: inputType,
+                                    inputType: op.inputType,
+                                    inputTypeObj: op.inputTypeObj,
                                     i: itemLength
                                 };
                                 $td = Template.process('tbodyLeftPlain', data, tmpl);
@@ -434,67 +463,100 @@
                             $table.data('item-length', itemLength);
                         }
                     }
-                    else if ($(this).hasClass('jsontable-cellMerge')) {
-                        $(this).toggleClass('primary');
-                        var firstSelect = true;
-                        var selectMergedCell = function(e){
-                            var $td = $(this);
-                            var $tr = $td.parent();
-                            var tdIndex = $td.index();
-                            $td.toggleClass('merge-target');
-                            firstSelect = false;
-                        };
-                        // Select merged cells
-                        if ($(this).hasClass('primary')) {
-                            // Clear classes
-                            $table.find('td.merge-target').removeClass('merge-target');
-                            $(this).text(l10n.cellMergeApply);
-                            $table.on('click', 'td', selectMergedCell);
-                        }
-                        // Apply merge
-                        else {
-                            $(this).text(l10n.cellMerge);
-                            $table.off('click', 'td');
-                            var $mergeTarget = $table.find('td.merge-target');
-                            var firstCell = {}, firstLine = {}, firstLineLastCell = {},
-                                lastCell  = {}, lastLine  = {};
-                            firstCell.obj = $mergeTarget.first();
-                            firstCell.idx = firstCell.obj.index();
-                            firstLine.obj = firstCell.obj.parent();
-                            firstLine.idx = firstLine.obj.index();
-                            firstLineLastCell.obj = firstLine.obj.children('.merge-target').last();
-                            firstLineLastCell.idx = firstLineLastCell.obj.index();
-                            lastCell.obj = $mergeTarget.last();
-                            lastCell.idx = lastCell.obj.index();
-                            lastLine.obj = lastCell.obj.parent();
-                            lastLine.idx = lastLine.obj.index();
-                            var colspan = firstLine.obj.children('.merge-target').length;
-                            var rowspan = lastLine.idx - firstLine.idx + 1;
-                            // Check existed colspan values
-                            var existedColspan = 0;
-                            firstLine.obj.children('.merge-target').filter('[colspan]').each(function(){
-                                existedColspan += Number($(this).attr('colspan'));
-                            });
-                            if (existedColspan) {
-                                colspan += (existedColspan - 1);
-                            }
-                            if (colspan > 1) {
-                                firstCell.obj.attr('colspan', colspan);
-                            }
-                            if (rowspan > 1) {
-                                firstCell.obj.attr('rowspan', rowspan);
-                            }
-                            $table.find('td.merge-target').not(':first').remove();
-                        }
-                        $table.toggleClass('jsontable-cell-merge');
+                    return false;
+                });
+            }
+
+            if (op.cellMerge) {
+                $container.on('click', 'a.jsontable-cellMerge', function(){
+                    $(this).toggleClass('primary');
+                    var firstSelect = true;
+                    var selectMergedCell = function(e){
+                        var $td = $(this);
+                        var $tr = $td.parent();
+                        var tdIndex = $td.index();
+                        $td.toggleClass('merge-target');
+                        firstSelect = false;
+                    };
+                    // Select merged cells
+                    if ($(this).hasClass('primary')) {
+                        // Clear classes
+                        $table.find('td.merge-target').removeClass('merge-target');
+                        $(this).text(l10n.cellMergeApply);
+                        $table.on('click', 'td', selectMergedCell);
                     }
+                    // Apply merge
+                    else {
+                        $(this).text(l10n.cellMerge);
+                        $table.off('click', 'td');
+                        var $mergeTarget = $table.find('td.merge-target');
+                        var firstCell = {}, firstLine = {}, firstLineLastCell = {},
+                            lastCell  = {}, lastLine  = {};
+                        firstCell.obj = $mergeTarget.first();
+                        firstCell.idx = firstCell.obj.index();
+                        firstLine.obj = firstCell.obj.parent();
+                        firstLine.idx = firstLine.obj.index();
+                        firstLineLastCell.obj = firstLine.obj.children('.merge-target').last();
+                        firstLineLastCell.idx = firstLineLastCell.obj.index();
+                        lastCell.obj = $mergeTarget.last();
+                        lastCell.idx = lastCell.obj.index();
+                        lastLine.obj = lastCell.obj.parent();
+                        lastLine.idx = lastLine.obj.index();
+                        var colspan = firstLine.obj.children('.merge-target').length;
+                        var rowspan = lastLine.idx - firstLine.idx + 1;
+                        // Check existed colspan values
+                        var existedColspan = 0;
+                        firstLine.obj.children('.merge-target').filter('[colspan]').each(function(){
+                            existedColspan += Number($(this).attr('colspan'));
+                        });
+                        if (existedColspan) {
+                            colspan += (existedColspan - 1);
+                        }
+                        if (colspan > 1) {
+                            firstCell.obj.attr('colspan', colspan);
+                        }
+                        if (rowspan > 1) {
+                            firstCell.obj.attr('rowspan', rowspan);
+                        }
+                        $table.find('td.merge-target').not(':first').remove();
+                    }
+                    $table.toggleClass('jsontable-cell-merge');
+                    return false;
+                });
+            }
+
+            if (op.debug) {
+                $this.before(Template.process('debugMessage', {}, tmpl));
+                $container.on('click', 'a.jsontable-debug', function(){
+                    if ($(this).hasClass('showed-json')) {
+                        $(this).removeClass('showed-json').text(l10n.showJSON).next().addClass('hidden');
+                        $this.addClass('hidden').prev().addClass('hidden');
+                    }
+                    else {
+                        $(this).addClass('showed-json').text(l10n.hideJSON).next().removeClass('hidden');
+                        $this.removeClass('hidden').prev().removeClass('hidden');
+                    }
+                    return false;
+                });
+                $container.on('click', 'a.jsontable-check-json', function(){
+                    try {
+                        json = JSON.parse($this.val());
+                    }
+                    catch(e) {
+                        alert(e.message);
+                        return false;
+                    }
+                    alert('Valid');
                     return false;
                 });
             }
 
             // Save values edited by user
             if (op.edit) {
-                $('form[method="post"]').on('submit', function(){
+                $('form[method="post"]').on('submit.MTAppJSONTable', function(){
+                    if ($this.is(':visible')) {
+                        return true;
+                    }
                     var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")');
                     $this.val(result);
                 });
@@ -700,8 +762,9 @@
                 .on('click', '#mtapplisting-dialog-cancel', function(e){
                     $(e.delegateTarget).html('').removeClass('mt-dialog').hide();
                     $('#mtapplisting-overlay').removeClass('mt-dialog-overlay').removeClass('overlay').hide();
+                    var triggerId = $(e.delegateTarget).data('triggerId');
                     if (op.cbAfterCancel !== null && typeof op.cbAfterCancel === 'function') {
-                        op.cbAfterCancel({name: 'cbAfterCancel'}, e.delegateTarget);
+                        op.cbAfterCancel({name: 'cbAfterCancel'}, $(e.delegateTarget), $('#' + triggerId));
                     }
                     return false;
                 })
@@ -723,14 +786,14 @@
                         });
                     }
                     if (values.length > 1) {
-                        $('#' + triggerId).val(',' + values.join(',') + ',');
+                        $('#' + triggerId).val(',' + values.join(',') + ',').trigger('change.MTAppListing');
                     }
                     else {
-                        $('#' + triggerId).val(values[0]);
+                        $('#' + triggerId).val(values[0]).trigger('change.MTAppListing');
                     }
 
                     if (op.cbAfterOK !== null && typeof op.cbAfterOK === 'function') {
-                        op.cbAfterOK({name: 'cbAfterOK'}, e.delegateTarget);
+                        op.cbAfterOK({name: 'cbAfterOK'}, $(e.delegateTarget), $('#' + triggerId));
                     }
 
                     // Reset trigger
@@ -753,7 +816,7 @@
                         }
                     });
                     if (op.cbAfterSearch !== null && typeof op.cbAfterSearch === 'function') {
-                        op.cbAfterSearch({name: 'cbAfterSearch'}, e.delegateTarget);
+                        op.cbAfterSearch({name: 'cbAfterSearch'}, $(e.delegateTarget));
                     }
                     return false;
                 })
@@ -765,7 +828,7 @@
                 .on('click', '#mtapplisting-search-reset', function(e){
                     $('#mtapplisting-text-filter').val('');
                     if (op.cbAfterSearchReset !== null && typeof op.cbAfterSearchReset === 'function') {
-                        op.cbAfterSearchReset({name: 'cbAfterSearchReset'}, e.delegateTarget);
+                        op.cbAfterSearchReset({name: 'cbAfterSearchReset'}, $(e.delegateTarget));
                     }
                     $('#mtapplisting-text-search').trigger('click');
                     return false;
@@ -802,11 +865,15 @@
                 /* ==================================================
                     Event of opening the dialog window
                 ================================================== */
-                .on('click', function(){ // Don't use ".mtDialog()"
+                .on('click', function(e){ // Don't use ".mtDialog()"
 
                     // Set the trigger id
                     var $dialog = $('#mtapplisting-dialog').addClass('mt-dialog');
                     $dialog.data('triggerId', $thisId);
+
+                    if (op.cbAfterOpenDialogFirst !== null && typeof op.cbAfterOpenDialogFirst === 'function') {
+                        op.cbAfterOpenDialogFirst({name: 'cbAfterOpenDialogFirst'}, $dialog, $this, $(e.target));
+                    }
 
                     // Show the overlay
                     $('#mtapplisting-overlay').addClass('mt-dialog-overlay').addClass('overlay').css({minHeight: $(document).height()}).show();
@@ -879,8 +946,14 @@
                         op.jsontable.listingTargetKey = op.jsontable.listingTargetKey || 'id';
                         op.jsontable.optionButtons = null;
                         op.jsontable.cbAfterSelectRow = function(cb, $tr, checked){
-                            if (!checked) {
-                                $tr.prependTo('#mtapplisting-tbody2');
+                            var defaultAction = true;
+                            if (op.cbAfterSelectRowUpperTable !== null && typeof op.cbAfterSelectRowUpperTable === 'function') {
+                                defaultAction = op.cbAfterSelectRowUpperTable({name: 'cbAfterSelectRowUpperTable'}, $tr, checked);
+                            }
+                            if (defaultAction) {
+                                if (!checked) {
+                                    $tr.prependTo('#mtapplisting-tbody2');
+                                }
                             }
                         };
                         op.jsontable.cbAfterBuild = function(cb, $container){
@@ -909,13 +982,19 @@
                         op.jsontable.footer = true; // overwrite
                         op.jsontable.items = response; // overwrite
                         op.jsontable.cbAfterSelectRow = function(cb, $tr, checked){  // overwrite
-                            $('#mtapplisting-textarea1').next().show();
-                            if (checked) {
-                                $tr.find('td').each(function(){
-                                    var w = $(this).width();
-                                    $(this).width(w + 'px');
-                                });
-                                $tr.appendTo('#mtapplisting-tbody1');
+                            var defaultAction = true;
+                            if (op.cbAfterSelectRowLowerTable !== null && typeof op.cbAfterSelectRowLowerTable === 'function') {
+                                defaultAction = op.cbAfterSelectRowLowerTable({name: 'cbAfterSelectRowLowerTable'}, $tr, checked);
+                            }
+                            if (defaultAction) {
+                                $('#mtapplisting-textarea1').next().show();
+                                if (checked) {
+                                    $tr.find('td').each(function(){
+                                        var w = $(this).width();
+                                        $(this).width(w + 'px');
+                                    });
+                                    $tr.appendTo('#mtapplisting-tbody1');
+                                }
                             }
                         };
                         op.jsontable.cbAfterBuild = function(cb, $container){ // overwrite
@@ -928,6 +1007,9 @@
                         op.jsontable.debug = false;
 
                         $('#mtapplisting-textarea2').MTAppJSONTable(op.jsontable);
+                        if (op.cbAjaxDone !== null && typeof op.cbAjaxDone === 'function') {
+                            op.cbAjaxDone({name: 'cbAjaxDone'}, $dialog);
+                        }
                     })
                     .fail(function(jqXHR, status){
                         $indicator.addClass('hidden');
@@ -945,6 +1027,9 @@
                         $dialog.find('div.mtapplisting-content').removeClass('hidden');
                     });
 
+                    if (op.cbAfterOpenDialogLast !== null && typeof op.cbAfterOpenDialogLast === 'function') {
+                        op.cbAfterOpenDialogLast({name: 'cbAfterOpenDialogLast'}, $dialog, $this);
+                    }
                     return false;
                 });
                 /*  Event of opening the dialog window  */
@@ -962,6 +1047,7 @@
         l10n: null, // Plain Object. Please check the code of l10n section.
 
         // Callbacks
+        cbAfterOpenDialogFirst: null, // Called just after opening the dialog
         cbProcessResponse: null, // Process the response
         cbAjaxDoneFilterJSONTable: null, // Stop executing JSONTable by returning false from this function.
         // If you get JSON from Data API, you might want to set the following function to this option:
@@ -969,11 +1055,15 @@
         // cbAjaxDoneFilterJSONTable: function(cb, $dialog, response){
         //     return (response.items && response.items.length > 0);
         // },
-        cbAjaxFail: null, // Be called when data could not be get
+        cbAjaxDone: null, // Called when data is loaded
+        cbAjaxFail: null, // Called when data could not be get
         cbAfterCancel: null, // After clicking the cancel button
         cbAfterOK: null, // After clicking the OK button
         cbAfterSearch: null, // After searching
         cbAfterSearchReset: null, // After resetting the text filter
+        cbAfterOpenDialogLast: null, // After opening the dialog
+        cbAfterSelectRowUpperTable: null, // function({name: 'cbAfterSelectRowUpperTable'}, $tr, $(this).is(':checked')){}
+        cbAfterSelectRowLowerTable: null, // function({name: 'cbAfterSelectRowLowerTable'}, $tr, $(this).is(':checked')){}
 
         // JSONTable
         jsontable: { // You can set the following options of MTAppJSONTable
@@ -985,6 +1075,711 @@
         }
     };
     // end - $.fn.MTAppListing()
+
+    // -------------------------------------------------
+    //  $(foo).MTAppShowListEntries();
+    //
+    //  Description:
+    //    フィールドに保存されているIDの記事のタイトルをData APIで取得して表示する
+    //
+    //  Usage:
+    //    $(foo).MTAppShowListEntries(options);
+    //
+    // -------------------------------------------------
+    $.fn.MTAppShowListEntries = function(options){
+        var op = $.extend({}, $.fn.MTAppShowListEntries.defaults, options);
+
+        if (op.api === null || op.siteId === 0) {
+            return;
+        }
+        return this.each(function(){
+
+            // Hide the field applied MTAppListing
+            if (!op.debug) {
+                $(this).hide();
+            }
+
+            $(this).on('showListEntries', function(){
+
+                var $this = $(this);
+
+                $this.data('api-obj', op.api);
+
+                // Get value of the field applied MTAppListing
+                var ids = $this.val().replace(/^,|,$/g, '');
+                var idsArray = ids.split(',');
+
+                // Get div.mtapplisting-item-list by id
+                var $itemListContainer = $this.prev('.mtapplisting-item-list');
+                if ($itemListContainer.length < 1) {
+                    // <div class="mtapplisting-item-list">
+                    //   <div class="mtapplisting-item-list-content"></div>
+                    //   <img src="indicator-login.gif" alt="">
+                    // </div>
+                    var itemList = [
+                        '<div class="mtapplisting-item-list">',
+                            '<div class="mtapplisting-item-list-content"></div>',
+                            '<img class="mtapplisting-item-list-loading" src="' + StaticURI + 'images/indicator-login.gif" alt="" style="display:none;">',
+                        '</div>'
+                    ].join("");
+                    $(this).before(itemList);
+                    $itemListContainer = $this.prev('.mtapplisting-item-list');
+                }
+                $itemListContainer.find('.mtapplisting-item-list-content').html('');
+                if (!ids) {
+                    return;
+                }
+                $itemListContainer.find('.mtapplisting-item-list-loading').show();
+
+
+                var entries = {};
+                var tmpl = {};
+                tmpl.ul = function(li){
+                   return '<ul>' + li + '</ul>';
+                };
+                if (op.canEditAllPosts) {
+                    tmpl.li = function(obj){
+                        return [
+                            '<li>',
+                                '<span class="title">',
+                                  '<a href="' + CMSScriptURI + '?__mode=view&_type=entry&blog_id=' + op.siteId + '&id=' + obj.id + '" target="_blank">' + obj.title + '</a>',
+                                '</span>',
+                                '<span class="view-link">',
+                                  '<a href="' + obj.permalink + '" target="_blank">',
+                                    '<img alt="記事を見る" src="' + StaticURI + 'images/status_icons/view.gif">',
+                                  '</a>',
+                                '</span>',
+                            '</li>',
+                            ''
+                        ].join("");
+                    };
+                }
+                else {
+                    tmpl.li = function(obj){
+                        return [
+                            '<li>',
+                                '<span class="title">' + obj.title + '</span>',
+                                '<span class="view-link">',
+                                  '<a href="' + obj.permalink + '" target="_blank">',
+                                    '<img alt="記事を見る" src="' + StaticURI + 'images/status_icons/view.gif">',
+                                  '</a>',
+                                '</span>',
+                            '</li>',
+                            ''
+                        ].join("");
+                    };
+                }
+                var tmplOut = {};
+                for (var key in tmpl) {
+                    tmplOut[key] = [];
+                }
+
+                op.params = op.params || {};
+                op.params.includeIds = ids;
+                if ('limit' in op.params) {
+                    op.params.limit = 9999;
+                }
+                if ('fields' in op.params) {
+                    op.params.fields = 'id,title,permalink';
+                }
+                op.api.listEntries(op.siteId, op.params, function(response) {
+                    if (response.error) {
+                        return;
+                    }
+                    if (response.items.length > 0) {
+                        for (var i = 0, l = response.items.length; i < l; i++) {
+                            if (!response.items[i].title) {
+                                response.items[i].title = 'id:' + response.items[i].id;
+                            }
+                            entries[ 'id-' + response.items[i].id ] = response.items[i];
+                        }
+                        for (var i = 0, l = idsArray.length; i < l; i++) {
+                            tmplOut.li.push( tmpl.li( entries[ 'id-' + idsArray[i] ] ) );
+                        }
+                    }
+                    $itemListContainer
+                        .find('.mtapplisting-item-list-content').html(tmpl.ul(tmplOut.li.join("")))
+                        .end()
+                        .find('.mtapplisting-item-list-loading').hide();
+                });
+            });
+        });
+    };
+    $.fn.MTAppShowListEntries.defaults = {
+        // For Data API
+        api: null,
+        siteId: 0,
+        params: null,
+        // Permissions
+        canEditAllPosts: true,
+        debug: false
+    };
+    /*  end - $.fn.MTAppShowListEntries()  */
+
+    // -------------------------------------------------
+    //  $.MTAppApplyTinyMCE();
+    //
+    //  Description:
+    //    概要欄やテキスト（複数行）のカスタムフィールドをリッチテキストエディタに変更する
+    //
+    //  Usage:
+    //    $.MTAppApplyTinyMCE(Options);
+    //
+    //  Options:
+    //    target: {Array} リッチテキストエディタに変更するtextareaのidの配列
+    //    sortable: {Boolean} ドラッグアンドドロップのソートに対応させる場合はtrue
+    // -------------------------------------------------
+    $.MTAppApplyTinyMCE = function(options){
+        var op = $.extend({}, $.MTAppApplyTinyMCE.defaults, options);
+        if (mtappVars.template_filename !== 'edit_entry') return;
+        var target = op.target;
+            // target = ['excerpt', 'customfield_document_textarea']
+        var targetTrim = {};
+            // targetTrim = {
+            //     'excerpt': 'excerpt',
+            //     'customfield_document_textarea': 'document_textarea'
+            // }
+        var targetMce = {};
+            // targetMce = {
+            //     'excerpt': {id: "excerpt", options: Object, editors: Object, parentElement: null, currentEditor: MT.Editor.TinyMCE…},
+            //     'customfield_document_textarea': {id: "document_textarea", options: Object, editors: Object, parentElement: null, currentEditor: MT.Editor.TinyMCE…}
+            // }
+        for (var i = 0, l = target.length; i < l; i++) {
+            if (target[i].indexOf('customfield_') !== -1) {
+                targetTrim[target[i]] = target[i].replace('customfield_', '');
+                document.getElementById(target[i]).id = targetTrim[target[i]];
+            }
+            else {
+                targetTrim[target[i]] = target[i];
+            }
+            targetMce[target[i]] = new MT.EditorManager(targetTrim[target[i]]);
+        }
+        $('#entry_form').submit(function() {
+            for (var i = 0, l = target.length; i < l; i++) {
+                targetMce[target[i]].currentEditor.save();
+            }
+        });
+        if (op.sortable) {
+            $('#sortable').sortable({
+                start: function(event, ui){
+                    var id = ui.item[0].id.replace(/-field/,'');
+                    if ($.inArray(id, target) !== -1) {
+                        targetMce[id].currentEditor.save();
+                    }
+                },
+                stop: function(event, ui){
+                    var id = ui.item[0].id.replace(/-field/g,'');
+                    if ($.inArray(id, target) !== -1) {
+                        $('#' + targetTrim[id]).removeAttr('style').next().remove();
+                        targetMce[id] = new MT.EditorManager(targetTrim[id]);
+                    }
+                }
+            });
+        }
+    };
+    $.MTAppApplyTinyMCE.defaults = {
+        target: [],
+        sortable: true
+    };
+    // end - $.MTAppApplyTinyMCE()
+
+    // -------------------------------------------------
+    //  $(foo).MTAppMultiFileUpload();
+    //
+    //  Description:
+    //    Data API を利用してファイルをアップロードします
+    //
+    //  Usage:
+    //    $(foo).MTAppMultiFileUpload(options);
+    //
+    // -------------------------------------------------
+    $.fn.MTAppMultiFileUpload = function(options){
+        var op = $.extend({}, $.fn.MTAppMultiFileUpload.defaults, options);
+
+        // Check some required variables
+        if (op.api === null) {
+            return $.errorMessage('MTAppMultiFileUpload', 'The "api" option is required.', 'alert', false);
+        }
+        if (op.siteId === 0) {
+            return $.errorMessage('MTAppMultiFileUpload', 'The "siteId" option is required.', 'alert', false);
+        }
+        if (typeof api.uploadAsset !== 'function') {
+            return $.errorMessage('MTAppMultiFileUpload', 'mt-data-api.js is required.', 'alert', false);
+        }
+
+        var l10n = {};
+        if (mtappVars.language === 'ja') {
+            l10n.widgetTitle = 'ファイルアップロード';
+            l10n.remove = '削除';
+        }
+        else {
+            l10n.widgetTitle = 'Upload File';
+            l10n.remove = 'Remove';
+        }
+        // Overwrite existing l10n
+        if (op.l10n) {
+            for (var key in op.l10n) {
+                l10n[key] = op.l10n[key];
+            }
+        }
+
+        return this.each(function(){
+            // Get the value of target element
+            var $this = $(this);
+            var thisValue = op.type === 'input' ? $this.val() : '';
+            var thisValueArray = thisValue !== '' ? thisValue.split(',') : [];
+
+            // Set a random number
+            var rand = '' + Math.random();
+            rand = rand.replace('.','');
+
+            // Set ids
+            var inputFileId = 'mtapp-multifileupload-file-' + rand;
+            var inputUploadBtnId = 'mtapp-multifileupload-btn-' + rand;
+            var inputUploadItemsId = 'mtapp-multifileupload-items-' + rand;
+
+            // Make remove button
+            var removeHtml = '<a class="mtapp-item-remove" href="#">' + l10n.remove + '</a>';
+
+            // Use api.authenticate
+            if (typeof mtappVars.DataAPIFileUploadUser === 'string' && typeof mtappVars.DataAPIFileUploadUserPassword === 'string') {
+                api.authenticate({
+                    username: mtappVars.DataAPIFileUploadUser,
+                    password: mtappVars.DataAPIFileUploadUserPassword,
+                    remember: true
+                }, function(authResponse){
+                    successAuthenticattion(authResponse);
+                });
+            }
+            // Use api.getToken
+            else {
+                api.getToken(function(authResponse) {
+                    successAuthenticattion(authResponse, true);
+                });
+            }
+
+            // Core function
+            function successAuthenticattion(authResponse, useDataAPIAuth) {
+                // An error occurred
+                if (authResponse.error) {
+                    if (authResponse.error.code === 401 && useDataAPIAuth) {
+                        location.href = api.getAuthorizationUrl(location.href);
+                    }
+                    else if (authResponse.error.message) {
+                        return $.errorMessage('MTAppMultiFileUpload', authResponse.error.message, 'alert', false);
+                    }
+                    else {
+                        return $.errorMessage('MTAppMultiFileUpload', 'An error occurred while authenticating.', 'alert', false);
+                    }
+                }
+
+                // Make the multiple attribute
+                var multiple = op.multiple ? ' multiple' : '';
+
+                // Make upload form
+                var uploadFromHtml = '';
+                if (op.uploadButton) {
+                    uploadFromHtml =
+                        '<div class="mtapp-multifileupload-file">' +
+                            '<input type="file" id="' + inputFileId + '"' + multiple + ' style="display:none;">' +
+                            op.uploadButton +
+                        '</div>';
+                }
+                else {
+                    uploadFromHtml =
+                        '<div class="mtapp-multifileupload-file"><input type="file" id="' + inputFileId + '"' + multiple + '></div>';
+                }
+                uploadFromHtml += '<div class="mtapp-multifileupload-items" id="' + inputUploadItemsId + '" style="display:none;"></div>';
+                // Widget Type
+                if (op.type === 'widget') {
+                    var itemUploadWidget = $.MTAppMakeWidget({
+                        label: l10n.widgetTitle,
+                        content: uploadFromHtml
+                    });
+                    $("#related-content").prepend(itemUploadWidget);
+                }
+                // Input Type
+                else {
+                    $this.css(op.targetInputStyle).after(uploadFromHtml);
+                }
+                // When an original button is clicked
+                if (op.uploadButton) {
+                    $('#' + inputFileId).next().on('click', function(){
+                        $('#' + inputFileId).trigger('click');
+                        return false;
+                    });
+                }
+
+                // Get the element for appending upload items
+                var $itemUploadItems = $('#' + inputUploadItemsId).on('click', 'a.mtapp-item-remove', function(e){
+                    var $remove = $(e.target);
+                    var $item = $remove.prev();
+                    var itemSavedValue = $item.data('itemvalue');
+                    var valueArray = $this.val().split(',');
+                    valueArray = $.grep(valueArray, function(v, i){
+                        return v != itemSavedValue;
+                    });
+                    $this.val(valueArray.join(','));
+                    $remove.parent('.mtapp-upload-item').remove();
+                    return false;
+                });
+
+                // When the edit entry screen is loading, set upload items to the p element nearby the target element of MTAppMultiFileUpload
+                var itemUploadItemsHtml = '';
+                if (mtappVars.screen_id === 'edit-entry') {
+                    var $assetList = $("#asset-list");
+                    var $includeAssetIds = $("#include_asset_ids");
+                    if (op.type === 'input' && $this.val() !== '' && $assetList.length) {
+                        for (var i = 0, l = thisValueArray.length; i < l; i++) {
+                            // If saved value is ID
+                            if (op.saveData === 'id') {
+                                var $listAsset = $('#list-asset-' + thisValueArray[i]);
+                                if ($listAsset.hasClass('asset-type-image')) {
+                                    itemUploadItemsHtml += '<p class="mtapp-upload-item"><a class="mtapp-item-type-image" href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + thisValueArray[i] + '" target="_blank" data-itemvalue="' + thisValueArray[i] + '"><img src="' + $listAsset.find('img').attr('src') + '"></a>' + removeHtml + '</p>';
+                                }
+                                else if ($listAsset.hasClass('asset-type-file')) {
+                                    itemUploadItemsHtml += '<p class="mtapp-upload-item"><a class="mtapp-item-type-file" href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + thisValueArray[i] + '" target="_blank" data-itemvalue="' + thisValueArray[i] + '">' + $listAsset.find('a.asset-title').text() + '</a>' + removeHtml + '</p>';
+                                }
+                            }
+                            // If saved value is URL
+                            else if (op.saveData === 'url') {
+                                // Image's URL
+                                if (/(jpg|jpeg|gif|png|bmp|ico|tif|tiff)$/i.test(thisValueArray[i])) {
+                                    itemUploadItemsHtml += '<p class="mtapp-upload-item"><a class="mtapp-item-type-image" href="' + thisValueArray[i] + '" target="_blank" data-itemvalue="' + thisValueArray[i] + '"><img src="' + thisValueArray[i] + '"></a>' + removeHtml + '</p>';
+                                }
+                                // Other type file URL
+                                else {
+                                    itemUploadItemsHtml += '<p class="mtapp-upload-item"><a class="mtapp-item-type-file" href="' + thisValueArray[i] + '" target="_blank" data-itemvalue="' + thisValueArray[i] + '">' + thisValueArray[i] + '</a>' + removeHtml + '</p>';
+                                }
+                            }
+                        }
+                        // Set items
+                        $itemUploadItems.html(itemUploadItemsHtml).show();
+                    }
+                }
+
+                // When some files are selected at input:file element, upload those files by Data API.
+                $('#' + inputFileId).on('change', function(){
+                    // Get the HTML element which selected files.
+                    var inputFile = $(this)[0];
+                    // Get the count of selected files.
+                    var l = inputFile.files.length;
+                    // Remove a element for showing "No Assets".
+                    if (mtappVars.screen_id === 'edit-entry') {
+                        $("#empty-asset-list").remove();
+                    }
+                    // Repeat the number of selected files.
+                    for (var i = 0; i < l; i++) {
+                        var fileObj = inputFile.files[i];
+                        // Make data to upload
+                        var data = {
+                            file: fileObj,
+                            path: op.uploadPath,
+                            autoRenameIfExists: op.autoRenameIfExists,
+                            normalizeOrientation: op.normalizeOrientation
+                        };
+                        // The path of uploading images is defined
+                        if (typeof op.uploadImagesPath === 'string' && fileObj.type.indexOf("image") !== -1) {
+                            data.path = op.uploadImagesPath;
+                        }
+                        // The path of uploading files excluding images is defined
+                        else if (typeof op.uploadFilesPath === 'string') {
+                            data.path = op.uploadFilesPath;
+                        }
+                        // Show a loading image
+                        $itemUploadItems.append('<img class="loading" src="' + StaticURI + 'images/indicator-login.gif" alt="">').show();
+                        // Upload a file
+                        api.uploadAsset(op.siteId, data, function(response) {
+                            // An error occurred
+                            if (response.error) {
+                                var errorMessage = response.error.message ? ': ' + response.error.message : 'An error occurred while uploading.';
+                                return $.errorMessage('MTAppMultiFileUpload', errorMessage, 'alert', false);
+                            }
+                            // Input Type
+                            if (op.type === 'input') {
+                                var val = $this.val();
+                                if (val && op.multiple) {
+                                    $this.val(val + ',' + response[op.saveData]);
+                                }
+                                else {
+                                    $this.val(response[op.saveData]);
+                                }
+                            }
+                            // Set upload items to the p element nearby the target element of MTAppMultiFileUpload
+                            var itemHtml = '';
+                            // If saved value is ID
+                            if (op.saveData === 'id') {
+                                if (response.mimeType.indexOf("image") !== -1) {
+                                    itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-image" href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" target="_blank" data-itemvalue="' + response.id + '"><img src="' + response.url + '"></a>' + removeHtml + '</p>';
+                                    // itemHtml = '<a href="' + response.url + '" target="_blank"><img src="' + response.url + '" style="display:block;max-width:215px;margin-bottom:5px;"></a>';
+                                    // itemHtml = '<img src="' + response.url + '" style="display:block;max-width:100px;margin-bottom:5px;">';
+                                }
+                                else {
+                                    itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-file" href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" target="_blank" data-itemvalue="' + response.id + '">' + response.filename + '</a>' + removeHtml + '</p>';
+                                    // itemHtml = '<a href="' + response.url + '" target="_blank">' + response.filename + '</a>';
+                                    // itemHtml = '<span style="display:block;">' + response.filename + '</span>';
+                                }
+                            }
+                            // If saved value is URL
+                            else if (op.saveData === 'url') {
+                                // Image's URL
+                                if (response.mimeType.indexOf("image") !== -1) {
+                                    itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-image" href="' + response.url + '" target="_blank" data-itemvalue="' + response.url + '"><img src="' + response.url + '"></a>' + removeHtml + '</p>';
+                                }
+                                // Other type file URL
+                                else {
+                                    itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-file" href="' + response.url + '" target="_blank" data-itemvalue="' + response.url + '">' + response.url + '</a>' + removeHtml + '</p>';
+                                }
+                            }
+                            // Remove a loading image
+                            $itemUploadItems.find('img.loading').remove();
+                            // Insert upload items
+                            if (op.multiple) {
+                                $itemUploadItems.append(itemHtml).show();
+                            }
+                            else {
+                                $itemUploadItems.html(itemHtml).show();
+                            }
+                            // If edit entry screen is open, set upload items to entry assets
+                            if (mtappVars.screen_id === 'edit-entry') {
+                                var entryItemHtml = "";
+                                // Images
+                                if (response.mimeType.indexOf("image") !== -1) {
+                                    entryItemHtml = [
+                                        '<li id="list-asset-' + response.id + '" class="asset-type-image" onmouseover="show(\'list-image-' + response.id + '\', window.parent.document)" onmouseout="hide(\'list-image-' + response.id + '\', window.parent.document)">',
+                                            '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" class="asset-title">' + response.filename + '</a>',
+                                            '<a href="javascript:removeAssetFromList(' + response.id + ')" title="Remove this asset." class="remove-asset icon-remove icon16 action-icon">Remove</a>',
+                                            '<img id="list-image-' + response.id + '" src="' + response.url + '" class="list-image hidden" style="max-width:100px;">',
+                                        '</li>'
+                                    ].join("");
+                                }
+                                // Other type files excluding images
+                                else {
+                                    entryItemHtml = [
+                                        '<li id="list-asset-' + response.id + '" class="asset-type-file">',
+                                            '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" class="asset-title">' + response.filename + '</a>',
+                                            '<a href="javascript:removeAssetFromList(' + response.id + ')" title="Remove this asset." class="remove-asset icon-remove icon16 action-icon">Remove</a>',
+                                        '</li>'
+                                    ].join("");
+                                }
+                                // Insert upload items to entry assets
+                                $assetList.append(entryItemHtml);
+                                var _ids = $includeAssetIds.val();
+                                if (_ids === "") {
+                                    $includeAssetIds.val(response.id);
+                                }
+                                else {
+                                    $includeAssetIds.val(_ids + "," + response.id);
+                                }
+                            }
+                            if (op.cbAfterUpload !== null && typeof op.cbAfterUpload === 'function') {
+                                op.cbAfterUpload({name: 'cbAfterUpload'}, $this, response);
+                            }
+                        });
+                    }
+                });
+            } // Core function
+        });
+    };
+    $.fn.MTAppMultiFileUpload.defaults = {
+        // Plain Object. Please check the code of l10n section.
+        l10n: null,
+        // For Data API and api.uploadAsset()
+        api: null, // Set Data API Object
+        // Upload items to this ID's blog
+        siteId: mtappVars.blog_id,
+        // If this value is true and the file with the same filename exists,
+        // the uploaded file is automatically renamed to the random generated name.
+        autoRenameIfExists: true,
+        // If this value is true and the uploaded file has a orientation information in Exif,
+        // this file's orientation is automatically normalized.
+        normalizeOrientation: true,
+        // 'input' or 'widget'
+        type: 'input',
+        // If you set input to the type option, this value is added to style of the target element.
+        targetInputStyle: {
+            display: 'inline',
+            marginRight: '1em',
+            width: '20em'
+        },
+        // If this value is true, the multiple attribute is edded to input:file.
+        multiple: true,
+        // Set 'id' or 'url'. This value is a propaty name of assets resource.
+        saveData: 'id',
+        // Set the basic upload directory path from a root of blog url.
+        uploadPath: 'upload',
+        // Set the upload directory path from a root of blog url for images.
+        // e.g. 'upload/images'
+        uploadImagesPath: null,
+        // Set the upload directory path from a root of blog url for other type files excluding images.
+        // e.g. 'upload/files'
+        uploadFilesPath: null,
+        // If you would like to use an original file button, set HTML to this option.
+        uploadButton: null,
+        // Called after upload files.
+        // e.g.
+        // cbAfterUpload: function(cb, $this, response){
+        //     do something
+        // }
+        // - cb : {name: 'cbAfterUpload'}
+        // - $this : The target element applying .MTAppMultiFileUpload()
+        // - response : The respunse from uploadAsset()
+        cbAfterUpload: null,
+        debug: false
+    };
+    /*  end - $.fn.MTAppMultiFileUpload()  */
+
+    // -------------------------------------------------
+    //  $(foo).MTAppMaxLength();
+    //
+    //  Description:
+    //    フィールドに最大文字数を設定します
+    //
+    //  Usage:
+    //    $(foo).MTAppMaxLength(options);
+    //
+    // -------------------------------------------------
+    $.fn.MTAppMaxLength = function(options){
+        var op = $.extend({}, $.fn.MTAppMaxLength.defaults, options);
+
+        if (op.maxLength < 1) {
+            return;
+        }
+        /* ==================================================
+            L10N
+        ================================================== */
+        var l10n = {};
+        if (mtappVars.language === 'ja') {
+            l10n.characters = '文字';
+            l10n.maximumCharacters = '最大文字数';
+            l10n.remainingCharacters = '残り文字数';
+            l10n.overCharacters = '最大文字数を[_1]文字超えています';
+            l10n.field = '欄';
+            l10n.alertMessageEach = '最大文字数を超えています。';
+            l10n.alertMessageTotal = '最大文字数を超えている入力欄があります。';
+        }
+        else {
+            l10n.characters = '';
+            l10n.maximumCharacters = 'Maximum characters';
+            l10n.remainingCharacters = 'Remaining characters';
+            l10n.overCharacters = '[_1] characters over';
+            l10n.field = 'field';
+            l10n.alertMessageEach = 'Number of characters exceeds maximum allowed.';
+            l10n.alertMessageTotal = 'There are fields whose number of characters exceeds maximum allowed.';
+        }
+        if (op.l10n) {
+            for (var key in op.l10n) {
+                l10n[key] = op.l10n[key];
+            }
+        }
+        /*  L10N  */
+
+        var $form = null;
+        var $submit = null;
+        return this.each(function(i){
+
+            if (i === 0) {
+                $form = $(this).closest('form').off('submit.MTAppMaxLength').on('submit.MTAppMaxLength', function(){
+                    var $items = $('.mtappmaxlength-item');
+                    var itemsCount = $items.length;
+                    $items.each(function(){
+                        var label = text = '';
+                        if ($(this).val().length > $(this).data('mtappmaxlength')) {
+                            if (op.eachAlert) {
+                                label = $(this).closest('div.field').find('div.field-header label').text();
+                                text = label ? label + l10n.field + ' : ' + l10n.alertMessageEach: l10n.alertMessageEach;
+                                alert(text);
+                                label = text = '';
+                            }
+                        }
+                        else {
+                            itemsCount--;
+                        }
+                    });
+                    if (itemsCount < 1) {
+                        $form.off('submit.MTAppMaxLength').submit();
+                    }
+                    else if (!op.eachAlert) {
+                        alert(l10n.alertMessageTotal);
+                    }
+                    return false;
+
+                });
+                $submit = $form.find(':submit');
+            }
+            var maxLength = op.maxLength;
+            var $this = $(this);
+            var width = $this.outerWidth(true);
+
+            var underStyle = {};
+            for (var key in op.overStyle) {
+                underStyle[key] = '';
+            }
+
+            var $parentSpan = $this.parent('.mtappmaxlength-wrapper');
+            var hidden = op.viewCount ? '' : ' hidden';
+            if (!$parentSpan.length) {
+                $parentSpan = $this.wrap('<span class="mtappmaxlength-wrapper"></span>').parent().width(width);
+                $parentSpan.append('<span class="mtappmaxlength-status' + hidden + '"></span>');
+            }
+            var $statusSpan = $parentSpan.find('.mtappmaxlength-status');
+            if (op.addAttr) {
+                $this.attr('maxlength', maxLength);
+            }
+            $this
+                .addClass('mtappmaxlength-item')
+                .data('mtappmaxlength', maxLength)
+                .on('keyup', function(){
+                    var count = $(this).val().length;
+                    setStatus($statusSpan, maxLength, count, l10n);
+                    if (count > op.maxLength) {
+                        $this.css(op.overStyle);
+                        $statusSpan.css(op.overStatusStyle);
+                    }
+                    else {
+                        $this.css(underStyle);
+                        $statusSpan.removeAttr('style');
+                        $form.removeAttr('mt:once');
+                        $submit.prop('disabled', false);
+                    }
+                }).trigger('keyup');
+        });
+        function setStatus($statusSpan, maxLength, count, l10n){
+            if (!count) {
+                $statusSpan.text(l10n.maximumCharacters + ' : ' + maxLength + l10n.characters);
+            }
+            else if (count <= maxLength) {
+                $statusSpan.text(l10n.remainingCharacters + ' : ' + (maxLength - count) + l10n.characters);
+            }
+            else if (count > maxLength) {
+                var overCount = count - maxLength;
+                $statusSpan.text(l10n.overCharacters.replace(/\[_1\]/, overCount));
+            }
+        }
+    };
+    $.fn.MTAppMaxLength.defaults = {
+        l10n: null,
+        // The maxLength option is required. You have to set not less than 1.
+        maxLength: 0,
+        // If set to true, add the maxlength attribute to the target element.
+        addAttr: false,
+        // An object of the CSS property-value pairs to set.
+        // This CSS is applied to the input elements when number of characters become greater than maxLength.
+        overStyle: {
+            border: '1px solid #ff0000',
+            color: '#ff0000'
+        },
+        // An object of the CSS property-value pairs to set.
+        // This CSS is applied to the status elements when number of characters become greater than maxLength.
+        overStatusStyle: {
+            color: '#ff0000'
+        },
+        // If set to false, hide the count status element.
+        viewCount: true,
+        // If set to true, alert at each field
+        eachAlert: false
+    };
+    /*  end - $.fn.MTAppMaxLength()  */
 
     // -------------------------------------------------
     //  $.MTAppGetCategoryName();
@@ -1035,7 +1830,7 @@
     $.MTAppSlideMenuV2 = function(options){
         var op = $.extend({}, $.MTAppSlideMenuV2.defaults, options);
 
-        if (typeof mtappVars.can_access_blogs_json.website === 'undefined' || !/^6\.0/.test(mtappVars.minor_version)) return;
+        if (typeof mtappVars.can_access_blogs_json.website === 'undefined' || !/^6\./.test(mtappVars.minor_version)) return;
 
         var crtUrl = location.href;
 
@@ -1248,14 +2043,27 @@
      * http://sourceforge.jp/projects/opensource/wiki/licenses%2FMIT_license
      *
      * Since:   2010-06-22
-     * Update:  2014-04-22
-     * version: 0.2.1
+     * Update:  2015-02-18
+     * version: 0.3.0
      *
      * jQuery 1.7 later (maybe...)
      *
      */
     $.fn.multicheckbox = function(options){
         var op = $.extend({}, $.fn.multicheckbox.defaults, options);
+
+        var l10n = {};
+        if (mtappVars.language === 'ja') {
+            l10n.maxCountMessage = '選択出来る上限数を超えました。';
+        }
+        else {
+            l10n.maxCountMessage = 'Exceed the check limit.';
+        }
+        if (op.l10n) {
+            for (var key in op.l10n) {
+                l10n[key] = op.l10n[key];
+            }
+        }
 
         return this.each(function(idx){
 
@@ -1329,6 +2137,16 @@
                 .on('click', 'input:checkbox', function(e){
                     var checkbox = e.target;
                     var checkValues = [];
+                    var checkedCount = $container.find(':checked').length;
+                    if (checkedCount > op.maxCount) {
+                        if (op.maxCountMessage) {
+                            alert(op.maxCountMessage);
+                        }
+                        else {
+                            alert(l10n.maxCountMessage);
+                        }
+                        return false;
+                    }
                     $container
                         .find('label').removeClass('mcb-label-checked')
                         .end()
@@ -1407,8 +2225,11 @@
         });
     };
     $.fn.multicheckbox.defaults = {
+        l10n: null,
         show: 'hide', // 'hide' or 'show' 元のテキストフィールドを非表示にするか否か
         label: '', // カンマ区切りの文字列か{'key1':'value1','key2':'value2'}のハッシュ
+        maxCount: 999999999, // チェックできる最大値を設定
+        maxCountMessage: '', // チェックできる最大値を超えたときにエラーメッセージ
         insert: 'before', // 'before' or 'after'
         add: false, // ユーザーがチェックボックスを追加できるようにする場合はtrue
         skin: false, // タグデザインを適用する場合は'tags'
@@ -1430,6 +2251,8 @@
     //  Options:
     //    basename: {String} 各フォーム要素のベースネーム
     //    label: {String, Object} カンマ区切りの文字列か{'key1':'value1','key2':'value2'}のハッシュ
+    //    maxCount: {Number} チェックできる最大値を設定
+    //    maxCountMessage: {String} チェックできる最大値を超えたときにエラーメッセージ
     //    insert: {String} 元のテキストエリアの前に挿入するか('before')、後ろに挿入するか('after')
     //    custom: {boolean} カスタムフィールドの場合(true)
     //    add: {boolean} ユーザーが項目を追加できるようにする(true)
@@ -1443,18 +2266,24 @@
         var fieldID = (op.custom) ? '#customfield_' + op.basename: '#' + op.basename;
         var optionShow = (op.debug) ? 'show' : 'hide';
         $(fieldID).multicheckbox({
+            l10n: op.l10n,
             show: optionShow,
             insert: op.insert,
             add: op.add,
             skin: op.skin,
             label: op.label,
+            maxCount: op.maxCount,
+            maxCountMessage: op.maxCountMessage,
             sort: op.sort
         });
         return $(fieldID + '-field');
     };
     $.MTAppMultiCheckbox.defaults = {
+        l10n: null,
         basename: '',
         label: '',
+        maxCount: 999999999,
+        maxCountMessage: '',
         insert: 'before',
         custom: false,
         add: false,
@@ -2701,15 +3530,92 @@
     $.MTAppOtherTypeCategories = function(options){
         var op = $.extend({}, $.MTAppOtherTypeCategories.defaults, options);
 
-        if (mtappVars.type === 'entry' || mtappVars.screen_id === 'edit-entry') {
-            var newCategoryWidgetType = op.type;
+        /* ==================================================
+            L10N
+        ================================================== */
+        var l10n = {};
+        if (mtappVars.language === 'ja') {
+            l10n.add = '追加';
+            l10n.addMessage = '追加するカテゴリのラベルを入力してください';
+        }
+        else {
+            l10n.add = 'Add';
+            l10n.addMessage = "Please enter a new category's label";
+        }
+        if (op.l10n) {
+            for (var key in op.l10n) {
+                l10n[key] = op.l10n[key];
+            }
+        }
+        /*  L10N  */
+
+        if (mtappVars.type !== 'entry' || mtappVars.screen_id !== 'edit-entry') {
+            return;
+        }
+        var _MTAppOtherTypeCategories = setInterval(function(){
+            // Confirm the existance of the category selector
+            if ($('#category-selector-list div.list-item').length > 0) {
+                clearInterval(_MTAppOtherTypeCategories);
+            }
+            else {
+                return;
+            }
+            // Make the other type category container
             var newCategoryWidgetHtml = $.MTAppMakeWidget({
                 label: op.label,
-                content: '<div id="other-type-category-list"></div>'
+                content: '<div id="other-type-category-list"></div>',
+                action: (op.add) ? '<a id="other-type-category-add" href="#">' + l10n.add + '</a>' : ''
             });
+            // Insert it next the category widget
             $('#category-field').after(newCategoryWidgetHtml);
+            // Add a click event to a#other-type-category-add
+            $('#other-type-category-add').on('click', function(){
+                var newCatLabel = prompt(l10n.addMessage, '');
+                if (newCatLabel) {
+                    $.MTAppLoadingImage('show');
+                    $.ajax({
+                        url: CMSScriptURI,
+                        data: {
+                            __mode: 'js_add_category',
+                            magic_token: document.getElementById('m_t').value,
+                            blog_id: mtappVars.blog_id,
+                            parent: 0, //parseInt( this.parentID ),
+                            _type: 'category',
+                            label: newCatLabel
+                        },
+                        type: 'POST'
+                    }).done(function(response){
+                        if (response.error) {
+                            $.errorMessage('MTAppOtherTypeCategories', response.error, 'alert');
+                        }
+                        var newCatId = response.result.id;
+                        switch (op.type) {
+                            case 'radio':
+                                $anotherCategoryList.find('label:first').after(
+                                    '<label for="another-cat-' + newCatId + '">' +
+                                        '<input id="another-cat-' + newCatId + '" type="radio" name="other-type-category" value="' + newCatId + '" checked="checked">' +
+                                        newCatLabel +
+                                    '</label>'
+                                );
+                                break;
+                            case 'select':
+                                $anotherCategoryList.find('option:first').after(
+                                    '<option value="' + newCatId + '" selected>' + newCatLabel + '</option>'
+                                );
+                                break;
+                            default: return false;
+                        }
+                        $('#category-ids').val(newCatId);
+                        $.MTAppLoadingImage('hide');
+                    }).fail(function(){
+                        $.errorMessage('MTAppOtherTypeCategories', 'Adding category failed', 'alert');
+                        $.MTAppLoadingImage('hide');
+                    });
+                }
+                return false;
+            });
             var $anotherCategoryList = $('#other-type-category-list');
-            $(window).load(function(){
+            // $(window).load(function(){
                 if (!op.debug) {
                     $('#category-field').addClass('mtapp-other-type-categories');
                 }
@@ -2726,7 +3632,7 @@
                     else {
                         return true;
                     }
-                    switch (newCategoryWidgetType) {
+                    switch (op.type) {
                         case 'radio':
                             var AttrDefChecked = categoryIds ? '': ' checked="checked"';
                             var AttrChecked = (categoryIds == catId) ? ' checked="checked"': '';
@@ -2747,12 +3653,11 @@
                     }
                     radioCatList.push(_html.join(''));
                 });
-                switch (newCategoryWidgetType) {
+                switch (op.type) {
                     case 'radio':
                         $anotherCategoryList.html(radioCatList.join(''));
                         $anotherCategoryList
-                            .find('input[name="other-type-category"]')
-                            .on('click', function(){
+                            .on('click', 'input[name="other-type-category"]', function(){
                                 if ($(this).is(':checked')) {
                                     $('#category-ids').val($(this).val());
                                 }
@@ -2764,19 +3669,20 @@
                     case 'select':
                         $anotherCategoryList.html(radioCatList.join('') + '</select>');
                         $anotherCategoryList
-                            .find('select')
-                            .on('change', function(){
+                            .on('change', 'select', function(){
                                 $('#category-ids').val($(this).find('option:selected').val());
                             });
                         break;
                 }
-            });
-        }
+            // });
+        }, 500);
     };
     $.MTAppOtherTypeCategories.defaults = {
         type: 'radio', // or 'select'
         label: 'カテゴリ',
         notSelectedText: '未選択',
+        // Set "true" to the add option if you would like to be able to add a new category.
+        add: false,
         debug: false
     };
     // end - $.MTAppOtherTypeCategories();
@@ -4311,6 +5217,12 @@
     });
 
     $.extend({
+        // ローディング画像の表示・非表示を切り替える
+        MTAppLoadingImage: function(type){
+            type = (type === 'show') ? 'block' : 'none';
+            document.getElementById('mtapp-loading-image').style.display = type;
+            return;
+        },
         // 1桁の整数の場合、頭に0を付ける
         digit: function(num, space) {
             var prefix = (space) ? ' ' : '0';
@@ -4353,6 +5265,26 @@
             var numArray = (num.indexOf('.') !== -1) ? num.split('.') : [num];
             numArray[0] = numArray[0].replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
             return numArray.join('.');
+        },
+        errorMessage: function(methodName, message, output, returnValue) {
+            if (!output) {
+                output = null;
+            }
+            var text = 'You have an error in ' + methodName + ': ' + message;
+            switch (output) {
+                case 'alert':
+                    alert(text);
+                    break;
+                case 'console':
+                    if (this.console && typeof console.log != "undefined"){
+                        console.log(text);
+                    }
+                    break;
+            }
+            if (typeof returnValue === 'boolean') {
+                return returnValue;
+            }
+            return text;
         }
 
 
