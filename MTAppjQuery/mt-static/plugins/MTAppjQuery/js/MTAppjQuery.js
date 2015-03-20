@@ -4079,7 +4079,7 @@
                 $form.removeAttr('mt:once');
             }
         };
-        $form.on('submit', function(){
+        $form.on('submit.MTAppHasCategory', function(){
             var categoryIds = $("input[name='category_ids']").val() ? $("input[name='category_ids']").val().split(',') : [];
             var count = 0;
             var eerror = false;
@@ -4099,6 +4099,7 @@
                 $.MTAppDialogMsg(dialogOptions);
                 return false;
             }
+            $(this).off('submit.MTAppHasCategory').submit();
         });
     };
     $.MTAppHasCategory.defaults = {
