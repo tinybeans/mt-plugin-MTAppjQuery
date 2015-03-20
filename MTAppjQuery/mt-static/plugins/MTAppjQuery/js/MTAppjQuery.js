@@ -1590,10 +1590,10 @@
         siteId: mtappVars.blog_id,
         // If this value is true and the file with the same filename exists,
         // the uploaded file is automatically renamed to the random generated name.
-        normalizeOrientation: true,
+        autoRenameIfExists: true,
         // If this value is true and the uploaded file has a orientation information in Exif,
         // this file's orientation is automatically normalized.
-        autoRenameIfExists: true,
+        normalizeOrientation: true,
         // 'input' or 'widget'
         type: 'input',
         // If you set input to the type option, this value is added to style of the target element.
