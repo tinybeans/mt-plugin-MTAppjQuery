@@ -1174,15 +1174,15 @@
                     tmplOut[key] = [];
                 }
 
-                op.params = op.params || {};
-                op.params.includeIds = ids;
-                if ('limit' in op.params) {
-                    op.params.limit = 9999;
+                var params = op.params || {};
+                params.includeIds = ids;
+                if (!('limit' in params)) {
+                    params.limit = 9999;
                 }
-                if ('fields' in op.params) {
-                    op.params.fields = 'id,title,permalink';
+                if (!('fields' in params)) {
+                    params.fields = 'id,title,permalink';
                 }
-                op.api.listEntries(op.siteId, op.params, function(response) {
+                op.api.listEntries(op.siteId, params, function(response) {
                     if (response.error) {
                         return;
                     }
