@@ -2496,7 +2496,7 @@
                         thisData.push($(this).val());
                     });
                     $this.val(thisData.join(','));
-                });
+                }).trigger('change');
             }
         });
     };
