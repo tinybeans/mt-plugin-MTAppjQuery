@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010-06-22
- * Update:  2015-03-25
+ * Update:  2015-04-14
  *
  */
 ;(function($){
@@ -904,6 +904,11 @@
                         data: op.data,
                         cache: op.cache
                     };
+                    if (op.accessToken) {
+                        ajaxOptions.headers = {
+                            'X-MT-Authorization': 'MTAuth accessToken=' + op.accessToken
+                        }
+                    }
 
                     // Get JSON by ajax
                     $.ajax(ajaxOptions).done(function(response){
@@ -1041,6 +1046,7 @@
         data: null, // PlainObject: Data to be sent to the server.
         dataType: 'json', // Set this value to ajax options
         cache: false,
+        accessToken: null,
 
         // Dialog
         dialogTitle: '', // Type the title of dialog window
