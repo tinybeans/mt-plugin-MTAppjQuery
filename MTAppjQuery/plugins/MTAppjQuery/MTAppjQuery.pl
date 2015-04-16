@@ -35,6 +35,9 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             ['fa_mtapp_end_body',   {Default => ''}],
 
             # Set system scope
+            ['login_with_data_api',    {Default => '0', Scope => 'system'}],
+            ['use_data_api_js',        {Default => '0', Scope => 'system'}],
+            ['data_api_version',       {Default => '',  Scope => 'system'}],
             ['jquery_ready_all',       {Default => '0', Scope => 'system'}],
             ['blogs_json',             {Default => '0', Scope => 'system'}],
             ['blogs_json_detail',      {Default => '0', Scope => 'system'}],
