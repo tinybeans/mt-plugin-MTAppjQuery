@@ -559,7 +559,7 @@ jQuery.ajax({
     if (this.console && typeof console.log != 'undefined'){
         console.log(response);
     }
-    //window.location.href = mtappVars.DataAPI.getAuthorizationUrl(location.href);
+    mtappVars.redirectLogin();
 });
 
 mtappVars.redirectLogin = function(){
