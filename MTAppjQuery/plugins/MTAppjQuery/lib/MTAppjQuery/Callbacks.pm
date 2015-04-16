@@ -136,6 +136,7 @@ sub template_source_header {
     my $op_fa_mtapp_html_foot = $p->get_config_value('fa_mtapp_html_foot', $scope) || '<!-- mtapp_html_foot (MTAppjQuery) -->';
     my $op_fa_mtapp_end_body  = $p->get_config_value('fa_mtapp_end_body', $scope) || '<!-- mtapp_end_body (MTAppjQuery) -->';
 
+    my $op_use_data_api_js = $p->get_config_value('use_data_api_js', 'system');
     ### ツールチップ用ボックスをページに追加する
     my $preset = <<__MTML__;
     <mt:SetVarBlock name="html_body_footer" append="1">
@@ -345,6 +346,23 @@ __MTML__
     }
     /* ]]> */
     </script>
+__MTML__
+
+
+    # MT.DataAPI Constructor
+    if ($op_use_data_api_js) {
+        $mtapp_vars .= <<__MTML__;
+    <script type="text/javascript" src="<mt:StaticWebPath>data-api/${op_data_api_version}/js/mt-data-api.min.js"></script>
+    <script>
+    mtappVars.DataAPI = new MT.DataAPI({
+        baseUrl:  '<mt:CGIPath><mt:Var name="config.DataAPIScript">',
+        clientId: 'MTAppjQuery-DataAPI'
+    });
+    </script>
+__MTML__
+    }
+
+    $mtapp_vars .= <<__MTML__;
     <mt:SetHashVar name="mtappVars">
     <mt:SetVar name="version" value="${version}">
     <mt:SetVar name="minor_version" value="${minor_version}">
