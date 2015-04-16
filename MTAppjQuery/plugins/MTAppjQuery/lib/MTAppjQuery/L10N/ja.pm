@@ -37,6 +37,9 @@ use vars qw ( %Lexicon );
     'Individual Settings' => '個別設定',
     'Use a JSON of Websites/Blogs' => 'ウェブサイト/ブログのJSONを利用する',
     'Detail Mode' => '詳細モード',
+    'Sign in Data API' => 'Data API 自動ログイン',
+    'Use DataAPI SDK' => 'DataAPI SDK を利用',
+    'Select version' => 'Data API のバージョンを選択',
 # config.tmpl
     'active' => '有効にする',
     'Enable' => '有効',

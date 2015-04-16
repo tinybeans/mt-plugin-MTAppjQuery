@@ -35,6 +35,9 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
             ['fa_mtapp_end_body',   {Default => ''}],
 
             # Set system scope
+            ['login_with_data_api',    {Default => '0', Scope => 'system'}],
+            ['use_data_api_js',        {Default => '0', Scope => 'system'}],
+            ['data_api_version',       {Default => '',  Scope => 'system'}],
             ['jquery_ready_all',       {Default => '0', Scope => 'system'}],
             ['blogs_json',             {Default => '0', Scope => 'system'}],
             ['blogs_json_detail',      {Default => '0', Scope => 'system'}],
@@ -91,6 +94,7 @@ sub init_registry {
             'MT::App::CMS::cms_post_save.template' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_template',
             'save_config_filter' => '$mt_app_jquery::MTAppjQuery::Callbacks::save_config_filter',
             'MT::App::CMS::pre_run' => \&pre_run,
+            'MT::Session::post_save' => '$mt_app_jquery::MTAppjQuery::Callbacks::session_post_save',
         },
         tags => {
             function => {

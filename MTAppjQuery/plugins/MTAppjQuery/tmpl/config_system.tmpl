@@ -1,5 +1,60 @@
 <mt:Ignore>システム設定</mt:Ignore>
 <h3><__trans phrase="System Settings"></h3>
+
+<mtapp:setting
+    id="login_with_data_api"
+    show_label="1"
+    label="<__trans phrase="Sign in Data API">">
+    <ul>
+        <li>
+            <select name="login_with_data_api" id="login_with_data_api">
+                <option value="1"<mt:if name="login_with_data_api" eq="1"> selected="selected"</mt:if>><__trans phrase="Enable"></option>
+                <option value="0"<mt:if name="login_with_data_api" eq="0"> selected="selected"</mt:if>><__trans phrase="Disable"></option>
+            </select>
+        </li>
+    </ul>
+</mtapp:setting>
+
+<mtapp:setting
+    id="use_data_api_js"
+    show_label="1"
+    label="<__trans phrase="Use DataAPI SDK">">
+    <ul>
+        <li>
+            <select name="use_data_api_js" id="use_data_api_js">
+                <option value="1"<mt:if name="use_data_api_js" eq="1"> selected="selected"</mt:if>><__trans phrase="Enable"></option>
+                <option value="0"<mt:if name="use_data_api_js" eq="0"> selected="selected"</mt:if>><__trans phrase="Disable"></option>
+            </select>
+            <span id="data_api_version_container" style="<mt:if name="use_data_api_js" eq="0">display:none;</mt:if>margin-left:5px;">
+                <label for="data_api_version"><__trans phrase="Select version">&nbsp;<input type="text" name="data_api_version" id="data_api_version" value="<mt:Var name="data_api_version">" class="text min"></label>
+            </span>
+        </li>
+    </ul>
+    <script type="text/javascript">
+    (function($){
+        var items;
+        if (/^6\.1/.test(mtappVars.version)) {
+            items = ['v2', 'v1'];
+        }
+        else {
+            items = ['v1'];
+        }
+        $('#data_api_version').MTAppMultiForm({
+            type: 'select',
+            items: items
+        });
+        $('#use_data_api_js').on('change', function(){
+            if ($(this).val() == 1) {
+                $('#data_api_version_container').show();
+            }
+            else {
+                $('#data_api_version_container').hide();
+            }
+        });
+    })(jQuery);
+    </script>
+</mtapp:setting>
+
 <mtapp:setting
     id="blogs_json"
     show_label="1"
