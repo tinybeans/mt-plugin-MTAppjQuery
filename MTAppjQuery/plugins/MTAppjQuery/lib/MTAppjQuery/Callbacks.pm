@@ -8,23 +8,6 @@ use MTAppjQuery::Tmplset;
 use MT::Permission;
 use MT::Session;
 use MT::Log;
-use Data::Dumper;
-use File::Basename;
-sub doLog {
-    my ($msg, $code) = @_;
-    return unless defined($msg);
-    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime(time);
-    $year += 1900;
-    $mon += 1;
-    # my $now = "$year年$mon月$mday日($youbi[$wday]) $hour時$min分$sec秒\n";
-    my $now = "$year/$mon/$mday $hour:$min:$sec";
-    my $log = MT::Log->new;
-    $log->message("[$now] $msg");
-    $log->metadata($code);
-    $log->save or die $log->errstr;
-}
-
-# doLog(Dumper($can_access_blogs));
 
 sub template_source_dashboard {
     my ($cb, $app, $tmpl_ref) = @_;
@@ -44,7 +27,6 @@ sub template_source_header {
     my $blog = $app->blog;
     my $author = $app->user;
 
-    my $log_text3 = "========== template_source_header ==========";
 
     # システム管理者かどうか
     my $is_superuser = 0;
@@ -166,17 +148,12 @@ sub template_source_header {
     my $session = $app->session;
     my $data_api_session_id = $session->get('mtapp_data_api_session_id') || '';
 
-    $log_text3 .= "\n(app->session)\n" . Dumper($session);
-    $log_text3 .= "\n(mtappVars.data_api_session_id)\n" . $data_api_session_id;
 
     if ($data_api_session_id) {
-        $log_text3 .= "\n(start _update_data_api_session_start)\n";
         &_update_data_api_session_start($session);
     }
     else {
         my $load_session = MT::Session->load({id => $session->id});
-        $log_text3 .= "\n(load_session)\n" . Dumper($load_session);
-        $log_text3 .= "\n(load_session's mtapp_data_api_session_id)\n" . $load_session->get('mtapp_data_api_session_id');
         if ($data_api_session_id = $load_session->get('mtapp_data_api_session_id')) {
             $session->set('mtapp_data_api_session_id', $data_api_session_id);
             $session->save;
@@ -185,13 +162,9 @@ sub template_source_header {
             my $username = $app->param('username');
             my $password = $app->param('password');
             if ($username and $password) {
-                $log_text3 .= "\n(start _data_api_authentication)\n";
                 $data_api_session_id = &_data_api_authentication($username, $password, $session, $op_data_api_version);
             }
         }
-        $log_text3 .= "\n(After session)\n" . Dumper($session);
-        # doLog('template_source_header / username : '.$app->param('username'));
-        # doLog('template_source_header / password : '.$app->param('password'));
 
     }
 
@@ -604,7 +577,6 @@ __MTML__
 
     $$tmpl_ref =~ s/(<head>)/$1\n$op_common_mtapp_top_head\n$op_fa_mtapp_top_head/g;
     $$tmpl_ref =~ s/(<mt:var name="html_head">)/$prepend_html_head\n$1/g;
-    doLog($log_text3);
 }
 
 sub template_source_footer {
@@ -678,7 +650,6 @@ __MTML__
 
 sub template_param_edit_entry {
     my ($cb, $app, $param, $tmpl) = @_;
-# doLog(Dumper($param));
     ### $app->
     my $host        = $app->{__host};
     my $static_path = $app->static_path;
@@ -706,7 +677,6 @@ sub template_param_edit_entry {
         my $blog_url  = $param->{blog_url} || '';
         my $blog_path = $blog_url;
            $blog_path =~ s!^$host|\/$!!g;
-# doLog('$blog_path : '.$blog_path.'  $blog_url : '.$blog_url);
 
         ### $p->
         my $p = MT->component('mt_app_jquery');
@@ -930,16 +900,12 @@ sub save_config_filter {
 sub session_post_save {
     my ($cb, $obj, $original) = @_;
 
-    my $log_text = "========== session_post_save ==========";
-    $log_text .= "\n(Before obj)\n" . Dumper($obj);
 
     my $p = MT->component('mt_app_jquery');
     my $op_login_with_data_api = $p->get_config_value('login_with_data_api', 'system');
 
     return unless $op_login_with_data_api;
     if ($obj->data =~ m/MTAppjQuery-DataAPI/i) {
-        $log_text .= "\n(Login by MTAppjQuery-DataAPI)\n";
-        $log_text .= "\n(obj->id)\n" . $obj->id;
         $obj->set('mtapp_data_api_session_id', $obj->id);
         $obj->save;
         return 1;
@@ -949,7 +915,6 @@ sub session_post_save {
 
     my $data_api_session_id = $obj->get('mtapp_data_api_session_id') || '';
     if ($data_api_session_id) {
-        $log_text .= "\n(start _update_data_api_session_start)\n";
         &_update_data_api_session_start($obj);
         return;
     }
@@ -958,10 +923,7 @@ sub session_post_save {
     my $username = MT->instance->param('username');
     my $password = MT->instance->param('password');
 
-    $log_text .= "\n(start _data_api_authentication)\n";
     &_data_api_authentication($username, $password, $obj, $data_api_version);
-    $log_text .= "\n(After obj)\n" . Dumper($obj);
-    doLog($log_text);
 
 }
 
@@ -973,15 +935,11 @@ sub _update_data_api_session_start {
 
     my $sess = MT::Session->load({id => $data_api_session_id});
 
-    my $log_text4 = "========== _update_data_api_session_start ==========";
-    $log_text4 .= "\n(Before sess)\n" . Dumper($sess);
 
     $sess->start(time);
     $sess->save;
     my $sess2 = MT::Session->load({id => $data_api_session_id});
 
-    $log_text4 .= "\n(After sess)\n" . Dumper($sess2);
-    doLog($log_text4);
 }
 
 sub _data_api_authentication {
@@ -1011,8 +969,6 @@ sub _data_api_authentication {
     $request->referer(MT->instance->base);
     $request->header('content-type' => 'application/x-www-form-urlencoded');
 
-    my $log_text2 = "========== _data_api_authentication ==========";
-    $log_text2 .= "\n(request)\n" . Dumper($request);
 
     # UserAagent
     my $ua = LWP::UserAgent->new;
@@ -1021,11 +977,9 @@ sub _data_api_authentication {
 
     # POST
     my $response = $ua->request($request);
-    $log_text2 .= "\n(response)\n" . Dumper($response);
 
     # Success
     if ($response->is_success) {
-        $log_text2 .= "\n(success)\n";
         my $content = $response->decoded_content;
         require JSON;
         my $json = JSON::decode_json($content);
@@ -1035,8 +989,6 @@ sub _data_api_authentication {
         my $remember = $json->{remember} || '';
         $sess->set('mtapp_data_api_session_id', $sessionId);
         $sess->save;
-        $log_text2 .= "\n(sess)\n" . Dumper($sess);
-        doLog($log_text2);
         return $sessionId;
     }
     # Error
@@ -1044,7 +996,6 @@ sub _data_api_authentication {
         MT->log('MTAppjQuery HTTP POST error code: ' . $response->code);
         MT->log('MTAppjQuery HTTP POST error message: ' . $response->message);
     }
-    doLog($log_text2);
 }
 
 sub _config_replace {
