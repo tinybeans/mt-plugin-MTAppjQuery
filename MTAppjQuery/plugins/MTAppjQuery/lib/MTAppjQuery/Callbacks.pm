@@ -529,7 +529,7 @@ jQuery.ajax({
         'X-MT-Authorization': 'MTAuth sessionId=' + mtappVars.data_api_session_id
     }
 }).done(function(data){
-    if (mtappVars.DataAPI instanceof MT.DataAPI) {
+    if (MT.DataAPI && mtappVars.DataAPI instanceof MT.DataAPI) {
         mtappVars.DataAPI.storeTokenData(data);
     }
     var accessToken = data.accessToken;
