@@ -94,6 +94,7 @@ sub init_registry {
             'MT::App::CMS::cms_post_save.template' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_template',
             'save_config_filter' => '$mt_app_jquery::MTAppjQuery::Callbacks::save_config_filter',
             'MT::App::CMS::pre_run' => \&pre_run,
+            'MT::Session::post_save' => '$mt_app_jquery::MTAppjQuery::Callbacks::session_post_save',
         },
         tags => {
             function => {
