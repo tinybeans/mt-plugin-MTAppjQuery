@@ -2,7 +2,7 @@ package MT::Plugin::MTAppjQuery;
 use strict;
 use base qw( MT::Plugin );
 
-our $VERSION = '1.8.1';
+our $VERSION = '1.8.2';
 
 my $plugin = MT::Plugin::MTAppjQuery->new({
     id          => 'mt_app_jquery',
@@ -89,8 +89,6 @@ sub init_registry {
             # 'template_param.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_favorite_blogs',
             'MT::App::CMS::template_param.edit_entry' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_edit_entry',
             'MT::App::CMS::template_param.edit_template' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_edit_template',
-            'MT::App::CMS::cms_post_save.entry' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_entry',
-            'MT::App::CMS::cms_post_save.page' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_entry',
             'MT::App::CMS::cms_post_save.template' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_template',
             'save_config_filter' => '$mt_app_jquery::MTAppjQuery::Callbacks::save_config_filter',
             'MT::App::CMS::pre_run' => \&pre_run,
