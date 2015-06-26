@@ -2,7 +2,121 @@ package MTAppjQuery::Tags;
 use strict;
 use Data::Dumper;
 
+sub plugin {
+    return MT->component('mt_app_jquery');
+}
+
+sub _sanitize_key {
+    my ($key) = @_;
+    $key =~ s/\s//g;
+    return $key;
+}
+
 # Function
+sub _hdlr_create_json {
+    my ($ctx, $args) = @_;
+
+    my $plugin = plugin();
+    unless ($args->{fields}) {
+        return $ctx->error($plugin->translate('The [_1] modifier is required.', 'fields'));
+    }
+
+    my $blog_id = $ctx->stash('blog_id');
+    my $json = {
+        items => [],
+    };
+
+    my @include_blogs = $args->{include_blogs} ? split(/,/, $args->{include_blogs}) : ($blog_id);
+
+    # Set terms
+    my $term = {
+        blog_id => \@include_blogs,
+    };
+    unless ($args->{include_draft}) {
+        $term->{status} = MT::Entry::RELEASE();
+    }
+
+    # Set arguments
+    my $arguments = undef;
+    if ($args->{offset}) {
+        $arguments->{offset} = $args->{offset};
+    }
+    if ($args->{limit}) {
+        $arguments->{limit} = $args->{limit};
+    }
+    if ($args->{sort_by}) {
+        $arguments->{sort} = $args->{sort_by};
+    }
+    if ($args->{sort_order}) {
+        $arguments->{direction} = $args->{sort_order};
+    }
+
+    my $tag = $ctx->stash('tag');
+    my $model = '';
+    if ($tag eq 'EntryCreateJSON') {
+        $model = 'entry';
+    }
+
+    my @entries = MT->model($model)->load($term, $arguments);
+
+    my @items;
+    my $total_results = 0;
+    my $array_join = $args->{array_join};
+    if ($array_join == 1) {
+        $array_join = ',';
+    }
+    foreach my $entry (@entries) {
+        my $item = {};
+        foreach my $field (split(/,/, $args->{fields})) {
+            # tags
+            if ($field eq 'tags') {
+                my @tags = $entry->get_tags;
+                if (@tags and $array_join) {
+                    $item->{tags} = $array_join . join($array_join, @tags) . $array_join;
+                }
+                elsif (@tags) {
+                    $item->{tags} = \@tags;
+                }
+            }
+            # categories
+            elsif ($field eq 'categories') {
+                my $categories = $entry->categories;
+                my @categories_label;
+                if (@$categories) {
+                    foreach my $category (@$categories) {
+                        push(@categories_label, $category->label);
+                    }
+                    if (@categories_label and $array_join) {
+                        $item->{categories} = $array_join . join($array_join, @categories_label) . $array_join;
+                    }
+                    elsif (@categories_label) {
+                        $item->{categories} = \@categories_label;
+                    }
+                }
+            }
+            # category
+            elsif ($field eq 'category') {
+                my $category = $entry->category;
+                if ($category) {
+                    $item->{category} = $category->label;
+                }
+            }
+            else {
+                my $field_key = $field;
+                $field_key =~ s/^field\./field_/;
+                $item->{$field_key} = $entry->$field || '';
+            }
+        }
+        push(@items, $item);
+        $total_results++;
+    }
+
+    $json->{totalResults} = $total_results;
+    $json->{items} = \@items;
+    require JSON;
+    return JSON::to_json($json);
+}
+
 sub _hdlr_user_file_append_text {
     my ($ctx, $args) = @_;
     return '';

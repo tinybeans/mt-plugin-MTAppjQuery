@@ -96,6 +96,7 @@ sub init_registry {
         },
         tags => {
             function => {
+                'EntryCreateJSON' => '$mt_app_jquery::MTAppjQuery::Tags::_hdlr_create_json',
                 'UserFileAppendText' => '$mt_app_jquery::MTAppjQuery::Tags::_hdlr_user_file_append_text',
                 'dumper' => '$mt_app_jquery::MTAppjQuery::Tags::_hdlr_dumper',
             },
