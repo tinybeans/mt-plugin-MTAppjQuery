@@ -4242,30 +4242,6 @@
 
 
     // -------------------------------------------------
-    //  $.MTAppEnableUploadify();
-    //
-    //  Description:
-    //    ブログ記事編集画面の複数ファイルアップロード機能（ベータ版）を有効にする。
-    //
-    //  Usage:
-    //    $.MTAppEnableUploadify(options);
-    //
-    //  Options:
-    //    enable: {Boolean} 有効にする（true）、無効にする（false）
-    // -------------------------------------------------
-    $.MTAppEnableUploadify = function(options){
-        var op = $.extend({}, $.MTAppEnableUploadify.defaults, options);
-
-        if (mtappVars.screen_id != 'list-plugins') return;
-        $('#uploadify-container').show()
-    };
-    $.MTAppEnableUploadify.defaults = {
-        enable: false
-    };
-    // end - $.MTAppEnableUploadify();
-
-
-    // -------------------------------------------------
     //  $(foo).MTAppTabSpace();
     //
     //  Description:
