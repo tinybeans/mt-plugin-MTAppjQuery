@@ -92,21 +92,6 @@ body.mtapp-skin {
 }
 
 /* ----------------------------------------
-   __Uploadify - マルチファイルアップロード
----------------------------------------- */
-.mtapp-uploadify-thumb {
-    width: 200px;
-    padding: 10px 0;
-}
-.mtapp-uploadify-cancel {
-    position: relative;
-    left: -16px;
-    padding-top: 10px;
-    vertical-align: top;
-    cursor: pointer;
-}
-
-/* ----------------------------------------
    __ヒントのツールチップ
 ---------------------------------------- */
 #mtapp-tooltip {
@@ -421,18 +406,6 @@ div.no-scroll-right-sidebar .widget-content {
 
 a.mtapp-if-page {
     padding-left: 4px;
-}
-/* ----------------------------------------
-   __プラグインの管理画面
----------------------------------------- */
-fieldset#uploadify_setting {
-    border: 1px solid #C8C2BE;
-}
-fieldset#uploadify_setting legend {
-    display: block;
-    margin-left: 10px;
-    font-size: 120%;
-    font-weight: bold;
 }
 /* ----------------------------------------
    __バリデーション

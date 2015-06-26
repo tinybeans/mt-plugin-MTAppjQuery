@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010-06-22
- * Update:  2015-04-14
+ * Update:  2015-05-26
  *
  */
 ;(function($){
@@ -739,8 +739,7 @@
         /*  Template  */
 
         /* ==================================================
-            Insert a button to open dialog window
-            and Initialization
+            Get the MTAppLisging Dialog
         ================================================== */
         var $dialog = $('#mtapplisting-dialog');
         if (!$dialog.length) {
@@ -750,7 +749,7 @@
             $('body').append(dialogHTML);
             $dialog = $('#mtapplisting-dialog');
         }
-        /*  Insert a button to open dialog window  */
+        /*  Get the MTAppLisging Dialog  */
 
         /* ==================================================
             Bind events to the dialog
@@ -4239,30 +4238,6 @@
         always: false
     };
     // end - $(foo).MTAppInlineEdit();
-
-
-    // -------------------------------------------------
-    //  $.MTAppEnableUploadify();
-    //
-    //  Description:
-    //    ブログ記事編集画面の複数ファイルアップロード機能（ベータ版）を有効にする。
-    //
-    //  Usage:
-    //    $.MTAppEnableUploadify(options);
-    //
-    //  Options:
-    //    enable: {Boolean} 有効にする（true）、無効にする（false）
-    // -------------------------------------------------
-    $.MTAppEnableUploadify = function(options){
-        var op = $.extend({}, $.MTAppEnableUploadify.defaults, options);
-
-        if (mtappVars.screen_id != 'list-plugins') return;
-        $('#uploadify-container').show()
-    };
-    $.MTAppEnableUploadify.defaults = {
-        enable: false
-    };
-    // end - $.MTAppEnableUploadify();
 
 
     // -------------------------------------------------
