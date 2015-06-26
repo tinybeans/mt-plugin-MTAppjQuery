@@ -739,8 +739,7 @@
         /*  Template  */
 
         /* ==================================================
-            Insert a button to open dialog window
-            and Initialization
+            Get the MTAppLisging Dialog
         ================================================== */
         var $dialog = $('#mtapplisting-dialog');
         if (!$dialog.length) {
@@ -750,7 +749,7 @@
             $('body').append(dialogHTML);
             $dialog = $('#mtapplisting-dialog');
         }
-        /*  Insert a button to open dialog window  */
+        /*  Get the MTAppLisging Dialog  */
 
         /* ==================================================
             Bind events to the dialog
