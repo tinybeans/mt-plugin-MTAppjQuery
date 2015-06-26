@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010-06-22
- * Update:  2015-04-14
+ * Update:  2015-05-26
  *
  */
 ;(function($){
@@ -739,8 +739,7 @@
         /*  Template  */
 
         /* ==================================================
-            Insert a button to open dialog window
-            and Initialization
+            Get the MTAppLisging Dialog
         ================================================== */
         var $dialog = $('#mtapplisting-dialog');
         if (!$dialog.length) {
@@ -750,7 +749,7 @@
             $('body').append(dialogHTML);
             $dialog = $('#mtapplisting-dialog');
         }
-        /*  Insert a button to open dialog window  */
+        /*  Get the MTAppLisging Dialog  */
 
         /* ==================================================
             Bind events to the dialog

@@ -12,6 +12,7 @@ use vars qw ( %Lexicon );
     'Edit user.css' => 'user.cssを編集',
     'Edit user.css(append)' => 'user.cssを編集(追記)',
 # Tags.pm
+    'The [_1] modifier is required.' => '[_1]モディファイアは必須です。',
     'meiji' => '明治',
     'taisho' => '大正',
     'showa' => '昭和',
