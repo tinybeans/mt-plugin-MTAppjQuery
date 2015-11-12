@@ -200,6 +200,7 @@ sub _fltr_compress {
 sub _fltr_json_decode {
     my ($str, $arg, $ctx) = @_;
     return $str unless $arg;
+    return '' unless $str;
     return MT::Util::from_json($str);
 }
 
