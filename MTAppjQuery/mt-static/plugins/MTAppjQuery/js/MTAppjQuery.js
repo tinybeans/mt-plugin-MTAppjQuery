@@ -3,8 +3,8 @@
  *
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
- * Since:   2010-06-22
- * Update:  2015-05-26
+ * Since:   2010/06/22
+ * Update:  2015/11/12
  *
  */
 ;(function($){
@@ -4505,7 +4505,8 @@
 
     // -------------------------------------------------
     //  $.MTAppSortableBatchEdit();
-    //
+    // -------------------------------------------------
+    //                         Latest Update: 2015/11/12
     //  Description:
     //    ブログ記事・ウェブページ一括編集画面をソート可能にして、日付を自動変更する
     //
@@ -4514,11 +4515,37 @@
     //
     //  Options:
     //    target: {String} 自動変更する日付の種類を指定。公開日'created_on'または更新日'modified_on'
-    //    update: {Function} 並べ替えが完了したときのイベントを設定。
+    //    interval: {String} 自動に減らしていく間隔を指定。1日:'day'、1時間'hour'、1分'minute'、1秒'second'。
+    //    update: {Function} 並べ替えが完了したときのイベントを設定
     // -------------------------------------------------
     $.MTAppSortableBatchEdit = function(options){
         var op = $.extend({}, $.MTAppSortableBatchEdit.defaults, options);
-        if (mtappVars.screen_id.indexOf('batch-edit-') < 0) return;
+        if (mtappVars.screen_id.indexOf('batch-edit-') === -1) {
+          return;
+        }
+        var interval = {
+            year:   32140800000,
+            month:  2678400000,
+            day:    86400000,
+            hour:   3600000,
+            minute: 60000,
+            second: 1000
+        };
+        if (typeof op.interval === 'undefined' || interval.hasOwnProperty(op.interval) == false) {
+            op.interval = 'day';
+        }
+        var getDatetimeFormat = function(ts, itv){
+            var date = new Date(ts);
+            var res = {
+                year:   date.getFullYear(),
+                month:  $.digit(date.getMonth() + 1),
+                day:    $.digit(date.getDate()),
+                hour:   (itv === 'day') ? '00' : $.digit(date.getHours()),
+                minute: (itv === 'day' || itv === 'hour') ? '00' : $.digit(date.getMinutes()),
+                second: (itv === 'day' || itv === 'hour' || itv === 'minute') ? '00' : $.digit(date.getSeconds())
+            };
+            return res.year + '-' + res.month + '-' + res.day + ' ' + res.hour + ':' + res.minute + ':' + res.second;
+        };
         $('#' + mtappVars.screen_id.replace(/batch-edit-/,'') + '-listing-table')
             .find('tr')
                 .css({'cursor':'move'})
@@ -4529,7 +4556,7 @@
                     cursor: 'move',
                     placeholder: 'mtapp-state-highlight',
                     start: function(ev, ui){
-                        $(ui.placeholder).height($(ui.item).height());
+                        $(ui.placeholder).height($(ui.item).height()).css('background-color', '#FFFBE6');
                     },
                     sort: function(ev, ui){
                         ui.item.css({
@@ -4547,58 +4574,21 @@
                         if (typeof op.update == 'function') {
                             op.update(ev, ui);
                         } else if (op.target == 'created_on' || op.target == 'modified_on') {
-                            // 公開日か更新日か
                             var n = op.target == 'created_on' ? 0 : 1;
-                            var input = ui.item.find('td.datetime:eq(' + n + ') input:text');
-                            var curr_dateitem = input.val(),
-                                next_dateitem = ui.item.next().find('td.datetime:eq(' + n + ') input:text').val(),
-                                prev_dateitem = ui.item.prev().find('td.datetime:eq(' + n + ') input:text').val();
-                            var curr_date = getDateObj(curr_dateitem),
-                                next_date = getDateObj(next_dateitem),
-                                prev_date = getDateObj(prev_dateitem);
-                            var curr_getTime = curr_date ? curr_date.getTime() : 0,
-                                next_getTime = next_date ? next_date.getTime() : 0,
-                                prev_getTime = prev_date ? prev_date.getTime() : 0;
-
-                            var new_getTime = 0;
-                            if (next_getTime && prev_getTime) {
-                                new_getTime = Math.floor( (prev_getTime + next_getTime) / 2 );
-                            } else if (next_getTime == 0 || prev_getTime == 0) {
-                                new_getTime = (next_getTime + prev_getTime) * 2 - curr_getTime;
-                            }
-
-                            curr_date.setTime(new_getTime);
-                            var ymd = [
-                                    curr_date.getFullYear(),
-                                    $.digit(curr_date.getMonth() + 1),
-                                    $.digit(curr_date.getDate())
-                                ],
-                                hms = [
-                                    $.digit(curr_date.getHours()),
-                                    $.digit(curr_date.getMinutes()),
-                                    $.digit(curr_date.getSeconds())
-                                ];
-                            input.val(ymd.join('-') + ' ' + hms.join(':'));
+                            var date = new Date();
+                            var ts = date.getTime();
+                            $('#entry-listing-table tbody tr').each(function(i){
+                                var _ts = ts - ((i + 1) * (interval[op.interval] - 0));
+                                $(this).find('td.datetime:eq(' + n + ') input:text').val(getDatetimeFormat(_ts, op.interval));
+                            });
                         }
                     }
                 });
-
-        function getDateObj(dateitem){
-            if (! dateitem) return null;
-            var _d = dateitem.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
-            var d = new Date();
-            d.setFullYear(_d[1]);
-            d.setMonth(_d[2] - 1);
-            d.setDate(_d[3]);
-            d.setHours(_d[4]);
-            d.setMinutes(_d[5]);
-            d.setSeconds(_d[6]);
-            return d;
-        }
     };
     $.MTAppSortableBatchEdit.defaults = {
-        target: 'created_on', // created_on, modified_on
-        update: null
+        target: 'created_on', // String: 'created_on' or 'modified_on'
+        interval: 'day', // String: 'day', 'hour', 'minute' or 'second'
+        update: null // Function: function(ev, ui){}
     };
     // end - $.MTAppSortableBatchEdit();
 
