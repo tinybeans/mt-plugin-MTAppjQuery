@@ -4516,6 +4516,7 @@
     //  Options:
     //    target: {String} 自動変更する日付の種類を指定。公開日'created_on'または更新日'modified_on'
     //    interval: {String} 自動に減らしていく間隔を指定。1日:'day'、1時間'hour'、1分'minute'、1秒'second'。
+    //    targetSort: {Boolean}  modified_on での並べ替えを無効にする場合は false を指定。
     //    update: {Function} 並べ替えが完了したときのイベントを設定
     // -------------------------------------------------
     $.MTAppSortableBatchEdit = function(options){
@@ -4546,6 +4547,21 @@
             };
             return res.year + '-' + res.month + '-' + res.day + ' ' + res.hour + ':' + res.minute + ':' + res.second;
         };
+        if (op.targetSort == true && op.target === 'modified_on') {
+            var currentList = [];
+            $('#' + mtappVars.screen_id.replace(/batch-edit-/,'') + '-listing-table tbody tr').each(function(){
+                var timeStr = $(this).find('td.datetime:eq(1) input:text').val().replace(/ /, 'T');
+                var date = new Date(timeStr);
+                var ts = date.getTime();
+                currentList.push({ ts: ts, html: this.outerHTML });
+            });
+            $.objectSort(currentList, 'ts', 'descend', 'numeric');
+            var tbodyHtml = '';
+            for (var i = 0, l = currentList.length; i < l; i++) {
+                tbodyHtml += currentList[i]['html'];
+            }
+            $('#' + mtappVars.screen_id.replace(/batch-edit-/,'') + '-listing-table tbody').get(0).innerHTML = tbodyHtml;
+        }
         $('#' + mtappVars.screen_id.replace(/batch-edit-/,'') + '-listing-table')
             .find('tr')
                 .css({'cursor':'move'})
@@ -4588,6 +4604,7 @@
     $.MTAppSortableBatchEdit.defaults = {
         target: 'created_on', // String: 'created_on' or 'modified_on'
         interval: 'day', // String: 'day', 'hour', 'minute' or 'second'
+        targetSort: true, // Boolean: true or false
         update: null // Function: function(ev, ui){}
     };
     // end - $.MTAppSortableBatchEdit();
@@ -5257,9 +5274,29 @@
                 return returnValue;
             }
             return text;
+        },
+        objectSort: function(array, key, order, type) {
+            order = (order === 'ascend') ? -1 : 1;
+            array.sort(function(obj1, obj2){
+                var v1 = obj1[key];
+                var v2 = obj2[key];
+                if (type === 'numeric') {
+                    v1 = v1 - 0;
+                    v2 = v2 - 0;
+                }
+                else if (type === 'string') {
+                    v1 = '' + v1;
+                    v2 = '' + v2;
+                }
+                if (v1 < v2) {
+                    return 1 * order;
+                }
+                if (v1 > v2) {
+                    return -1 * order;
+                }
+                return 0;
+            });
         }
-
-
     });
 
     function getFieldID(basename) {
