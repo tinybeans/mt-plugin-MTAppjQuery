@@ -558,7 +558,7 @@
                         return true;
                     }
                     var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")');
-                    $this.val(result);
+                    $this.val(result.replace(/^(\s|\n)+$/g, ''));
                 });
             }
             if (op.sortable && op.headerPosition === 'top') {
