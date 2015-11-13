@@ -4053,7 +4053,8 @@
 
     // ---------------------------------------------------------------------
     //  $.MTAppHasCategory();
-    //
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2015/11/13
     //  Description:
     //
     //    必要な数のカテゴリや指定したIDのカテゴリが選択されているかチェックし、選択されていない場合はエラーダイアログを表示する。
@@ -4073,9 +4074,13 @@
     $.MTAppHasCategory = function(options){
         var op = $.extend({}, $.MTAppHasCategory.defaults, options);
         var $form = $('form#entry_form');
-        if ($form.length < 1) return;
+        if ($form.length < 1) {
+            return;
+        }
         var type = mtappVars.type;
-        if (!(type == 'entry' || type == 'page')) return;
+        if (!(type == 'entry' || type == 'page')){
+            return;
+        }
         var reqCats = (op.requiredIds) ? op.requiredIds.split(',') : [];
         var dialogOptions = {
             modal: true,
@@ -4084,10 +4089,11 @@
                 $form.removeAttr('mt:once');
             }
         };
-        $form.on('submit.MTAppHasCategory', function(){
+        $form.on('submit.MTAppHasCategory', function(e){
+            delete Editor.strings.unsavedChanges;
+            $(window).off('beforeunload');
             var categoryIds = $("input[name='category_ids']").val() ? $("input[name='category_ids']").val().split(',') : [];
             var count = 0;
-            var eerror = false;
             if (reqCats.length) {
                 for (var i = 0, l = reqCats.length; i < l; i++) {
                     if ($.inArray(reqCats[i], categoryIds) == -1) {
