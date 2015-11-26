@@ -1081,6 +1081,100 @@
     };
     // end - $.fn.MTAppListing()
 
+    // ---------------------------------------------------------------------
+    //  $.MTAppTemplateListCustomize();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2015/11/25
+    //
+    //  テンプレートの管理画面（一覧画面）を見やすくします。
+    // ---------------------------------------------------------------------
+    $.MTAppTemplateListCustomize = function(options){
+        var op = $.extend({}, $.MTAppTemplateListCustomize.defaults, options);
+        if (mtappVars.screen_id !== 'list-template') {
+            return;
+        }
+
+        if (op.displayType === 'listIndent') {
+            $('table.listing-table tbody').each(function(){
+                var $tdList = $(this).find('td.template-name');
+                for (var i = 0, l = op.templateNameSets.length; i < l; i++) {
+                    var $firstTr;
+                    var $tr;
+                    $tdList.find(':contains("' + op.templateNameSets[i]['pattern'] + '")').each(function(idx){
+                        var _replacement = op.templateNameSets[i]['replacement'] ? op.templateNameSets[i]['replacement']: '';
+                        this.innerHTML = this.innerHTML.replace(op.templateNameSets[i]['pattern'], _replacement);
+                        this.style.position = 'relative';
+                        this.style.left = '2em';
+                        if (idx === 0) {
+                            $firstTr = $(this).parents('tr');
+                            var tdCount = $firstTr.find('td').length;
+                            var paddingLeft = 8;
+                            $(this).parent().prevAll().each(function(){
+                                paddingLeft += $(this).width();
+                            });
+                            $firstTr.before(
+                                '<tr>' +
+                                    '<td colspan="' + tdCount + '" style="padding-left:' + paddingLeft + 'px;font-weight:' + op.labelWeight + ';">' +
+                                        op.templateNameSets[i]['label'] +
+                                    '</td>' +
+                                '</tr>'
+                            );
+                        }
+                        else {
+                            $(this).parents('tr').insertAfter($tr);
+                        }
+                        $tr = $(this).parents('tr');
+                    });
+                }
+            });
+        }
+        else {
+            $('table.listing-table tbody').each(function(){
+                var $tdList = $(this).find('td.template-name');
+                var $firstTd;
+                var $parentTbody;
+                for (var i = 0, l = op.templateNameSets.length; i < l; i++) {
+                    $tdList.find(':contains("' + op.templateNameSets[i]['pattern'] + '")').each(function(idx){
+                        var _replacement = op.templateNameSets[i]['replacement'] ? op.templateNameSets[i]['replacement']: '';
+                        this.innerHTML = this.innerHTML.replace(op.templateNameSets[i]['pattern'], _replacement);
+                        if (idx === 0) {
+                            $firstTd = $(this).parent().prepend('<span style="display:' + op.labelType + ';margin-right:5px;margin-bottom:5px;font-weight:' + op.labelWeight + ';">' + op.templateNameSets[i]['label'] + '</span>');
+                            $firstTd.parent().attr('data-group-order', i);
+                            $parentTbody = $firstTd.parents('tbody');
+                            $firstTd.prevAll('.cb').find(':checkbox').remove();
+                        }
+                        else {
+                            $(this).closest('tr').hide().end().css({marginLeft: '5px'}).appendTo($firstTd);
+                        }
+                    });
+                }
+                if (op.moveTop) {
+                    for (var i = op.templateNameSets.length - 1; i >= 0; i--) {
+                        $('[data-group-order=' + i + ']').prependTo($parentTbody);
+                    }
+                }
+            });
+        }
+        $('tbody tr:visible').each(function(idx){
+            if (idx % 2 == 1) {
+                $(this).removeClass('odd even').addClass('odd');
+            }
+            else {
+                $(this).removeClass('odd even').addClass('even');
+            }
+        });
+    };
+    $.MTAppTemplateListCustomize.defaults = {
+        templateNameSets: [],
+        displayType: 'listIndent', // String: 'listIndent' or 'group'
+        labelWeight: 'bold', // String: 'bold' or 'normal'
+        // If you set 'group' to 'displayType' option, set the following options.
+        moveTop: false, // Boolean: true or false
+        labelType: 'block' // String: 'block' or 'inline'
+    };
+    // end - $.MTAppTemplateListCustomize();
+
+
     // -------------------------------------------------
     //  $(foo).MTAppShowListEntries();
     //
