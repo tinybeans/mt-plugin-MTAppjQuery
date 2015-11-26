@@ -3387,20 +3387,12 @@
     // end - $.MTAppTabs
 
 
-    // -------------------------------------------------
+    // ---------------------------------------------------------------------
     //  $.MTAppMsg();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2015/11/26
     //
-    //  Description:
-    //    画面上部にMTデフォルトの形式のメッセージを表示する。
-    //
-    //  Usage:
-    //    $.MTAppMsg(options);
-    //
-    //  Options:
-    //    msg: {String} 表示するメッセージ
-    //    type: {String} 'info' or 'success' or 'error'
-    //    parent: {Boolean} p.msg-text で包含しない場合(true)
-    //    timeout: {Number} 一定時間経過後に非表示にする場合にミリ秒を指定。0は非表示にしない。
+    // 画面上部にMTデフォルトの形式のメッセージを表示します。
     // ---------------------------------------------------------------------
     $.MTAppMsg = function(options){
         var op = $.extend({}, $.MTAppMsg.defaults, options);
@@ -3423,41 +3415,32 @@
             myMsg[4] = '';
         }
 
-        var msgBlock = $('#msg-block');
+        var $myMsg = $(myMsg.join('')).on('click.MTAppMsg', '.mt-close-msg', function(){
+            $(this).parent('.msg').remove();
+        });
 
-        if (msgBlock.length == 0) {
-            $('#content-header').append('<div id="msg-block"></div>');
-        }
-
-        var $myMsg = $(myMsg.join(''));
-
-        var $msgBlock = $('#msg-block').append($myMsg);
-
-        if (mtappVars.template_filename === 'dialog/asset_list') {
-            $msgBlock.on('click', '.mt-close-msg', function(){
-                $(this).parent('.msg').remove();
-            });
-        }
+        $('#content-header').append($myMsg);
 
         if (op.timeout > 0) {
             var animation = (op.animation === 'slideUp') ? 'slideUp' : 'fadeOut';
-            setTimeout(function(){
-                if (animation === 'slideUp') {
-                    $myMsg.slideUp();
-                } else {
-                    $myMsg.fadeOut();
-                }
-            }, op.timeout);
+            window.onload = function(){
+                setTimeout(function(){
+                    if (animation === 'slideUp') {
+                        $myMsg.slideUp();
+                    } else {
+                        $myMsg.fadeOut();
+                    }
+                }, op.timeout);
+            };
         }
     };
     $.MTAppMsg.defaults = {
-        msg: '',
-        type: 'info',
-        parent: false,
-        timeout: 0,
+        msg: '', // String: 表示するメッセージ
+        type: 'info', // String: 'info', 'success' or 'error'
+        parent: false, // Boolean: Whether to wrap the message with p.msg-text or not.
+        timeout: 0, // Number: Set milliseconds when you want to hide the message after a while.
         animation: 'fadeOut'
     };
-    // end - $.MTAppMsg();
 
 
     // ---------------------------------------------------------------------
