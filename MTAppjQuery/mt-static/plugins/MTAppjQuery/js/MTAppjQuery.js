@@ -3707,6 +3707,9 @@
                     var $div = $(this).children().children('div');
                     var catLabel = $div.text().replace(/\s/g, '');
                     var catId = $div.children('input').attr('name');
+                    var attrDefChecked = '';
+                    var attrChecked = '';
+                    var attrDisabled = '';
                     var _html = [];
                     if (catId) {
                         catId = catId.match(/[0-9]+$/)[0];
@@ -3716,20 +3719,42 @@
                     }
                     switch (op.type) {
                         case 'radio':
-                            var AttrDefChecked = categoryIds ? '': ' checked="checked"';
-                            var AttrChecked = (categoryIds == catId) ? ' checked="checked"': '';
-                            if (i == 0) {
-                                _html.push('<label for="another-cat-0"><input id="another-cat-0" type="radio" name="other-type-category" value=""' + AttrDefChecked + '>' + op.notSelectedText+ '</label>');
+                            if (categoryIds === '') {
+                                if (op.selected === null) {
+                                    attrDefChecked = ' checked="checked"';
+                                } else {
+                                    if (catId == op.selected) {
+                                        attrChecked = ' checked="checked"';
+                                    }
+                                }
+                            } else {
+                                if (categoryIds == catId) {
+                                    attrChecked = ' checked="checked"';
+                                }
                             }
-                            _html.push('<label for="another-cat-' + catId + '"><input id="another-cat-' + catId + '" type="radio" name="other-type-category" value="' + catId + '"' + AttrChecked + '>' + catLabel + '</label>');
+                            if (i == 0) {
+                                _html.push('<label for="another-cat-0"><input id="another-cat-0" type="radio" name="other-type-category" value=""' + attrDefChecked + '>' + op.notSelectedText+ '</label>');
+                            }
+                            _html.push('<label for="another-cat-' + catId + '"><input id="another-cat-' + catId + '" type="radio" name="other-type-category" value="' + catId + '"' + attrChecked + '>' + catLabel + '</label>');
                             break;
                         case 'select':
-                            var AttrDefSelected = categoryIds ? '': ' selected';
-                            var AttrSelected = (categoryIds == catId) ? ' selected': '';
-                            if (i == 0) {
-                                _html.push('<select name="other-type-category"><option value=""' + AttrDefSelected + '>未選択</option>');
+                            if (categoryIds === '') {
+                                if (op.selected === null) {
+                                    attrDefChecked = ' selected="selected"';
+                                } else {
+                                    if (catId == op.selected) {
+                                        attrChecked = ' selected="selected"';
+                                    }
+                                }
+                            } else {
+                                if (categoryIds == catId) {
+                                    attrChecked = ' selected="selected"';
+                                }
                             }
-                            _html.push('<option value="' + catId + '"' + AttrSelected + '>' + catLabel + '</option>');
+                            if (i == 0) {
+                                _html.push('<select name="other-type-category"><option value=""' + attrDefChecked + '>未選択</option>');
+                            }
+                            _html.push('<option value="' + catId + '"' + attrChecked + '>' + catLabel + '</option>');
                             break;
                         default: return false;
                     }
@@ -3746,14 +3771,14 @@
                                 else {
                                     $('#category-ids').val('');
                                 }
-                            });
+                            }).find('input[name="other-type-category"]:checked').trigger('click');
                         break;
                     case 'select':
                         $anotherCategoryList.html(radioCatList.join('') + '</select>');
                         $anotherCategoryList
                             .on('change', 'select', function(){
                                 $('#category-ids').val($(this).find('option:selected').val());
-                            });
+                            }).find('select').trigger('change');
                         break;
                 }
             // });
@@ -3763,7 +3788,9 @@
         type: 'radio', // or 'select'
         label: 'カテゴリ',
         notSelectedText: '未選択',
-        // Set "true" to the add option if you would like to be able to add a new category.
+        // Set the category ID to "selected" option if you would like to select the specific category.
+        selected: null,
+        // Set "true" to "add" option if you would like to be able to add a new category.
         add: false,
         debug: false
     };
