@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2015/11/12
+ * Update:  2015/12/27
  *
  */
 ;(function($){
@@ -3594,21 +3594,13 @@
     // end - $.MTAppInCats();
 
 
-    // -------------------------------------------------
+    // ---------------------------------------------------------------------
     //  $.MTAppOtherTypeCategories();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2015/12/27
     //
-    //  Description:
-    //    記事カテゴリ選択のUIをラジオボタンまたはドロップダウンリストに変更する。
-    //
-    //  Usage:
-    //    $.MTAppOtherTypeCategories(options);
-    //
-    //  Options:
-    //    type: {String} 'radio'（ラジオボタン） or 'select'（ドロップダウンリスト）
-    //    label: {String} ウィジェットのタイトルバーに表示されるラベル
-    //    lanotSelectedTextbel: {String} 未選択状態にするための要素のラベル
-    //    debug: {Boolean} trueにすると元のカテゴリウィジェットが表示される
-    // -------------------------------------------------
+    // 記事カテゴリ選択のUIをラジオボタンまたはドロップダウンリストに変更します。
+    // ---------------------------------------------------------------------
     $.MTAppOtherTypeCategories = function(options){
         var op = $.extend({}, $.MTAppOtherTypeCategories.defaults, options);
 
@@ -3793,15 +3785,19 @@
         }, 500);
     };
     $.MTAppOtherTypeCategories.defaults = {
-        type: 'radio', // or 'select'
+        // A string of the new widget type. You can set either "radio" or "select".
+        type: 'radio',
+        // A string of the widget name.
         label: 'カテゴリ',
+        // A string to be displayed when no category is selected.
         notSelectedText: '未選択',
         // Set the category ID to "selected" option if you would like to select the specific category.
         selected: null,
         // Set true to "disabledExceptSelected" option if you would like to disable categories expecting the selected category.
         disabledExceptSelected: null,
-        // Set "true" to "add" option if you would like to be able to add a new category.
+        // Set true to "add" option if you would like to be able to add a new category.
         add: false,
+        // If set to true, the original widget is shown.
         debug: false
     };
     // end - $.MTAppOtherTypeCategories();
