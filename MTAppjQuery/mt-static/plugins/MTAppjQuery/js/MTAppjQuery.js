@@ -3702,6 +3702,7 @@
                     var attrDefChecked = '';
                     var attrChecked = '';
                     var attrDisabled = '';
+                    var attrHiddenClass = '';
                     var _html = [];
                     if (catId) {
                         catId = catId.match(/[0-9]+$/)[0];
@@ -3717,6 +3718,8 @@
                                 } else {
                                     if (catId == op.selected) {
                                         attrChecked = ' checked="checked"';
+                                    } else if (op.hiddenExceptSelected) {
+                                        attrHiddenClass = ' class="hidden"';
                                     } else if (op.disabledExceptSelected) {
                                         attrDisabled = ' disabled="disabled"';
                                     }
@@ -3724,14 +3727,16 @@
                             } else {
                                 if (categoryIds == catId) {
                                     attrChecked = ' checked="checked"';
+                                } else if (op.hiddenExceptSelected) {
+                                    attrHiddenClass = ' class="hidden"';
                                 } else if (op.disabledExceptSelected) {
                                     attrDisabled = ' disabled="disabled"';
                                 }
                             }
                             if (i == 0) {
-                                _html.push('<label for="another-cat-0"><input id="another-cat-0" type="radio" name="other-type-category" value=""' + attrDefChecked + attrDisabled + '>' + op.notSelectedText+ '</label>');
+                                _html.push('<label for="another-cat-0"' + attrHiddenClass + '><input id="another-cat-0" type="radio" name="other-type-category" value=""' + attrDefChecked + attrDisabled + '>' + op.notSelectedText+ '</label>');
                             }
-                            _html.push('<label for="another-cat-' + catId + '"><input id="another-cat-' + catId + '" type="radio" name="other-type-category" value="' + catId + '"' + attrChecked + attrDisabled + '>' + catLabel + '</label>');
+                            _html.push('<label for="another-cat-' + catId + '"' + attrHiddenClass + '><input id="another-cat-' + catId + '" type="radio" name="other-type-category" value="' + catId + '"' + attrChecked + attrDisabled + '>' + catLabel + '</label>');
                             break;
                         case 'select':
                             if (categoryIds === '') {
@@ -3740,6 +3745,8 @@
                                 } else {
                                     if (catId == op.selected) {
                                         attrChecked = ' selected="selected"';
+                                    } else if (op.hiddenExceptSelected) {
+                                        attrHiddenClass = ' class="hidden"';
                                     } else if (op.disabledExceptSelected) {
                                         attrDisabled = ' disabled="disabled"';
                                     }
@@ -3747,14 +3754,16 @@
                             } else {
                                 if (categoryIds == catId) {
                                     attrChecked = ' selected="selected"';
+                                } else if (op.hiddenExceptSelected) {
+                                    attrHiddenClass = ' class="hidden"';
                                 } else if (op.disabledExceptSelected) {
                                     attrDisabled = ' disabled="disabled"';
                                 }
                             }
                             if (i == 0) {
-                                _html.push('<select name="other-type-category"><option value=""' + attrDefChecked + attrDisabled + '>未選択</option>');
+                                _html.push('<select name="other-type-category"><option value=""' + attrDefChecked + attrDisabled + attrHiddenClass + '>未選択</option>');
                             }
-                            _html.push('<option value="' + catId + '"' + attrChecked + attrDisabled + '>' + catLabel + '</option>');
+                            _html.push('<option value="' + catId + '"' + attrChecked + attrDisabled + attrHiddenClass + '>' + catLabel + '</option>');
                             break;
                         default: return false;
                     }
@@ -3794,7 +3803,9 @@
         // Set the category ID to "selected" option if you would like to select the specific category.
         selected: null,
         // Set true to "disabledExceptSelected" option if you would like to disable categories expecting the selected category.
-        disabledExceptSelected: null,
+        disabledExceptSelected: false,
+        // Set true to "hiddenExceptSelected" option if you would like to hide categories expecting the selected category.
+        hiddenExceptSelected: false,
         // Set true to "add" option if you would like to be able to add a new category.
         add: false,
         // If set to true, the original widget is shown.
