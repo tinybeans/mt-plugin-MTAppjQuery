@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2015/11/12
+ * Update:  2015/12/27
  *
  */
 ;(function($){
@@ -3594,21 +3594,13 @@
     // end - $.MTAppInCats();
 
 
-    // -------------------------------------------------
+    // ---------------------------------------------------------------------
     //  $.MTAppOtherTypeCategories();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2015/12/27
     //
-    //  Description:
-    //    記事カテゴリ選択のUIをラジオボタンまたはドロップダウンリストに変更する。
-    //
-    //  Usage:
-    //    $.MTAppOtherTypeCategories(options);
-    //
-    //  Options:
-    //    type: {String} 'radio'（ラジオボタン） or 'select'（ドロップダウンリスト）
-    //    label: {String} ウィジェットのタイトルバーに表示されるラベル
-    //    lanotSelectedTextbel: {String} 未選択状態にするための要素のラベル
-    //    debug: {Boolean} trueにすると元のカテゴリウィジェットが表示される
-    // -------------------------------------------------
+    // 記事カテゴリ選択のUIをラジオボタンまたはドロップダウンリストに変更します。
+    // ---------------------------------------------------------------------
     $.MTAppOtherTypeCategories = function(options){
         var op = $.extend({}, $.MTAppOtherTypeCategories.defaults, options);
 
@@ -3707,6 +3699,9 @@
                     var $div = $(this).children().children('div');
                     var catLabel = $div.text().replace(/\s/g, '');
                     var catId = $div.children('input').attr('name');
+                    var attrDefChecked = '';
+                    var attrChecked = '';
+                    var attrDisabled = '';
                     var _html = [];
                     if (catId) {
                         catId = catId.match(/[0-9]+$/)[0];
@@ -3716,20 +3711,50 @@
                     }
                     switch (op.type) {
                         case 'radio':
-                            var AttrDefChecked = categoryIds ? '': ' checked="checked"';
-                            var AttrChecked = (categoryIds == catId) ? ' checked="checked"': '';
-                            if (i == 0) {
-                                _html.push('<label for="another-cat-0"><input id="another-cat-0" type="radio" name="other-type-category" value=""' + AttrDefChecked + '>' + op.notSelectedText+ '</label>');
+                            if (categoryIds === '') {
+                                if (op.selected === null) {
+                                    attrDefChecked = ' checked="checked"';
+                                } else {
+                                    if (catId == op.selected) {
+                                        attrChecked = ' checked="checked"';
+                                    } else if (op.disabledExceptSelected) {
+                                        attrDisabled = ' disabled="disabled"';
+                                    }
+                                }
+                            } else {
+                                if (categoryIds == catId) {
+                                    attrChecked = ' checked="checked"';
+                                } else if (op.disabledExceptSelected) {
+                                    attrDisabled = ' disabled="disabled"';
+                                }
                             }
-                            _html.push('<label for="another-cat-' + catId + '"><input id="another-cat-' + catId + '" type="radio" name="other-type-category" value="' + catId + '"' + AttrChecked + '>' + catLabel + '</label>');
+                            if (i == 0) {
+                                _html.push('<label for="another-cat-0"><input id="another-cat-0" type="radio" name="other-type-category" value=""' + attrDefChecked + attrDisabled + '>' + op.notSelectedText+ '</label>');
+                            }
+                            _html.push('<label for="another-cat-' + catId + '"><input id="another-cat-' + catId + '" type="radio" name="other-type-category" value="' + catId + '"' + attrChecked + attrDisabled + '>' + catLabel + '</label>');
                             break;
                         case 'select':
-                            var AttrDefSelected = categoryIds ? '': ' selected';
-                            var AttrSelected = (categoryIds == catId) ? ' selected': '';
-                            if (i == 0) {
-                                _html.push('<select name="other-type-category"><option value=""' + AttrDefSelected + '>未選択</option>');
+                            if (categoryIds === '') {
+                                if (op.selected === null) {
+                                    attrDefChecked = ' selected="selected"';
+                                } else {
+                                    if (catId == op.selected) {
+                                        attrChecked = ' selected="selected"';
+                                    } else if (op.disabledExceptSelected) {
+                                        attrDisabled = ' disabled="disabled"';
+                                    }
+                                }
+                            } else {
+                                if (categoryIds == catId) {
+                                    attrChecked = ' selected="selected"';
+                                } else if (op.disabledExceptSelected) {
+                                    attrDisabled = ' disabled="disabled"';
+                                }
                             }
-                            _html.push('<option value="' + catId + '"' + AttrSelected + '>' + catLabel + '</option>');
+                            if (i == 0) {
+                                _html.push('<select name="other-type-category"><option value=""' + attrDefChecked + attrDisabled + '>未選択</option>');
+                            }
+                            _html.push('<option value="' + catId + '"' + attrChecked + attrDisabled + '>' + catLabel + '</option>');
                             break;
                         default: return false;
                     }
@@ -3746,25 +3771,33 @@
                                 else {
                                     $('#category-ids').val('');
                                 }
-                            });
+                            }).find('input[name="other-type-category"]:checked').trigger('click');
                         break;
                     case 'select':
                         $anotherCategoryList.html(radioCatList.join('') + '</select>');
                         $anotherCategoryList
                             .on('change', 'select', function(){
                                 $('#category-ids').val($(this).find('option:selected').val());
-                            });
+                            }).find('select').trigger('change');
                         break;
                 }
             // });
         }, 500);
     };
     $.MTAppOtherTypeCategories.defaults = {
-        type: 'radio', // or 'select'
+        // A string of the new widget type. You can set either "radio" or "select".
+        type: 'radio',
+        // A string of the widget name.
         label: 'カテゴリ',
+        // A string to be displayed when no category is selected.
         notSelectedText: '未選択',
-        // Set "true" to the add option if you would like to be able to add a new category.
+        // Set the category ID to "selected" option if you would like to select the specific category.
+        selected: null,
+        // Set true to "disabledExceptSelected" option if you would like to disable categories expecting the selected category.
+        disabledExceptSelected: null,
+        // Set true to "add" option if you would like to be able to add a new category.
         add: false,
+        // If set to true, the original widget is shown.
         debug: false
     };
     // end - $.MTAppOtherTypeCategories();
