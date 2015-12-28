@@ -3600,6 +3600,7 @@
     //                                             Latest update: 2015/12/27
     //
     // 記事カテゴリ選択のUIをラジオボタンまたはドロップダウンリストに変更します。
+    //
     // ---------------------------------------------------------------------
     $.MTAppOtherTypeCategories = function(options){
         var op = $.extend({}, $.MTAppOtherTypeCategories.defaults, options);
