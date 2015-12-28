@@ -3733,7 +3733,7 @@
                                     attrDisabled = ' disabled="disabled"';
                                 }
                             }
-                            if (i == 0) {
+                            if (i == 0 && !op.selected) {
                                 _html.push('<label for="another-cat-0"' + attrHiddenClass + '><input id="another-cat-0" type="radio" name="other-type-category" value=""' + attrDefChecked + attrDisabled + '>' + op.notSelectedText+ '</label>');
                             }
                             _html.push('<label for="another-cat-' + catId + '"' + attrHiddenClass + '><input id="another-cat-' + catId + '" type="radio" name="other-type-category" value="' + catId + '"' + attrChecked + attrDisabled + '>' + catLabel + '</label>');
@@ -3760,7 +3760,7 @@
                                     attrDisabled = ' disabled="disabled"';
                                 }
                             }
-                            if (i == 0) {
+                            if (i == 0 && !op.selected) {
                                 _html.push('<select name="other-type-category"><option value=""' + attrDefChecked + attrDisabled + attrHiddenClass + '>未選択</option>');
                             }
                             _html.push('<option value="' + catId + '"' + attrChecked + attrDisabled + attrHiddenClass + '>' + catLabel + '</option>');
