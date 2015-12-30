@@ -5022,6 +5022,94 @@
     // end - $.MTAppMakeWidget();
 
 
+    // ---------------------------------------------------------------------
+    //  $.MTAppMoveToWidget();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2015/11/17
+    //
+    // 指定したフィールドを1つの新しいサイドバーウィジェットにまとめて入れるか、既存のウィジェット
+    // に挿入します。
+    //
+    // ---------------------------------------------------------------------
+    $.MTAppMoveToWidget = function(options){
+        var op = $.extend({}, $.MTAppMoveToWidget.defaults, options);
+        // Edit entry screen only
+        if (mtappVars.screen_id !== 'edit-entry') {
+            return;
+        }
+        // The pointerSelector option is required.
+        if (op.pointerSelector === '') {
+            return $.errorMessage('MTAppMoveToWidget', 'pointerSelector is required', 'alert', false);
+        }
+        // The fields option is set to a string which is field IDs separated by comma.
+        var fields = (op.field !== '') ? op.field.split(',') : [];
+        // The basename option is set to a string which is field basenames separated by comma.
+        if (op.basename !== '' && typeof op.basename === 'string') {
+            var basenames = op.basename.split(',');
+            for (var i = 0, l = basenames.length; i < l; i++) {
+                fields.push(basenames[i] + '-field');
+            }
+        }
+        // Get content to move
+        var movingHtml = '';
+        for (var i = 0, l = fields.length; i < l; i++) {
+            $('#' + fields[i]).each(function(){
+              $(this).removeClass('hidden').removeClass('sort-enabled');
+              movingHtml += this.outerHTML;
+            }).remove();
+        }
+        // Set HTML to insert
+        var insertHtml = '';
+        if (op.makeWidget) {
+            // Make a new widget
+            insertHtml = $.MTAppMakeWidget({
+                label: op.widgetLabel,
+                content: op.widgetContent + movingHtml,
+                action: op.widgetAction,
+                footer: op.widgetFooter
+            });
+        }
+        else {
+            insertHtml = movingHtml;
+        }
+        // Move
+        switch (op.method) {
+          case 'before':
+            $(op.pointerSelector).before(insertHtml);
+            break;
+          case 'append':
+            $(op.pointerSelector).append(insertHtml);
+            break;
+          case 'prepend':
+            $(op.pointerSelector).prepend(insertHtml);
+            break;
+          default:
+            $(op.pointerSelector).after(insertHtml);
+        }
+    };
+    $.MTAppMoveToWidget.defaults = {
+        // Set to true if you want to make a new widget.
+        makeWidget: true,
+        // Set a string/HTML which is a widget name to the widgetLabel option.
+        widgetLabel: 'New Widget',
+        // Set a string/HTML which is a widget content to the widgetContent option.
+        widgetContent: '',
+        // Set a string/HTML which is a widget content to the widgetAction option.
+        widgetAction: '',
+        // Set a string/HTML which is a widget content to the widgetFooter option.
+        widgetFooter: '',
+        // Set a separated comma text of moving field's basename
+        basename: '',
+        // Set a separated comma text of moving field's ID
+        field: '',
+        // Set the selecter which is the destination moving fields.
+        pointerSelector: '',
+        // Set a method name, one of 'after', 'before', 'append' and 'prepend'
+        method: 'after'
+    };
+    // end - $.MTAppMoveToWidget()
+
+
     // -------------------------------------------------
     //  $.MTAppGroupFilter(); (for PowerCMS)
     //
