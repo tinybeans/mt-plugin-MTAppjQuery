@@ -783,3 +783,11 @@ span.mtappmultiform-radio input {
 }
 
 /*  MTAppMaxLength  */
+/* ==================================================
+    MTAppCategorySwitch
+================================================== */
+.MTAppCategorySwitch #category-list a.delete {
+  display: none !important;
+}
+
+/*  MTAppCategorySwitch  */

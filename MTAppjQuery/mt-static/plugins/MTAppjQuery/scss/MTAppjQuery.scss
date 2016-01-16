@@ -685,3 +685,11 @@ span.mtappmultiform-radio {
     text-align: right;
 }
 /*  MTAppMaxLength  */
+
+/* ==================================================
+    MTAppCategorySwitch
+================================================== */
+.MTAppCategorySwitch #category-list a.delete {
+    display: none !important;
+}
+/*  MTAppCategorySwitch  */
