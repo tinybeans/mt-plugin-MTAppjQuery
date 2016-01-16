@@ -3542,6 +3542,99 @@
     // end - $.MTAppSlideMenu
 
 
+    // ---------------------------------------------------------------------
+    //  $.MTAppCategorySwitch();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2016/01/13
+    //
+    //  カテゴリによって表示するフィールドを切り替えます。
+    // ---------------------------------------------------------------------
+    $.MTAppCategorySwitch = function(options){
+        var op = $.extend({}, $.MTAppCategorySwitch.defaults, options);
+        if (mtappVars.screen_id !== 'edit-entry' || (op.selector === null && op.basename === null)) {
+            return;
+        }
+
+        $('body').addClass('MTAppCategorySwitch');
+        var makeSelectorIntoObject = function(prop, value, intoHash, intoArray, basename){
+            intoHash[prop] = [];
+            if (value === '') {
+                return;
+            }
+            var array = value.split(',');
+            for (var i = 0, l = array.length; i < l; i++) {
+                if (basename) {
+                    var selector = '#' + array[i].replace(/^c:/, 'customfield_') + '-field';
+                    intoHash[prop].push(selector);
+                    intoArray.push(selector);
+                } else {
+                    intoHash[prop].push(array[i]);
+                    intoArray.push(array[i]);
+                }
+            }
+        };
+
+        // 対象とするフィールド一覧を作成
+        var targetSelector = [];
+        var settingSelector = {};
+        if (op.selector !== null) {
+            for (var prop in op.selector) {
+                makeSelectorIntoObject(prop, op.selector[prop], settingSelector, targetSelector, false);
+            }
+        } else if (op.basename !== null) {
+            for (var prop in op.basename) {
+                makeSelectorIntoObject(prop, op.basename[prop], settingSelector, targetSelector, true);
+            }
+        }
+        targetSelector.sort();
+        $.unique(targetSelector);
+
+        // 対象とするフィールドを全て取得してクラスをつける
+        var $target = $( targetSelector.join(',') ).addClass('hidden cfs-hidden');
+
+        var showFields = function($obj){
+            $obj.removeClass('hidden cfs-hidden').addClass('cfs-show').show();
+        };
+
+        var switchCategoryAction = function(){
+            var selectedCategoriesValue = $('#category-ids').val();
+            var selectedCategories = selectedCategoriesValue !== '' ? selectedCategoriesValue.split(',') : ['init'];
+            if (selectedCategoriesValue === '' && settingSelector.hasOwnProperty('init') && settingSelector['init'].length < 1) {
+                showFields($target);
+            } else {
+                $target.addClass('hidden cfs-hidden');
+            }
+            for (var i = 0, l = selectedCategories.length; i < l; i++) {
+                var category = selectedCategories[i] === 'init' ? 'init' : 'cat' + selectedCategories[i];
+                if (!settingSelector.hasOwnProperty(category)) {
+                    continue;
+                }
+                for (var x = 0, y = settingSelector[category].length; x < y; x++) {
+                    showFields( $(settingSelector[category][x]) );
+                }
+            }
+        }
+        $('#category-field').on('click.switchCategory', switchCategoryAction).trigger('click.switchCategory');
+    };
+    $.MTAppCategorySwitch.defaults = {
+        // カテゴリIDにcatという接頭辞を付けて、そのカテゴリが選択された時に表示させる要素のセレクタをカンマ区切りで指定します。
+        // selector: {
+        //     'cat1': '#title-field,#text-field,#customfield_foo-field',
+        //     'cat2': '#title-field,#keywords-field,#excerpt-field',
+        //     'init': '#title-field,#text-field,#excerpt-field'
+        // },
+        selector: null,
+        // カテゴリIDにcatという接頭辞を付けて、そのカテゴリが選択された時に表示させるフィールドのベースネームをカンマ区切りで指定します。
+        // basename: {
+        //     'cat1': 'title,text,customfield_foo',
+        //     'cat2': 'title,keywords,excerpt'
+        //     'init': ''
+        // },
+        basename: null
+    };
+    // end - $.MTAppCategorySwitch();
+
+
     // -------------------------------------------------
     //  $.MTAppInCats();
     //
