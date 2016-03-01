@@ -2047,7 +2047,7 @@
         scopeList.push(
             typeScopeList('website', li.website.join(''))
         );
-        $('#scope-selector').html('<ul id="mtapp-slidemenu-v2">' + scopeList.join('') + '</ul>');
+        $('#scope-selector').html('<div id="mtapp-slidemenu-v2">' + scopeList.join('') + '</div>');
 
         // Attach an event handler function for events to the elements
         $('#mtapp-slidemenu-v2 div.scope-list').not('.system').on('click', 'a', function(e){
