@@ -3545,7 +3545,7 @@
     // ---------------------------------------------------------------------
     //  $.MTAppCategorySwitch();
     // ---------------------------------------------------------------------
-    //                                             Latest update: 2016/01/13
+    //                                             Latest update: 2016/03/15
     //
     //  カテゴリによって表示するフィールドを切り替えます。
     // ---------------------------------------------------------------------
@@ -3614,7 +3614,8 @@
                 }
             }
         }
-        $('#category-field').on('click.switchCategory', switchCategoryAction).trigger('click.switchCategory');
+        $('#main').on('click.MTAppCategorySwitch', '#category-field,#other-type-category-list', switchCategoryAction);
+        switchCategoryAction();
     };
     $.MTAppCategorySwitch.defaults = {
         // カテゴリIDにcatという接頭辞を付けて、そのカテゴリが選択された時に表示させる要素のセレクタをカンマ区切りで指定します。
