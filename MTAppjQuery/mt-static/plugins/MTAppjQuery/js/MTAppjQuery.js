@@ -2648,7 +2648,7 @@
                 $(this)
                     .blur(function(){
                         var values = [];
-                        $(this).siblings().andSelf().each(function(){
+                        $(this).siblings('input:text').andSelf().each(function(){
                             values.push($(this).val());
                         });
                         $self.val(values.join(separator));
@@ -2656,7 +2656,7 @@
                     .keydown(function(e){
                         if (e.which == 13) {
                             var values = [];
-                            $(this).siblings().andSelf().each(function(){
+                            $(this).siblings('input:text').andSelf().each(function(){
                                 values.push($(this).val());
                             });
                             $self.val(values.join(separator));
