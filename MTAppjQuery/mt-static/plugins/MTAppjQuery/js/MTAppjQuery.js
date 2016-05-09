@@ -1399,6 +1399,7 @@
         if (op.api === null) {
             return $.errorMessage('MTAppMultiFileUpload', 'The "api" option is required.', 'alert', false);
         }
+        var api = op.api;
         if (op.siteId === 0) {
             return $.errorMessage('MTAppMultiFileUpload', 'The "siteId" option is required.', 'alert', false);
         }
