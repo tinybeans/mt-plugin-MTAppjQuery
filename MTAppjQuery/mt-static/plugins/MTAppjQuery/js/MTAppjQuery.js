@@ -1589,7 +1589,7 @@
                         // Show a loading image
                         $itemUploadItems.append('<img class="loading" src="' + StaticURI + 'images/indicator-login.gif" alt="">').show();
                         // Upload a file
-                        api.uploadAsset(op.siteId, data, function(response) {
+                        var upload = function(response){
                             // An error occurred
                             if (response.error) {
                                 var errorMessage = response.error.message ? ': ' + response.error.message : 'An error occurred while uploading.';
@@ -1675,7 +1675,15 @@
                             if (op.cbAfterUpload !== null && typeof op.cbAfterUpload === 'function') {
                                 op.cbAfterUpload({name: 'cbAfterUpload'}, $this, response);
                             }
-                        });
+                        };
+                        // Adjustment by varsions
+                        if (api.getVersion() == 1) {
+                          api.uploadAsset(op.siteId, data, upload);
+                        }
+                        else {
+                          data.site_id = op.siteId;
+                          api.uploadAsset(data, upload);
+                        }
                     }
                 });
             } // Core function
