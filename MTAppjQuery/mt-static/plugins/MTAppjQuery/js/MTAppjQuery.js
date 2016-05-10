@@ -1655,8 +1655,6 @@
                             }
                         }
                         if (op.cbAfterUpload !== null && typeof op.cbAfterUpload === 'function') {
-                          console.log('i:' + i);
-                          console.log('counter:' + counter);
                             if (l == counter) {
                               last = true;
                             }
@@ -1733,12 +1731,15 @@
         uploadButton: null,
         // Called after upload files.
         // e.g.
-        // cbAfterUpload: function(cb, $this, response){
+        // cbAfterUpload: function(cb, $this, response, first, last){
         //     do something
         // }
         // - cb : {name: 'cbAfterUpload'}
         // - $this : The target element applying .MTAppMultiFileUpload()
         // - response : The respunse from uploadAsset()
+        // - first : When the loop is first, set true
+        // - last : When the loop is last, set true
+
         cbAfterUpload: null,
         debug: false
     };
