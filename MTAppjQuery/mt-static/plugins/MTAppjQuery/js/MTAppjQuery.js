@@ -12,23 +12,19 @@
     if (typeof mtappVars !== 'object') return;
     mtappVars.adminScript = location.href.replace(/\?.*/, '');
 
-    // -------------------------------------------------
+    // ---------------------------------------------------------------------
     //  $(foo).MTAppJSONTable();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2016/05/11
     //
-    //  Description:
-    //    fooに指定したtextareaを表形式の入力欄にし、表に入力された値をJSONで元のtextareaに保存します。
-    //
-    //  Usage:
-    //    $(foo).MTAppJSONTable(options);
-    //
-    //    このメソッドで扱えるJSONのフォーマットは下記の通りです。
-    //    {"items":[
-    //        {"key1": "value1", "key2": "value2", "key3": "value3"},
-    //        {"key1": "value1", "key2": "value2", "key3": "value3"},
-    //        {"key1": "value1", "key2": "value2", "key3": "value3"}
-    //    ]}
-    //
-    // -------------------------------------------------
+    //  textareaを表形式の入力欄にし、表に入力された値をJSONで元のtextareaに保存します。
+    //  このメソッドで扱えるJSONのフォーマットは下記の通りです。
+    //  {"items":[
+    //      {"key1": "value1", "key2": "value2", "key3": "value3"},
+    //      {"key1": "value1", "key2": "value2", "key3": "value3"},
+    //      {"key1": "value1", "key2": "value2", "key3": "value3"}
+    //  ]}
+    // ---------------------------------------------------------------------
     $.fn.MTAppJSONTable = function(options){
         var op = $.extend({}, $.fn.MTAppJSONTable.defaults, options);
 
@@ -457,6 +453,9 @@
                         }
                     }
                     else if ($(this).hasClass('jsontable-clear')) {
+                        if (op.cbBeforeClear !== null && typeof op.cbBeforeClear === 'function') {
+                            op.cbBeforeClear({name: 'cbBeforeClear'}, $container);
+                        }
                         $table.find('.jsontable-selected-data').remove();
                         if (op.headerPosition === 'left') {
                             itemLength--;
@@ -651,6 +650,7 @@
         cbAfterBuild: null, // function({name: 'cbAfterBuild'}, $container){}
         cbBeforeAdd: null, // function({name: 'cbBeforeAdd', type: 'column'}, $td){}
         cbAfterAdd: null, // function({name: 'cbAfterAdd', type: 'row or column'}, $container){}
+        cbBeforeClear: null, // function({name: 'cbAfterAdd'}, $container){}
         cbAfterSelectRow: null, // function({name: 'cbAfterSelectRow'}, $tr, $(this).is(':checked')){}
         cbAfterSelectColumn: null, // function({name: 'cbAfterSelectColumn'}, $td, $(this).is(':checked')){}
 
