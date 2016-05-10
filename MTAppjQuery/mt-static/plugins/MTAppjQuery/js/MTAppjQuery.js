@@ -5150,27 +5150,23 @@
     // ---------------------------------------------------------------------
     $.MTAppMoveToWidget = function(options){
         var op = $.extend({}, $.MTAppMoveToWidget.defaults, options);
-        // Edit entry screen only
         if (mtappVars.screen_id !== 'edit-entry') {
             return;
         }
-        // The pointerSelector option is required.
         if (op.pointerSelector === '') {
             return $.errorMessage('MTAppMoveToWidget', 'pointerSelector is required', 'alert', false);
         }
-        // The fields option is set to a string which is field IDs separated by comma.
-        var fields = (op.field !== '') ? op.field.split(',') : [];
-        // The basename option is set to a string which is field basenames separated by comma.
+        var selectors = (op.selector !== '') ? op.selector.split(',') : [];
         if (op.basename !== '' && typeof op.basename === 'string') {
             var basenames = op.basename.split(',');
             for (var i = 0, l = basenames.length; i < l; i++) {
-                fields.push(basenames[i] + '-field');
+                selectors.push('#' + basenames[i].replace(/^c:/, 'customfield_') + '-field');
             }
         }
         // Get content to move
         var movingHtml = '';
-        for (var i = 0, l = fields.length; i < l; i++) {
-            $('#' + fields[i]).each(function(){
+        for (var i = 0, l = selectors.length; i < l; i++) {
+            $(selectors[i]).each(function(){
               $(this).removeClass('hidden').removeClass('sort-enabled');
               movingHtml += this.outerHTML;
             }).remove();
@@ -5180,8 +5176,9 @@
         if (op.makeWidget) {
             // Make a new widget
             insertHtml = $.MTAppMakeWidget({
+                basename: op.widgetBasename,
                 label: op.widgetLabel,
-                content: op.widgetContent + movingHtml,
+                content: op.widgetContentTop + movingHtml + op.widgetContentBottom,
                 action: op.widgetAction,
                 footer: op.widgetFooter
             });
@@ -5207,18 +5204,22 @@
     $.MTAppMoveToWidget.defaults = {
         // Set to true if you want to make a new widget.
         makeWidget: true,
-        // Set a string/HTML which is a widget name to the widgetLabel option.
+        // Set a string. This is widget basename.
+        widgetBasename: '',
+        // Set a string/HTML. This is a widget name.
         widgetLabel: 'New Widget',
-        // Set a string/HTML which is a widget content to the widgetContent option.
-        widgetContent: '',
-        // Set a string/HTML which is a widget content to the widgetAction option.
+        // Set a string/HTML. This is a widget content which is inserted to the top position.
+        widgetContentTop: '',
+        // Set a string/HTML. This is a widget content which is inserted to the bottom position.
+        widgetContentBottom: '',
+        // Set a string/HTML. This is a widget action content.
         widgetAction: '',
-        // Set a string/HTML which is a widget content to the widgetFooter option.
+        // Set a string/HTML. This is a widget footer content.
         widgetFooter: '',
         // Set a separated comma text of moving field's basename
         basename: '',
         // Set a separated comma text of moving field's ID
-        field: '',
+        selector: '',
         // Set the selecter which is the destination moving fields.
         pointerSelector: '',
         // Set a method name, one of 'after', 'before', 'append' and 'prepend'
