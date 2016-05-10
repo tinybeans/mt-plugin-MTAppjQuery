@@ -5072,7 +5072,10 @@
     // -------------------------------------------------
     $.MTAppMakeField = function(options) {
         var op = $.extend({}, $.MTAppMakeField.defaults, options);
-        var id = op.id ? ' id="' + op.id + '-field"' : '';
+        if (op.basename === '' && op.id !== '') {
+            op.basename = op.id;
+        }
+        var id = op.basename !== '' ? ' id="' + op.basename + '-field"' : '';
         var hint = op.hint ? '<div class="hint">' + op.hint + '</div>' : '';
         return [
             '<div' + id + ' class="field field-top-label sort-enabled">',
@@ -5084,6 +5087,8 @@
         ].join('');
     };
     $.MTAppMakeField.defaults = {
+        basename: '',
+        // Deprecated. Alias of basename
         id: '',
         label: '',
         content: '',
@@ -5110,8 +5115,9 @@
     // -------------------------------------------------
     $.MTAppMakeWidget = function(options) {
         var op = $.extend({}, $.MTAppMakeWidget.defaults, options);
+        var id = op.basename !== '' ? ' id="' + op.basename + '-field"' : '';
         return [
-            '<div class="widget">',
+            '<div' + id + ' class="widget">',
                 '<div class="widget-header">',
                     '<div class="widget-action">' + op.action + '</div>',
                     '<div class="widget-label">',
@@ -5124,6 +5130,7 @@
         ].join('');
     };
     $.MTAppMakeWidget.defaults = {
+        basename: '',
         label: '',
         content: '',
         action: '',
