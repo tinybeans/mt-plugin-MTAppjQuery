@@ -3708,7 +3708,7 @@
     // ---------------------------------------------------------------------
     //  $.MTAppOtherTypeCategories();
     // ---------------------------------------------------------------------
-    //                                             Latest update: 2015/12/27
+    //                                             Latest update: 2016/05/18
     //
     // 記事カテゴリ選択のUIをラジオボタンまたはドロップダウンリストに変更します。
     //
@@ -3816,6 +3816,10 @@
                     var attrDisabled = '';
                     var attrHiddenClass = '';
                     var _html = [];
+                    var marginLeft = '';
+                    if (op.nest) {
+                        marginLeft = ' style="margin-left:' + $(this).children().css('margin-left') + ';"';
+                    }
                     if (catId) {
                         catId = catId.match(/[0-9]+$/)[0];
                     }
@@ -3846,9 +3850,9 @@
                                 }
                             }
                             if (i == 0 && !op.selected) {
-                                _html.push('<label for="another-cat-0"' + attrHiddenClass + '><input id="another-cat-0" type="radio" name="other-type-category" value=""' + attrDefChecked + attrDisabled + '>' + op.notSelectedText+ '</label>');
+                                _html.push('<label for="another-cat-0"' + attrHiddenClass + marginLeft + '><input id="another-cat-0" type="radio" name="other-type-category" value=""' + attrDefChecked + attrDisabled + '>' + op.notSelectedText+ '</label>');
                             }
-                            _html.push('<label for="another-cat-' + catId + '"' + attrHiddenClass + '><input id="another-cat-' + catId + '" type="radio" name="other-type-category" value="' + catId + '"' + attrChecked + attrDisabled + '>' + catLabel + '</label>');
+                            _html.push('<label for="another-cat-' + catId + '"' + attrHiddenClass + marginLeft + '><input id="another-cat-' + catId + '" type="radio" name="other-type-category" value="' + catId + '"' + attrChecked + attrDisabled + '>' + catLabel + '</label>');
                             break;
                         case 'select':
                             if (categoryIds === '') {
@@ -3920,6 +3924,8 @@
         hiddenExceptSelected: false,
         // Set true to "add" option if you would like to be able to add a new category.
         add: false,
+        // Set true to "nest" option if you would like to nest categories. (Only radio type)
+        nest: false,
         // If set to true, the original widget is shown.
         debug: false
     };
