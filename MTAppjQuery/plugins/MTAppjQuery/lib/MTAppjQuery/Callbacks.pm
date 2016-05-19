@@ -6,25 +6,6 @@ use MT::Blog;
 use MT::Util;
 use MTAppjQuery::Tmplset;
 use MT::Permission;
-use MT::Session;
-use MT::Log;
-
-use Data::Dumper;
-use File::Basename;
-sub doLog {
-    my ($msg, $code) = @_;
-    return unless defined($msg);
-    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime(time);
-    $year += 1900;
-    $mon += 1;
-    # my $now = "$year年$mon月$mday日($youbi[$wday]) $hour時$min分$sec秒\n";
-    my $now = "$year/$mon/$mday $hour:$min:$sec";
-    my $log = MT::Log->new;
-    $log->message("[$now] $msg");
-    $log->metadata($code);
-    $log->save or die $log->errstr;
-}
-# doLog(basename(FILE).':'.LINE, Dumper($can_access_blogs));
 
 sub template_source_dashboard {
     my ($cb, $app, $tmpl_ref) = @_;
@@ -43,7 +24,6 @@ sub template_source_header {
     my $p = MT->component('mt_app_jquery');
     my $blog = $app->blog;
     my $author = $app->user;
-
 
     # システム管理者かどうか
     my $is_superuser = 0;
@@ -157,44 +137,9 @@ sub template_source_header {
     my $op_fa_mtapp_end_body  = $p->get_config_value('fa_mtapp_end_body', $scope) || '<!-- mtapp_end_body (MTAppjQuery) -->';
 
     # Data API
-    my $op_login_with_data_api = MT->config->MTAppjQueryDataAPIDualLogin;
     my $op_use_data_api_js = $p->get_config_value('use_data_api_js', 'system');
     my $op_data_api_version = $p->get_config_value('data_api_version', 'system');
-    my $op_data_api_client_id = MT->config->MTAppjQueryDataAPIClientId;
-
-
-    # Get Data API Session ID
-    # if ($op_login_with_data_api) {
-    if (0) {
-        my $session = $app->session;
-        # doLog('$session: '.$session->id);
-        my $data_api_session_id = $session->get('mtapp_data_api_access_token') || '';
-        # doLog('get: '.$session->get('mtapp_data_api_access_token'));
-        $app->bake_cookie(
-            -name    => 'mtapp_data_api_access_token',
-            -value   => $session->get('mtapp_data_api_access_token') || '',
-            -path    => '/',
-        );
-
-        # if ($data_api_session_id) {
-        #     &_update_data_api_session_start($session);
-        # }
-        # else {
-        #     my $load_session = MT::Session->load({id => $session->id});
-        #     if ($data_api_session_id = $load_session->get('mtapp_data_api_session_id')) {
-        #         $session->set('mtapp_data_api_session_id', $data_api_session_id);
-        #         $session->save;
-        #     }
-        #     else {
-        #         my $username = $app->param('username');
-        #         my $password = $app->param('password');
-        #         if ($username and $password) {
-        #             $data_api_session_id = &_data_api_authentication($username, $password, $session, $op_data_api_version);
-        #         }
-        #     }
-        # }
-
-    }
+    my $op_data_api_client_id = 'MTAppjQuery-DataAPI';
 
     ### ツールチップ用ボックスをページに追加する
     my $preset = <<__MTML__;
@@ -407,19 +352,6 @@ __MTML__
     </script>
 __MTML__
 
-    # Redirect
-    if ($op_login_with_data_api) {
-        $op_common_js_include .= <<__MTML__;
-<script>
-var mtappRedirectURL = getCookie('mtappRedirectURL');
-if (mtappRedirectURL) {
-    setCookie('mtappRedirectURL', '');
-    window.location.href = mtappRedirectURL;
-}
-</script>
-__MTML__
-    }
-
     # MT.DataAPI Constructor
     if ($op_use_data_api_js) {
         $mtapp_vars .= <<__MTML__;
@@ -538,64 +470,6 @@ __MTML__
     $user_js
     </mt:SetVarBlock>
     <mt:SetVarBlock name="mtapp_end_body" append="1">$op_common_mtapp_end_body</mt:SetVarBlock>
-__MTML__
-
-    # Data API AccessToken
-    if ($op_login_with_data_api) {
-        $prepend_html_head .= <<__MTML__;
-<mt:SetVarBlock name="mtapp_end_body" append="1">
-<script>
-jQuery.ajax({
-    url: '<mt:CGIPath><mt:Var name="config.DataAPIScript">/v2/token',
-    type: 'POST',
-    dataType: 'json',
-    headers: {
-        'X-MT-Authorization': 'MTAuth sessionId=' + mtappVars.data_api_session_id
-    }
-}).done(function(data){
-    if (MT.DataAPI && mtappVars.DataAPI instanceof MT.DataAPI) {
-        mtappVars.DataAPI.storeTokenData(data);
-    }
-    var accessToken = data.accessToken;
-    var sessionId = data.sessionId;
-    var token = 'MTAuth accessToken=' + accessToken;
-    jQuery.ajax({
-        url: '<mt:CGIPath><mt:Var name="config.DataAPIScript">/v2/users/me',
-        type: 'GET',
-        dataType: 'json',
-        headers: {
-            'X-MT-Authorization': token
-        }
-    }).done(function(response) {
-        if (response.error) {
-            if (response.error.code === 401) {
-                window.location.href = mtappVars.DataAPI.getAuthorizationUrl(location.href);
-                return;
-            }
-            jQuery.errorMessage('Getting user', 'response.error.message', 'alert');
-            return;
-        }
-        var user = response;
-        jQuery(document).triggerHandler('DataAPIReady', [user, accessToken, sessionId]);
-    });
-
-}).fail(function(response){
-    if (this.console && typeof console.log != 'undefined'){
-        console.log(response);
-    }
-    //mtappVars.redirectLogin();
-});
-
-mtappVars.redirectLogin = function(){
-    setCookie('mtappRedirectURL', location.href);
-    window.location.href = '<mt:CGIPath><mt:Var name="config.AdminScript">?__mode=logout';
-};
-</script>
-</mt:SetVarBlock>
-__MTML__
-    }
-
-    $prepend_html_head .= <<__MTML__;
     <mt:SetVarBlock name="mtapp_end_body" append="1">$op_fa_mtapp_end_body</mt:SetVarBlock>
 __MTML__
 
@@ -610,39 +484,6 @@ sub template_source_footer {
     <mt:var name="mtapp_end_body">
 __MTML__
     $$tmpl_ref =~ s!(</body>)!$replace$1!;
-
-    # Sign in to Data API
-
-    my $p = MT->component('mt_app_jquery');
-    my $login_with_data_api = $p->get_config_value('login_with_data_api', 'system');
-    # my $use_data_api_js = $p->get_config_value('use_data_api_js', 'system');
-    # my $data_api_version = $p->get_config_value('data_api_version', 'system');
-
-    # if ($login_with_data_api) {
-    if (0) {
-        my $username = $app->param('username');
-        my $password = $app->param('password');
-        # doLog("\n".'username: '.$username);
-        # doLog("\n".'password: '.$password);
-        if ($username and $password) {
-            my %username_cookie = (
-                -name  => "mtapp_username",
-                -value => $username,
-                -path  => '/'
-            );
-            my %password_cookie = (
-                -name  => "mtapp_password",
-                -value => $password,
-                -path  => '/'
-            );
-            $app->bake_cookie(%username_cookie);
-            $app->bake_cookie(%password_cookie);
-            # doLog("\n".'username: '.$username);
-            # doLog("\n".'password: '.$password);
-        }
-    }
-
-    # doLog("\n app->cookies \n ".Dumper($app->cookies));
 }
 
 sub template_source_favorite_blogs {
@@ -791,197 +632,6 @@ sub save_config_filter {
     return 1;
 }
 
-sub session_post_save {
-    my ($cb, $obj, $original) = @_;
-    data_api_auto_login($obj);
-}
-sub session_post_delete {
-    my ($cb, $obj, $original) = @_;
-    doLog("session_post_delete\n" . Dumper($obj));
-}
-# sub session_post_save {
-#     my ($cb, $sess, $original) = @_;
-
-#     my $app = MT->instance;
-
-#     return unless $app->id eq 'cms';
-
-#     return unless $app->param('username') || $app->param('password');
-#     require MT::App::DataAPI;
-#     require MT::DataAPI::Endpoint::Auth;
-
-#     my $data_api_app = MT::App::DataAPI->new;
-#     $data_api_app->param('username', $app->param('username'));
-#     $data_api_app->param('password', $app->param('password'));
-#     $data_api_app->param('remember', '1');
-#     $data_api_app->param('clientId', 'MTAppjQueryPlugin');
-
-# my $dolog = "";
-# $dolog .= "\n ===== [session_post_save] start =====";
-# $dolog .= "\n app id: ".$app->id;
-# $dolog .= "\n app username: ".$app->param('username');
-# $dolog .= "\n app password: ".$app->param('password');
-# $dolog .= "\n app clientId: ".$app->param('clientId');
-#     my $response = MT::DataAPI::Endpoint::Auth::authentication($data_api_app);
-#     # $app->bake_cookie(
-#     #     -name    => 'mtapp_data_api_access_token',
-#     #     -value   => $response->accessToken,
-#     #     -expires => '3600',
-#     # );
-#     # my $response;
-#     # my $ott = MT->model('session')->new();
-#     # $ott->kind('OT');    # One time Token
-#     # $ott->id( $data_api_app->make_magic_token() );
-#     # $ott->start(time);
-#     # $ott->duration( time + 5 * 60 );
-#     # $ott->set( response =>
-#     #         MT::Util::to_json( $response, { convert_blessed => 1 } ) );
-#     # $ott->save
-#     #     or return $data_api_app->error(
-#     #     $data_api_app->translate(
-#     #         "The login could not be confirmed because of a database error ([_1])",
-#     #         $ott->errstr
-#     #     )
-#     #     );
-#     # $response = { oneTimeToken => $ott->id, };
-#     # my $token = MT::DataAPI::Endpoint::Auth::token($data_api_app);
-
-#     # my $data = $data_api_app->mt_authorization_data;
-# $dolog .= "\n [response] \n" . Dumper($response);
-# # $dolog .= "\n [data] \n" . Dumper($data);
-# # $dolog .= "\n [token] \n" . Dumper($token);
-# $dolog .= "\n [sess->id] \n" . $sess->id;
-# $dolog .= "\n [accessToken] \n" . $response->{accessToken};
-# $dolog .= "\n ===== [session_post_save]  end  =====";
-# doLog($dolog);
-#     $sess->set('mtapp_data_api_access_token', $response->{accessToken});
-#     $sess->save;
-# return;
-# #     doLog("\n".'$app->id:' . $app->id);
-# #     return unless $app->id eq 'cms';
-# #     doLog('After @@@@ return unless $app->id eq \'cms\'; @@@@');
-
-# #     my $p = MT->component('mt_app_jquery');
-# #     my $op_login_with_data_api = $p->get_config_value('login_with_data_api', 'system');
-
-# #     return unless $op_login_with_data_api;
-# #     if ($obj->data =~ m/MTAppjQueryPlugin/i) {
-# #         $obj->set('mtapp_data_api_session_id', $obj->id);
-# #         $obj->save;
-# #         return 1;
-# #     }
-# #     my $kind = $obj->kind || '';
-# #     return unless $kind eq 'US';
-
-# #     my $data_api_session_id = $obj->get('mtapp_data_api_session_id') || '';
-# #     if ($data_api_session_id) {
-# #         &_update_data_api_session_start($obj);
-# #         return;
-# #     }
-
-# #     my $data_api_version = $p->get_config_value('data_api_version', 'system');
-# #     my $username = MT->instance->param('username');
-# #     my $password = MT->instance->param('password');
-
-# #     &_data_api_authentication($username, $password, $obj, $data_api_version);
-
-# }
-
-sub _update_data_api_session_start {
-    my ($sess) = @_;
-
-    my $data_api_session_id = $sess->get('mtapp_data_api_session_id')
-        or return;
-
-    my $sess = MT::Session->load({id => $data_api_session_id});
-
-
-    $sess->start(time);
-    $sess->save;
-    my $sess2 = MT::Session->load({id => $data_api_session_id});
-
-}
-
-# sub _data_api_authentication {
-#     my ($username, $password, $sess, $data_api_version) = @_;
-
-#     require LWP::UserAgent;
-#     require HTTP::Request::Common;
-
-#     my $clientId = 'MTAppjQueryPlugin';
-
-#     # Post Data
-#     my %postdata = (
-#         'username' => $username,
-#         'password' => $password,
-#         'clientId' => $clientId,
-#     );
-
-#     # Endpoint
-#     my $dat_api_script = MT->config->CGIPath . MT->config->DataAPIScript;
-#     if ($dat_api_script !~ /^http/) {
-#         $dat_api_script = MT->instance->base . $dat_api_script;
-#     }
-#     my $endpoint = $dat_api_script . '/' . $data_api_version . '/authentication';
-
-#     # Request
-#     my $request = HTTP::Request::Common::POST($endpoint, [%postdata]);
-#     $request->referer(MT->instance->base);
-#     $request->header('content-type' => 'application/x-www-form-urlencoded');
-
-
-#     # UserAagent
-#     my $ua = LWP::UserAgent->new;
-#     $ua->timeout(30);
-#     $ua->agent($clientId);
-
-#     # POST
-#     my $response = $ua->request($request);
-
-#     # Success
-#     if ($response->is_success) {
-#         my $content = $response->decoded_content;
-#         require JSON;
-#         my $json = JSON::decode_json($content);
-#         my $sessionId = $json->{sessionId} || '';
-#         my $accessToken = $json->{accessToken} || '';
-#         my $expiresIn = $json->{expiresIn} || '';
-#         my $remember = $json->{remember} || '';
-#         $sess->set('mtapp_data_api_session_id', $sessionId);
-#         $sess->save;
-#         return $sessionId;
-#     }
-#     # Error
-#     else {
-#         MT->log('MTAppjQuery HTTP POST error code: ' . $response->code);
-#         MT->log('MTAppjQuery HTTP POST error message: ' . $response->message);
-#     }
-# }
-
-sub _config_replace {
-    my ($str) = @_;
-    return '' if (! $str);
-    $str =~ s!__filepath__!' + fileObj.filePath.replace(/\\/\\//g,"/") + '!g;
-    $str =~ s!__filename__!' + fileObj.name + '!g;
-    return $str;
-}
-
-# http://d.hatena.ne.jp/perlcodesample/touch/20080621/1214058703
-sub _parse {
-    my ($text, $headers) = @_;
-
-    my @lines = split('\|', $text);
-
-    my $items_hash_list = [];
-    foreach my $line (@lines){
-        my @items = split(',', $line);
-        my %items_hash = ();
-        @items_hash{ @{ $headers } } = @items;
-        push @{ $items_hash_list },{ %items_hash };
-    }
-    wantarray ? return @{ $items_hash_list } : return $items_hash_list;
-}
-
 # Thank you very much!!
 # From alfasado/mt-plugin-multi-uploader - GitHub
 # https://github.com/alfasado/mt-plugin-multi-uploader/blob/master/plugins/MultiUploader/lib/MultiUploader/Util.pm
@@ -999,43 +649,6 @@ sub is_user_can {
         }
     }
     return $perm;
-}
-
-sub data_api_auto_login {
-    my ($session) = @_;
-
-doLog("\n\n".'========== sub data_api_auto_login =========='."\n\n".Dumper($session));
-    require MT::App::DataAPI;
-    require MT::DataAPI::Endpoint::Auth;
-
-    my $app = MT->instance;
-    my $data_api_app = MT::App::DataAPI->new;
-    my $data_api_client_id = MT->config->MTAppjQueryDataAPIClientId;
-    $data_api_app->param('clientId', $data_api_client_id);
-
-    my $user = $app->user;
-    my $remember = MT->config->MTAppjQueryDataAPIRemember; # default => 0
-    my $data_api_session = $data_api_app->start_session($user, $remember);
-
-    my %arg = (
-        -name  => $data_api_app->user_cookie,
-        -value => Encode::encode(
-            $data_api_app->charset,
-            join( '::', $user->name, $data_api_session->id, $remember )
-        ),
-        -httponly => 1,
-    );
-    $arg{-expires} = '+10y' if $remember;
-    $app->bake_cookie(%arg);
-
-    # Test [start]
-    # my @current_session = MT::Session->load({
-    #     kind => 'DS',
-    # });
-    # my $current_session_count = @current_session;
-    # Test [ end ]
-    doLog("\n\n".'========== AccessTokenTTL =========='."\n\n".MT->config->AccessTokenTTL);
-    doLog("\n\n".'========== data_api_session =========='."\n\n".Dumper($data_api_session->id));
 }
 
 1;

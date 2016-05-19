@@ -64,16 +64,6 @@ sub init_registry {
             'MTAppjQueryUserCSSName' => {
                 default => 'user.css',
             },
-            'MTAppjQueryDataAPIDualLogin' => {
-                default => 0,
-            },
-            'MTAppjQueryDataAPIClientId' => {
-                default => 'MTAppjQueryPlugin',
-            },
-            # You should not change the following value:
-            'MTAppjQueryDataAPIRemember' => {
-                default => 0,
-            },
         },
         callbacks => {
             'MT::App::CMS::template_source.dashboard' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_source_dashboard',
@@ -101,8 +91,6 @@ sub init_registry {
             'MT::App::CMS::cms_post_save.template' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_template',
             'save_config_filter' => '$mt_app_jquery::MTAppjQuery::Callbacks::save_config_filter',
             'MT::App::CMS::pre_run' => \&pre_run,
-            'MT::Session::post_save' => '$mt_app_jquery::MTAppjQuery::Callbacks::session_post_save',
-            'MT::Session::post_delete' => '$mt_app_jquery::MTAppjQuery::Callbacks::session_post_delete',
         },
         tags => {
             function => {
