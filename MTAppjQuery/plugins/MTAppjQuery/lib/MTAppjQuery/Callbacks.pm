@@ -113,7 +113,7 @@ sub template_source_header {
     my $op_jquery_ready     = $p->get_config_value('jquery_ready', $scope);
     my $op_jquery_ready_url = $p->get_config_value('jquery_ready_url', $scope);
     my $op_blogs_json       = $p->get_config_value('blogs_json', 'system');
-    my $op_blogs_json_detail= $p->get_config_value('blogs_json_detail', 'system');
+    my $op_blogs_json_detail= $p->get_config_value('blogs_json_detail', 'system') || '0';
     my $op_jqselectable   = 0;#$p->get_config_value('jqselectable', $scope);
 
     # Free textarea / common
