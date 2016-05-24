@@ -405,8 +405,12 @@ __MTML__
 __MTML__
 
     my $target = '<script type="text/javascript" src="<\$mt:var name="static_uri"\$>jquery/jquery\.(min\.)*js\?v=<mt:var name="mt_version_id" escape="URL">"></script>';
-    my $jquery_ready_url = $op_jquery_ready_url ? $op_jquery_ready_url : "${static_plugin_path}user-files/jquery_ready.js";
-    my $jquery_ready = $op_jquery_ready ? qq(<script type="text/javascript" src="${jquery_ready_url}"></script>) : '';
+    my $jquery_ready_url = "${static_plugin_path}user-files/jquery_ready.js";
+    $jquery_ready_url =~ s/^https?://;
+    if ($op_jquery_ready_url) {
+        $jquery_ready_url = $op_jquery_ready_url;
+    }
+    my $jquery_ready = $op_jquery_ready ? qq(<script type="text/javascript" src="$jquery_ready_url"></script>) : '';
 
     $$tmpl_ref =~ s!($target)!$mtapp_vars  $1\n  $jquery_ready!g;
 
@@ -417,10 +421,12 @@ __MTML__
     my $user_js_tmpl = MT::Template->load({name => $user_js_tmplname, identifier => 'user_js', blog_id => $blog_id});
     if (defined($user_js_tmpl)) {
         $user_js_url = $blog->site_url . $user_js_tmpl->outfile . '?v=' . $user_js_tmpl->modified_on;
-    } elsif ($op_userjs_url ne '') {
-        $user_js_url = $op_userjs_url;
     } else {
         $user_js_url = "${static_plugin_path}user-files/user.js";
+    }
+    $user_js_url =~ s/^https?://;
+    if ($op_userjs_url) {
+        $user_js_url = $op_userjs_url;
     }
     my $user_js = ($op_userjs == 1) ? qq(<script type="text/javascript" src="$user_js_url"></script>): '';
 
@@ -430,10 +436,12 @@ __MTML__
     my $user_css_tmpl = MT::Template->load({name => $user_css_tmplname, identifier => 'user_css', blog_id => $blog_id});
     if (defined($user_css_tmpl)) {
         $user_css_url = $blog->site_url . $user_css_tmpl->outfile . '?v=' . $user_css_tmpl->modified_on;
-    } elsif ($op_usercss_url ne '') {
-        $user_css_url = $op_usercss_url;
     } else {
         $user_css_url = "${static_plugin_path}user-files/user.css";
+    }
+    $user_css_url =~ s/^https?://;
+    if ($op_usercss_url) {
+        $user_css_url = $op_usercss_url;
     }
     my $user_css = ($op_usercss == 1) ? qq(<link rel="stylesheet" href="$user_css_url" type="text/css" />): '';
 
