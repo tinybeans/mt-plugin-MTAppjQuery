@@ -5491,21 +5491,28 @@
         },
         noScroll: function (styles, containerSelector){
             if (this.length < 1) return;
-            var $this = this;
             if (containerSelector) {
                 $(containerSelector).css('overflow-y', 'hidden');
             }
+            var $this = this;
             var $parent = $this.parent().css('position', 'relative');
             var parentHeight = $parent.height();
+            var $document = $(document);
+            var getThisTop = function(){
+                return $document.scrollTop() - $parent.offset().top + 10;
+            };
             $parent.height(parentHeight);
             $this.css({'position': 'absolute', 'z-index': 99});
             if (styles) {
                 $this.css(styles);
             }
             $(window).scroll(function(){
-                var thisTop = $(document).scrollTop() - $parent.offset().top + 10;
+                var thisTop = getThisTop();
                 if (thisTop < 0) {
                     thisTop = 0;
+                }
+                if ($document.height() - $document.scrollTop() < $this.height()) {
+                    return;
                 }
                 $this.stop().animate(
                     {top: thisTop + 'px'},
