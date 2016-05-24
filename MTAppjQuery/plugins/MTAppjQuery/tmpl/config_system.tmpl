@@ -292,6 +292,24 @@
 
 </mtapp:setting>
 
+<script type="text/javascript">
+// <![CDATA[
+(function($){
+    $('a.change_user_file').click(function(){
+        $(this).hide().next().show();
+    });
+    if (mtappVars.blog_id != 0) {
+        $('#jquery_ready_all_container').hide();
+    }
+    var $form = $('#mtappjquery-setting-form').closest('form');
+    $form.submit(function(){
+        if ($('#jquery_ready_all').is(':checked')) {
+            return window.confirm('<__trans phrase="Setting jquery_ready.js">: <__trans phrase="Apply to all websites and blogs?">');
+        }
+    });
+})(jQuery);
+// ]]>
+</script>
 
 <mt:Ignore>
     <!-- 不要 -->
