@@ -138,8 +138,8 @@ sub template_source_header {
 
     # Data API
     my $op_use_data_api_js = $p->get_config_value('use_data_api_js', 'system');
+    my $op_data_api_script_url = $p->get_config_value('data_api_script_url', 'system');
     my $op_data_api_version = $p->get_config_value('data_api_version', 'system');
-    my $op_data_api_client_id = 'MTAppjQuery-DataAPI';
 
     ### ツールチップ用ボックスをページに追加する
     my $preset = <<__MTML__;
@@ -308,6 +308,9 @@ __MTML__
     var mtappVars = {
         "version" : "${version}",
         "minor_version" : "${minor_version}",
+        <mt:If name="dataapi_default_version">
+        "dataapi_default_version" : "<mt:Var name="dataapi_default_version">",
+        </mt:If>
         "debug_mode" : "<mt:Var name="config.DebugMode">",
         "language" : "<mt:Var name="config.DefaultLanguage">",
         "type" : "${_type}",
@@ -354,12 +357,16 @@ __MTML__
 
     # MT.DataAPI Constructor
     if ($op_use_data_api_js) {
+        my $data_api_script_url = $app->{__host} . $app->{__mt_path} . MT->config->DataAPIScript;
+        if ($op_data_api_script_url) {
+            $data_api_script_url = $op_data_api_script_url;
+        }
         $mtapp_vars .= <<__MTML__;
-    <script type="text/javascript" src="<mt:StaticWebPath>data-api/${op_data_api_version}/js/mt-data-api.min.js"></script>
+    <script type="text/javascript" src="<mt:StaticWebPath regex_replace="/https?:/","">data-api/${op_data_api_version}/js/mt-data-api.min.js"></script>
     <script>
     mtappVars.DataAPI = new MT.DataAPI({
-        baseUrl:  '<mt:CGIPath><mt:Var name="config.DataAPIScript">',
-        clientId: '${op_data_api_client_id}'
+        baseUrl:  '$data_api_script_url',
+        clientId: 'MTAppjQuery-DataAPI'
     });
     </script>
 __MTML__
@@ -607,6 +614,16 @@ sub template_param_edit_template {
             'key' => $identifier
         });
     }
+}
+
+sub template_param_cfg_plugin {
+    my ($cb, $app, $param, $tmpl) = @_;
+
+    my $scope_type = $param->{scope_type} || 'system';
+    return unless $scope_type eq 'system';
+
+    require MT::App::DataAPI;
+    $param->{dataapi_default_version} = MT::App::DataAPI::DEFAULT_VERSION() || 1;;
 }
 
 sub cms_post_save_template {

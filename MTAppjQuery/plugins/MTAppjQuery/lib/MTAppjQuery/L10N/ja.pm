@@ -39,7 +39,7 @@ use vars qw ( %Lexicon );
     'Use a JSON of Websites/Blogs' => 'ウェブサイト/ブログのJSONを利用する',
     'Detail Mode' => '詳細モード',
     'Use DataAPI SDK' => 'DataAPI SDK を利用',
-    'Select version' => 'Data API のバージョンを選択',
+    'Select version' => 'Data API バージョン',
     'Append code' => 'コードを追加',
 # config.tmpl
     'active' => '有効にする',

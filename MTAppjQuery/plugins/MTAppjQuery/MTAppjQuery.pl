@@ -36,6 +36,7 @@ my $plugin = MT::Plugin::MTAppjQuery->new({
 
             # Set system scope
             ['use_data_api_js',        {Default => '0', Scope => 'system'}],
+            ['data_api_script_url',    {Default => '',  Scope => 'system'}],
             ['data_api_version',       {Default => '',  Scope => 'system'}],
             ['jquery_ready_all',       {Default => '0', Scope => 'system'}],
             ['blogs_json',             {Default => '0', Scope => 'system'}],
@@ -88,6 +89,7 @@ sub init_registry {
             # 'template_param.favorite_blogs' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_favorite_blogs',
             'MT::App::CMS::template_param.edit_entry' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_edit_entry',
             'MT::App::CMS::template_param.edit_template' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_edit_template',
+            'MT::App::CMS::template_param.cfg_plugin' => '$mt_app_jquery::MTAppjQuery::Callbacks::template_param_cfg_plugin',
             'MT::App::CMS::cms_post_save.template' => '$mt_app_jquery::MTAppjQuery::Callbacks::cms_post_save_template',
             'save_config_filter' => '$mt_app_jquery::MTAppjQuery::Callbacks::save_config_filter',
             'MT::App::CMS::pre_run' => \&pre_run,
