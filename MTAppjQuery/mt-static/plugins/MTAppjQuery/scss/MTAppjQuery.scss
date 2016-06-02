@@ -483,8 +483,13 @@ div.mtapp-sortable span.mtapp-linebreak-field-item {
     }
 }
 /* !MTAppTabs */
-body.mtapp-tabs div.mt-dialog {
-    z-index: 9999 !important;
+body{
+    &.fullscreen_editor_screen div.mtapp-tabs-container {
+        visibility: hidden !important;
+    }
+    &.mtapp-tabs div.mt-dialog {
+        z-index: 9999 !important;
+    }
 }
 div.mtapp-tabs-container {
     ul.mtapp-tabs-navi {
