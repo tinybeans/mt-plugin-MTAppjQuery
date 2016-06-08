@@ -1,5 +1,6 @@
 package MTAppjQuery::Tags;
 use strict;
+use MT::Util qw(remove_html);
 use Data::Dumper;
 
 sub plugin {
@@ -17,9 +18,7 @@ sub _hdlr_create_json {
     my ($ctx, $args) = @_;
 
     my $plugin = plugin();
-    unless ($args->{fields}) {
-        return $ctx->error($plugin->translate('The [_1] modifier is required.', 'fields'));
-    }
+    my $fields = $args->{fields} || 'title,text,text_more,keywords,tags,categories';
 
     my $blog_id = $ctx->stash('blog_id');
     my $json = {
@@ -44,26 +43,18 @@ sub _hdlr_create_json {
     if ($args->{limit}) {
         $arguments->{limit} = $args->{limit};
     }
-    if ($args->{sort_by}) {
-        $arguments->{sort} = $args->{sort_by};
-    }
-    if ($args->{sort_order}) {
-        $arguments->{direction} = $args->{sort_order};
-    }
+    $arguments->{sort} = $args->{sort_by} || 'authored_on';
+    $arguments->{direction} = $args->{sort_order} || 'descend';
 
-    my $tag = $ctx->stash('tag');
-    my $model = '';
-    if ($tag eq 'EntryCreateJSON') {
-        $model = 'entry';
-    }
+    my $model = $args->{model} || 'entry';
 
     my @entries = MT->model($model)->load($term, $arguments);
 
     my @items;
     my $total_results = 0;
-    my $array_join = $args->{array_join};
-    if ($array_join == 1) {
-        $array_join = ',';
+    my $no_array = $args->{no_array};
+    if ($no_array == 1) {
+        $no_array = ',';
     }
     foreach my $entry (@entries) {
         my $item = {};
@@ -71,11 +62,26 @@ sub _hdlr_create_json {
             # tags
             if ($field eq 'tags') {
                 my @tags = $entry->get_tags;
-                if (@tags and $array_join) {
-                    $item->{tags} = $array_join . join($array_join, @tags) . $array_join;
+                my @sanitized_tags;
+                if ($args->{remove_html}) {
+                    for (my $i = 0; $i <= $#tags; $i++){
+                        my $html_removed_tag = remove_html($tags[$i]);
+                        if ($html_removed_tag) {
+                            push(@sanitized_tags, $html_removed_tag);
+                        }
+                    }
                 }
-                elsif (@tags) {
-                    $item->{tags} = \@tags;
+                if (!@sanitized_tags) {
+                    push @sanitized_tags, @tags;
+                }
+                if (@sanitized_tags and $no_array) {
+                    $item->{tags} = $no_array . join($no_array, @sanitized_tags) . $no_array;
+                }
+                elsif (@sanitized_tags) {
+                    $item->{tags} = \@sanitized_tags;
+                }
+                else {
+                    $item->{tags} = '';
                 }
             }
             # categories
@@ -84,13 +90,24 @@ sub _hdlr_create_json {
                 my @categories_label;
                 if (@$categories) {
                     foreach my $category (@$categories) {
-                        push(@categories_label, $category->label);
+                        if ($args->{remove_html}) {
+                            my $html_removed_category = remove_html($category->label);
+                            if ($html_removed_category) {
+                                push(@categories_label, $html_removed_category);
+                            }
+                        }
+                        else {
+                            push(@categories_label, $category->label);
+                        }
                     }
-                    if (@categories_label and $array_join) {
-                        $item->{categories} = $array_join . join($array_join, @categories_label) . $array_join;
+                    if (@categories_label and $no_array) {
+                        $item->{categories} = $no_array . join($no_array, @categories_label) . $no_array;
                     }
                     elsif (@categories_label) {
                         $item->{categories} = \@categories_label;
+                    }
+                    else {
+                        $item->{categories} = '';
                     }
                 }
             }
@@ -98,13 +115,26 @@ sub _hdlr_create_json {
             elsif ($field eq 'category') {
                 my $category = $entry->category;
                 if ($category) {
-                    $item->{category} = $category->label;
+                    if ($args->{remove_html}) {
+                        $item->{category} = remove_html($category->label);
+                    }
+                    else {
+                        $item->{category} = $category->label;
+                    }
+                }
+                else {
+                    $item->{category} = '';
                 }
             }
             else {
                 my $field_key = $field;
                 $field_key =~ s/^field\./field_/;
-                $item->{$field_key} = $entry->$field || '';
+                if ($args->{remove_html}) {
+                    $item->{$field_key} = remove_html($entry->$field) || '';
+                }
+                else {
+                    $item->{$field_key} = $entry->$field || '';
+                }
             }
         }
         push(@items, $item);
