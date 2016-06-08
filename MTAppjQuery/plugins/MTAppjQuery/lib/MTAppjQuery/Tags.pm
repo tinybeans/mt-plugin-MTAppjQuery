@@ -35,6 +35,10 @@ sub _hdlr_create_json {
         $term->{status} = MT::Entry::RELEASE();
     }
 
+    # Get totalResults
+    my $model = $args->{model} || 'entry';
+    my $total_results = MT->model($model)->count($term, undef);
+
     # Set arguments
     my $arguments = undef;
     if ($args->{offset}) {
@@ -46,12 +50,10 @@ sub _hdlr_create_json {
     $arguments->{sort} = $args->{sort_by} || 'authored_on';
     $arguments->{direction} = $args->{sort_order} || 'descend';
 
-    my $model = $args->{model} || 'entry';
 
     my @entries = MT->model($model)->load($term, $arguments);
 
     my @items;
-    my $total_results = 0;
     my $no_array = $args->{no_array};
     if ($no_array == 1) {
         $no_array = ',';
@@ -138,7 +140,6 @@ sub _hdlr_create_json {
             }
         }
         push(@items, $item);
-        $total_results++;
     }
 
     $json->{totalResults} = $total_results;
