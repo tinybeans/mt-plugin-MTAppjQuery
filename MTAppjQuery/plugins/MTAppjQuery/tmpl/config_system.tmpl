@@ -1,6 +1,51 @@
 <mt:Ignore>システム設定</mt:Ignore>
 <h3><__trans phrase="System Settings"></h3>
 <mtapp:setting
+    id="use_data_api_js"
+    show_label="1"
+    label="<__trans phrase="Use DataAPI SDK">">
+    <ul>
+        <li>
+            <select name="use_data_api_js" id="use_data_api_js">
+                <option value="1"<mt:if name="use_data_api_js" eq="1"> selected="selected"</mt:if>><__trans phrase="Enable"></option>
+                <option value="0"<mt:if name="use_data_api_js" eq="0"> selected="selected"</mt:if>><__trans phrase="Disable"></option>
+            </select>
+            <span id="data_api_version_container" style="<mt:if name="use_data_api_js" eq="0">display:none;</mt:if>margin-left:5px;">
+                <label for="data_api_version"><__trans phrase="Select version">&nbsp;<input type="text" name="data_api_version" id="data_api_version" value="<mt:Var name="data_api_version">" class="text min"></label>
+            </span>
+            <mt:Unless name="data_api_script_url">
+            <a href="javascript:void(0);" class="change_user_file">DataAPI Script <__trans phrase="Change URL"></a>
+            </mt:Unless>
+            <span<mt:Unless name="data_api_script_url"> style="display:none;"</mt:Unless>>
+                &nbsp;URL&nbsp;
+                <input type="text" class="text med" value="<mt:If name="data_api_script_url"><$mt:Var name="data_api_script_url" encode_html="1"$></mt:If>" name="data_api_script_url" id="data_api_script_url" />
+            </span>
+        </li>
+    </ul>
+    <script type="text/javascript">
+    (function($){
+        var items = [];
+        var currentVersion = mtappVars.dataapi_default_version || 1;
+        for (var i = 1; i <= currentVersion; i++) {
+            items.push('v' + i);
+        }
+        $('#data_api_version').MTAppMultiForm({
+            type: 'select',
+            items: items
+        });
+        $('#use_data_api_js').on('change', function(){
+            if ($(this).val() == 1) {
+                $('#data_api_version_container').show();
+            }
+            else {
+                $('#data_api_version_container').hide();
+            }
+        });
+    })(jQuery);
+    </script>
+</mtapp:setting>
+
+<mtapp:setting
     id="blogs_json"
     show_label="1"
     label="<__trans phrase="Use a JSON of Websites/Blogs">">
@@ -252,6 +297,24 @@
 
 </mtapp:setting>
 
+<script type="text/javascript">
+// <![CDATA[
+(function($){
+    $('a.change_user_file').click(function(){
+        $(this).hide().next().show();
+    });
+    if (mtappVars.blog_id != 0) {
+        $('#jquery_ready_all_container').hide();
+    }
+    var $form = $('#mtappjquery-setting-form').closest('form');
+    $form.submit(function(){
+        if ($('#jquery_ready_all').is(':checked')) {
+            return window.confirm('<__trans phrase="Setting jquery_ready.js">: <__trans phrase="Apply to all websites and blogs?">');
+        }
+    });
+})(jQuery);
+// ]]>
+</script>
 
 <mt:Ignore>
     <!-- 不要 -->
@@ -296,74 +359,3 @@
         </ul>
     </mtapp:setting>
 </mt:Ignore>
-
-<div id="uploadify-container" style="display: none;">
-    <mtapp:settinggroup id="uploadify_setting" class="border" show="1">
-        <legend><__trans phrase="Uploadify"></legend>
-        <mtapp:setting
-            id="active_uploadify"
-            label="<__trans phrase="active Uploadify">">
-            <ul>
-                <li><input type="checkbox" name="active_uploadify" id="active_uploadify"<tmpl_if name=active_uploadify> checked="checked"</tmpl_if> /></li>
-            </ul>
-        </mtapp:setting>
-        <mtapp:setting
-            id="upload_folder"
-            label="<__trans phrase="Upload folder">"
-            hint="<__trans phrase="The path to the folder you would like to save the files to. Do not end the path with a ‘/’.">"
-            show_hint="1">
-            <ul>
-                <li><input type="text" value="<mt:var name="upload_folder" encode_html="1">" name="upload_folder" id="upload_folder" /></li>
-            </ul>
-            <script type="text/javascript">
-            /* <![CDATA[ */
-            (function($){
-                $("#upload_folder").blur(function(){
-                    var value = $(this).val().replace(/^\/|\/$/g,"");
-                    $(this).val(value);
-                });
-            })(jQuery);
-            /* ]]> */
-            </script>
-        </mtapp:setting>
-        <mtapp:setting
-            id="img_elm"
-            label="<__trans phrase="img element"><br />(.png .jpg .jpeg .gif)"
-            hint="<__trans phrase="You can write that File name is __filename__, File path is __filepath__.">"
-            show_hint="1">
-            <ul>
-                <li><input type="text" value="<mt:var name="img_elm" encode_html="1">" name="img_elm" id="img_elm" /></li>
-            </ul>
-        </mtapp:setting>
-<mt:Ignore>
-        <mtapp:setting
-            id="file_elm"
-            label="<__trans phrase="a element">"
-            hint="<__trans phrase="You can write that File name is __filename__, File path is __filepath__.">"
-            show_hint="1">
-            <ul>
-                <li><input type="text" value="<mt:var name="file_elm" encode_html="1">" name="file_elm" id="file_elm" /></li>
-            </ul>
-        </mtapp:setting>
-</mt:Ignore>
-    </mtapp:settinggroup>
-
-    <script type="text/javascript">
-    // <![CDATA[
-    (function($){
-        $('a.change_user_file').click(function(){
-            $(this).hide().next().show();
-        });
-        if (mtappVars.blog_id != 0) {
-            $('#jquery_ready_all_container').hide();
-        }
-        var $form = $('#mtappjquery-setting-form').closest('form');
-        $form.submit(function(){
-            if ($('#jquery_ready_all').is(':checked')) {
-                return window.confirm('<__trans phrase="Setting jquery_ready.js">: <__trans phrase="Apply to all websites and blogs?">');
-            }
-        });
-    })(jQuery);
-    // ]]>
-    </script>
-</div>

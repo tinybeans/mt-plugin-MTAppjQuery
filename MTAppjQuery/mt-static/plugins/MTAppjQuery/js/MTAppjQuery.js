@@ -3,8 +3,8 @@
  *
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
- * Since:   2010-06-22
- * Update:  2015-03-25
+ * Since:   2010/06/22
+ * Update:  2015/12/27
  *
  */
 ;(function($){
@@ -12,23 +12,19 @@
     if (typeof mtappVars !== 'object') return;
     mtappVars.adminScript = location.href.replace(/\?.*/, '');
 
-    // -------------------------------------------------
+    // ---------------------------------------------------------------------
     //  $(foo).MTAppJSONTable();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2016/05/11
     //
-    //  Description:
-    //    fooに指定したtextareaを表形式の入力欄にし、表に入力された値をJSONで元のtextareaに保存します。
-    //
-    //  Usage:
-    //    $(foo).MTAppJSONTable(options);
-    //
-    //    このメソッドで扱えるJSONのフォーマットは下記の通りです。
-    //    {"items":[
-    //        {"key1": "value1", "key2": "value2", "key3": "value3"},
-    //        {"key1": "value1", "key2": "value2", "key3": "value3"},
-    //        {"key1": "value1", "key2": "value2", "key3": "value3"}
-    //    ]}
-    //
-    // -------------------------------------------------
+    //  textareaを表形式の入力欄にし、表に入力された値をJSONで元のtextareaに保存します。
+    //  このメソッドで扱えるJSONのフォーマットは下記の通りです。
+    //  {"items":[
+    //      {"key1": "value1", "key2": "value2", "key3": "value3"},
+    //      {"key1": "value1", "key2": "value2", "key3": "value3"},
+    //      {"key1": "value1", "key2": "value2", "key3": "value3"}
+    //  ]}
+    // ---------------------------------------------------------------------
     $.fn.MTAppJSONTable = function(options){
         var op = $.extend({}, $.fn.MTAppJSONTable.defaults, options);
 
@@ -457,6 +453,9 @@
                         }
                     }
                     else if ($(this).hasClass('jsontable-clear')) {
+                        if (op.cbBeforeClear !== null && typeof op.cbBeforeClear === 'function') {
+                            op.cbBeforeClear({name: 'cbBeforeClear'}, $container);
+                        }
                         $table.find('.jsontable-selected-data').remove();
                         if (op.headerPosition === 'left') {
                             itemLength--;
@@ -558,7 +557,7 @@
                         return true;
                     }
                     var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")');
-                    $this.val(result);
+                    $this.val(result.replace(/^(\s|\n)+$/g, ''));
                 });
             }
             if (op.sortable && op.headerPosition === 'top') {
@@ -651,6 +650,7 @@
         cbAfterBuild: null, // function({name: 'cbAfterBuild'}, $container){}
         cbBeforeAdd: null, // function({name: 'cbBeforeAdd', type: 'column'}, $td){}
         cbAfterAdd: null, // function({name: 'cbAfterAdd', type: 'row or column'}, $container){}
+        cbBeforeClear: null, // function({name: 'cbAfterAdd'}, $container){}
         cbAfterSelectRow: null, // function({name: 'cbAfterSelectRow'}, $tr, $(this).is(':checked')){}
         cbAfterSelectColumn: null, // function({name: 'cbAfterSelectColumn'}, $td, $(this).is(':checked')){}
 
@@ -739,8 +739,7 @@
         /*  Template  */
 
         /* ==================================================
-            Insert a button to open dialog window
-            and Initialization
+            Get the MTAppLisging Dialog
         ================================================== */
         var $dialog = $('#mtapplisting-dialog');
         if (!$dialog.length) {
@@ -750,7 +749,7 @@
             $('body').append(dialogHTML);
             $dialog = $('#mtapplisting-dialog');
         }
-        /*  Insert a button to open dialog window  */
+        /*  Get the MTAppLisging Dialog  */
 
         /* ==================================================
             Bind events to the dialog
@@ -904,6 +903,11 @@
                         data: op.data,
                         cache: op.cache
                     };
+                    if (op.accessToken) {
+                        ajaxOptions.headers = {
+                            'X-MT-Authorization': 'MTAuth accessToken=' + op.accessToken
+                        }
+                    }
 
                     // Get JSON by ajax
                     $.ajax(ajaxOptions).done(function(response){
@@ -1041,6 +1045,7 @@
         data: null, // PlainObject: Data to be sent to the server.
         dataType: 'json', // Set this value to ajax options
         cache: false,
+        accessToken: null,
 
         // Dialog
         dialogTitle: '', // Type the title of dialog window
@@ -1075,6 +1080,114 @@
         }
     };
     // end - $.fn.MTAppListing()
+
+    // ---------------------------------------------------------------------
+    //  $.MTAppTemplateListCustomize();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2016/06/08
+    //
+    //  テンプレートの管理画面（一覧画面）を見やすくします。
+    // ---------------------------------------------------------------------
+    $.MTAppTemplateListCustomize = function(options){
+        var op = $.extend({}, $.MTAppTemplateListCustomize.defaults, options);
+        if (mtappVars.screen_id !== 'list-template') {
+            return;
+        }
+
+        if (op.displayType === 'listIndent') {
+            $('table.listing-table tbody').each(function(){
+                var $tdList = $(this).find('td.template-name');
+                for (var i = 0, l = op.templateNameSets.length; i < l; i++) {
+                    var $firstTr;
+                    var $tr;
+                    $tdList.find('a').filter(function(idx, elm){
+                      if (op.templateNameSets[i]['keyword'] instanceof RegExp) {
+                        return op.templateNameSets[i]['keyword'].test(elm.innerHTML);
+                      }
+                      else {
+                        return elm.innerHTML.indexOf(op.templateNameSets[i]['keyword']) !== -1;
+                      }
+                    }).each(function(idx){
+                        var _replacement = op.templateNameSets[i]['replacement'] ? op.templateNameSets[i]['replacement']: '';
+                        this.innerHTML = this.innerHTML.replace(op.templateNameSets[i]['keyword'], _replacement);
+                        this.style.position = 'relative';
+                        this.style.left = '2em';
+                        if (idx === 0) {
+                            $firstTr = $(this).parents('tr');
+                            var tdCount = $firstTr.find('td').length;
+                            var paddingLeft = 8;
+                            $(this).parent().prevAll().each(function(){
+                                paddingLeft += $(this).width();
+                            });
+                            $firstTr.before(
+                                '<tr>' +
+                                    '<td colspan="' + tdCount + '" style="padding-left:' + paddingLeft + 'px;font-weight:' + op.labelWeight + ';">' +
+                                        op.templateNameSets[i]['label'] +
+                                    '</td>' +
+                                '</tr>'
+                            );
+                        }
+                        else {
+                            $(this).parents('tr').insertAfter($tr);
+                        }
+                        $tr = $(this).parents('tr');
+                    });
+                }
+            });
+        }
+        else {
+            $('table.listing-table tbody').each(function(){
+                var $tdList = $(this).find('td.template-name');
+                var $firstTd;
+                var $parentTbody;
+                for (var i = 0, l = op.templateNameSets.length; i < l; i++) {
+                    $tdList.find('a').filter(function(idx, elm){
+                      if (op.templateNameSets[i]['keyword'] instanceof RegExp) {
+                        return op.templateNameSets[i]['keyword'].test(elm.innerHTML);
+                      }
+                      else {
+                        return elm.innerHTML.indexOf(op.templateNameSets[i]['keyword']) !== -1;
+                      }
+                    }).each(function(idx){
+                        var _replacement = op.templateNameSets[i]['replacement'] ? op.templateNameSets[i]['replacement']: '';
+                        this.innerHTML = this.innerHTML.replace(op.templateNameSets[i]['keyword'], _replacement);
+                        if (idx === 0) {
+                            $firstTd = $(this).parent().prepend('<span style="display:' + op.labelType + ';margin-right:5px;margin-bottom:5px;font-weight:' + op.labelWeight + ';">' + op.templateNameSets[i]['label'] + '</span>');
+                            $firstTd.parent().attr('data-group-order', i);
+                            $parentTbody = $firstTd.parents('tbody');
+                            $firstTd.prevAll('.cb').find(':checkbox').remove();
+                        }
+                        else {
+                            $(this).closest('tr').hide().end().css({marginLeft: '5px'}).appendTo($firstTd);
+                        }
+                    });
+                }
+                if (op.moveTop) {
+                    for (var i = op.templateNameSets.length - 1; i >= 0; i--) {
+                        $('[data-group-order=' + i + ']').prependTo($parentTbody);
+                    }
+                }
+            });
+        }
+        $('tbody tr:visible').each(function(idx){
+            if (idx % 2 == 1) {
+                $(this).removeClass('odd even').addClass('odd');
+            }
+            else {
+                $(this).removeClass('odd even').addClass('even');
+            }
+        });
+    };
+    $.MTAppTemplateListCustomize.defaults = {
+        templateNameSets: [],
+        displayType: 'listIndent', // String: 'listIndent' or 'group'
+        labelWeight: 'bold', // String: 'bold' or 'normal'
+        // If you set 'group' to 'displayType' option, set the following options.
+        moveTop: false, // Boolean: true or false
+        labelType: 'block' // String: 'block' or 'inline'
+    };
+    // end - $.MTAppTemplateListCustomize();
+
 
     // -------------------------------------------------
     //  $(foo).MTAppShowListEntries();
@@ -1283,16 +1396,13 @@
     };
     // end - $.MTAppApplyTinyMCE()
 
-    // -------------------------------------------------
+    // ---------------------------------------------------------------------
     //  $(foo).MTAppMultiFileUpload();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2016/05/09
     //
-    //  Description:
-    //    Data API を利用してファイルをアップロードします
-    //
-    //  Usage:
-    //    $(foo).MTAppMultiFileUpload(options);
-    //
-    // -------------------------------------------------
+    // Data API を利用してファイルをアップロードします。
+    // ---------------------------------------------------------------------
     $.fn.MTAppMultiFileUpload = function(options){
         var op = $.extend({}, $.fn.MTAppMultiFileUpload.defaults, options);
 
@@ -1300,6 +1410,7 @@
         if (op.api === null) {
             return $.errorMessage('MTAppMultiFileUpload', 'The "api" option is required.', 'alert', false);
         }
+        var api = op.api;
         if (op.siteId === 0) {
             return $.errorMessage('MTAppMultiFileUpload', 'The "siteId" option is required.', 'alert', false);
         }
@@ -1469,6 +1580,102 @@
                         $("#empty-asset-list").remove();
                     }
                     // Repeat the number of selected files.
+                    var first = true;
+                    var last = false;
+                    var counter = 0;
+                    // Upload a file
+                    var upload = function(response){
+                        counter++;
+                        // An error occurred
+                        if (response.error) {
+                            var errorMessage = response.error.message ? ': ' + response.error.message : 'An error occurred while uploading.';
+                            return $.errorMessage('MTAppMultiFileUpload', errorMessage, 'alert', false);
+                        }
+                        // Input Type
+                        if (op.type === 'input') {
+                            var val = $this.val();
+                            if (val && op.multiple) {
+                                $this.val(val + ',' + response[op.saveData]);
+                            }
+                            else {
+                                $this.val(response[op.saveData]);
+                            }
+                        }
+                        // Set upload items to the p element nearby the target element of MTAppMultiFileUpload
+                        var itemHtml = '';
+                        // If saved value is ID
+                        if (op.saveData === 'id') {
+                            if (response.mimeType.indexOf("image") !== -1) {
+                                itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-image" href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" target="_blank" data-itemvalue="' + response.id + '"><img src="' + response.url + '"></a>' + removeHtml + '</p>';
+                                // itemHtml = '<a href="' + response.url + '" target="_blank"><img src="' + response.url + '" style="display:block;max-width:215px;margin-bottom:5px;"></a>';
+                                // itemHtml = '<img src="' + response.url + '" style="display:block;max-width:100px;margin-bottom:5px;">';
+                            }
+                            else {
+                                itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-file" href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" target="_blank" data-itemvalue="' + response.id + '">' + response.filename + '</a>' + removeHtml + '</p>';
+                                // itemHtml = '<a href="' + response.url + '" target="_blank">' + response.filename + '</a>';
+                                // itemHtml = '<span style="display:block;">' + response.filename + '</span>';
+                            }
+                        }
+                        // If saved value is URL
+                        else if (op.saveData === 'url') {
+                            // Image's URL
+                            if (response.mimeType.indexOf("image") !== -1) {
+                                itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-image" href="' + response.url + '" target="_blank" data-itemvalue="' + response.url + '"><img src="' + response.url + '"></a>' + removeHtml + '</p>';
+                            }
+                            // Other type file URL
+                            else {
+                                itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-file" href="' + response.url + '" target="_blank" data-itemvalue="' + response.url + '">' + response.url + '</a>' + removeHtml + '</p>';
+                            }
+                        }
+                        // Remove a loading image
+                        $itemUploadItems.find('img.loading').remove();
+                        // Insert upload items
+                        if (op.multiple) {
+                            $itemUploadItems.append(itemHtml).show();
+                        }
+                        else {
+                            $itemUploadItems.html(itemHtml).show();
+                        }
+                        // If edit entry screen is open, set upload items to entry assets
+                        if (mtappVars.screen_id === 'edit-entry') {
+                            var entryItemHtml = "";
+                            // Images
+                            if (response.mimeType.indexOf("image") !== -1) {
+                                entryItemHtml = [
+                                    '<li id="list-asset-' + response.id + '" class="asset-type-image" onmouseover="show(\'list-image-' + response.id + '\', window.parent.document)" onmouseout="hide(\'list-image-' + response.id + '\', window.parent.document)">',
+                                        '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" class="asset-title">' + response.filename + '</a>',
+                                        '<a href="javascript:removeAssetFromList(' + response.id + ')" title="Remove this asset." class="remove-asset icon-remove icon16 action-icon">Remove</a>',
+                                        '<img id="list-image-' + response.id + '" src="' + response.url + '" class="list-image hidden" style="max-width:100px;">',
+                                    '</li>'
+                                ].join("");
+                            }
+                            // Other type files excluding images
+                            else {
+                                entryItemHtml = [
+                                    '<li id="list-asset-' + response.id + '" class="asset-type-file">',
+                                        '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" class="asset-title">' + response.filename + '</a>',
+                                        '<a href="javascript:removeAssetFromList(' + response.id + ')" title="Remove this asset." class="remove-asset icon-remove icon16 action-icon">Remove</a>',
+                                    '</li>'
+                                ].join("");
+                            }
+                            // Insert upload items to entry assets
+                            $assetList.append(entryItemHtml);
+                            var _ids = $includeAssetIds.val();
+                            if (_ids === "") {
+                                $includeAssetIds.val(response.id);
+                            }
+                            else {
+                                $includeAssetIds.val(_ids + "," + response.id);
+                            }
+                        }
+                        if (op.cbAfterUpload !== null && typeof op.cbAfterUpload === 'function') {
+                            if (l == counter) {
+                              last = true;
+                            }
+                            op.cbAfterUpload({name: 'cbAfterUpload'}, $this, response, first, last);
+                        }
+                        first = false;
+                    };
                     for (var i = 0; i < l; i++) {
                         var fileObj = inputFile.files[i];
                         // Make data to upload
@@ -1488,94 +1695,14 @@
                         }
                         // Show a loading image
                         $itemUploadItems.append('<img class="loading" src="' + StaticURI + 'images/indicator-login.gif" alt="">').show();
-                        // Upload a file
-                        api.uploadAsset(op.siteId, data, function(response) {
-                            // An error occurred
-                            if (response.error) {
-                                var errorMessage = response.error.message ? ': ' + response.error.message : 'An error occurred while uploading.';
-                                return $.errorMessage('MTAppMultiFileUpload', errorMessage, 'alert', false);
-                            }
-                            // Input Type
-                            if (op.type === 'input') {
-                                var val = $this.val();
-                                if (val && op.multiple) {
-                                    $this.val(val + ',' + response[op.saveData]);
-                                }
-                                else {
-                                    $this.val(response[op.saveData]);
-                                }
-                            }
-                            // Set upload items to the p element nearby the target element of MTAppMultiFileUpload
-                            var itemHtml = '';
-                            // If saved value is ID
-                            if (op.saveData === 'id') {
-                                if (response.mimeType.indexOf("image") !== -1) {
-                                    itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-image" href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" target="_blank" data-itemvalue="' + response.id + '"><img src="' + response.url + '"></a>' + removeHtml + '</p>';
-                                    // itemHtml = '<a href="' + response.url + '" target="_blank"><img src="' + response.url + '" style="display:block;max-width:215px;margin-bottom:5px;"></a>';
-                                    // itemHtml = '<img src="' + response.url + '" style="display:block;max-width:100px;margin-bottom:5px;">';
-                                }
-                                else {
-                                    itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-file" href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" target="_blank" data-itemvalue="' + response.id + '">' + response.filename + '</a>' + removeHtml + '</p>';
-                                    // itemHtml = '<a href="' + response.url + '" target="_blank">' + response.filename + '</a>';
-                                    // itemHtml = '<span style="display:block;">' + response.filename + '</span>';
-                                }
-                            }
-                            // If saved value is URL
-                            else if (op.saveData === 'url') {
-                                // Image's URL
-                                if (response.mimeType.indexOf("image") !== -1) {
-                                    itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-image" href="' + response.url + '" target="_blank" data-itemvalue="' + response.url + '"><img src="' + response.url + '"></a>' + removeHtml + '</p>';
-                                }
-                                // Other type file URL
-                                else {
-                                    itemHtml = '<p class="mtapp-upload-item"><a class="mtapp-item-type-file" href="' + response.url + '" target="_blank" data-itemvalue="' + response.url + '">' + response.url + '</a>' + removeHtml + '</p>';
-                                }
-                            }
-                            // Remove a loading image
-                            $itemUploadItems.find('img.loading').remove();
-                            // Insert upload items
-                            if (op.multiple) {
-                                $itemUploadItems.append(itemHtml).show();
-                            }
-                            else {
-                                $itemUploadItems.html(itemHtml).show();
-                            }
-                            // If edit entry screen is open, set upload items to entry assets
-                            if (mtappVars.screen_id === 'edit-entry') {
-                                var entryItemHtml = "";
-                                // Images
-                                if (response.mimeType.indexOf("image") !== -1) {
-                                    entryItemHtml = [
-                                        '<li id="list-asset-' + response.id + '" class="asset-type-image" onmouseover="show(\'list-image-' + response.id + '\', window.parent.document)" onmouseout="hide(\'list-image-' + response.id + '\', window.parent.document)">',
-                                            '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" class="asset-title">' + response.filename + '</a>',
-                                            '<a href="javascript:removeAssetFromList(' + response.id + ')" title="Remove this asset." class="remove-asset icon-remove icon16 action-icon">Remove</a>',
-                                            '<img id="list-image-' + response.id + '" src="' + response.url + '" class="list-image hidden" style="max-width:100px;">',
-                                        '</li>'
-                                    ].join("");
-                                }
-                                // Other type files excluding images
-                                else {
-                                    entryItemHtml = [
-                                        '<li id="list-asset-' + response.id + '" class="asset-type-file">',
-                                            '<a href="' + CMSScriptURI + '?__mode=view&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;id=' + response.id + '" class="asset-title">' + response.filename + '</a>',
-                                            '<a href="javascript:removeAssetFromList(' + response.id + ')" title="Remove this asset." class="remove-asset icon-remove icon16 action-icon">Remove</a>',
-                                        '</li>'
-                                    ].join("");
-                                }
-                                // Insert upload items to entry assets
-                                $assetList.append(entryItemHtml);
-                                var _ids = $includeAssetIds.val();
-                                if (_ids === "") {
-                                    $includeAssetIds.val(response.id);
-                                }
-                                else {
-                                    $includeAssetIds.val(_ids + "," + response.id);
-                                }
-                            }
-                            if (op.cbAfterUpload !== null && typeof op.cbAfterUpload === 'function') {
-                                op.cbAfterUpload({name: 'cbAfterUpload'}, $this, response);
-                            }
-                        });
+                        // Adjustment by varsions
+                        if (api.getVersion() == 1) {
+                          api.uploadAsset(op.siteId, data, upload);
+                        }
+                        else {
+                          data.site_id = op.siteId;
+                          api.uploadAsset(data, upload);
+                        }
                     }
                 });
             } // Core function
@@ -1618,12 +1745,15 @@
         uploadButton: null,
         // Called after upload files.
         // e.g.
-        // cbAfterUpload: function(cb, $this, response){
+        // cbAfterUpload: function(cb, $this, response, first, last){
         //     do something
         // }
         // - cb : {name: 'cbAfterUpload'}
         // - $this : The target element applying .MTAppMultiFileUpload()
         // - response : The respunse from uploadAsset()
+        // - first : When the loop is first, set true
+        // - last : When the loop is last, set true
+
         cbAfterUpload: null,
         debug: false
     };
@@ -1948,7 +2078,7 @@
         scopeList.push(
             typeScopeList('website', li.website.join(''))
         );
-        $('#scope-selector').html('<ul id="mtapp-slidemenu-v2">' + scopeList.join('') + '</ul>');
+        $('#scope-selector').html('<div id="mtapp-slidemenu-v2">' + scopeList.join('') + '</div>');
 
         // Attach an event handler function for events to the elements
         $('#mtapp-slidemenu-v2 div.scope-list').not('.system').on('click', 'a', function(e){
@@ -2549,7 +2679,7 @@
                 $(this)
                     .blur(function(){
                         var values = [];
-                        $(this).siblings().andSelf().each(function(){
+                        $(this).siblings('input:text').andSelf().each(function(){
                             values.push($(this).val());
                         });
                         $self.val(values.join(separator));
@@ -2557,7 +2687,7 @@
                     .keydown(function(e){
                         if (e.which == 13) {
                             var values = [];
-                            $(this).siblings().andSelf().each(function(){
+                            $(this).siblings('input:text').andSelf().each(function(){
                                 values.push($(this).val());
                             });
                             $self.val(values.join(separator));
@@ -3288,20 +3418,12 @@
     // end - $.MTAppTabs
 
 
-    // -------------------------------------------------
+    // ---------------------------------------------------------------------
     //  $.MTAppMsg();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2015/11/26
     //
-    //  Description:
-    //    画面上部にMTデフォルトの形式のメッセージを表示する。
-    //
-    //  Usage:
-    //    $.MTAppMsg(options);
-    //
-    //  Options:
-    //    msg: {String} 表示するメッセージ
-    //    type: {String} 'info' or 'success' or 'error'
-    //    parent: {Boolean} p.msg-text で包含しない場合(true)
-    //    timeout: {Number} 一定時間経過後に非表示にする場合にミリ秒を指定。0は非表示にしない。
+    // 画面上部にMTデフォルトの形式のメッセージを表示します。
     // ---------------------------------------------------------------------
     $.MTAppMsg = function(options){
         var op = $.extend({}, $.MTAppMsg.defaults, options);
@@ -3324,41 +3446,32 @@
             myMsg[4] = '';
         }
 
-        var msgBlock = $('#msg-block');
+        var $myMsg = $(myMsg.join('')).on('click.MTAppMsg', '.mt-close-msg', function(){
+            $(this).parent('.msg').remove();
+        });
 
-        if (msgBlock.length == 0) {
-            $('#content-header').append('<div id="msg-block"></div>');
-        }
-
-        var $myMsg = $(myMsg.join(''));
-
-        var $msgBlock = $('#msg-block').append($myMsg);
-
-        if (mtappVars.template_filename === 'dialog/asset_list') {
-            $msgBlock.on('click', '.mt-close-msg', function(){
-                $(this).parent('.msg').remove();
-            });
-        }
+        $('#content-header').append($myMsg);
 
         if (op.timeout > 0) {
             var animation = (op.animation === 'slideUp') ? 'slideUp' : 'fadeOut';
-            setTimeout(function(){
-                if (animation === 'slideUp') {
-                    $myMsg.slideUp();
-                } else {
-                    $myMsg.fadeOut();
-                }
-            }, op.timeout);
+            window.onload = function(){
+                setTimeout(function(){
+                    if (animation === 'slideUp') {
+                        $myMsg.slideUp();
+                    } else {
+                        $myMsg.fadeOut();
+                    }
+                }, op.timeout);
+            };
         }
     };
     $.MTAppMsg.defaults = {
-        msg: '',
-        type: 'info',
-        parent: false,
-        timeout: 0,
+        msg: '', // String: 表示するメッセージ
+        type: 'info', // String: 'info', 'success' or 'error'
+        parent: false, // Boolean: Whether to wrap the message with p.msg-text or not.
+        timeout: 0, // Number: Set milliseconds when you want to hide the message after a while.
         animation: 'fadeOut'
     };
-    // end - $.MTAppMsg();
 
 
     // ---------------------------------------------------------------------
@@ -3460,6 +3573,100 @@
     // end - $.MTAppSlideMenu
 
 
+    // ---------------------------------------------------------------------
+    //  $.MTAppCategorySwitch();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2016/03/15
+    //
+    //  カテゴリによって表示するフィールドを切り替えます。
+    // ---------------------------------------------------------------------
+    $.MTAppCategorySwitch = function(options){
+        var op = $.extend({}, $.MTAppCategorySwitch.defaults, options);
+        if (mtappVars.screen_id !== 'edit-entry' || (op.selector === null && op.basename === null)) {
+            return;
+        }
+
+        $('body').addClass('MTAppCategorySwitch');
+        var makeSelectorIntoObject = function(prop, value, intoHash, intoArray, basename){
+            intoHash[prop] = [];
+            if (value === '') {
+                return;
+            }
+            var array = value.split(',');
+            for (var i = 0, l = array.length; i < l; i++) {
+                if (basename) {
+                    var selector = '#' + array[i].replace(/^c:/, 'customfield_') + '-field';
+                    intoHash[prop].push(selector);
+                    intoArray.push(selector);
+                } else {
+                    intoHash[prop].push(array[i]);
+                    intoArray.push(array[i]);
+                }
+            }
+        };
+
+        // 対象とするフィールド一覧を作成
+        var targetSelector = [];
+        var settingSelector = {};
+        if (op.selector !== null) {
+            for (var prop in op.selector) {
+                makeSelectorIntoObject(prop, op.selector[prop], settingSelector, targetSelector, false);
+            }
+        } else if (op.basename !== null) {
+            for (var prop in op.basename) {
+                makeSelectorIntoObject(prop, op.basename[prop], settingSelector, targetSelector, true);
+            }
+        }
+        targetSelector.sort();
+        $.unique(targetSelector);
+
+        // 対象とするフィールドを全て取得してクラスをつける
+        var $target = $( targetSelector.join(',') ).addClass('hidden cfs-hidden');
+
+        var showFields = function($obj){
+            $obj.removeClass('hidden cfs-hidden').addClass('cfs-show').show();
+        };
+
+        var switchCategoryAction = function(){
+            var selectedCategoriesValue = $('#category-ids').val();
+            var selectedCategories = selectedCategoriesValue !== '' ? selectedCategoriesValue.split(',') : ['init'];
+            if (selectedCategoriesValue === '' && settingSelector.hasOwnProperty('init') && settingSelector['init'].length < 1) {
+                showFields($target);
+            } else {
+                $target.addClass('hidden cfs-hidden');
+            }
+            for (var i = 0, l = selectedCategories.length; i < l; i++) {
+                var category = selectedCategories[i] === 'init' ? 'init' : 'cat' + selectedCategories[i];
+                if (!settingSelector.hasOwnProperty(category)) {
+                    continue;
+                }
+                for (var x = 0, y = settingSelector[category].length; x < y; x++) {
+                    showFields( $(settingSelector[category][x]) );
+                }
+            }
+        }
+        $('#main').on('click.MTAppCategorySwitch', '#category-field,#other-type-category-list', switchCategoryAction);
+        switchCategoryAction();
+    };
+    $.MTAppCategorySwitch.defaults = {
+        // カテゴリIDにcatという接頭辞を付けて、そのカテゴリが選択された時に表示させる要素のセレクタをカンマ区切りで指定します。
+        // selector: {
+        //     'cat1': '#title-field,#text-field,#customfield_foo-field',
+        //     'cat2': '#title-field,#keywords-field,#excerpt-field',
+        //     'init': '#title-field,#text-field,#excerpt-field'
+        // },
+        selector: null,
+        // カテゴリIDにcatという接頭辞を付けて、そのカテゴリが選択された時に表示させるフィールドのベースネームをカンマ区切りで指定します。
+        // basename: {
+        //     'cat1': 'title,text,customfield_foo',
+        //     'cat2': 'title,keywords,excerpt'
+        //     'init': ''
+        // },
+        basename: null
+    };
+    // end - $.MTAppCategorySwitch();
+
+
     // -------------------------------------------------
     //  $.MTAppInCats();
     //
@@ -3512,21 +3719,14 @@
     // end - $.MTAppInCats();
 
 
-    // -------------------------------------------------
+    // ---------------------------------------------------------------------
     //  $.MTAppOtherTypeCategories();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2016/05/18
     //
-    //  Description:
-    //    記事カテゴリ選択のUIをラジオボタンまたはドロップダウンリストに変更する。
+    // 記事カテゴリ選択のUIをラジオボタンまたはドロップダウンリストに変更します。
     //
-    //  Usage:
-    //    $.MTAppOtherTypeCategories(options);
-    //
-    //  Options:
-    //    type: {String} 'radio'（ラジオボタン） or 'select'（ドロップダウンリスト）
-    //    label: {String} ウィジェットのタイトルバーに表示されるラベル
-    //    lanotSelectedTextbel: {String} 未選択状態にするための要素のラベル
-    //    debug: {Boolean} trueにすると元のカテゴリウィジェットが表示される
-    // -------------------------------------------------
+    // ---------------------------------------------------------------------
     $.MTAppOtherTypeCategories = function(options){
         var op = $.extend({}, $.MTAppOtherTypeCategories.defaults, options);
 
@@ -3625,7 +3825,15 @@
                     var $div = $(this).children().children('div');
                     var catLabel = $div.text().replace(/\s/g, '');
                     var catId = $div.children('input').attr('name');
+                    var attrDefChecked = '';
+                    var attrChecked = '';
+                    var attrDisabled = '';
+                    var attrHiddenClass = '';
                     var _html = [];
+                    var marginLeft = '';
+                    if (op.nest) {
+                        marginLeft = ' style="margin-left:' + $(this).children().css('margin-left') + ';"';
+                    }
                     if (catId) {
                         catId = catId.match(/[0-9]+$/)[0];
                     }
@@ -3634,20 +3842,58 @@
                     }
                     switch (op.type) {
                         case 'radio':
-                            var AttrDefChecked = categoryIds ? '': ' checked="checked"';
-                            var AttrChecked = (categoryIds == catId) ? ' checked="checked"': '';
-                            if (i == 0) {
-                                _html.push('<label for="another-cat-0"><input id="another-cat-0" type="radio" name="other-type-category" value=""' + AttrDefChecked + '>' + op.notSelectedText+ '</label>');
+                            if (categoryIds === '') {
+                                if (op.selected === null) {
+                                    attrDefChecked = ' checked="checked"';
+                                } else {
+                                    if (catId == op.selected) {
+                                        attrChecked = ' checked="checked"';
+                                    } else if (op.hiddenExceptSelected) {
+                                        attrHiddenClass = ' class="hidden"';
+                                    } else if (op.disabledExceptSelected) {
+                                        attrDisabled = ' disabled="disabled"';
+                                    }
+                                }
+                            } else {
+                                if (categoryIds == catId) {
+                                    attrChecked = ' checked="checked"';
+                                } else if (op.hiddenExceptSelected) {
+                                    attrHiddenClass = ' class="hidden"';
+                                } else if (op.disabledExceptSelected) {
+                                    attrDisabled = ' disabled="disabled"';
+                                }
                             }
-                            _html.push('<label for="another-cat-' + catId + '"><input id="another-cat-' + catId + '" type="radio" name="other-type-category" value="' + catId + '"' + AttrChecked + '>' + catLabel + '</label>');
+                            if (i == 0 && !op.selected) {
+                                _html.push('<label for="another-cat-0"' + attrHiddenClass + marginLeft + '><input id="another-cat-0" type="radio" name="other-type-category" value=""' + attrDefChecked + attrDisabled + '>' + op.notSelectedText+ '</label>');
+                            }
+                            _html.push('<label for="another-cat-' + catId + '"' + attrHiddenClass + marginLeft + '><input id="another-cat-' + catId + '" type="radio" name="other-type-category" value="' + catId + '"' + attrChecked + attrDisabled + '>' + catLabel + '</label>');
                             break;
                         case 'select':
-                            var AttrDefSelected = categoryIds ? '': ' selected';
-                            var AttrSelected = (categoryIds == catId) ? ' selected': '';
-                            if (i == 0) {
-                                _html.push('<select name="other-type-category"><option value=""' + AttrDefSelected + '>未選択</option>');
+                            if (categoryIds === '') {
+                                if (op.selected === null) {
+                                    attrDefChecked = ' selected="selected"';
+                                } else {
+                                    if (catId == op.selected) {
+                                        attrChecked = ' selected="selected"';
+                                    } else if (op.hiddenExceptSelected) {
+                                        attrHiddenClass = ' class="hidden"';
+                                    } else if (op.disabledExceptSelected) {
+                                        attrDisabled = ' disabled="disabled"';
+                                    }
+                                }
+                            } else {
+                                if (categoryIds == catId) {
+                                    attrChecked = ' selected="selected"';
+                                } else if (op.hiddenExceptSelected) {
+                                    attrHiddenClass = ' class="hidden"';
+                                } else if (op.disabledExceptSelected) {
+                                    attrDisabled = ' disabled="disabled"';
+                                }
                             }
-                            _html.push('<option value="' + catId + '"' + AttrSelected + '>' + catLabel + '</option>');
+                            if (i == 0 && !op.selected) {
+                                _html.push('<select name="other-type-category"><option value=""' + attrDefChecked + attrDisabled + attrHiddenClass + '>未選択</option>');
+                            }
+                            _html.push('<option value="' + catId + '"' + attrChecked + attrDisabled + attrHiddenClass + '>' + catLabel + '</option>');
                             break;
                         default: return false;
                     }
@@ -3664,25 +3910,37 @@
                                 else {
                                     $('#category-ids').val('');
                                 }
-                            });
+                            }).find('input[name="other-type-category"]:checked').trigger('click');
                         break;
                     case 'select':
                         $anotherCategoryList.html(radioCatList.join('') + '</select>');
                         $anotherCategoryList
                             .on('change', 'select', function(){
                                 $('#category-ids').val($(this).find('option:selected').val());
-                            });
+                            }).find('select').trigger('change');
                         break;
                 }
             // });
         }, 500);
     };
     $.MTAppOtherTypeCategories.defaults = {
-        type: 'radio', // or 'select'
+        // A string of the new widget type. You can set either "radio" or "select".
+        type: 'radio',
+        // A string of the widget name.
         label: 'カテゴリ',
+        // A string to be displayed when no category is selected.
         notSelectedText: '未選択',
-        // Set "true" to the add option if you would like to be able to add a new category.
+        // Set the category ID to "selected" option if you would like to select the specific category.
+        selected: null,
+        // Set true to "disabledExceptSelected" option if you would like to disable categories expecting the selected category.
+        disabledExceptSelected: false,
+        // Set true to "hiddenExceptSelected" option if you would like to hide categories expecting the selected category.
+        hiddenExceptSelected: false,
+        // Set true to "add" option if you would like to be able to add a new category.
         add: false,
+        // Set true to "nest" option if you would like to nest categories. (Only radio type)
+        nest: false,
+        // If set to true, the original widget is shown.
         debug: false
     };
     // end - $.MTAppOtherTypeCategories();
@@ -4048,7 +4306,8 @@
 
     // ---------------------------------------------------------------------
     //  $.MTAppHasCategory();
-    //
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2015/11/13
     //  Description:
     //
     //    必要な数のカテゴリや指定したIDのカテゴリが選択されているかチェックし、選択されていない場合はエラーダイアログを表示する。
@@ -4068,9 +4327,13 @@
     $.MTAppHasCategory = function(options){
         var op = $.extend({}, $.MTAppHasCategory.defaults, options);
         var $form = $('form#entry_form');
-        if ($form.length < 1) return;
+        if ($form.length < 1) {
+            return;
+        }
         var type = mtappVars.type;
-        if (!(type == 'entry' || type == 'page')) return;
+        if (!(type == 'entry' || type == 'page')){
+            return;
+        }
         var reqCats = (op.requiredIds) ? op.requiredIds.split(',') : [];
         var dialogOptions = {
             modal: true,
@@ -4079,10 +4342,11 @@
                 $form.removeAttr('mt:once');
             }
         };
-        $form.on('submit.MTAppHasCategory', function(){
+        $form.on('submit.MTAppHasCategory', function(e){
+            delete Editor.strings.unsavedChanges;
+            $(window).off('beforeunload');
             var categoryIds = $("input[name='category_ids']").val() ? $("input[name='category_ids']").val().split(',') : [];
             var count = 0;
-            var eerror = false;
             if (reqCats.length) {
                 for (var i = 0, l = reqCats.length; i < l; i++) {
                     if ($.inArray(reqCats[i], categoryIds) == -1) {
@@ -4233,30 +4497,6 @@
         always: false
     };
     // end - $(foo).MTAppInlineEdit();
-
-
-    // -------------------------------------------------
-    //  $.MTAppEnableUploadify();
-    //
-    //  Description:
-    //    ブログ記事編集画面の複数ファイルアップロード機能（ベータ版）を有効にする。
-    //
-    //  Usage:
-    //    $.MTAppEnableUploadify(options);
-    //
-    //  Options:
-    //    enable: {Boolean} 有効にする（true）、無効にする（false）
-    // -------------------------------------------------
-    $.MTAppEnableUploadify = function(options){
-        var op = $.extend({}, $.MTAppEnableUploadify.defaults, options);
-
-        if (mtappVars.screen_id != 'list-plugins') return;
-        $('#uploadify-container').show()
-    };
-    $.MTAppEnableUploadify.defaults = {
-        enable: false
-    };
-    // end - $.MTAppEnableUploadify();
 
 
     // -------------------------------------------------
@@ -4524,7 +4764,8 @@
 
     // -------------------------------------------------
     //  $.MTAppSortableBatchEdit();
-    //
+    // -------------------------------------------------
+    //                         Latest Update: 2015/11/12
     //  Description:
     //    ブログ記事・ウェブページ一括編集画面をソート可能にして、日付を自動変更する
     //
@@ -4533,11 +4774,53 @@
     //
     //  Options:
     //    target: {String} 自動変更する日付の種類を指定。公開日'created_on'または更新日'modified_on'
-    //    update: {Function} 並べ替えが完了したときのイベントを設定。
+    //    interval: {String} 自動に減らしていく間隔を指定。1日:'day'、1時間'hour'、1分'minute'、1秒'second'。
+    //    targetSort: {Boolean}  modified_on での並べ替えを無効にする場合は false を指定。
+    //    update: {Function} 並べ替えが完了したときのイベントを設定
     // -------------------------------------------------
     $.MTAppSortableBatchEdit = function(options){
         var op = $.extend({}, $.MTAppSortableBatchEdit.defaults, options);
-        if (mtappVars.screen_id.indexOf('batch-edit-') < 0) return;
+        if (mtappVars.screen_id.indexOf('batch-edit-') === -1) {
+          return;
+        }
+        var interval = {
+            year:   32140800000,
+            month:  2678400000,
+            day:    86400000,
+            hour:   3600000,
+            minute: 60000,
+            second: 1000
+        };
+        if (typeof op.interval === 'undefined' || interval.hasOwnProperty(op.interval) == false) {
+            op.interval = 'day';
+        }
+        var getDatetimeFormat = function(ts, itv){
+            var date = new Date(ts);
+            var res = {
+                year:   date.getFullYear(),
+                month:  $.digit(date.getMonth() + 1),
+                day:    $.digit(date.getDate()),
+                hour:   (itv === 'day') ? '00' : $.digit(date.getHours()),
+                minute: (itv === 'day' || itv === 'hour') ? '00' : $.digit(date.getMinutes()),
+                second: (itv === 'day' || itv === 'hour' || itv === 'minute') ? '00' : $.digit(date.getSeconds())
+            };
+            return res.year + '-' + res.month + '-' + res.day + ' ' + res.hour + ':' + res.minute + ':' + res.second;
+        };
+        if (op.targetSort == true && op.target === 'modified_on') {
+            var currentList = [];
+            $('#' + mtappVars.screen_id.replace(/batch-edit-/,'') + '-listing-table tbody tr').each(function(){
+                var timeStr = $(this).find('td.datetime:eq(1) input:text').val().replace(/ /, 'T');
+                var date = new Date(timeStr);
+                var ts = date.getTime();
+                currentList.push({ ts: ts, html: this.outerHTML });
+            });
+            $.objectSort(currentList, 'ts', 'descend', 'numeric');
+            var tbodyHtml = '';
+            for (var i = 0, l = currentList.length; i < l; i++) {
+                tbodyHtml += currentList[i]['html'];
+            }
+            $('#' + mtappVars.screen_id.replace(/batch-edit-/,'') + '-listing-table tbody').get(0).innerHTML = tbodyHtml;
+        }
         $('#' + mtappVars.screen_id.replace(/batch-edit-/,'') + '-listing-table')
             .find('tr')
                 .css({'cursor':'move'})
@@ -4548,7 +4831,7 @@
                     cursor: 'move',
                     placeholder: 'mtapp-state-highlight',
                     start: function(ev, ui){
-                        $(ui.placeholder).height($(ui.item).height());
+                        $(ui.placeholder).height($(ui.item).height()).css('background-color', '#FFFBE6');
                     },
                     sort: function(ev, ui){
                         ui.item.css({
@@ -4566,58 +4849,22 @@
                         if (typeof op.update == 'function') {
                             op.update(ev, ui);
                         } else if (op.target == 'created_on' || op.target == 'modified_on') {
-                            // 公開日か更新日か
                             var n = op.target == 'created_on' ? 0 : 1;
-                            var input = ui.item.find('td.datetime:eq(' + n + ') input:text');
-                            var curr_dateitem = input.val(),
-                                next_dateitem = ui.item.next().find('td.datetime:eq(' + n + ') input:text').val(),
-                                prev_dateitem = ui.item.prev().find('td.datetime:eq(' + n + ') input:text').val();
-                            var curr_date = getDateObj(curr_dateitem),
-                                next_date = getDateObj(next_dateitem),
-                                prev_date = getDateObj(prev_dateitem);
-                            var curr_getTime = curr_date ? curr_date.getTime() : 0,
-                                next_getTime = next_date ? next_date.getTime() : 0,
-                                prev_getTime = prev_date ? prev_date.getTime() : 0;
-
-                            var new_getTime = 0;
-                            if (next_getTime && prev_getTime) {
-                                new_getTime = Math.floor( (prev_getTime + next_getTime) / 2 );
-                            } else if (next_getTime == 0 || prev_getTime == 0) {
-                                new_getTime = (next_getTime + prev_getTime) * 2 - curr_getTime;
-                            }
-
-                            curr_date.setTime(new_getTime);
-                            var ymd = [
-                                    curr_date.getFullYear(),
-                                    $.digit(curr_date.getMonth() + 1),
-                                    $.digit(curr_date.getDate())
-                                ],
-                                hms = [
-                                    $.digit(curr_date.getHours()),
-                                    $.digit(curr_date.getMinutes()),
-                                    $.digit(curr_date.getSeconds())
-                                ];
-                            input.val(ymd.join('-') + ' ' + hms.join(':'));
+                            var date = new Date();
+                            var ts = date.getTime();
+                            $('#entry-listing-table tbody tr').each(function(i){
+                                var _ts = ts - ((i + 1) * (interval[op.interval] - 0));
+                                $(this).find('td.datetime:eq(' + n + ') input:text').val(getDatetimeFormat(_ts, op.interval));
+                            });
                         }
                     }
                 });
-
-        function getDateObj(dateitem){
-            if (! dateitem) return null;
-            var _d = dateitem.match(/(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
-            var d = new Date();
-            d.setFullYear(_d[1]);
-            d.setMonth(_d[2] - 1);
-            d.setDate(_d[3]);
-            d.setHours(_d[4]);
-            d.setMinutes(_d[5]);
-            d.setSeconds(_d[6]);
-            return d;
-        }
     };
     $.MTAppSortableBatchEdit.defaults = {
-        target: 'created_on', // created_on, modified_on
-        update: null
+        target: 'created_on', // String: 'created_on' or 'modified_on'
+        interval: 'day', // String: 'day', 'hour', 'minute' or 'second'
+        targetSort: true, // Boolean: true or false
+        update: null // Function: function(ev, ui){}
     };
     // end - $.MTAppSortableBatchEdit();
 
@@ -4846,7 +5093,10 @@
     // -------------------------------------------------
     $.MTAppMakeField = function(options) {
         var op = $.extend({}, $.MTAppMakeField.defaults, options);
-        var id = op.id ? ' id="' + op.id + '-field"' : '';
+        if (op.basename === '' && op.id !== '') {
+            op.basename = op.id;
+        }
+        var id = op.basename !== '' ? ' id="' + op.basename + '-field"' : '';
         var hint = op.hint ? '<div class="hint">' + op.hint + '</div>' : '';
         return [
             '<div' + id + ' class="field field-top-label sort-enabled">',
@@ -4858,6 +5108,8 @@
         ].join('');
     };
     $.MTAppMakeField.defaults = {
+        basename: '',
+        // Deprecated. Alias of basename
         id: '',
         label: '',
         content: '',
@@ -4884,8 +5136,9 @@
     // -------------------------------------------------
     $.MTAppMakeWidget = function(options) {
         var op = $.extend({}, $.MTAppMakeWidget.defaults, options);
+        var id = op.basename !== '' ? ' id="' + op.basename + '-field"' : '';
         return [
-            '<div class="widget">',
+            '<div' + id + ' class="widget">',
                 '<div class="widget-header">',
                     '<div class="widget-action">' + op.action + '</div>',
                     '<div class="widget-label">',
@@ -4898,12 +5151,102 @@
         ].join('');
     };
     $.MTAppMakeWidget.defaults = {
+        basename: '',
         label: '',
         content: '',
         action: '',
         footer: ''
     };
     // end - $.MTAppMakeWidget();
+
+
+    // ---------------------------------------------------------------------
+    //  $.MTAppMoveToWidget();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2015/11/17
+    //
+    // 指定したフィールドを1つの新しいサイドバーウィジェットにまとめて入れるか、既存のウィジェット
+    // に挿入します。
+    //
+    // ---------------------------------------------------------------------
+    $.MTAppMoveToWidget = function(options){
+        var op = $.extend({}, $.MTAppMoveToWidget.defaults, options);
+        if (mtappVars.screen_id !== 'edit-entry') {
+            return;
+        }
+        if (op.pointerSelector === '') {
+            return $.errorMessage('MTAppMoveToWidget', 'pointerSelector is required', 'alert', false);
+        }
+        var selectors = (op.selector !== '') ? op.selector.split(',') : [];
+        if (op.basename !== '' && typeof op.basename === 'string') {
+            var basenames = op.basename.split(',');
+            for (var i = 0, l = basenames.length; i < l; i++) {
+                selectors.push('#' + basenames[i].replace(/^c:/, 'customfield_') + '-field');
+            }
+        }
+        // Get content to move
+        var movingHtml = '';
+        for (var i = 0, l = selectors.length; i < l; i++) {
+            $(selectors[i]).each(function(){
+              $(this).removeClass('hidden').removeClass('sort-enabled');
+              movingHtml += this.outerHTML;
+            }).remove();
+        }
+        // Set HTML to insert
+        var insertHtml = '';
+        if (op.makeWidget) {
+            // Make a new widget
+            insertHtml = $.MTAppMakeWidget({
+                basename: op.widgetBasename,
+                label: op.widgetLabel,
+                content: op.widgetContentTop + movingHtml + op.widgetContentBottom,
+                action: op.widgetAction,
+                footer: op.widgetFooter
+            });
+        }
+        else {
+            insertHtml = movingHtml;
+        }
+        // Move
+        switch (op.method) {
+          case 'before':
+            $(op.pointerSelector).before(insertHtml);
+            break;
+          case 'append':
+            $(op.pointerSelector).append(insertHtml);
+            break;
+          case 'prepend':
+            $(op.pointerSelector).prepend(insertHtml);
+            break;
+          default:
+            $(op.pointerSelector).after(insertHtml);
+        }
+    };
+    $.MTAppMoveToWidget.defaults = {
+        // Set to true if you want to make a new widget.
+        makeWidget: true,
+        // Set a string. This is widget basename.
+        widgetBasename: '',
+        // Set a string/HTML. This is a widget name.
+        widgetLabel: 'New Widget',
+        // Set a string/HTML. This is a widget content which is inserted to the top position.
+        widgetContentTop: '',
+        // Set a string/HTML. This is a widget content which is inserted to the bottom position.
+        widgetContentBottom: '',
+        // Set a string/HTML. This is a widget action content.
+        widgetAction: '',
+        // Set a string/HTML. This is a widget footer content.
+        widgetFooter: '',
+        // Set a separated comma text of moving field's basename
+        basename: '',
+        // Set a separated comma text of moving field's ID
+        selector: '',
+        // Set the selecter which is the destination moving fields.
+        pointerSelector: '',
+        // Set a method name, one of 'after', 'before', 'append' and 'prepend'
+        method: 'after'
+    };
+    // end - $.MTAppMoveToWidget()
 
 
     // -------------------------------------------------
@@ -5162,21 +5505,28 @@
         },
         noScroll: function (styles, containerSelector){
             if (this.length < 1) return;
-            var $this = this;
             if (containerSelector) {
                 $(containerSelector).css('overflow-y', 'hidden');
             }
+            var $this = this;
             var $parent = $this.parent().css('position', 'relative');
             var parentHeight = $parent.height();
+            var $document = $(document);
+            var getThisTop = function(){
+                return $document.scrollTop() - $parent.offset().top + 10;
+            };
             $parent.height(parentHeight);
             $this.css({'position': 'absolute', 'z-index': 99});
             if (styles) {
                 $this.css(styles);
             }
             $(window).scroll(function(){
-                var thisTop = $(document).scrollTop() - $parent.offset().top + 10;
+                var thisTop = getThisTop();
                 if (thisTop < 0) {
                     thisTop = 0;
+                }
+                if ($document.height() - $document.scrollTop() < $this.height()) {
+                    return;
                 }
                 $this.stop().animate(
                     {top: thisTop + 'px'},
@@ -5286,9 +5636,29 @@
                 return returnValue;
             }
             return text;
+        },
+        objectSort: function(array, key, order, type) {
+            order = (order === 'ascend') ? -1 : 1;
+            array.sort(function(obj1, obj2){
+                var v1 = obj1[key];
+                var v2 = obj2[key];
+                if (type === 'numeric') {
+                    v1 = v1 - 0;
+                    v2 = v2 - 0;
+                }
+                else if (type === 'string') {
+                    v1 = '' + v1;
+                    v2 = '' + v2;
+                }
+                if (v1 < v2) {
+                    return 1 * order;
+                }
+                if (v1 > v2) {
+                    return -1 * order;
+                }
+                return 0;
+            });
         }
-
-
     });
 
     function getFieldID(basename) {

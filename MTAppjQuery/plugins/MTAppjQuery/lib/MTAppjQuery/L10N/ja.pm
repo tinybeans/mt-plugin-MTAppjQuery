@@ -12,6 +12,7 @@ use vars qw ( %Lexicon );
     'Edit user.css' => 'user.cssを編集',
     'Edit user.css(append)' => 'user.cssを編集(追記)',
 # Tags.pm
+    'The [_1] modifier is required.' => '[_1]モディファイアは必須です。',
     'meiji' => '明治',
     'taisho' => '大正',
     'showa' => '昭和',
@@ -37,6 +38,9 @@ use vars qw ( %Lexicon );
     'Individual Settings' => '個別設定',
     'Use a JSON of Websites/Blogs' => 'ウェブサイト/ブログのJSONを利用する',
     'Detail Mode' => '詳細モード',
+    'Use DataAPI SDK' => 'DataAPI SDK を利用',
+    'Select version' => 'Data API バージョン',
+    'Append code' => 'コードを追加',
 # config.tmpl
     'active' => '有効にする',
     'Enable' => '有効',
@@ -75,19 +79,6 @@ use vars qw ( %Lexicon );
     '(JavasScript unless you are familiar with the contents of the file it is recommended that you disable it.)' => '（JavasScriptファイルの内容を理解している場合以外は無効にしないことをお勧めします。）',
     'Apply the setting to all websites and blogs.' => '全てのウェブサイトとブログに設定を適用する',
     'Apply to all websites and blogs?' => '全てのウェブサイトとブログに設定を適用しますか？',
-
-# Uploadify blog_config.tmpl / system_config.tmpl
-	'Uploadify' => 'マルチファイルアップロード',
-	'active Uploadify' => 'マルチファイルアップロードを有効する',
-	'To stop using Uploadify' => 'Uploadifyの利用を停止する',
-    'Upload folder' => 'アップロード先フォルダ',
-    'The path to the folder you would like to save the files to. Do not end the path with a ‘/’.' => 'ファイルをアップロードするフォルダのパスを指定。末尾の「/」は不要。',
-	'img element' => 'img要素',
-	'a element' => 'a要素',
-	'You can write that File name is __filename__, File path is __filepath__.' => 'ファイル名＝「__filename__」、ファイルのパス＝「__filepath__」',
-	'A multiple file upload' => 'マルチファイルアップロード',
-	'A multiple file upload meta' => 'マルチファイルアップロード　メタ情報',
-    'Append code' => 'コードを追加',
 );
 
 1;

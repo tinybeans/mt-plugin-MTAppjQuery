@@ -25,9 +25,8 @@ Business plan is for all commercial websites.
 
 * 10,000(+tax) / 1 install(site)
 * support by email(for 6 month)
-* view new document
-* digital data of document (ePub, mobi, PDF)
-* view new tips site
+* view document website
+* view tips site (coming soon)
 
 Buy license below link.
 

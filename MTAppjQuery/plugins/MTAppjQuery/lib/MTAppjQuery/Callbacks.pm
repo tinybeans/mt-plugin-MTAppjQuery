@@ -113,7 +113,7 @@ sub template_source_header {
     my $op_jquery_ready     = $p->get_config_value('jquery_ready', $scope);
     my $op_jquery_ready_url = $p->get_config_value('jquery_ready_url', $scope);
     my $op_blogs_json       = $p->get_config_value('blogs_json', 'system');
-    my $op_blogs_json_detail= $p->get_config_value('blogs_json_detail', 'system');
+    my $op_blogs_json_detail= $p->get_config_value('blogs_json_detail', 'system') || '0';
     my $op_jqselectable   = 0;#$p->get_config_value('jqselectable', $scope);
 
     # Free textarea / common
@@ -135,6 +135,11 @@ sub template_source_header {
     my $op_fa_jq_js_include   = $p->get_config_value('fa_jq_js_include', $scope) || '/* jq_js_include (MTAppjQuery) */';
     my $op_fa_mtapp_html_foot = $p->get_config_value('fa_mtapp_html_foot', $scope) || '<!-- mtapp_html_foot (MTAppjQuery) -->';
     my $op_fa_mtapp_end_body  = $p->get_config_value('fa_mtapp_end_body', $scope) || '<!-- mtapp_end_body (MTAppjQuery) -->';
+
+    # Data API
+    my $op_use_data_api_js = $p->get_config_value('use_data_api_js', 'system');
+    my $op_data_api_script_url = $p->get_config_value('data_api_script_url', 'system');
+    my $op_data_api_version = $p->get_config_value('data_api_version', 'system');
 
     ### ツールチップ用ボックスをページに追加する
     my $preset = <<__MTML__;
@@ -303,6 +308,9 @@ __MTML__
     var mtappVars = {
         "version" : "${version}",
         "minor_version" : "${minor_version}",
+        <mt:If name="dataapi_default_version">
+        "dataapi_default_version" : "<mt:Var name="dataapi_default_version">",
+        </mt:If>
         "debug_mode" : "<mt:Var name="config.DebugMode">",
         "language" : "<mt:Var name="config.DefaultLanguage">",
         "type" : "${_type}",
@@ -315,7 +323,6 @@ __MTML__
         "user_name" : "<mt:var name="author_name" encode_js="1">",
         "is_superuser" : $is_superuser,
         "curr_website_id" : <mt:if name="curr_website_id"><mt:var name="curr_website_id"><mt:else>0</mt:if>,
-        "blog_id" : ${blog_id},
         "entry_id" : ${entry_id},
         "page_id" : ${page_id},
         "status" : "<mt:Var name="status">",
@@ -323,6 +330,8 @@ __MTML__
         "template_id" : ${template_id},
         "template_identifier" : '<mt:Var name="identifier">',
         "modified_by" : "<mt:Var name="modified_by">",
+        "blog_id" : ${blog_id},
+        "blog_name" : "<mt:var name="blog_name">",
         "blog_url" : "<mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if>",
         "static_plugin_path" : "${static_plugin_path}",
         "html_title" : "<mt:var name="mtapp_html_title" trim="1" replace='"','\"'>",
@@ -345,6 +354,26 @@ __MTML__
     }
     /* ]]> */
     </script>
+__MTML__
+
+    # MT.DataAPI Constructor
+    if ($op_use_data_api_js) {
+        my $data_api_script_url = $app->{__host} . $app->{__mt_path} . MT->config->DataAPIScript;
+        if ($op_data_api_script_url) {
+            $data_api_script_url = $op_data_api_script_url;
+        }
+        $mtapp_vars .= <<__MTML__;
+    <script type="text/javascript" src="<mt:StaticWebPath regex_replace="/https?:/","">data-api/${op_data_api_version}/js/mt-data-api.min.js"></script>
+    <script>
+    mtappVars.DataAPI = new MT.DataAPI({
+        baseUrl:  '$data_api_script_url',
+        clientId: 'MTAppjQuery-DataAPI'
+    });
+    </script>
+__MTML__
+    }
+
+    $mtapp_vars .= <<__MTML__;
     <mt:SetHashVar name="mtappVars">
     <mt:SetVar name="version" value="${version}">
     <mt:SetVar name="minor_version" value="${minor_version}">
@@ -384,8 +413,12 @@ __MTML__
 __MTML__
 
     my $target = '<script type="text/javascript" src="<\$mt:var name="static_uri"\$>jquery/jquery\.(min\.)*js\?v=<mt:var name="mt_version_id" escape="URL">"></script>';
-    my $jquery_ready_url = $op_jquery_ready_url ? $op_jquery_ready_url : "${static_plugin_path}user-files/jquery_ready.js";
-    my $jquery_ready = $op_jquery_ready ? qq(<script type="text/javascript" src="${jquery_ready_url}"></script>) : '';
+    my $jquery_ready_url = "${static_plugin_path}user-files/jquery_ready.js";
+    $jquery_ready_url =~ s/^https?://;
+    if ($op_jquery_ready_url) {
+        $jquery_ready_url = $op_jquery_ready_url;
+    }
+    my $jquery_ready = $op_jquery_ready ? qq(<script type="text/javascript" src="$jquery_ready_url"></script>) : '';
 
     $$tmpl_ref =~ s!($target)!$mtapp_vars  $1\n  $jquery_ready!g;
 
@@ -396,10 +429,12 @@ __MTML__
     my $user_js_tmpl = MT::Template->load({name => $user_js_tmplname, identifier => 'user_js', blog_id => $blog_id});
     if (defined($user_js_tmpl)) {
         $user_js_url = $blog->site_url . $user_js_tmpl->outfile . '?v=' . $user_js_tmpl->modified_on;
-    } elsif ($op_userjs_url ne '') {
-        $user_js_url = $op_userjs_url;
     } else {
         $user_js_url = "${static_plugin_path}user-files/user.js";
+    }
+    $user_js_url =~ s/^https?://;
+    if ($op_userjs_url) {
+        $user_js_url = $op_userjs_url;
     }
     my $user_js = ($op_userjs == 1) ? qq(<script type="text/javascript" src="$user_js_url"></script>): '';
 
@@ -409,10 +444,12 @@ __MTML__
     my $user_css_tmpl = MT::Template->load({name => $user_css_tmplname, identifier => 'user_css', blog_id => $blog_id});
     if (defined($user_css_tmpl)) {
         $user_css_url = $blog->site_url . $user_css_tmpl->outfile . '?v=' . $user_css_tmpl->modified_on;
-    } elsif ($op_usercss_url ne '') {
-        $user_css_url = $op_usercss_url;
     } else {
         $user_css_url = "${static_plugin_path}user-files/user.css";
+    }
+    $user_css_url =~ s/^https?://;
+    if ($op_usercss_url) {
+        $user_css_url = $op_usercss_url;
     }
     my $user_css = ($op_usercss == 1) ? qq(<link rel="stylesheet" href="$user_css_url" type="text/css" />): '';
 
@@ -432,7 +469,6 @@ __MTML__
     </mt:SetVarBlock>
     <mt:SetVarBlock name="js_include" append="1">
     $jqselectable
-    <mt:var name="uploadify_source">
     <script type="text/javascript" src="${static_plugin_path}js/MTAppjQuery.js"></script>
     $op_common_js_include
     $op_fa_js_include
@@ -528,7 +564,6 @@ __MTML__
 
 sub template_param_edit_entry {
     my ($cb, $app, $param, $tmpl) = @_;
-# doLog(Dumper($param));
     ### $app->
     my $host        = $app->{__host};
     my $static_path = $app->static_path;
@@ -549,82 +584,6 @@ sub template_param_edit_entry {
         push @blog_json, MT::Util::to_json(\%blog_date);
     }
     $param->{json_can_create_post_blogs} = join ",", @blog_json;
-
-    if (&is_user_can($blog, $user, 'upload')) {
-        ### $param->
-        my $blog_id   = $param->{blog_id} || 0;
-        my $blog_url  = $param->{blog_url} || '';
-        my $blog_path = $blog_url;
-           $blog_path =~ s!^$host|\/$!!g;
-# doLog('$blog_path : '.$blog_path.'  $blog_url : '.$blog_url);
-
-        ### $p->
-        my $p = MT->component('mt_app_jquery');
-        my $scope = (!$blog_id) ? 'system' : 'blog:'.$blog_id;
-        my $active_uploadify = $p->get_config_value('active_uploadify', $scope);
-        return unless $active_uploadify;
-        my $img  = &_config_replace($p->get_config_value('img_elm', $scope));
-        my $file = &_config_replace($p->get_config_value('file_elm', $scope));
-
-        ### Variable
-        my $static_plugin_path = $static_path . $p->{envelope} . '/';
-
-        ### SetVar(param)
-        $param->{blog_path} = $blog_path;
-        $param->{upload_folder} = $p->get_config_value('upload_folder', $scope);
-        $param->{static_plugin_path} = $static_plugin_path;
-        $param->{uploadify_source} = <<__MTML__;
-        <link href="${static_plugin_path}lib/uploadify/css/uploadify.css" rel="stylesheet" type="text/css" />
-        <script type="text/javascript" src="${static_plugin_path}lib/uploadify/scripts/swfobject.js"></script>
-__MTML__
-
-        ### Add uploadify-widget
-        my $host_node = $tmpl->getElementById('entry-status-widget');
-        my $new_node = $tmpl->createElement('app:widget',
-            {
-                id    => 'entry-uploadify-widget',
-                label => '<__trans_section component="mt_app_jquery"><__trans phrase="A multiple file upload"></__trans_section>',
-            }
-        );
-
-        my $inner_html = MTAppjQuery::Tmplset::uploadify_widget_innerHTML;
-        $inner_html =~ s!__IMAGES__!$img!g;
-        $inner_html =~ s!__FILES__!$file!g;
-        $new_node->innerHTML($inner_html);
-        $tmpl->insertAfter($new_node, $host_node);
-
-        ### Add asset_uploadify
-        $host_node = $tmpl->getElementById('keywords');
-        $new_node = $tmpl->createElement('app:Setting',
-            {
-                id    => 'asset_uploadify',
-                label => '<__trans_section component="mt_app_jquery"><__trans phrase="A multiple file upload"></__trans_section>',
-                label_class => 'top_label',
-            }
-        );
-        $inner_html = <<__MTML__;
-        <input type="text" name="asset_uploadify" id="asset_uploadify" value="<mt:var name="asset_uploadify">" class="full-width" mt:watch-change="1" />
-__MTML__
-        $new_node->innerHTML($inner_html);
-        $new_node->setAttribute('class','hidden');
-        $tmpl->insertAfter($new_node, $host_node);
-
-        ### Add asset_uploadify_meta
-        $new_node = $tmpl->createElement('app:Setting',
-            {
-                id    => 'asset_uploadify_meta',
-                label => '<__trans_section component="mt_app_jquery"><__trans phrase="A multiple file upload meta"></__trans_section>',
-                label_class => 'top_label',
-            }
-        );
-        $inner_html = <<__MTML__;
-        <input type="text" name="asset_uploadify_meta" id="asset_uploadify_meta" value="<mt:var name="asset_uploadify_meta">" class="full-width" mt:watch-change="1" />
-__MTML__
-        $new_node->innerHTML($inner_html);
-        $new_node->setAttribute('class','hidden');
-        $tmpl->insertAfter($new_node, $host_node);
-    };
-
 }
 
 sub template_param_edit_template {
@@ -658,92 +617,14 @@ sub template_param_edit_template {
     }
 }
 
-sub cms_post_save_entry {
-    my ($cb, $app, $obj, $orig_obj) = @_;
+sub template_param_cfg_plugin {
+    my ($cb, $app, $param, $tmpl) = @_;
 
-    my $blog = $app->blog;
-    my $user = $app->user;
+    my $scope_type = $param->{scope_type} || 'system';
+    return unless $scope_type eq 'system';
 
-    return if (! &is_user_can($blog, $user, 'upload'));
-
-    require MT::Asset;
-    require MT::ObjectAsset;
-
-    ### $app->
-    my $blog_id = $blog->id || 0;
-
-    ### $obj->
-    my $entry_id = $obj->id;
-
-    ### $p-> ($plugin->)
-    my $p = MT->component('mt_app_jquery');
-    my $scope = (!$blog_id) ? 'system' : 'blog:'.$blog_id;
-    my $active_uploadify = $p->get_config_value('active_uploadify', $scope);
-    return unless $active_uploadify;
-
-    my $asset_uploadify = $app->param('asset_uploadify');
-    my $asset_uploadify_meta = $app->param('asset_uploadify_meta');
-
-    my $headers = [
-        'queue_id',
-        'asset_blog_id',
-        'asset_class',
-        'asset_created_by',
-        #'asset_created_on',
-        'asset_file_ext',
-        'asset_file_name',
-        'asset_file_path',
-        'asset_label',
-        'asset_mime_type',
-        #'asset_modified_on',
-        'asset_url'
-    ];
-    my $headers_meta = ['queue_id','image_width','image_height'];
-
-    my $assets = _parse($asset_uploadify, $headers);
-    my $assets_meta = _parse($asset_uploadify_meta, $headers_meta);
-
-    foreach my $asset (@$assets) {
-        my $obj = MT::Asset::Image->new;
-        $obj->blog_id($blog_id) or return;
-        $obj->label($asset->{asset_label}) or return;
-        $obj->url($asset->{asset_url}) or return;
-        $obj->file_path($asset->{asset_file_path}) or return;
-        $obj->file_name($asset->{asset_file_name}) or return;
-        $obj->file_ext($asset->{asset_file_ext}) or return;
-        $obj->mime_type($asset->{asset_mime_type}) or return;
-        $obj->class($asset->{asset_class}) or return;
-        $obj->created_by($asset->{asset_created_by}) or return;
-        foreach my $asset_meta (@$assets_meta) {
-            if ($asset_meta->{queue_id} == $asset->{queue_id}) {
-                $obj->image_width($asset_meta->{image_width}) or return;
-                $obj->image_height($asset_meta->{image_height}) or return;
-            }
-        }
-        $obj->save or die 'Failed to save the item.';
-    }
-    my @saved_assets = MT::Asset::Image->load({
-        blog_id => $blog_id,
-    });
-    my @curt_post_assets_id = ();
-    foreach my $saved_asset (@saved_assets) {
-        my $saved_asset_id = $saved_asset->id;
-        my $saved_asset_filename = $saved_asset->file_name;
-        foreach my $asset (@$assets) {
-            if ($saved_asset_filename eq $asset->{asset_file_name}) {
-                push(@curt_post_assets_id, $saved_asset_id);
-            }
-        }
-    }
-
-    foreach my $asset_id (@curt_post_assets_id) {
-        my $obj_asset = MT::ObjectAsset->new;
-        $obj_asset->blog_id($blog_id);
-        $obj_asset->asset_id($asset_id);
-        $obj_asset->object_ds('entry');
-        $obj_asset->object_id($entry_id);
-        $obj_asset->save or die 'Failed to save the objectasset.';
-    }
+    require MT::App::DataAPI;
+    $param->{dataapi_default_version} = MT::App::DataAPI::DEFAULT_VERSION() || 1;;
 }
 
 sub cms_post_save_template {
@@ -775,30 +656,6 @@ sub save_config_filter {
         }
     }
     return 1;
-}
-
-sub _config_replace {
-    my ($str) = @_;
-    return '' if (! $str);
-    $str =~ s!__filepath__!' + fileObj.filePath.replace(/\\/\\//g,"/") + '!g;
-    $str =~ s!__filename__!' + fileObj.name + '!g;
-    return $str;
-}
-
-# http://d.hatena.ne.jp/perlcodesample/touch/20080621/1214058703
-sub _parse {
-    my ($text, $headers) = @_;
-
-    my @lines = split('\|', $text);
-
-    my $items_hash_list = [];
-    foreach my $line (@lines){
-        my @items = split(',', $line);
-        my %items_hash = ();
-        @items_hash{ @{ $headers } } = @items;
-        push @{ $items_hash_list },{ %items_hash };
-    }
-    wantarray ? return @{ $items_hash_list } : return $items_hash_list;
 }
 
 # Thank you very much!!
