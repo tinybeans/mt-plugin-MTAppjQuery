@@ -1084,7 +1084,7 @@
     // ---------------------------------------------------------------------
     //  $.MTAppTemplateListCustomize();
     // ---------------------------------------------------------------------
-    //                                             Latest update: 2015/11/25
+    //                                             Latest update: 2016/06/08
     //
     //  テンプレートの管理画面（一覧画面）を見やすくします。
     // ---------------------------------------------------------------------
@@ -1100,9 +1100,16 @@
                 for (var i = 0, l = op.templateNameSets.length; i < l; i++) {
                     var $firstTr;
                     var $tr;
-                    $tdList.find(':contains("' + op.templateNameSets[i]['pattern'] + '")').each(function(idx){
+                    $tdList.find('a').filter(function(idx, elm){
+                      if (op.templateNameSets[i]['keyword'] instanceof RegExp) {
+                        return op.templateNameSets[i]['keyword'].test(elm.innerHTML);
+                      }
+                      else {
+                        return elm.innerHTML.indexOf(op.templateNameSets[i]['keyword']) !== -1;
+                      }
+                    }).each(function(idx){
                         var _replacement = op.templateNameSets[i]['replacement'] ? op.templateNameSets[i]['replacement']: '';
-                        this.innerHTML = this.innerHTML.replace(op.templateNameSets[i]['pattern'], _replacement);
+                        this.innerHTML = this.innerHTML.replace(op.templateNameSets[i]['keyword'], _replacement);
                         this.style.position = 'relative';
                         this.style.left = '2em';
                         if (idx === 0) {
@@ -1134,9 +1141,16 @@
                 var $firstTd;
                 var $parentTbody;
                 for (var i = 0, l = op.templateNameSets.length; i < l; i++) {
-                    $tdList.find(':contains("' + op.templateNameSets[i]['pattern'] + '")').each(function(idx){
+                    $tdList.find('a').filter(function(idx, elm){
+                      if (op.templateNameSets[i]['keyword'] instanceof RegExp) {
+                        return op.templateNameSets[i]['keyword'].test(elm.innerHTML);
+                      }
+                      else {
+                        return elm.innerHTML.indexOf(op.templateNameSets[i]['keyword']) !== -1;
+                      }
+                    }).each(function(idx){
                         var _replacement = op.templateNameSets[i]['replacement'] ? op.templateNameSets[i]['replacement']: '';
-                        this.innerHTML = this.innerHTML.replace(op.templateNameSets[i]['pattern'], _replacement);
+                        this.innerHTML = this.innerHTML.replace(op.templateNameSets[i]['keyword'], _replacement);
                         if (idx === 0) {
                             $firstTd = $(this).parent().prepend('<span style="display:' + op.labelType + ';margin-right:5px;margin-bottom:5px;font-weight:' + op.labelWeight + ';">' + op.templateNameSets[i]['label'] + '</span>');
                             $firstTd.parent().attr('data-group-order', i);
