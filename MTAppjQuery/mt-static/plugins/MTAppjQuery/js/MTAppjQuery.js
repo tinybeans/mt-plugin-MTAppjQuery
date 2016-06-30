@@ -5658,6 +5658,10 @@
                 }
                 return 0;
             });
+        },
+        // ランダムに仮のIDを作成
+        temporaryId: function() {
+            return 'temp-' + ('' + Math.random()).replace(/[^\d]/g, '');
         }
     });
 
