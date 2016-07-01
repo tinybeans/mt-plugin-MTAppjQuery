@@ -559,6 +559,10 @@
                     var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")');
                     $this.val(result.replace(/^(\s|\n)+$/g, ''));
                 });
+                $this.on('MTAppJSONTableSave', function(){
+                    var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")');
+                    $this.val(result.replace(/^(\s|\n)+$/g, ''));
+                });
             }
             if (op.sortable && op.headerPosition === 'top') {
                 $table.sortable({
