@@ -4856,7 +4856,7 @@
                             var n = op.target == 'created_on' ? 0 : 1;
                             var date = new Date();
                             var ts = date.getTime();
-                            $('#entry-listing-table tbody tr').each(function(i){
+                            $('#' + mtappVars.type + '-listing-table tbody tr').each(function(i){
                                 var _ts = ts - ((i + 1) * (interval[op.interval] - 0));
                                 $(this).find('td.datetime:eq(' + n + ') input:text').val(getDatetimeFormat(_ts, op.interval));
                             });
