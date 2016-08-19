@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2015/12/27
+ * Update:  2016/08/19
  *
  */
 ;(function($){
@@ -1191,6 +1191,141 @@
         labelType: 'block' // String: 'block' or 'inline'
     };
     // end - $.MTAppTemplateListCustomize();
+
+
+    // ---------------------------------------------------------------------
+    //  $.MTAppUserMenuWidget();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2016/08/19
+    //
+    // オリジナルの管理メニューウィジェット・メニューを追加します。
+    //
+    // ---------------------------------------------------------------------
+    $.MTAppUserMenuWidget = function(options, words){
+        var op = $.extend({}, $.MTAppUserMenuWidget.defaults, options);
+        var language = mtappVars.language === 'ja' ? 'ja' : 'en';
+        var words = words || {};
+        var l10n = $.extend({}, $.MTAppUserMenuWidget.l10n[language], words);
+        if (!mtappVars.MTAppUserMenuWidget) {
+            mtappVars.MTAppUserMenuWidget = {
+                zIndex: 10000
+            };
+        }
+
+        var widgetLabel = op.label|| l10n.widgetName;
+        var widgetId = $.temporaryId();
+        var items = op.items;
+
+        // Template
+        var tmpl = {
+            container: '<div id="[#= id #]" class="mtapp-usermenu-container [#= type #]" style="width:[#= width #];">[#= widget #]</div>',
+            item: [
+                '[# if (header) { #]',
+                '<li class="mtapp-usermenu-header">',
+                '[# } else { #]',
+                '<li>',
+                '[# } #]',
+                    '[# if (url) { #]',
+                    '<a href="[#= url #]">[#= label #]</a>',
+                    '[# } else { #]',
+                    '<span class="header-label">[#= label #]</span>',
+                    '[# } #]',
+                    '[# if (excerpt) { #]',
+                    '<p class="excerpt">[#= excerpt #]</p>',
+                    '[# } #]',
+                    '[# if (hint) { #]',
+                    '<span class="hint">[#= hint #]</span>',
+                    '[# } #]',
+                '</li>'
+            ].join(''),
+            menu: '<li><a id="[#= target #]-open" class="mtapp-usermenu-open" href="#[#= target #]">[#= label #]</a></li>'
+        };
+        // Make <li>
+        var content = '';
+        if (items.length > 0) {
+            for (var i = 0, l = items.length; i < l; i++) {
+                content += Template.process('item', {
+                    label:  items[i].label,
+                    url:    items[i].url,
+                    hint:   items[i].hint,
+                    header: items[i].header,
+                    excerpt: items[i].excerpt
+                }, tmpl);
+            }
+        }
+        // Make widget HTML
+        var widget = $.MTAppMakeWidget({
+            label: widgetLabel,
+            content: '<ul>' + content + '</ul>'
+        });
+
+        // Insert HTML
+        if (op.type === 'dashboard' || op.type === 'both') {
+            if (mtappVars.screen_id === 'dashboard') {
+                // Make container included widget
+                var widgetContainer = Template.process('container', {
+                    type: 'dashboard',
+                    id: widgetId + '-widget',
+                    width: op.width,
+                    widget: widget
+                }, tmpl);
+                // Insert HTML
+                $('#widget-container-main').prepend(widgetContainer);
+            }
+        }
+        if (op.type === 'menu' || op.type === 'both') {
+            // Make container included widget
+            var widgetContainer = Template.process('container', {
+                type: 'menu',
+                id: widgetId,
+                width: op.width,
+                widget: widget
+            }, tmpl);
+            // Make HTML of menu
+            var menu = Template.process('menu', {target: widgetId, label: widgetLabel}, tmpl);
+            // Insert HTML
+            $('body').prepend(widgetContainer);
+            $('#user').before(menu);
+            $('#' + widgetId + '-open').on('click.MTAppUserMenuWidgetOpen', function(){
+                mtappVars.MTAppUserMenuWidget.zIndex++;
+                $('#' + widgetId).css('z-index', mtappVars.MTAppUserMenuWidget.zIndex).fadeToggle('fast');
+                return false;
+            })
+        }
+    };
+    $.MTAppUserMenuWidget.l10n = {
+      en: {
+          widgetName: 'User Menu'
+      },
+      ja: {
+          widgetName: 'ユーザーメニュー'
+      }
+    };
+    $.MTAppUserMenuWidget.defaults = {
+        label: '',
+        width: '300px',
+        type: 'both', // 'menu', 'dashboard' or 'both'
+        // e.g
+        // items: [
+        //   {
+        //     label: 'This is a header',
+        //     header: true,
+        //     hint: 'This is a header section.'
+        //   },
+        //   {
+        //     label: 'Create Book',
+        //     url: CMSScriptURI + '?__mode=view&_type=entry&blog_id=4&title=Book',
+        //     excerpt: 'Create a new entry with "Book" title in First Blog'
+        //   },
+        //   {
+        //     label: 'Create Magazine',
+        //     url: CMSScriptURI + '?__mode=view&_type=entry&blog_id=4&title=Magazine',
+        //     hint: 'Create a new entry with "Magazine" title in First Blog'
+        //   },
+        // ]
+        items: []
+    };
+    // end - $.MTAppUserMenuWidget();
 
 
     // -------------------------------------------------
