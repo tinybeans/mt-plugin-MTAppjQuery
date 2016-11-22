@@ -119,6 +119,12 @@
                     }
                 }
             }
+            // XSS対策
+            for (var i = 0, l = items.length; i < l; i++) {
+                for (var prop in items[i]) {
+                    items[i][prop] = items[i][prop].encodeHTML()
+                }
+            }
 
             op.items = items;
 
