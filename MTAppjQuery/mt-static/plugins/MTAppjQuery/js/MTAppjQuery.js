@@ -1229,7 +1229,7 @@
                 '[# if (header) { #]',
                 '<li class="mtapp-usermenu-header">',
                 '[# } else { #]',
-                '<li>',
+                '<li class="mtapp-usermenu-item">',
                 '[# } #]',
                     '[# if (url) { #]',
                     '<a href="[#= url #]">[#= label #]</a>',
