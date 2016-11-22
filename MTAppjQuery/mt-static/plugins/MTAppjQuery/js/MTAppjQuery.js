@@ -13,6 +13,178 @@
     mtappVars.adminScript = location.href.replace(/\?.*/, '');
 
     // ---------------------------------------------------------------------
+    //  $(foo).MTAppAssetFields();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2016/07/01
+    //
+    //  input:text で MT 標準の「アイテム」ダイアログを利用できるようにします。
+    //  id, filename, url, thumnail(imageのみ)の値を JSON で保存します。
+    // ---------------------------------------------------------------------
+    $.fn.MTAppAssetFields = function(options, words){
+        var op = $.extend({}, $.fn.MTAppAssetFields.defaults, options);
+
+        var language = mtappVars.language === 'ja' ? 'ja' : 'en';
+        var words = words || {};
+        var l10n = $.extend({}, $.fn.MTAppAssetFields.l10n[language], words);
+
+        // フィールド保存用スクリプト（MT標準のスクリプト）
+        var insertScriptHTML = [
+            '<scr' + 'ipt type="text/javascript">',
+            'function insertCustomFieldAsset(html, id, preview_html) {',
+            '    getByID(id).value = html;',
+            '    if ( !preview_html )',
+            '        preview_html = html ? html : \'\';',
+
+            '    try {',
+            '        /* remove the form enclosure from the preview */',
+            '        var enc = document.createElement( "div" );',
+            '        enc.innerHTML = preview_html;',
+            '        var form = enc.getElementsByTagName( "form" )[ 0 ];',
+            '        getByID(id + \'_preview\').innerHTML = form ? form.innerHTML : preview_html;',
+            '    } catch(e) { ',
+            '        log.error(e);',
+            '    };',
+            '    var remove_button = getByID(id + \'_remove_asset\');',
+            '    if (remove_button && html) {',
+            '        TC.removeClassName(getByID(id + \'_remove_asset\'), \'hidden\');',
+            '    }',
+            '    else if (remove_button) {',
+            '        TC.addClassName(getByID(id + \'_remove_asset\'), \'hidden\');',
+            '    }',
+            '}',
+            '</scr' + 'ipt>'
+        ];
+        $('body').append(insertScriptHTML.join(''));
+
+        // MTAppAssetFields を適用したフィールドの ID を保存する
+        if (!$('body').data('MTAppAssetFieldsIDs')) {
+            $('body').data('MTAppAssetFieldsIDs',[]);
+        }
+
+        // 保存時に form タグを置換する
+        var MTAppAssetFieldsSubmit = function(){
+            var ids = $('body').data('MTAppAssetFieldsIDs');
+            for (var i = 0, l = ids.length; i < l; i++) {
+                var $field = $('#' + ids[i]);
+                var value = $field.val();
+                if (/<form mt:asset-id/.test(value)) {
+                    value = value.replace(/<form mt:asset-id="(\d+)".+?href="([^"]+)">([^<]+).+/gi, '{"id":"$1","filename":"$3","url":"$2"}');
+                    var $customfieldPreviewImage = $field.next().find('img');
+                    if ($customfieldPreviewImage.length > 0) {
+                        var thumbURL = $customfieldPreviewImage.attr('src');
+                        value = value.replace(/\}$/, ',"thumbnail":' + '"' + thumbURL + '"}');
+                    }
+                    $field.val(value);
+                    if ($field.hasClass('jsontable-input')) {
+                        $field.closest('div.mtapp-json-table').prev().trigger('MTAppJSONTableSave');
+                    }
+                }
+            }
+            return true;
+        };
+        this.closest('form').off('submit.MTAppAssetFieldsSubmit').on('submit.MTAppAssetFieldsSubmit', MTAppAssetFieldsSubmit);
+
+        return this.each(function(){
+            var $this = $(this);
+            if (!op.debug) {
+                $this.hide();
+            }
+            if ($this.hasClass('isMTAppAssetFields')) {
+                return;
+            } else {
+                $this.addClass('isMTAppAssetFields')
+            }
+            // 要素のidを取得。ない場合はTemporary idを作成
+            var thisId = $this.attr('id') || $.temporaryId();
+            thisId = 'customfield_mtappassetfields_' + thisId;
+
+            // id を body の data に保存
+            var bodyData = $('body').data('MTAppAssetFieldsIDs');
+            bodyData.push(thisId);
+
+            $this.attr('id', thisId);
+
+            // アイテム用 HTML を作成
+            var assetTypeLabel = '';
+            if (op.assetTypeLabel !== '') {
+                assetTypeLabel = op.assetTypeLabel;
+            } else {
+                assetTypeLabel = l10n[op.assetType];
+            }
+            // - 保存されている値を取得(JSON)
+            var json = $this.val();
+            if (json) {
+                try {
+                    json = JSON.parse(json);
+                }
+                catch(e) {
+                    alert(e.message);
+                }
+            }
+            var itemThumbHTML = '';
+            var removeLinkHidden = 'hidden'
+            if (json.url) {
+                if (op.assetType === 'image') {
+                    itemThumbHTML = '<a href="' + json.url + '" target="_blank"><img src="' + json.thumbnail + '" alt=""></a>';
+                } else if (op.assetType === 'file') {
+                    itemThumbHTML = '<a href="' + json.url + '" target="_blank">' + json.filename + '</a>';
+                }
+                removeLinkHidden = '';
+            }
+            var html = [
+                '<div id="' + thisId +'_preview" class="customfield_preview">',
+                    itemThumbHTML,
+                '</div>',
+                '<div class="actions-bar" style="clear: none;">',
+                    '<div class="actions-bar-inner pkg actions">',
+                        '<a href="' + ScriptURI + '?__mode=list_asset&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;dialog_view=1&amp;filter=class&amp;filter_val=' + op.assetType + '&amp;require_type=' + op.assetType + '&amp;edit_field=' + thisId +'&amp;asset_select=1" class="mtapp-open-dialog">',
+                            assetTypeLabel + l10n.select,
+                        '</a>&nbsp;',
+                        '<a href="#" id="' + thisId +'_remove_asset" class="' + removeLinkHidden + '" type="submit" onclick="insertCustomFieldAsset(\'\', \'' + thisId +'\'); return false;">',
+                            assetTypeLabel + l10n.remove,
+                        '</a>',
+                  '</div>',
+                '</div>'
+            ].join('');
+
+            // アイテム用 HTML を挿入
+            $this.after(html);
+            $this.next().next().find('.mtapp-open-dialog').mtDialog();
+
+            return true;
+        });
+    };
+    $.fn.MTAppAssetFields.l10n = {
+      en: {
+          image: 'Image',
+          file: 'File',
+          select: ' Select',
+          remove: ' Remove'
+      },
+      ja: {
+          image: '画像',
+          file: 'ファイル',
+          select: 'を選択',
+          remove: 'を削除'
+
+      }
+    };
+    $.fn.MTAppAssetFields.defaults = {
+        // Set a blog ID which is a target to upload files.
+        blogId: mtappVars.blog_id,
+        // You can set either 'image' or 'file'
+        assetType: 'image',
+        // Set a text of <a> tag if you want to change.
+        assetTypeLabel: '',
+        // If set to true, you can edit images in a dialog.
+        edit: false,
+        // If set to true, the original field is shown.
+        debug: false
+    };
+    // end - $.MTAppAssetFields();
+
+
+    // ---------------------------------------------------------------------
     //  $(foo).MTAppJSONTable();
     // ---------------------------------------------------------------------
     //                                             Latest update: 2016/05/11
