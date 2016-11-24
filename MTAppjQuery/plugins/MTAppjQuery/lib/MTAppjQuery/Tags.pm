@@ -1,5 +1,6 @@
 package MTAppjQuery::Tags;
 use strict;
+use warnings;
 use MT::Util qw(remove_html);
 use Data::Dumper;
 
@@ -226,6 +227,13 @@ sub _fltr_compress {
     $str =~ s/\n//g;
   }
   return $str;
+}
+
+sub _fltr_remove_host {
+    my ($str, $arg, $ctx) = @_;
+    return $str unless $arg;
+    $str =~ s/https?:\/\/[^\/\s'"]*\/?/\//g;
+    return $str;
 }
 
 sub _fltr_json_decode {

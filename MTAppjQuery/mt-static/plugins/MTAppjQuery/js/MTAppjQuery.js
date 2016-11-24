@@ -4,13 +4,183 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2015/12/27
+ * Update:  2016/11/24
  *
  */
 ;(function($){
 
     if (typeof mtappVars !== 'object') return;
     mtappVars.adminScript = location.href.replace(/\?.*/, '');
+
+    // ---------------------------------------------------------------------
+    //  $(foo).MTAppAssetFields();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2016/07/01
+    //
+    //  input:text で MT 標準の「アイテム」ダイアログを利用できるようにします。
+    //  id, filename, url, thumnail(imageのみ)の値を JSON で保存します。
+    // ---------------------------------------------------------------------
+    $.fn.MTAppAssetFields = function(options, words){
+        var op = $.extend({}, $.fn.MTAppAssetFields.defaults, options);
+
+        var language = mtappVars.language === 'ja' ? 'ja' : 'en';
+        var words = words || {};
+        var l10n = $.extend({}, $.fn.MTAppAssetFields.l10n[language], words);
+
+        // フィールド保存用スクリプト（MT標準のスクリプト）
+        var insertScriptHTML = [
+            '<scr' + 'ipt type="text/javascript">',
+            'function insertCustomFieldAsset(html, id, preview_html) {',
+            '    getByID(id).value = html;',
+            '    if ( !preview_html )',
+            '        preview_html = html ? html : \'\';',
+
+            '    try {',
+            '        /* remove the form enclosure from the preview */',
+            '        var enc = document.createElement( "div" );',
+            '        enc.innerHTML = preview_html;',
+            '        var form = enc.getElementsByTagName( "form" )[ 0 ];',
+            '        getByID(id + \'_preview\').innerHTML = form ? form.innerHTML : preview_html;',
+            '    } catch(e) { ',
+            '        log.error(e);',
+            '    };',
+            '    var remove_button = getByID(id + \'_remove_asset\');',
+            '    if (remove_button && html) {',
+            '        TC.removeClassName(getByID(id + \'_remove_asset\'), \'hidden\');',
+            '    }',
+            '    else if (remove_button) {',
+            '        TC.addClassName(getByID(id + \'_remove_asset\'), \'hidden\');',
+            '    }',
+            '}',
+            '</scr' + 'ipt>'
+        ];
+        $('body').append(insertScriptHTML.join(''));
+
+        // MTAppAssetFields を適用したフィールドの ID を保存する
+        if (!$('body').data('MTAppAssetFieldsIDs')) {
+            $('body').data('MTAppAssetFieldsIDs',[]);
+        }
+
+        // 保存時に form タグを置換する
+        var MTAppAssetFieldsSubmit = function(){
+            var ids = $('body').data('MTAppAssetFieldsIDs');
+            for (var i = 0, l = ids.length; i < l; i++) {
+                var $field = $('#' + ids[i]);
+                var value = $field.val();
+                if (/<form mt:asset-id/.test(value)) {
+                    value = value.replace(/<form mt:asset-id="(\d+)".+?href="([^"]+)">([^<]+).+/gi, '{"id":"$1","filename":"$3","url":"$2"}');
+                    var $customfieldPreviewImage = $field.next().find('img');
+                    if ($customfieldPreviewImage.length > 0) {
+                        var thumbURL = $customfieldPreviewImage.attr('src');
+                        value = value.replace(/\}$/, ',"thumbnail":' + '"' + thumbURL + '"}');
+                    }
+                    $field.val(value);
+                    if ($field.hasClass('jsontable-input')) {
+                        $field.closest('div.mtapp-json-table').prev().trigger('MTAppJSONTableSave');
+                    }
+                }
+            }
+            return true;
+        };
+        this.closest('form').off('submit.MTAppAssetFieldsSubmit').on('submit.MTAppAssetFieldsSubmit', MTAppAssetFieldsSubmit);
+
+        return this.each(function(){
+            var $this = $(this);
+            if (!op.debug) {
+                $this.hide();
+            }
+            if ($this.hasClass('isMTAppAssetFields')) {
+                return;
+            } else {
+                $this.addClass('isMTAppAssetFields');
+            }
+            // 要素のidを取得。ない場合はTemporary idを作成
+            var thisId = $this.attr('id') || $.temporaryId();
+            thisId = 'customfield_mtappassetfields_' + thisId;
+
+            // id を body の data に保存
+            var bodyData = $('body').data('MTAppAssetFieldsIDs');
+            bodyData.push(thisId);
+
+            $this.attr('id', thisId);
+
+            // アイテム用 HTML を作成
+            var assetTypeLabel = '';
+            if (op.assetTypeLabel !== '') {
+                assetTypeLabel = op.assetTypeLabel;
+            } else {
+                assetTypeLabel = l10n[op.assetType];
+            }
+            // - 保存されている値を取得(JSON)
+            var json = $this.val();
+            if (json) {
+                try {
+                    json = JSON.parse(json);
+                }
+                catch(e) {
+                    alert(e.message);
+                }
+            }
+            var itemThumbHTML = '';
+            var removeLinkHidden = 'hidden'
+            if (json.url) {
+                if (op.assetType === 'image') {
+                    itemThumbHTML = '<a href="' + json.url + '" target="_blank"><img src="' + json.thumbnail + '" alt=""></a>';
+                } else if (op.assetType === 'file') {
+                    itemThumbHTML = '<a href="' + json.url + '" target="_blank">' + json.filename + '</a>';
+                }
+                removeLinkHidden = '';
+            }
+            var html = [
+                '<div id="' + thisId +'_preview" class="customfield_preview">',
+                    itemThumbHTML,
+                '</div>',
+                '<div class="actions-bar" style="clear: none;">',
+                    '<div class="actions-bar-inner pkg actions">',
+                        '<a href="' + ScriptURI + '?__mode=list_asset&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;dialog_view=1&amp;filter=class&amp;filter_val=' + op.assetType + '&amp;require_type=' + op.assetType + '&amp;edit_field=' + thisId +'&amp;asset_select=1" class="mtapp-open-dialog">',
+                            assetTypeLabel + l10n.select,
+                        '</a>&nbsp;',
+                        '<a href="#" id="' + thisId +'_remove_asset" class="' + removeLinkHidden + '" type="submit" onclick="insertCustomFieldAsset(\'\', \'' + thisId +'\'); return false;">',
+                            assetTypeLabel + l10n.remove,
+                        '</a>',
+                  '</div>',
+                '</div>'
+            ].join('');
+
+            // アイテム用 HTML を挿入
+            $this.after(html);
+            $this.next().next().find('.mtapp-open-dialog').mtDialog();
+
+            return true;
+        });
+    };
+    $.fn.MTAppAssetFields.l10n = {
+      en: {
+          image: 'Image',
+          file: 'File',
+          select: ' Select',
+          remove: ' Remove'
+      },
+      ja: {
+          image: '画像',
+          file: 'ファイル',
+          select: 'を選択',
+          remove: 'を削除'
+
+      }
+    };
+    $.fn.MTAppAssetFields.defaults = {
+        // You can set either 'image' or 'file'
+        assetType: 'image',
+        // Set a text of <a> tag if you want to change.
+        assetTypeLabel: '',
+        // If set to true, you can edit images in a dialog.
+        edit: false,
+        // If set to true, the original field is shown.
+        debug: false
+    };
+    // end - $.MTAppAssetFields();
+
 
     // ---------------------------------------------------------------------
     //  $(foo).MTAppJSONTable();
@@ -116,6 +286,17 @@
                 for (var x = 0, y = items.length; x < y; x++) {
                     if (!items[x].hasOwnProperty(order[i])) {
                         items[x][order[i]] = '';
+                    }
+                }
+            }
+            // XSS対策
+            for (var i = 0, l = items.length; i < l; i++) {
+                for (var prop in items[i]) {
+                    if (typeof items[i][prop] === 'string') {
+                        items[i][prop] = items[i][prop].encodeHTML();
+                    }
+                    else if (typeof items[i][prop] === 'object') {
+                        items[i][prop] = JSON.stringify(items[i][prop]);
                     }
                 }
             }
@@ -556,7 +737,11 @@
                     if ($this.is(':visible')) {
                         return true;
                     }
-                    var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")');
+                    var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")', op.nest);
+                    $this.val(result.replace(/^(\s|\n)+$/g, ''));
+                });
+                $this.on('MTAppJSONTableSave', function(){
+                    var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")', op.nest);
                     $this.val(result.replace(/^(\s|\n)+$/g, ''));
                 });
             }
@@ -571,7 +756,7 @@
             }
         });
     };
-    $.fn.MTAppJSONTable.save = function(headerPosition, itemsRootKey, $table, filter){
+    $.fn.MTAppJSONTable.save = function(headerPosition, itemsRootKey, $table, filter, nest){
         var values = '';
         var itemsArray = [];
         if (typeof filter !== 'string') {
@@ -582,6 +767,16 @@
                 var item = {};
                 $(this).find('.jsontable-input').each(function(){
                     var v = $(this).val();
+                    if (nest) {
+                        if (/^\s*".+?"\s*$/.test(v)) {
+                            v = JSON.stringify(v);
+                        }
+                        try {
+                            v = JSON.parse(v);
+                        } catch (e) {
+                            // nothing to do
+                        }
+                    }
                     item[$(this).attr('data-name')] = v;
 
                     // cellMerge
@@ -591,7 +786,6 @@
                     if ($(this).parent().attr('rowspan')) {
                         item[$(this).attr('data-name') + '_rowspan'] = $(this).parent().attr('rowspan');
                     }
-
                     values += v;
                 });
                 itemsArray.push(JSON.stringify(item));
@@ -607,6 +801,16 @@
             $tr.each(function(i){
                 $(this).find('.jsontable-input').each(function(j){
                     var v = $(this).val();
+                    if (nest) {
+                        if (/^\s*".+?"\s*$/.test(v)) {
+                            v = JSON.stringify(v);
+                        }
+                        try {
+                            v = JSON.parse(v);
+                        } catch (e) {
+                            // nothing to do
+                        }
+                    }
                     var idx = $(this).parent().attr('data-item-index');
                     itemsArrayObj[idx][$(this).attr('data-name')] = v;
 
@@ -654,6 +858,7 @@
         cbAfterSelectRow: null, // function({name: 'cbAfterSelectRow'}, $tr, $(this).is(':checked')){}
         cbAfterSelectColumn: null, // function({name: 'cbAfterSelectColumn'}, $td, $(this).is(':checked')){}
 
+        nest: false, // backward compatible
         debug: false // true: show the original textarea.
     };
     // end - $.fn.MTAppJSONTable()
@@ -1187,6 +1392,141 @@
         labelType: 'block' // String: 'block' or 'inline'
     };
     // end - $.MTAppTemplateListCustomize();
+
+
+    // ---------------------------------------------------------------------
+    //  $.MTAppUserMenuWidget();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2016/08/19
+    //
+    // オリジナルの管理メニューウィジェット・メニューを追加します。
+    //
+    // ---------------------------------------------------------------------
+    $.MTAppUserMenuWidget = function(options, words){
+        var op = $.extend({}, $.MTAppUserMenuWidget.defaults, options);
+        var language = mtappVars.language === 'ja' ? 'ja' : 'en';
+        var words = words || {};
+        var l10n = $.extend({}, $.MTAppUserMenuWidget.l10n[language], words);
+        if (!mtappVars.MTAppUserMenuWidget) {
+            mtappVars.MTAppUserMenuWidget = {
+                zIndex: 10000
+            };
+        }
+
+        var widgetLabel = op.label|| l10n.widgetName;
+        var widgetId = $.temporaryId();
+        var items = op.items;
+
+        // Template
+        var tmpl = {
+            container: '<div id="[#= id #]" class="mtapp-usermenu-container [#= type #]" style="width:[#= width #];">[#= widget #]</div>',
+            item: [
+                '[# if (header) { #]',
+                '<li class="mtapp-usermenu-header">',
+                '[# } else { #]',
+                '<li class="mtapp-usermenu-item">',
+                '[# } #]',
+                    '[# if (url) { #]',
+                    '<a href="[#= url #]">[#= label #]</a>',
+                    '[# } else { #]',
+                    '<span class="header-label">[#= label #]</span>',
+                    '[# } #]',
+                    '[# if (excerpt) { #]',
+                    '<p class="excerpt">[#= excerpt #]</p>',
+                    '[# } #]',
+                    '[# if (hint) { #]',
+                    '<span class="hint">[#= hint #]</span>',
+                    '[# } #]',
+                '</li>'
+            ].join(''),
+            menu: '<li><a id="[#= target #]-open" class="mtapp-usermenu-open" href="#[#= target #]">[#= label #]</a></li>'
+        };
+        // Make <li>
+        var content = '';
+        if (items.length > 0) {
+            for (var i = 0, l = items.length; i < l; i++) {
+                content += Template.process('item', {
+                    label:  items[i].label,
+                    url:    items[i].url,
+                    hint:   items[i].hint,
+                    header: items[i].header,
+                    excerpt: items[i].excerpt
+                }, tmpl);
+            }
+        }
+        // Make widget HTML
+        var widget = $.MTAppMakeWidget({
+            label: widgetLabel,
+            content: '<ul>' + content + '</ul>'
+        });
+
+        // Insert HTML
+        if (op.type === 'dashboard' || op.type === 'both') {
+            if (mtappVars.screen_id === 'dashboard') {
+                // Make container included widget
+                var widgetContainer = Template.process('container', {
+                    type: 'dashboard',
+                    id: widgetId + '-widget',
+                    width: op.width,
+                    widget: widget
+                }, tmpl);
+                // Insert HTML
+                $('#widget-container-main').prepend(widgetContainer);
+            }
+        }
+        if (op.type === 'menu' || op.type === 'both') {
+            // Make container included widget
+            var widgetContainer = Template.process('container', {
+                type: 'menu',
+                id: widgetId,
+                width: op.width,
+                widget: widget
+            }, tmpl);
+            // Make HTML of menu
+            var menu = Template.process('menu', {target: widgetId, label: widgetLabel}, tmpl);
+            // Insert HTML
+            $('body').prepend(widgetContainer);
+            $('#user').before(menu);
+            $('#' + widgetId + '-open').on('click.MTAppUserMenuWidgetOpen', function(){
+                mtappVars.MTAppUserMenuWidget.zIndex++;
+                $('#' + widgetId).css('z-index', mtappVars.MTAppUserMenuWidget.zIndex).fadeToggle('fast');
+                return false;
+            })
+        }
+    };
+    $.MTAppUserMenuWidget.l10n = {
+      en: {
+          widgetName: 'User Menu'
+      },
+      ja: {
+          widgetName: 'ユーザーメニュー'
+      }
+    };
+    $.MTAppUserMenuWidget.defaults = {
+        label: '',
+        width: '300px',
+        type: 'both', // 'menu', 'dashboard' or 'both'
+        // e.g
+        // items: [
+        //   {
+        //     label: 'This is a header',
+        //     header: true,
+        //     hint: 'This is a header section.'
+        //   },
+        //   {
+        //     label: 'Create Book',
+        //     url: CMSScriptURI + '?__mode=view&_type=entry&blog_id=4&title=Book',
+        //     excerpt: 'Create a new entry with "Book" title in First Blog'
+        //   },
+        //   {
+        //     label: 'Create Magazine',
+        //     url: CMSScriptURI + '?__mode=view&_type=entry&blog_id=4&title=Magazine',
+        //     hint: 'Create a new entry with "Magazine" title in First Blog'
+        //   },
+        // ]
+        items: []
+    };
+    // end - $.MTAppUserMenuWidget();
 
 
     // -------------------------------------------------
@@ -4852,7 +5192,7 @@
                             var n = op.target == 'created_on' ? 0 : 1;
                             var date = new Date();
                             var ts = date.getTime();
-                            $('#entry-listing-table tbody tr').each(function(i){
+                            $('#' + mtappVars.type + '-listing-table tbody tr').each(function(i){
                                 var _ts = ts - ((i + 1) * (interval[op.interval] - 0));
                                 $(this).find('td.datetime:eq(' + n + ') input:text').val(getDatetimeFormat(_ts, op.interval));
                             });
@@ -5658,6 +5998,10 @@
                 }
                 return 0;
             });
+        },
+        // ランダムに仮のIDを作成
+        temporaryId: function() {
+            return 'temp-' + ('' + Math.random()).replace(/[^\d]/g, '');
         }
     });
 

@@ -2,7 +2,7 @@ package MT::Plugin::MTAppjQuery;
 use strict;
 use base qw( MT::Plugin );
 
-our $VERSION = '1.9.0';
+our $VERSION = '1.10.0';
 
 my $plugin = MT::Plugin::MTAppjQuery->new({
     id          => 'mt_app_jquery',
@@ -105,6 +105,7 @@ sub init_registry {
                 'split_format' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_split_format',
                 'nengou' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_nengou',
                 'compress' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_compress',
+                'remove_host' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_remove_host',
                 'json_decode' => '$mt_app_jquery::MTAppjQuery::Tags::_fltr_json_decode',
             },
         },
