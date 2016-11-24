@@ -294,7 +294,12 @@
             // XSS対策
             for (var i = 0, l = items.length; i < l; i++) {
                 for (var prop in items[i]) {
-                    items[i][prop] = items[i][prop].encodeHTML()
+                    if (typeof items[i][prop] === 'string') {
+                        items[i][prop] = items[i][prop].encodeHTML();
+                    }
+                    else if (typeof items[i][prop] === 'object') {
+                        items[i][prop] = JSON.stringify(items[i][prop]);
+                    }
                 }
             }
 
