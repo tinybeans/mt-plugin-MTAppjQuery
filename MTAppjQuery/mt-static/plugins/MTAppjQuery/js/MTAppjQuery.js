@@ -170,8 +170,6 @@
       }
     };
     $.fn.MTAppAssetFields.defaults = {
-        // Set a blog ID which is a target to upload files.
-        blogId: mtappVars.blog_id,
         // You can set either 'image' or 'file'
         assetType: 'image',
         // Set a text of <a> tag if you want to change.
