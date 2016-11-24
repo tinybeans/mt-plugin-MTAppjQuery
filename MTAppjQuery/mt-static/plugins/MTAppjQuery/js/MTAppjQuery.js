@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2016/08/19
+ * Update:  2016/11/24
  *
  */
 ;(function($){
