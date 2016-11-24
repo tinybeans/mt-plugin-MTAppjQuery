@@ -664,3 +664,37 @@ span.mtappmultiform-radio input {
   display: none !important; }
 
 /*  MTAppCategorySwitch  */
+/* ==================================================
+    MTAppUserMenuWidget
+================================================== */
+.mtapp-usermenu-container.dashboard {
+  width: 100% !important;
+  margin-bottom: 15px; }
+
+.mtapp-usermenu-container.menu {
+  display: none;
+  position: absolute;
+  top: 32px;
+  right: 1px;
+  border-radius: 3px;
+  box-shadow: 0 3px 12px 0 rgba(0, 0, 0, 0.3);
+  z-index: 10000; }
+
+.mtapp-usermenu-container .widget {
+  margin-bottom: 0; }
+  .mtapp-usermenu-container .widget .mtapp-usermenu-header {
+    padding: 5px;
+    background-color: #e6e6e6; }
+    .mtapp-usermenu-container .widget .mtapp-usermenu-header .header-label {
+      font-size: 14px;
+      font-weight: bold; }
+  .mtapp-usermenu-container .widget .excerpt {
+    margin-bottom: 0; }
+  .mtapp-usermenu-container .widget .hint {
+    display: block; }
+
+#utility-nav a.mtapp-usermenu-open {
+  padding: 0 10px;
+  border-right: 1px solid #666666; }
+
+/*  MTAppUserMenuWidget  */
