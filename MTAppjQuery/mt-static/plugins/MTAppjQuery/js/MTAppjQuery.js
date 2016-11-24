@@ -92,7 +92,7 @@
             if ($this.hasClass('isMTAppAssetFields')) {
                 return;
             } else {
-                $this.addClass('isMTAppAssetFields')
+                $this.addClass('isMTAppAssetFields');
             }
             // 要素のidを取得。ない場合はTemporary idを作成
             var thisId = $this.attr('id') || $.temporaryId();
@@ -734,11 +734,11 @@
                     if ($this.is(':visible')) {
                         return true;
                     }
-                    var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")');
+                    var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")', op.nest);
                     $this.val(result.replace(/^(\s|\n)+$/g, ''));
                 });
                 $this.on('MTAppJSONTableSave', function(){
-                    var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")');
+                    var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")', op.nest);
                     $this.val(result.replace(/^(\s|\n)+$/g, ''));
                 });
             }
@@ -753,7 +753,7 @@
             }
         });
     };
-    $.fn.MTAppJSONTable.save = function(headerPosition, itemsRootKey, $table, filter){
+    $.fn.MTAppJSONTable.save = function(headerPosition, itemsRootKey, $table, filter, nest){
         var values = '';
         var itemsArray = [];
         if (typeof filter !== 'string') {
@@ -764,6 +764,16 @@
                 var item = {};
                 $(this).find('.jsontable-input').each(function(){
                     var v = $(this).val();
+                    if (nest) {
+                        if (/^\s*".+?"\s*$/.test(v)) {
+                            v = JSON.stringify(v);
+                        }
+                        try {
+                            v = JSON.parse(v);
+                        } catch (e) {
+                            // nothing to do
+                        }
+                    }
                     item[$(this).attr('data-name')] = v;
 
                     // cellMerge
@@ -773,7 +783,6 @@
                     if ($(this).parent().attr('rowspan')) {
                         item[$(this).attr('data-name') + '_rowspan'] = $(this).parent().attr('rowspan');
                     }
-
                     values += v;
                 });
                 itemsArray.push(JSON.stringify(item));
@@ -789,6 +798,16 @@
             $tr.each(function(i){
                 $(this).find('.jsontable-input').each(function(j){
                     var v = $(this).val();
+                    if (nest) {
+                        if (/^\s*".+?"\s*$/.test(v)) {
+                            v = JSON.stringify(v);
+                        }
+                        try {
+                            v = JSON.parse(v);
+                        } catch (e) {
+                            // nothing to do
+                        }
+                    }
                     var idx = $(this).parent().attr('data-item-index');
                     itemsArrayObj[idx][$(this).attr('data-name')] = v;
 
@@ -836,6 +855,7 @@
         cbAfterSelectRow: null, // function({name: 'cbAfterSelectRow'}, $tr, $(this).is(':checked')){}
         cbAfterSelectColumn: null, // function({name: 'cbAfterSelectColumn'}, $td, $(this).is(':checked')){}
 
+        nest: false, // backward compatible
         debug: false // true: show the original textarea.
     };
     // end - $.fn.MTAppJSONTable()
