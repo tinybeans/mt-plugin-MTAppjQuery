@@ -5528,7 +5528,7 @@
     // ---------------------------------------------------------------------
     $.MTAppMoveToWidget = function(options){
         var op = $.extend({}, $.MTAppMoveToWidget.defaults, options);
-        if (mtappVars.screen_id !== 'edit-entry') {
+        if (mtappVars.screen_id !== 'edit-entry' && mtappVars.screen_id !== 'edit-page') {
             return;
         }
         if (op.pointerSelector === '') {
