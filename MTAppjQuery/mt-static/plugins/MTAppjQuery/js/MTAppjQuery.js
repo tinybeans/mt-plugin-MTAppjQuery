@@ -185,7 +185,7 @@
     // ---------------------------------------------------------------------
     //  $(foo).MTAppJSONTable();
     // ---------------------------------------------------------------------
-    //                                             Latest update: 2016/05/11
+    //                                             Latest update: 2017/01/10
     //
     //  textareaを表形式の入力欄にし、表に入力された値をJSONで元のtextareaに保存します。
     //  このメソッドで扱えるJSONのフォーマットは下記の通りです。
@@ -593,6 +593,9 @@
                 $container.on('click', 'div.add-btn a', function(){
                     if ($(this).hasClass('jsontable-add-row')) {
                         var plainTr = Template.process('tbodyTopPlain', op, tmpl);
+                        if (op.cbBeforeAdd !== null && typeof op.cbBeforeAdd === 'function') {
+                            op.cbBeforeAdd({name: 'cbBeforeAdd', type: 'row'}, $container);
+                        }
                         $table.find('tbody').append(plainTr);
                         if (op.cbAfterAdd !== null && typeof op.cbAfterAdd === 'function') {
                             op.cbAfterAdd({name: 'cbAfterAdd', type: 'row'}, $container);
@@ -737,12 +740,24 @@
                     if ($this.is(':visible')) {
                         return true;
                     }
+                    if (op.cbBeforeSave !== null && typeof op.cbBeforeSave === 'function') {
+                        op.cbBeforeSave({name: 'cbBeforeSave'}, $container, $this);
+                    }
                     var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")', op.nest);
                     $this.val(result.replace(/^(\s|\n)+$/g, ''));
+                    if (op.cbAfterSave !== null && typeof op.cbAfterSave === 'function') {
+                        op.cbAfterSave({name: 'cbAfterSave'}, $container, $this, result);
+                    }
                 });
                 $this.on('MTAppJSONTableSave', function(){
+                    if (op.cbBeforeSave !== null && typeof op.cbBeforeSave === 'function') {
+                        op.cbBeforeSave({name: 'cbBeforeSave'}, $container, $this);
+                    }
                     var result = $.fn.MTAppJSONTable.save(op.headerPosition, op.itemsRootKey, $table, ':not(".hidden")', op.nest);
                     $this.val(result.replace(/^(\s|\n)+$/g, ''));
+                    if (op.cbAfterSave !== null && typeof op.cbAfterSave === 'function') {
+                        op.cbAfterSave({name: 'cbAfterSave'}, $container, $this, result);
+                    }
                 });
             }
             if (op.sortable && op.headerPosition === 'top') {
@@ -857,6 +872,8 @@
         cbBeforeClear: null, // function({name: 'cbAfterAdd'}, $container){}
         cbAfterSelectRow: null, // function({name: 'cbAfterSelectRow'}, $tr, $(this).is(':checked')){}
         cbAfterSelectColumn: null, // function({name: 'cbAfterSelectColumn'}, $td, $(this).is(':checked')){}
+        cbBeforeSave: null, // function({name: 'cbBeforeSave'}, $container, $this){}
+        cbAfterSave: null, // function({name: 'cbAfterSave'}, $container, $this, savedJSON){}
 
         nest: false, // backward compatible
         debug: false // true: show the original textarea.
