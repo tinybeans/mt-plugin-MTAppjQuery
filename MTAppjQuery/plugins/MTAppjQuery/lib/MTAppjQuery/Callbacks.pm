@@ -6,6 +6,7 @@ use MT::Blog;
 use MT::Util;
 use MTAppjQuery::Tmplset;
 use MT::Permission;
+use CustomFields::Util qw( get_meta );
 
 sub template_source_dashboard {
     my ($cb, $app, $tmpl_ref) = @_;
@@ -24,6 +25,25 @@ sub template_source_header {
     my $p = MT->component('mt_app_jquery');
     my $blog = $app->blog;
     my $author = $app->user;
+
+    # 表示しているウェブサイト/ブログの情報を JSON で `mtappVars.current_site` にセット
+    my $current_site_json = 'null';
+    if (defined $blog) {
+        my $current_site = $blog->{column_values};
+        $current_site->{customfields} = get_meta($blog);
+        $current_site_json =MT::Util::to_json($current_site);
+    }
+
+    # ログインしているユーザーの情報をカスタムフィールドも含めて JSON で `mtappVars.me` にセット
+    my $me = $author->{column_values};
+    if (defined $me->{password}) {
+        delete $me->{password};
+    }
+    if (defined $me->{api_password}) {
+        delete $me->{api_password};
+    }
+    $me->{customfields} = get_meta($author);
+    my $me_json = MT::Util::to_json($me);
 
     # システム管理者かどうか
     my $is_superuser = 0;
@@ -315,6 +335,7 @@ __MTML__
         "language" : "<mt:Var name="config.DefaultLanguage">",
         "type" : "${_type}",
         "mode" : "${mode}",
+        "me" : ${me_json},
         "author_id" : <mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if>,
         "author_name" : "<mt:var name="author_name" encode_js="1">",
         "author_permissions" : [$permissions],
@@ -330,6 +351,7 @@ __MTML__
         "template_id" : ${template_id},
         "template_identifier" : '<mt:Var name="identifier">',
         "modified_by" : "<mt:Var name="modified_by">",
+        "current_site" : ${current_site_json},
         "blog_id" : ${blog_id},
         "blog_name" : "<mt:var name="blog_name">",
         "blog_url" : "<mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if>",
@@ -391,6 +413,8 @@ __MTML__
     <mt:SetVarBlock name="mtappVars" key="debug_mode"><mt:Var name="config.DebugMode"></mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="language"><mt:Var name="config.DefaultLanguage"></mt:SetVarBlock>
 
+    <mt:SetVarBlock name="mtappVars" key="current_site">${current_site_json}</mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="me">${me_json}</mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="author_permissions"><mt:SetVarBlock name="_author_permissions">${permissions}</mt:SetVarBlock>,<mt:Var name="_author_permissions" replace="'","">,</mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="author_roles"><mt:SetVarBlock name="_author_roles">${role_names}</mt:SetVarBlock>,<mt:Var name="_author_roles" replace='"',''>,</mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="author_name"><mt:var name="author_name"></mt:SetVarBlock>
