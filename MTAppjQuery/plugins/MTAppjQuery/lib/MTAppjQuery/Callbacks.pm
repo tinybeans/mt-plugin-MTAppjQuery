@@ -263,6 +263,7 @@ __MTML__
                 if ($is_superuser == 1 or $perms_blog_id eq $blog->id) {
                     # Set into $can_access_blogs
                     my $simple_blog = {};
+                    my $detailed_blog = {};
                     if ($op_blogs_json_detail ne '1') {
                         $simple_blog->{id} = $blog_id;
                         $simple_blog->{name} = $blog->name;
@@ -271,9 +272,11 @@ __MTML__
                         push @{$parent_website->{$parent_website_key}}, $simple_blog;
                     }
                     else {
-                        push @{$can_access_blogs->{blog}}, $blog->{column_values};
+                        $detailed_blog = $blog->{column_values};
+                        $detailed_blog->{customfields} = get_meta($blog);
+                        push @{$can_access_blogs->{blog}}, $detailed_blog;
                         # Set into $parent_website
-                        push @{$parent_website->{$parent_website_key}}, $blog->{column_values};
+                        push @{$parent_website->{$parent_website_key}}, $detailed_blog;
                     }
                     last;
                 }
@@ -284,6 +287,7 @@ __MTML__
             foreach my $perms_blog_id (@perms_blog_ids) {
                 if ($is_superuser == 1 or $perms_blog_id eq $website_id) {
                     my $simple_website = {};
+                    my $detailed_website = {};
                     if ($op_blogs_json_detail ne '1') {
                         $simple_website->{id} = $website_id;
                         $simple_website->{name} = $website->name;
@@ -291,8 +295,10 @@ __MTML__
                         push @{$can_access_blogs->{website}}, $simple_website;
                     }
                     else {
-                        $website->{column_values}->{children} = $parent_website->{'website-' . $website_id} || [];
-                        push @{$can_access_blogs->{website}}, $website->{column_values};
+                        $detailed_website = $website->{column_values};
+                        $detailed_website->{customfields} = get_meta($website);
+                        $detailed_website->{children} = $parent_website->{'website-' . $website_id} || [];
+                        push @{$can_access_blogs->{website}}, $detailed_website;
                     }
                     last;
                 }
