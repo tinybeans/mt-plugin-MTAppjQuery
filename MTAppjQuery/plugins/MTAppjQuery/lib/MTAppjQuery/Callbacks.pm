@@ -6,12 +6,18 @@ use MT::Blog;
 use MT::Util;
 use MTAppjQuery::Tmplset;
 use MT::Permission;
+use CustomFields::Util qw( get_meta );
 
 sub template_source_dashboard {
     my ($cb, $app, $tmpl_ref) = @_;
 
+    my $url = $app->uri(mode => 'dashboard', args => undef);
     if ($app->request('fresh_login')) {
-        my $url = $app->uri(mode => 'dashboard', args => undef);
+        $app->redirect($url);
+    }
+
+    my $q = $app->param;
+    if ($q->param('__mode') eq '') {
         $app->redirect($url);
     }
 }
@@ -24,6 +30,25 @@ sub template_source_header {
     my $p = MT->component('mt_app_jquery');
     my $blog = $app->blog;
     my $author = $app->user;
+
+    # 表示しているウェブサイト/ブログの情報を JSON で `mtappVars.current_site` にセット
+    my $current_site_json = 'null';
+    if (defined $blog) {
+        my $current_site = $blog->{column_values};
+        $current_site->{customfields} = get_meta($blog);
+        $current_site_json =MT::Util::to_json($current_site);
+    }
+
+    # ログインしているユーザーの情報をカスタムフィールドも含めて JSON で `mtappVars.me` にセット
+    my $me = $author->{column_values};
+    if (defined $me->{password}) {
+        delete $me->{password};
+    }
+    if (defined $me->{api_password}) {
+        delete $me->{api_password};
+    }
+    $me->{customfields} = get_meta($author);
+    my $me_json = MT::Util::to_json($me);
 
     # システム管理者かどうか
     my $is_superuser = 0;
@@ -243,6 +268,7 @@ __MTML__
                 if ($is_superuser == 1 or $perms_blog_id eq $blog->id) {
                     # Set into $can_access_blogs
                     my $simple_blog = {};
+                    my $detailed_blog = {};
                     if ($op_blogs_json_detail ne '1') {
                         $simple_blog->{id} = $blog_id;
                         $simple_blog->{name} = $blog->name;
@@ -251,9 +277,11 @@ __MTML__
                         push @{$parent_website->{$parent_website_key}}, $simple_blog;
                     }
                     else {
-                        push @{$can_access_blogs->{blog}}, $blog->{column_values};
+                        $detailed_blog = $blog->{column_values};
+                        $detailed_blog->{customfields} = get_meta($blog);
+                        push @{$can_access_blogs->{blog}}, $detailed_blog;
                         # Set into $parent_website
-                        push @{$parent_website->{$parent_website_key}}, $blog->{column_values};
+                        push @{$parent_website->{$parent_website_key}}, $detailed_blog;
                     }
                     last;
                 }
@@ -264,6 +292,7 @@ __MTML__
             foreach my $perms_blog_id (@perms_blog_ids) {
                 if ($is_superuser == 1 or $perms_blog_id eq $website_id) {
                     my $simple_website = {};
+                    my $detailed_website = {};
                     if ($op_blogs_json_detail ne '1') {
                         $simple_website->{id} = $website_id;
                         $simple_website->{name} = $website->name;
@@ -271,8 +300,10 @@ __MTML__
                         push @{$can_access_blogs->{website}}, $simple_website;
                     }
                     else {
-                        $website->{column_values}->{children} = $parent_website->{'website-' . $website_id} || [];
-                        push @{$can_access_blogs->{website}}, $website->{column_values};
+                        $detailed_website = $website->{column_values};
+                        $detailed_website->{customfields} = get_meta($website);
+                        $detailed_website->{children} = $parent_website->{'website-' . $website_id} || [];
+                        push @{$can_access_blogs->{website}}, $detailed_website;
                     }
                     last;
                 }
@@ -315,6 +346,7 @@ __MTML__
         "language" : "<mt:Var name="config.DefaultLanguage">",
         "type" : "${_type}",
         "mode" : "${mode}",
+        "me" : ${me_json},
         "author_id" : <mt:if name="author_id"><mt:var name="author_id"><mt:else>0</mt:if>,
         "author_name" : "<mt:var name="author_name" encode_js="1">",
         "author_permissions" : [$permissions],
@@ -330,6 +362,7 @@ __MTML__
         "template_id" : ${template_id},
         "template_identifier" : '<mt:Var name="identifier">',
         "modified_by" : "<mt:Var name="modified_by">",
+        "current_site" : ${current_site_json},
         "blog_id" : ${blog_id},
         "blog_name" : "<mt:var name="blog_name">",
         "blog_url" : "<mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if>",
@@ -391,6 +424,8 @@ __MTML__
     <mt:SetVarBlock name="mtappVars" key="debug_mode"><mt:Var name="config.DebugMode"></mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="language"><mt:Var name="config.DefaultLanguage"></mt:SetVarBlock>
 
+    <mt:SetVarBlock name="mtappVars" key="current_site">${current_site_json}</mt:SetVarBlock>
+    <mt:SetVarBlock name="mtappVars" key="me">${me_json}</mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="author_permissions"><mt:SetVarBlock name="_author_permissions">${permissions}</mt:SetVarBlock>,<mt:Var name="_author_permissions" replace="'","">,</mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="author_roles"><mt:SetVarBlock name="_author_roles">${role_names}</mt:SetVarBlock>,<mt:Var name="_author_roles" replace='"',''>,</mt:SetVarBlock>
     <mt:SetVarBlock name="mtappVars" key="author_name"><mt:var name="author_name"></mt:SetVarBlock>
