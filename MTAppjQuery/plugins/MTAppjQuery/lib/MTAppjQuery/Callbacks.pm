@@ -11,8 +11,13 @@ use CustomFields::Util qw( get_meta );
 sub template_source_dashboard {
     my ($cb, $app, $tmpl_ref) = @_;
 
+    my $url = $app->uri(mode => 'dashboard', args => undef);
     if ($app->request('fresh_login')) {
-        my $url = $app->uri(mode => 'dashboard', args => undef);
+        $app->redirect($url);
+    }
+
+    my $q = $app->param;
+    if ($q->param('__mode') eq '') {
         $app->redirect($url);
     }
 }
