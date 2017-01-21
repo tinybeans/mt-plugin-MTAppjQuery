@@ -1,5 +1,6 @@
 package MTAppjQuery::Callbacks;
 use strict;
+use warnings;
 use utf8;
 use MT::Website;
 use MT::Blog;
@@ -396,7 +397,7 @@ __MTML__
             $data_api_script_url = $op_data_api_script_url;
         }
         $mtapp_vars .= <<__MTML__;
-    <script type="text/javascript" src="<mt:StaticWebPath regex_replace="/https?:/","">data-api/${op_data_api_version}/js/mt-data-api.min.js"></script>
+    <script type="text/javascript" src="<mt:Var name="static_uri">data-api/${op_data_api_version}/js/mt-data-api.min.js"></script>
     <script>
     mtappVars.DataAPI = new MT.DataAPI({
         baseUrl:  '$data_api_script_url',

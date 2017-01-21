@@ -1,5 +1,6 @@
 package MT::Plugin::MTAppjQuery;
 use strict;
+use warnings;
 use base qw( MT::Plugin );
 
 our $VERSION = '1.10.1';
