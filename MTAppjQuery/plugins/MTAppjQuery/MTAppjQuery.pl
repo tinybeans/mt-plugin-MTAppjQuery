@@ -1,8 +1,9 @@
 package MT::Plugin::MTAppjQuery;
 use strict;
+use warnings;
 use base qw( MT::Plugin );
 
-our $VERSION = '1.10.1';
+our $VERSION = '1.10.2';
 
 my $plugin = MT::Plugin::MTAppjQuery->new({
     id          => 'mt_app_jquery',
