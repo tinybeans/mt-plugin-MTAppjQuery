@@ -1130,7 +1130,7 @@
                     // Options for ajax
                     var ajaxOptions = {
                         dataType: op.dataType,
-                        url: op.url,
+                        url: $this.attr('data-url') ? $this.attr('data-url') : op.url,
                         data: op.data,
                         cache: op.cache
                     };
