@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2016/11/24
+ * Update:  2017/02/23
  *
  */
 ;(function($){
@@ -65,20 +65,7 @@
         var MTAppAssetFieldsSubmit = function(){
             var ids = $('body').data('MTAppAssetFieldsIDs');
             for (var i = 0, l = ids.length; i < l; i++) {
-                var $field = $('#' + ids[i]);
-                var value = $field.val();
-                if (/<form mt:asset-id/.test(value)) {
-                    value = value.replace(/<form mt:asset-id="(\d+)".+?href="([^"]+)">([^<]+).+/gi, '{"id":"$1","filename":"$3","url":"$2"}');
-                    var $customfieldPreviewImage = $field.next().find('img');
-                    if ($customfieldPreviewImage.length > 0) {
-                        var thumbURL = $customfieldPreviewImage.attr('src');
-                        value = value.replace(/\}$/, ',"thumbnail":' + '"' + thumbURL + '"}');
-                    }
-                    $field.val(value);
-                    if ($field.hasClass('jsontable-input')) {
-                        $field.closest('div.mtapp-json-table').prev().trigger('MTAppJSONTableSave');
-                    }
-                }
+                $('#' + ids[i]).not('.no-convert').trigger('convert');
             }
             return true;
         };
@@ -88,6 +75,9 @@
             var $this = $(this);
             if (!op.debug) {
                 $this.hide();
+            }
+            if (op.noConvert) {
+                $this.addClass('no-convert');
             }
             if ($this.hasClass('isMTAppAssetFields')) {
                 return;
@@ -151,6 +141,23 @@
             $this.after(html);
             $this.next().next().find('.mtapp-open-dialog').mtDialog();
 
+            // <form> を JSON に変換するイベントを設定
+            $this.on('convert', function(){
+                var $self = $(this);
+                var value = $self.val();
+                if (/<form mt:asset-id/.test(value)) {
+                    value = value.replace(/<form mt:asset-id="(\d+)".+?href="([^"]+)">([^<]+).+/gi, '{"id":"$1","filename":"$3","url":"$2"}');
+                    var $customfieldPreviewImage = $self.next().find('img');
+                    if ($customfieldPreviewImage.length > 0) {
+                        var thumbURL = $customfieldPreviewImage.attr('src');
+                        value = value.replace(/\}$/, ',"thumbnail":' + '"' + thumbURL + '"}');
+                    }
+                    $self.val(value);
+                    if ($self.hasClass('jsontable-input')) {
+                        $self.closest('div.mtapp-json-table').prev().trigger('MTAppJSONTableSave');
+                    }
+                }
+            });
             return true;
         });
     };
@@ -176,6 +183,8 @@
         assetTypeLabel: '',
         // If set to true, you can edit images in a dialog.
         edit: false,
+        // If set to true, transforming form into JSON is disabled when object is saved.
+        noConvert: false,
         // If set to true, the original field is shown.
         debug: false
     };
