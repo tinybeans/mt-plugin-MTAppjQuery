@@ -5,9 +5,7 @@
  * Copyright (c) 2010 Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-07-22
- * Update:  2012-04-21
- * for version: 0.15
- * Comment:
+ * Update:  2017-03-17
  *
  */
 
@@ -628,6 +626,13 @@ span.mtappmultiform-radio {
                 display: inline-block;
                 padding: 2px 4px;
             }
+            tr {
+                &.odd,
+                &.jsontable-selected-data {
+                    background-color: inherit;
+                }
+            }
+
         }
         #mtapplisting-customfield_relatedentries1 {
             cursor: move;

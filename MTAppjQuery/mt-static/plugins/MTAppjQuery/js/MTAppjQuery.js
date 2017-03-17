@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2017/02/23
+ * Update:  2017/03/17
  *
  */
 ;(function($){
@@ -902,6 +902,9 @@
     // -------------------------------------------------
     $.fn.MTAppListing = function(options){
         var op = $.extend({}, $.fn.MTAppListing.defaults, options);
+        if (typeof options.jsontable === 'object' && options.jsontable !== null) {
+            op.jsontable = $.extend({}, $.fn.MTAppListing.defaults.jsontable, options.jsontable);
+        }
 
         /* ==================================================
             L10N
@@ -1176,11 +1179,13 @@
                         op.jsontable.clear = false;
                         op.jsontable.cellMerge = false;
                         op.jsontable.sortable = false;
-                        op.jsontable.listingCheckboxType = 'checkbox'; // Maybe enable to set "radio" from v1.7.1.
                         op.jsontable.listingCheckbox = true;
                         op.jsontable.listingTargetKey = op.jsontable.listingTargetKey || 'id';
                         op.jsontable.optionButtons = null;
                         op.jsontable.cbAfterSelectRow = function(cb, $tr, checked){
+                            if (op.jsontable.listingCheckboxType === 'radio') {
+                                return false;
+                            }
                             var defaultAction = true;
                             if (op.cbAfterSelectRowUpperTable !== null && typeof op.cbAfterSelectRowUpperTable === 'function') {
                                 defaultAction = op.cbAfterSelectRowUpperTable({name: 'cbAfterSelectRowUpperTable'}, $tr, checked);
@@ -1206,13 +1211,6 @@
                             });
 
                         // Dummy textarea2 options
-                            // The following options have be already set at dummy1
-                            // op.jsontable.headerPosition = 'top';
-                            // op.jsontable.edit = false;
-                            // op.jsontable.add = false;
-                            // op.jsontable.clear = false;
-                            // op.jsontable.listingCheckbox = true;
-                            // op.jsontable.listingTargetKey = op.jsontable.listingTargetKey || 'id';
                         op.jsontable.caption = null; // overwrite
                         op.jsontable.footer = true; // overwrite
                         op.jsontable.items = response; // overwrite
@@ -1224,6 +1222,9 @@
                             if (defaultAction) {
                                 $('#mtapplisting-textarea1').next().show();
                                 if (checked) {
+                                    if (op.jsontable.listingCheckboxType === 'radio') {
+                                        $('#mtapplisting-tbody1 tr').appendTo('#mtapplisting-tbody2');
+                                    }
                                     $tr.find('td').each(function(){
                                         var w = $(this).width();
                                         $(this).width(w + 'px');
@@ -1235,8 +1236,17 @@
                         op.jsontable.cbAfterBuild = function(cb, $container){ // overwrite
                             $container.find('tbody').attr('id', 'mtapplisting-tbody2');
                             var savedValue = $this.val().replace(/^,|,$/g, '').split(',');
-                            for (var i = 0, l = savedValue.length; i < l; i++) {
-                                $('td[data-value="' + savedValue[i].replace(/\s*/g, '') + '"]').parent().find('td:first-child input.jsontable-cb').trigger('click');
+                            if (op.jsontable.listingCheckboxType === 'radio') {
+                                $('td[data-value="' + savedValue[0].replace(/\s*/g, '') + '"]')
+                                    .parent()
+                                        .find('td:first-child input.jsontable-cb').prop('checked', true)
+                                    .end()
+                                    .appendTo('#mtapplisting-tbody1');
+                            }
+                            else {
+                                for (var i = 0, l = savedValue.length; i < l; i++) {
+                                    $('td[data-value="' + savedValue[i].replace(/\s*/g, '') + '"]').parent().find('td:first-child input.jsontable-cb').trigger('click');
+                                }
                             }
                         };
                         op.jsontable.debug = false;
@@ -1307,6 +1317,7 @@
             headerOrder: [], // [required] Array: Order of table header
             itemsRootKey: 'items', // [required] String: The root key of items
             listingTargetKey: 'id', // [required] String: Target key  which is saved value when listing mode is applied
+            listingCheckboxType: 'checkbox', // 'checkbox' or 'radio'
             listingTargetEscape: false // [required] Boolean: encodeURIComponent(target value)
         }
     };
