@@ -18,7 +18,7 @@ sub template_source_dashboard {
     }
 
     my $q = $app->param;
-    if ($q->param('__mode') eq '') {
+    unless ($q->param('__mode')) {
         $app->redirect($url);
     }
 }
@@ -60,7 +60,7 @@ sub template_source_header {
     my $_type   = $app->param('_type') || '_type';
     my $mode    = $app->param('__mode') || '';
     my $id      = $app->param('id') || 0;
-    my $blog_id = (defined $blog) ? $blog->id : 0;
+    my $blog_id = (defined $blog) ? $blog->id + 0 : 0;
     my $author_id = $author->id;
     return unless ($_type =~ m/^\w+$/);
     return unless ($mode =~ m/^\w+$/);
@@ -109,7 +109,7 @@ sub template_source_header {
             if ($permission->permissions) {
                 my $perm = $permission->permissions;
                 # For mtappVars.author_permissions
-                if ($blog_id == 0 or $blog_id == $permission->blog_id) {
+                if ($blog_id == 0 or $blog_id == $permission->blog_id + 0) {
                     push @perms, $perm;
                 }
                 # For mtappVars.author_permissions_json
