@@ -12,6 +12,34 @@
     if (typeof mtappVars !== 'object') return;
     mtappVars.adminScript = location.href.replace(/\?.*/, '');
 
+    // -------------------------------------------------
+    //  .mt-dialog の表示状態を監視するイベントを設定
+    // -------------------------------------------------
+    mtappVars.MTAppObsDialog = {
+        dialog: null,
+        open: false,
+        interval: 800,
+        callbackTargetSelector: '',
+        obs: function(){
+            if (mtappVars.MTAppObsDialog.dialog === null) {
+                mtappVars.MTAppObsDialog.dialog = $('div.mt-dialog').not('#mtapplisting-dialog');
+            }
+            var timeoutId = setTimeout(mtappVars.MTAppObsDialog.obs, mtappVars.MTAppObsDialog.interval);
+            // ダイアログが開いたことを記録
+            if (mtappVars.MTAppObsDialog.dialog.is(':visible') && mtappVars.MTAppObsDialog.open === false) {
+                mtappVars.MTAppObsDialog.open = true;
+            }
+            // ダイアログが開いた後に閉じられたとき
+            else if (mtappVars.MTAppObsDialog.dialog.is(':hidden') && mtappVars.MTAppObsDialog.open === true) {
+                mtappVars.MTAppObsDialog.open = false;
+                if (mtappVars.MTAppObsDialog.callbackTargetSelector) {
+                    $(mtappVars.MTAppObsDialog.callbackTargetSelector).trigger('MTAppDialogClosed');
+                }
+                clearTimeout(timeoutId);
+            }
+        }
+    };
+
     // ---------------------------------------------------------------------
     //  $(foo).MTAppAssetFields();
     // ---------------------------------------------------------------------
