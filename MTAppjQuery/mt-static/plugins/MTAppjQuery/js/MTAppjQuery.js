@@ -112,6 +112,10 @@
             } else {
                 $this.addClass('isMTAppAssetFields');
             }
+
+            // フィールドの値を data() でセット
+            $this.data('MTAppAssetFieldsValue', $this.val());
+
             // 要素のidを取得。ない場合はTemporary idを作成
             var thisId = $this.attr('id') || $.temporaryId();
             thisId = 'customfield_mtappassetfields_' + thisId;
@@ -122,51 +126,77 @@
 
             $this.attr('id', thisId);
 
-            // アイテム用 HTML を作成
-            var assetTypeLabel = '';
-            if (op.assetTypeLabel !== '') {
-                assetTypeLabel = op.assetTypeLabel;
-            } else {
-                assetTypeLabel = l10n[op.assetType];
-            }
-            // - 保存されている値を取得(JSON)
-            var json = $this.val();
-            if (json) {
-                try {
-                    json = JSON.parse(json);
+            // JSON から HTML を作成
+            $this.on('refreshHTML', function(ev, type){
+                // 二重適用を防ぐ
+                $this.nextAll('div.MTAppAssetFields').remove();
+                // アイテム用 HTML を作成
+                var assetTypeLabel = '';
+                if (op.assetTypeLabel !== '') {
+                    assetTypeLabel = op.assetTypeLabel;
+                } else {
+                    assetTypeLabel = l10n[op.assetType];
                 }
-                catch(e) {
-                    alert(e.message);
+                // 保存されている値を取得(JSON)
+                var json = $this.val();
+                if (json) {
+                    try {
+                        json = JSON.parse(json);
+                    }
+                    catch(e) {
+                        alert(e.message);
+                    }
                 }
-            }
-            var itemThumbHTML = '';
-            var removeLinkHidden = 'hidden'
-            if (json.url) {
-                if (op.assetType === 'image') {
-                    itemThumbHTML = '<a href="' + json.url + '" target="_blank"><img src="' + json.thumbnail + '" alt=""></a>';
-                } else if (op.assetType === 'file') {
-                    itemThumbHTML = '<a href="' + json.url + '" target="_blank">' + json.filename + '</a>';
+                var itemThumbHTML = '';
+                var removeLinkHidden = 'hidden'
+                if (json.url) {
+                    if (op.assetType === 'image') {
+                        if (type === 'force' && typeof json.thumbnail === 'undefined' && typeof mtappVars.DataAPI === 'object') {
+                            var tempImgId = $.temporaryId();
+                            itemThumbHTML = '<a href="' + json.url + '" target="_blank"><img id="' + tempImgId + '" src="" alt="" style="display: none;"></a>';
+                            (function(tempImgId, $this){
+                                mtappVars.DataAPI.getThumbnail(mtappVars.blog_id, json.id, { width: 240, height: 240 }, function(response){
+                                    var thumbnail = response.url;
+                                    $('#' + tempImgId).attr('src', thumbnail).fadeIn();
+                                    var replacement = ',"thumbnail":"' + thumbnail +'"}';
+                                    var value = $this.val().replace(/\}$/, replacement);
+                                    $this.val(value);
+                                });
+                            })(tempImgId, $this);
+                        }
+                        else {
+                            itemThumbHTML = '<a href="' + json.url + '" target="_blank"><img src="' + json.thumbnail + '" alt=""></a>';
+                        }
+                    } else if (op.assetType === 'file' || op.assetType === 'audio') {
+                        itemThumbHTML = '<a href="' + json.url + '" target="_blank">' + json.filename + '</a>';
+                    }
+                    removeLinkHidden = '';
                 }
-                removeLinkHidden = '';
-            }
-            var html = [
-                '<div id="' + thisId +'_preview" class="customfield_preview">',
-                    itemThumbHTML,
-                '</div>',
-                '<div class="actions-bar" style="clear: none;">',
-                    '<div class="actions-bar-inner pkg actions">',
-                        '<a href="' + ScriptURI + '?__mode=list_asset&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;dialog_view=1&amp;filter=class&amp;filter_val=' + op.assetType + '&amp;require_type=' + op.assetType + '&amp;edit_field=' + thisId +'&amp;asset_select=1" class="mtapp-open-dialog">',
-                            assetTypeLabel + l10n.select,
-                        '</a>&nbsp;',
-                        '<a href="#" id="' + thisId +'_remove_asset" class="' + removeLinkHidden + '" type="submit" onclick="insertCustomFieldAsset(\'\', \'' + thisId +'\'); return false;">',
-                            assetTypeLabel + l10n.remove,
-                        '</a>',
-                  '</div>',
-                '</div>'
-            ].join('');
+                var canMulti = op.canMulti ? '&amp;can_multi=1' : '';
+                var html = [
+                    '<div id="' + thisId +'_preview" class="customfield_preview MTAppAssetFields">',
+                        itemThumbHTML,
+                    '</div>',
+                    '<div class="actions-bar MTAppAssetFields" style="clear: none;">',
+                        '<div class="actions-bar-inner pkg actions">',
+                            '<a href="' + ScriptURI + '?__mode=list_asset&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;dialog_view=1&amp;filter=class&amp;filter_val=' + op.assetType + '&amp;require_type=' + op.assetType + '&amp;edit_field=' + thisId + canMulti + '&amp;asset_select=1" class="mtapp-open-dialog">',
+                                assetTypeLabel + l10n.select,
+                            '</a>&nbsp;',
+                            '<a href="#" id="' + thisId +'_remove_asset" class="' + removeLinkHidden + '" type="submit" onclick="insertCustomFieldAsset(\'\', \'' + thisId +'\'); return false;">',
+                                assetTypeLabel + l10n.remove,
+                            '</a>',
+                      '</div>',
+                    '</div>'
+                ].join('');
+                // アイテム用 HTML を挿入
+                $this.after(html);
+            });
 
-            // アイテム用 HTML を挿入
-            $this.after(html);
+            // 初回の実行
+            $this.trigger('refreshHTML');
+
+
+            // ダイアログを開くリンクにイベントを設定
             $this.next().next().find('.mtapp-open-dialog').mtDialog();
 
             // <form> を JSON に変換するイベントを設定
@@ -193,19 +223,20 @@
       en: {
           image: 'Image',
           file: 'File',
+          audio: 'Audio',
           select: ' Select',
           remove: ' Remove'
       },
       ja: {
           image: '画像',
           file: 'ファイル',
+          audio: 'オーディオ',
           select: 'を選択',
           remove: 'を削除'
-
       }
     };
     $.fn.MTAppAssetFields.defaults = {
-        // You can set either 'image' or 'file'
+        // You can set either 'image', 'file' or 'audio'
         assetType: 'image',
         // Set a text of <a> tag if you want to change.
         assetTypeLabel: '',
@@ -213,6 +244,8 @@
         edit: false,
         // If set to true, transforming form into JSON is disabled when object is saved.
         noConvert: false,
+        // If set to true, you can upload multiple files at one time.
+        canMulti: false,
         // If set to true, the original field is shown.
         debug: false
     };
