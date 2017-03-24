@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2017/03/17
+ * Update:  2017/03/24
  *
  */
 ;(function($){
@@ -5685,6 +5685,142 @@
         method: 'after'
     };
     // end - $.MTAppMoveToWidget()
+
+
+    // ---------------------------------------------------------------------
+    //  $(foo).MTAppAssetsGallery();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2017/03/21
+    //
+    //  MTAppJSONTable と MTAppAssetFields を組み合わせたギャラリー機能を提供します
+    // ---------------------------------------------------------------------
+    $.fn.MTAppAssetsGallery = function(options, words){
+        var op = $.extend({}, $.fn.MTAppAssetsGallery.defaults, options);
+
+        var language = mtappVars.language === 'ja' ? 'ja' : 'en';
+        var words = words || {};
+        var l10n = $.extend({}, $.fn.MTAppAssetsGallery.l10n[language], words);
+
+
+        var MTAppAssetFieldsOptions = {
+            assetType: op.galleryType,
+            assetTypeLabel: op.galleryLabel || '',
+            noConvert: false,
+            debug: op.debug
+        };
+
+        var MTAppJSONTableOptionsDefault = {
+            inputType: 'textarea', // 'textarea' or 'input'
+            caption: null, // String: Table caption
+            header: null, // Object: Table header
+            headerOrder: [], // Array: Order of table header
+            headerPosition: 'top',
+            footer: false,
+            items: null,
+            itemsRootKey: 'items',
+            edit: true,
+            add: true,
+            clear: true,
+            cellMerge: false,
+            sortable: true,
+            optionButtons: null,
+            cbAfterBuild: function(cb, $container){
+                $container
+                    .find('td.asset textarea')
+                    .not('.isMTAppAssetFields')
+                    .MTAppAssetFields(MTAppAssetFieldsOptions);
+            },
+            cbBeforeAdd: null,
+            cbAfterAdd: function(cb, $container){
+                $container
+                    .find('td.asset textarea')
+                    .not('.isMTAppAssetFields')
+                    .MTAppAssetFields(MTAppAssetFieldsOptions);
+            },
+            cbBeforeClear: null,
+            cbAfterSelectRow: null,
+            cbAfterSelectColumn: null,
+            cbBeforeSave: null,
+            cbAfterSave: null,
+            nest: true,
+            debug: op.debug
+        };
+        var MTAppJSONTableOptions = $.extend({}, MTAppJSONTableOptionsDefault, op.MTAppJSONTableOptions);
+
+        return this.each(function(){
+            var $this = $(this);
+            // アイテム一括アップロード用のフィールドを追加
+            $this.before('<div class="MTAppAssetsGallery"><textarea class="text full low"></textarea></div>');
+            var $multiUploadContainer = $this.prevAll('.MTAppAssetsGallery').eq(0);
+            var $multiUpload = $multiUploadContainer.find('textarea');
+            // MTAppAssetFields を適用
+            $multiUpload.MTAppAssetFields({
+                assetType: op.galleryType,
+                assetTypeLabel: op.galleryLabel,
+                edit: false,
+                noConvert: false,
+                canMulti: true,
+                debug: op.debug
+            }, {
+                select: l10n.select,
+            });
+            // Dialog が閉じられた時のコールバックを設定
+            $multiUpload.on('MTAppDialogClosed', function(){
+                if ($(this).val() === '') {
+                    return false;
+                }
+                $.MTAppLoadingImage('show');
+                var separator = '<form';
+                var forms = $(this).val();
+                forms = forms.split(separator);
+                forms.shift();
+                for (var i = 0, l = forms.length; i < l; i++) {
+                    forms[i] = separator + forms[i];
+                }
+                var $container = $('div.mtapp-json-table');
+                // 空の行を取得
+                var $emptyCells = $container.find('td.asset textarea.jsontable-input').filter(function(){
+                    return $(this).val() === '';
+                });
+                var $addBtn = $container.find('a.jsontable-add-row');
+                var l = forms.length - $emptyCells.length;
+                for (var i = 0; i < l; i++) {
+                    $addBtn.trigger('click');
+                }
+                // 空の行を再取得
+                $emptyCells = $container.find('td.asset textarea.jsontable-input').filter(function(){
+                    return $(this).val() === '';
+                });
+                // 空の行に <form> を入れて MTAppAssetFields を適用
+                $emptyCells.each(function(){
+                    var form = forms.shift();
+                    $(this).val(form).trigger('convert').trigger('refreshHTML', ['force']);
+                });
+                $.MTAppLoadingImage('hide');
+            });
+            $multiUploadContainer.find('a.mtapp-open-dialog').on('click.MTAppAssetsGalleryMultiUpload', function(){
+                mtappVars.MTAppObsDialog.callbackTargetSelector = '#' + $multiUpload.attr('id');
+                mtappVars.MTAppObsDialog.obs();
+            });
+            $this.MTAppJSONTable(MTAppJSONTableOptions);
+            return true;
+        });
+    };
+    $.fn.MTAppAssetsGallery.l10n = {
+        en: {
+            select: ' Bulk Select',
+        },
+        ja: {
+            select: 'を一括選択',
+        }
+    };
+    $.fn.MTAppAssetsGallery.defaults = {
+        galleryType: 'image', // 'image', 'file' or 'audio'
+        galleryLabel: '',
+        MTAppJSONTableOptions: {},
+        debug: false
+    };
+    // end - $.MTAppAssetsGallery();
 
 
     // -------------------------------------------------
