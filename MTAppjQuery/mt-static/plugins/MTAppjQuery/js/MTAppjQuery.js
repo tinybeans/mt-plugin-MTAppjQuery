@@ -4,13 +4,41 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2017/03/17
+ * Update:  2017/03/24
  *
  */
 ;(function($){
 
     if (typeof mtappVars !== 'object') return;
     mtappVars.adminScript = location.href.replace(/\?.*/, '');
+
+    // -------------------------------------------------
+    //  .mt-dialog の表示状態を監視するイベントを設定
+    // -------------------------------------------------
+    mtappVars.MTAppObsDialog = {
+        dialog: null,
+        open: false,
+        interval: 800,
+        callbackTargetSelector: '',
+        obs: function(){
+            if (mtappVars.MTAppObsDialog.dialog === null) {
+                mtappVars.MTAppObsDialog.dialog = $('div.mt-dialog').not('#mtapplisting-dialog');
+            }
+            var timeoutId = setTimeout(mtappVars.MTAppObsDialog.obs, mtappVars.MTAppObsDialog.interval);
+            // ダイアログが開いたことを記録
+            if (mtappVars.MTAppObsDialog.dialog.is(':visible') && mtappVars.MTAppObsDialog.open === false) {
+                mtappVars.MTAppObsDialog.open = true;
+            }
+            // ダイアログが開いた後に閉じられたとき
+            else if (mtappVars.MTAppObsDialog.dialog.is(':hidden') && mtappVars.MTAppObsDialog.open === true) {
+                mtappVars.MTAppObsDialog.open = false;
+                if (mtappVars.MTAppObsDialog.callbackTargetSelector) {
+                    $(mtappVars.MTAppObsDialog.callbackTargetSelector).trigger('MTAppDialogClosed');
+                }
+                clearTimeout(timeoutId);
+            }
+        }
+    };
 
     // ---------------------------------------------------------------------
     //  $(foo).MTAppAssetFields();
@@ -84,6 +112,10 @@
             } else {
                 $this.addClass('isMTAppAssetFields');
             }
+
+            // フィールドの値を data() でセット
+            $this.data('MTAppAssetFieldsValue', $this.val());
+
             // 要素のidを取得。ない場合はTemporary idを作成
             var thisId = $this.attr('id') || $.temporaryId();
             thisId = 'customfield_mtappassetfields_' + thisId;
@@ -94,51 +126,77 @@
 
             $this.attr('id', thisId);
 
-            // アイテム用 HTML を作成
-            var assetTypeLabel = '';
-            if (op.assetTypeLabel !== '') {
-                assetTypeLabel = op.assetTypeLabel;
-            } else {
-                assetTypeLabel = l10n[op.assetType];
-            }
-            // - 保存されている値を取得(JSON)
-            var json = $this.val();
-            if (json) {
-                try {
-                    json = JSON.parse(json);
+            // JSON から HTML を作成
+            $this.on('refreshHTML', function(ev, type){
+                // 二重適用を防ぐ
+                $this.nextAll('div.MTAppAssetFields').remove();
+                // アイテム用 HTML を作成
+                var assetTypeLabel = '';
+                if (op.assetTypeLabel !== '') {
+                    assetTypeLabel = op.assetTypeLabel;
+                } else {
+                    assetTypeLabel = l10n[op.assetType];
                 }
-                catch(e) {
-                    alert(e.message);
+                // 保存されている値を取得(JSON)
+                var json = $this.val();
+                if (json) {
+                    try {
+                        json = JSON.parse(json);
+                    }
+                    catch(e) {
+                        alert(e.message);
+                    }
                 }
-            }
-            var itemThumbHTML = '';
-            var removeLinkHidden = 'hidden'
-            if (json.url) {
-                if (op.assetType === 'image') {
-                    itemThumbHTML = '<a href="' + json.url + '" target="_blank"><img src="' + json.thumbnail + '" alt=""></a>';
-                } else if (op.assetType === 'file') {
-                    itemThumbHTML = '<a href="' + json.url + '" target="_blank">' + json.filename + '</a>';
+                var itemThumbHTML = '';
+                var removeLinkHidden = 'hidden'
+                if (json.url) {
+                    if (op.assetType === 'image') {
+                        if (type === 'force' && typeof json.thumbnail === 'undefined' && typeof mtappVars.DataAPI === 'object') {
+                            var tempImgId = $.temporaryId();
+                            itemThumbHTML = '<a href="' + json.url + '" target="_blank"><img id="' + tempImgId + '" src="" alt="" style="display: none;"></a>';
+                            (function(tempImgId, $this){
+                                mtappVars.DataAPI.getThumbnail(mtappVars.blog_id, json.id, { width: 240, height: 240 }, function(response){
+                                    var thumbnail = response.url;
+                                    $('#' + tempImgId).attr('src', thumbnail).fadeIn();
+                                    var replacement = ',"thumbnail":"' + thumbnail +'"}';
+                                    var value = $this.val().replace(/\}$/, replacement);
+                                    $this.val(value);
+                                });
+                            })(tempImgId, $this);
+                        }
+                        else {
+                            itemThumbHTML = '<a href="' + json.url + '" target="_blank"><img src="' + json.thumbnail + '" alt=""></a>';
+                        }
+                    } else if (op.assetType === 'file' || op.assetType === 'audio') {
+                        itemThumbHTML = '<a href="' + json.url + '" target="_blank">' + json.filename + '</a>';
+                    }
+                    removeLinkHidden = '';
                 }
-                removeLinkHidden = '';
-            }
-            var html = [
-                '<div id="' + thisId +'_preview" class="customfield_preview">',
-                    itemThumbHTML,
-                '</div>',
-                '<div class="actions-bar" style="clear: none;">',
-                    '<div class="actions-bar-inner pkg actions">',
-                        '<a href="' + ScriptURI + '?__mode=list_asset&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;dialog_view=1&amp;filter=class&amp;filter_val=' + op.assetType + '&amp;require_type=' + op.assetType + '&amp;edit_field=' + thisId +'&amp;asset_select=1" class="mtapp-open-dialog">',
-                            assetTypeLabel + l10n.select,
-                        '</a>&nbsp;',
-                        '<a href="#" id="' + thisId +'_remove_asset" class="' + removeLinkHidden + '" type="submit" onclick="insertCustomFieldAsset(\'\', \'' + thisId +'\'); return false;">',
-                            assetTypeLabel + l10n.remove,
-                        '</a>',
-                  '</div>',
-                '</div>'
-            ].join('');
+                var canMulti = op.canMulti ? '&amp;can_multi=1' : '';
+                var html = [
+                    '<div id="' + thisId +'_preview" class="customfield_preview MTAppAssetFields">',
+                        itemThumbHTML,
+                    '</div>',
+                    '<div class="actions-bar MTAppAssetFields" style="clear: none;">',
+                        '<div class="actions-bar-inner pkg actions">',
+                            '<a href="' + ScriptURI + '?__mode=list_asset&amp;_type=asset&amp;blog_id=' + mtappVars.blog_id + '&amp;dialog_view=1&amp;filter=class&amp;filter_val=' + op.assetType + '&amp;require_type=' + op.assetType + '&amp;edit_field=' + thisId + canMulti + '&amp;asset_select=1" class="mtapp-open-dialog">',
+                                assetTypeLabel + l10n.select,
+                            '</a>&nbsp;',
+                            '<a href="#" id="' + thisId +'_remove_asset" class="' + removeLinkHidden + '" type="submit" onclick="insertCustomFieldAsset(\'\', \'' + thisId +'\'); return false;">',
+                                assetTypeLabel + l10n.remove,
+                            '</a>',
+                      '</div>',
+                    '</div>'
+                ].join('');
+                // アイテム用 HTML を挿入
+                $this.after(html);
+            });
 
-            // アイテム用 HTML を挿入
-            $this.after(html);
+            // 初回の実行
+            $this.trigger('refreshHTML');
+
+
+            // ダイアログを開くリンクにイベントを設定
             $this.next().next().find('.mtapp-open-dialog').mtDialog();
 
             // <form> を JSON に変換するイベントを設定
@@ -165,19 +223,20 @@
       en: {
           image: 'Image',
           file: 'File',
+          audio: 'Audio',
           select: ' Select',
           remove: ' Remove'
       },
       ja: {
           image: '画像',
           file: 'ファイル',
+          audio: 'オーディオ',
           select: 'を選択',
           remove: 'を削除'
-
       }
     };
     $.fn.MTAppAssetFields.defaults = {
-        // You can set either 'image' or 'file'
+        // You can set either 'image', 'file' or 'audio'
         assetType: 'image',
         // Set a text of <a> tag if you want to change.
         assetTypeLabel: '',
@@ -185,6 +244,8 @@
         edit: false,
         // If set to true, transforming form into JSON is disabled when object is saved.
         noConvert: false,
+        // If set to true, you can upload multiple files at one time.
+        canMulti: false,
         // If set to true, the original field is shown.
         debug: false
     };
@@ -5624,6 +5685,142 @@
         method: 'after'
     };
     // end - $.MTAppMoveToWidget()
+
+
+    // ---------------------------------------------------------------------
+    //  $(foo).MTAppAssetsGallery();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2017/03/21
+    //
+    //  MTAppJSONTable と MTAppAssetFields を組み合わせたギャラリー機能を提供します
+    // ---------------------------------------------------------------------
+    $.fn.MTAppAssetsGallery = function(options, words){
+        var op = $.extend({}, $.fn.MTAppAssetsGallery.defaults, options);
+
+        var language = mtappVars.language === 'ja' ? 'ja' : 'en';
+        var words = words || {};
+        var l10n = $.extend({}, $.fn.MTAppAssetsGallery.l10n[language], words);
+
+
+        var MTAppAssetFieldsOptions = {
+            assetType: op.galleryType,
+            assetTypeLabel: op.galleryLabel || '',
+            noConvert: false,
+            debug: op.debug
+        };
+
+        var MTAppJSONTableOptionsDefault = {
+            inputType: 'textarea', // 'textarea' or 'input'
+            caption: null, // String: Table caption
+            header: null, // Object: Table header
+            headerOrder: [], // Array: Order of table header
+            headerPosition: 'top',
+            footer: false,
+            items: null,
+            itemsRootKey: 'items',
+            edit: true,
+            add: true,
+            clear: true,
+            cellMerge: false,
+            sortable: true,
+            optionButtons: null,
+            cbAfterBuild: function(cb, $container){
+                $container
+                    .find('td.asset textarea')
+                    .not('.isMTAppAssetFields')
+                    .MTAppAssetFields(MTAppAssetFieldsOptions);
+            },
+            cbBeforeAdd: null,
+            cbAfterAdd: function(cb, $container){
+                $container
+                    .find('td.asset textarea')
+                    .not('.isMTAppAssetFields')
+                    .MTAppAssetFields(MTAppAssetFieldsOptions);
+            },
+            cbBeforeClear: null,
+            cbAfterSelectRow: null,
+            cbAfterSelectColumn: null,
+            cbBeforeSave: null,
+            cbAfterSave: null,
+            nest: true,
+            debug: op.debug
+        };
+        var MTAppJSONTableOptions = $.extend({}, MTAppJSONTableOptionsDefault, op.MTAppJSONTableOptions);
+
+        return this.each(function(){
+            var $this = $(this);
+            // アイテム一括アップロード用のフィールドを追加
+            $this.before('<div class="MTAppAssetsGallery"><textarea class="text full low"></textarea></div>');
+            var $multiUploadContainer = $this.prevAll('.MTAppAssetsGallery').eq(0);
+            var $multiUpload = $multiUploadContainer.find('textarea');
+            // MTAppAssetFields を適用
+            $multiUpload.MTAppAssetFields({
+                assetType: op.galleryType,
+                assetTypeLabel: op.galleryLabel,
+                edit: false,
+                noConvert: false,
+                canMulti: true,
+                debug: op.debug
+            }, {
+                select: l10n.select,
+            });
+            // Dialog が閉じられた時のコールバックを設定
+            $multiUpload.on('MTAppDialogClosed', function(){
+                if ($(this).val() === '') {
+                    return false;
+                }
+                $.MTAppLoadingImage('show');
+                var separator = '<form';
+                var forms = $(this).val();
+                forms = forms.split(separator);
+                forms.shift();
+                for (var i = 0, l = forms.length; i < l; i++) {
+                    forms[i] = separator + forms[i];
+                }
+                var $container = $('div.mtapp-json-table');
+                // 空の行を取得
+                var $emptyCells = $container.find('td.asset textarea.jsontable-input').filter(function(){
+                    return $(this).val() === '';
+                });
+                var $addBtn = $container.find('a.jsontable-add-row');
+                var l = forms.length - $emptyCells.length;
+                for (var i = 0; i < l; i++) {
+                    $addBtn.trigger('click');
+                }
+                // 空の行を再取得
+                $emptyCells = $container.find('td.asset textarea.jsontable-input').filter(function(){
+                    return $(this).val() === '';
+                });
+                // 空の行に <form> を入れて MTAppAssetFields を適用
+                $emptyCells.each(function(){
+                    var form = forms.shift();
+                    $(this).val(form).trigger('convert').trigger('refreshHTML', ['force']);
+                });
+                $.MTAppLoadingImage('hide');
+            });
+            $multiUploadContainer.find('a.mtapp-open-dialog').on('click.MTAppAssetsGalleryMultiUpload', function(){
+                mtappVars.MTAppObsDialog.callbackTargetSelector = '#' + $multiUpload.attr('id');
+                mtappVars.MTAppObsDialog.obs();
+            });
+            $this.MTAppJSONTable(MTAppJSONTableOptions);
+            return true;
+        });
+    };
+    $.fn.MTAppAssetsGallery.l10n = {
+        en: {
+            select: ' Bulk Select',
+        },
+        ja: {
+            select: 'を一括選択',
+        }
+    };
+    $.fn.MTAppAssetsGallery.defaults = {
+        galleryType: 'image', // 'image', 'file' or 'audio'
+        galleryLabel: '',
+        MTAppJSONTableOptions: {},
+        debug: false
+    };
+    // end - $.MTAppAssetsGallery();
 
 
     // -------------------------------------------------

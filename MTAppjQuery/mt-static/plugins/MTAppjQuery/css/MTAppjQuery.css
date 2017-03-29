@@ -5,7 +5,7 @@
  * Copyright (c) 2010 Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-07-22
- * Update:  2017-03-17
+ * Update:  2017-03-24
  *
  */
 /* !mixin */
@@ -699,3 +699,13 @@ span.mtappmultiform-radio input {
   border-right: 1px solid #666666; }
 
 /*  MTAppUserMenuWidget  */
+/* ==================================================
+    MTAppAssetsGallery
+================================================== */
+.MTAppAssetsGallery .customfield_preview a {
+  display: none; }
+
+.MTAppAssetsGallery .actions-bar .actions-bar-inner a:last-child {
+  display: none; }
+
+/*  MTAppAssetsGallery  */
