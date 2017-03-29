@@ -108,14 +108,16 @@ sub template_source_header {
         foreach my $permission (@permission) {
             if ($permission->permissions) {
                 my $perm = $permission->permissions;
+                my $perm_blog_id = $permission->blog_id + 0 || undef;
+                next unless (defined $perm_blog_id);
                 # For mtappVars.author_permissions
-                if ($blog_id == 0 or $blog_id == $permission->blog_id + 0) {
+                if ($blog_id == 0 or $blog_id == $perm_blog_id) {
                     push @perms, $perm;
                 }
                 # For mtappVars.author_permissions_json
                 $perm =~ s/'//g;
                 my @perms_array = split /,/, $perm;
-                $perms{'blog:' . $permission->blog_id} = \@perms_array;
+                $perms{'blog:' . $perm_blog_id} = \@perms_array;
             }
         }
         $permissions = join ',', @perms;
