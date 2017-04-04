@@ -108,8 +108,9 @@ sub template_source_header {
         foreach my $permission (@permission) {
             if ($permission->permissions) {
                 my $perm = $permission->permissions;
-                my $perm_blog_id = $permission->blog_id + 0 || undef;
+                my $perm_blog_id = $permission->blog_id || undef;
                 next unless (defined $perm_blog_id);
+                $perm_blog_id = $perm_blog_id + 0;
                 # For mtappVars.author_permissions
                 if ($blog_id == 0 or $blog_id == $perm_blog_id) {
                     push @perms, $perm;
