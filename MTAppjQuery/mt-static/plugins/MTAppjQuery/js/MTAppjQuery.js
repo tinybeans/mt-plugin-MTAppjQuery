@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2017/03/24
+ * Update:  2017/04/04
  *
  */
 ;(function($){
@@ -1683,6 +1683,7 @@
                 $itemListContainer.find('.mtapplisting-item-list-loading').show();
 
 
+                var type = op.model === 'page' ? 'page' : 'entry';
                 var entries = {};
                 var tmpl = {};
                 tmpl.ul = function(li){
@@ -1693,7 +1694,7 @@
                         return [
                             '<li>',
                                 '<span class="title">',
-                                  '<a href="' + CMSScriptURI + '?__mode=view&_type=entry&blog_id=' + op.siteId + '&id=' + obj.id + '" target="_blank">' + obj.title + '</a>',
+                                  '<a href="' + CMSScriptURI + '?__mode=view&_type=' + type + '&blog_id=' + op.siteId + '&id=' + obj.id + '" target="_blank">' + obj.title + '</a>',
                                 '</span>',
                                 '<span class="view-link">',
                                   '<a href="' + obj.permalink + '" target="_blank">',
@@ -1733,7 +1734,8 @@
                 if (!('fields' in params)) {
                     params.fields = 'id,title,permalink';
                 }
-                op.api.listEntries(op.siteId, params, function(response) {
+                var methodName = op.model === 'page' ? 'listPages' : 'listEntries';
+                op.api[methodName](op.siteId, params, function(response) {
                     if (response.error) {
                         return;
                     }
@@ -1757,6 +1759,7 @@
         });
     };
     $.fn.MTAppShowListEntries.defaults = {
+        model: 'entry', // 'entry' or 'page'
         // For Data API
         api: null,
         siteId: 0,
