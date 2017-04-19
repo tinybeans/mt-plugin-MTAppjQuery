@@ -833,6 +833,7 @@
             if (op.sortable && op.headerPosition === 'top') {
                 $table.sortable({
                     items: 'tr',
+                    handle: 'td.jsontable-sort-handle',
                     cursor: 'move'
                 });
             }

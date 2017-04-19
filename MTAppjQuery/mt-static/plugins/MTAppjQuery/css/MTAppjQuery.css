@@ -5,7 +5,7 @@
  * Copyright (c) 2010 Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-07-22
- * Update:  2017-03-24
+ * Update:  2017-04-19
  *
  */
 /* !mixin */
@@ -546,6 +546,8 @@ span.mtappmultiform-radio input {
     margin-top: 10px;
     text-align: left;
     font-weight: bold; }
+  .mtapp-json-table .jsontable-table tr.odd {
+    background-color: transparent; }
   .mtapp-json-table .jsontable-table th, .mtapp-json-table .jsontable-table td {
     padding: 0;
     border: 1px solid #c0c6c9; }
