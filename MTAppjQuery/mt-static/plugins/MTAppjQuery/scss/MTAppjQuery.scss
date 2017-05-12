@@ -5,7 +5,7 @@
  * Copyright (c) 2010 Tomohiro Okuwaki (http://www.tinybeans.net/blog/)
  *
  * Since:   2010-07-22
- * Update:  2017-04-19
+ * Update:  2017-05-12
  *
  */
 
@@ -547,7 +547,7 @@ span.mtappmultiform-radio {
             font-weight: bold;
         }
         tr.odd {
-            background-color: transparent;
+            background-color: transparent !important;
         }
         th, td {
             padding: 0;
