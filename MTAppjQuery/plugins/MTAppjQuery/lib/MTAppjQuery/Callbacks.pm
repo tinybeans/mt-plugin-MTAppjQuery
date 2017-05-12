@@ -37,7 +37,9 @@ sub template_source_header {
     if (defined $blog) {
         my $current_site = $blog->{column_values};
         $current_site->{customfields} = get_meta($blog);
-        $current_site_json =MT::Util::to_json($current_site);
+        $current_site_json = MT::Util::to_json($current_site);
+        $current_site_json =~ s/</&lt;/g;
+        $current_site_json =~ s/>/&gt;/g;
     }
 
     # ログインしているユーザーの情報をカスタムフィールドも含めて JSON で `mtappVars.me` にセット
@@ -316,6 +318,8 @@ __MTML__
 
         # To JSON
         $can_access_blogs_json = MT::Util::to_json($can_access_blogs);
+        $can_access_blogs_json =~ s/</&lt;/g;
+        $can_access_blogs_json =~ s/>/&gt;/g;
     }
     ### jQueryの読み込み前後にmtappVarsとjquery_ready.jsをセットする
     my $mtapp_vars = <<__MTML__;
