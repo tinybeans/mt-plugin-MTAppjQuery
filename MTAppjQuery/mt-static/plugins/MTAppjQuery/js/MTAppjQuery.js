@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2017/04/04
+ * Update:  2017/06/13
  *
  */
 ;(function($){
@@ -5781,7 +5781,7 @@
                 for (var i = 0, l = forms.length; i < l; i++) {
                     forms[i] = separator + forms[i];
                 }
-                var $container = $('div.mtapp-json-table');
+                var $container = $this.next('div.mtapp-json-table');
                 // 空の行を取得
                 var $emptyCells = $container.find('td.asset textarea.jsontable-input').filter(function(){
                     return $(this).val() === '';
