@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2017/06/13
+ * Update:  2017/09/25
  *
  */
 ;(function($){
@@ -667,6 +667,9 @@
                             op.cbBeforeAdd({name: 'cbBeforeAdd', type: 'row'}, $container);
                         }
                         $table.find('tbody').append(plainTr);
+                        if (op.cbAfterAddSystem !== null && typeof op.cbAfterAddSystem === 'function') {
+                            op.cbAfterAddSystem({name: 'cbAfterAddSystem', type: 'row'}, $container);
+                        }
                         if (op.cbAfterAdd !== null && typeof op.cbAfterAdd === 'function') {
                             op.cbAfterAdd({name: 'cbAfterAdd', type: 'row'}, $container);
                         }
@@ -702,6 +705,9 @@
                         });
                         itemLength++;
                         $table.data('item-length', itemLength);
+                        if (op.cbAfterAddSystem !== null && typeof op.cbAfterAddSystem === 'function') {
+                            op.cbAfterAddSystem({name: 'cbAfterAddSystem', type: 'column'}, $container);
+                        }
                         if (op.cbAfterAdd !== null && typeof op.cbAfterAdd === 'function') {
                             op.cbAfterAdd({name: 'cbAfterAdd', type: 'column'}, $container);
                         }
@@ -837,6 +843,9 @@
                     cursor: 'move'
                 });
             }
+            if (op.cbAfterBuildSystem !== null && typeof op.cbAfterBuildSystem === 'function') {
+                op.cbAfterBuildSystem({name: 'cbAfterBuildSystem'}, $container);
+            }
             if (op.cbAfterBuild !== null && typeof op.cbAfterBuild === 'function') {
                 op.cbAfterBuild({name: 'cbAfterBuild'}, $container);
             }
@@ -937,8 +946,10 @@
         listingTargetEscape: false, // Boolean: encodeURIComponent(target value)
         optionButtons: null, // [{classname:"classname", text:"button text"}]
         // Callbacks
+        cbAfterBuildSystem: null, // function({name: 'cbAfterBuild'}, $container){}
         cbAfterBuild: null, // function({name: 'cbAfterBuild'}, $container){}
         cbBeforeAdd: null, // function({name: 'cbBeforeAdd', type: 'column'}, $td){}
+        cbAfterAddSystem: null, // function({name: 'cbAfterAdd', type: 'row or column'}, $container){}
         cbAfterAdd: null, // function({name: 'cbAfterAdd', type: 'row or column'}, $container){}
         cbBeforeClear: null, // function({name: 'cbAfterAdd'}, $container){}
         cbAfterSelectRow: null, // function({name: 'cbAfterSelectRow'}, $tr, $(this).is(':checked')){}
@@ -1204,6 +1215,9 @@
                             'X-MT-Authorization': 'MTAuth accessToken=' + op.accessToken
                         }
                     }
+                    if (op.ajaxOptions) {
+                        $.extend(ajaxOptions, op.ajaxOptions);
+                    }
 
                     // Get JSON by ajax
                     $.ajax(ajaxOptions).done(function(response){
@@ -1349,6 +1363,7 @@
         dataType: 'json', // Set this value to ajax options
         cache: false,
         accessToken: null,
+        ajaxOptions: null, // Set plane object if you want to overwrite ajax options
 
         // Dialog
         dialogTitle: '', // Type the title of dialog window
@@ -5728,14 +5743,14 @@
             cellMerge: false,
             sortable: true,
             optionButtons: null,
-            cbAfterBuild: function(cb, $container){
+            cbAfterBuildSystem: function(cb, $container){
                 $container
                     .find('td.asset textarea')
                     .not('.isMTAppAssetFields')
                     .MTAppAssetFields(MTAppAssetFieldsOptions);
             },
             cbBeforeAdd: null,
-            cbAfterAdd: function(cb, $container){
+            cbAfterAddSystem: function(cb, $container){
                 $container
                     .find('td.asset textarea')
                     .not('.isMTAppAssetFields')
