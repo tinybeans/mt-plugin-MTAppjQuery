@@ -6028,6 +6028,157 @@
     // end - $(foo).MTAppSortableSnippet();
 
 
+    // ---------------------------------------------------------------------
+    //  $.MTAppGoogleMapFields();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2017/07/03
+    //                                             Author: BUN（https://github.com/dreamseeker）
+    //
+    //  表示中の Google マップから座標を取得します。
+    // ---------------------------------------------------------------------
+    $.MTAppGoogleMapFields = function(options) {
+        var op = $.extend({}, $.MTAppGoogleMapFields.defaults, options);
+        if(mtappVars.screen_id !== 'edit-entry' || op.basename === null){
+            return;
+        }
+
+        var selector      = (op.custom) ? 'customfield_' + op.basename : op.basename,
+            $mapCodeField = $('#' + selector),
+            $mapContainer = $('#' + selector + '-field');
+
+        // 地図用のコンテナをセット
+        $mapContainer
+            .after('<div id="' + selector + '_gmap"></div>');
+
+        // 地図座標のフィールドを非表示
+        $mapCodeField.hide();
+
+        // 座標関連の変数を初期化
+        var _saved_pos = $mapCodeField.val(),
+            _map_pos   = (_saved_pos !== '') ? _saved_pos.split(',') : op.mapPosition,
+            _lat       = parseFloat(_map_pos[0]),
+            _lng       = parseFloat(_map_pos[1]),
+            _zoom      = parseInt(_map_pos[2]);
+
+        var mapMarker,
+            mapCanvas,
+            mapGeocoder,
+            $map    = $('#' + selector + '_gmap'),
+            mapOpts = {
+                zoom            : _zoom,
+                center          : new google.maps.LatLng(_lat, _lng),
+                mapTypeId       : google.maps.MapTypeId.ROADMAP,
+                scrollwheel     : false,
+                zoomControl     : true,
+                disableDefaultUI: true
+            };
+
+        // マーカーのセット
+        var refreshMarker = function(){
+            mapMarker = new google.maps.Marker({
+                position: mapCanvas.getCenter(),
+                map     : mapCanvas
+            });
+        };
+
+        // フィールドに座標をセット
+        var refreshMapCode = function(){
+            var _pos   = mapCanvas.getCenter(),
+                _array = [_pos.lat(), _pos.lng(), mapCanvas.getZoom()];
+
+            $mapCodeField.val(_array.join(','));
+        };
+
+        // 住所やランドマークから座標を取得
+        var geocodeSearch = function(){
+            var address_label      = $(op.address).closest('.field').find('.field-header > label').text(),
+                $targetFieldHeader = $mapCodeField.closest('.field').find('.field-header');
+
+            $targetFieldHeader.append('<a href="#" class="button update-map">「' + address_label + '」から地図を表示</a>');
+
+            $targetFieldHeader.find('.update-map').on('click', function(e){
+                e.preventDefault();
+                var _query = $(op.address).val();
+
+                if(mapGeocoder){
+                    mapGeocoder.geocode({ 'address': _query }, function(_results, _status){
+                        if(_status == google.maps.GeocoderStatus.OK){
+                            mapCanvas.setCenter(_results[0].geometry.location);
+                            mapMarker.setPosition(_results[0].geometry.location);
+                        } else if(_status == google.maps.GeocoderStatus.ERROR){
+                            alert('サーバとの通信時に何らかのエラーが発生しました。');
+                        } else if(_status == google.maps.GeocoderStatus.INVALID_REQUEST){
+                            alert('GeocoderRequestに誤りがあります。');
+                        } else if(_status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT){
+                            alert('クエリ送信の制限回数を超えました。時間を空けて検索してください。');
+                        } else if(_status == google.maps.GeocoderStatus.REQUEST_DENIED){
+                            alert('ジオコーダの利用が許可されていません。');
+                        } else if(_status == google.maps.GeocoderStatus.UNKNOWN_ERROR){
+                            alert('未知のエラーに遭遇しました。');
+                        } else if(_status == google.maps.GeocoderStatus.ZERO_RESULTS){
+                            alert('検索結果が見つかりませんでした。キーワードを変えて検索してください。');
+                        } else {
+                            alert(_status);
+                        }
+                    });
+                }
+            });
+        };
+
+        var loadGoogleMap = function(){
+            // 地図の表示サイズをセット
+            $map.css({
+                width: op.mapWidth,
+                height: op.mapHeight,
+                marginBottom: '15px'
+            });
+
+            // 地図座標のフィールドのマージンをリセット
+            $mapContainer.css({
+                marginBottom: 0
+            });
+
+            // 地図・マーカーの表示
+            mapCanvas = new google.maps.Map($map[0], mapOpts);
+            refreshMarker();
+
+            // イベント：中心座標が変わったらマーカーを再描画
+            google.maps.event.addListener(mapCanvas, 'center_changed', function(){
+                mapMarker.setMap(null);
+                refreshMarker();
+            });
+
+            // イベント：アイドル状態になったら座標を再セット
+            google.maps.event.addListener(mapCanvas, 'idle', function(){
+                refreshMapCode();
+            });
+        };
+
+        loadGoogleMap();
+
+        // 住所欄と連携していれば、ジオコーディングを有効化
+        if(op.address !== null){
+            mapGeocoder = new google.maps.Geocoder();
+            geocodeSearch();
+        }
+
+        // デバッグモードなら、ターゲットのフィールドを表示させる
+        if(op.debug){
+            $mapCodeField.show();
+        }
+    };
+    $.MTAppGoogleMapFields.defaults = {
+        basename   : null,
+        custom     : null,
+        address    : null,
+        debug      : false,
+        mapPosition: [35.68118333426901,139.76734411475218,14],
+        mapWidth   : '100%',
+        mapHeight  : '400px'
+    };
+    // end - $.MTAppGoogleMapFields();
+
+
     // -------------------------------------------------
     //  Utilities
     //
