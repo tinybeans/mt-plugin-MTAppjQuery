@@ -4333,7 +4333,7 @@
                                 }
                             }
                             if (i == 0 && !op.selected) {
-                                _html.push('<select name="other-type-category"><option value=""' + attrDefChecked + attrDisabled + attrHiddenClass + '>未選択</option>');
+                                _html.push('<select name="other-type-category"><option value=""' + attrDefChecked + attrDisabled + attrHiddenClass + '>' + op.notSelectedText+ '</option>');
                             }
                             _html.push('<option value="' + catId + '"' + attrChecked + attrDisabled + attrHiddenClass + '>' + catLabel + '</option>');
                             break;
