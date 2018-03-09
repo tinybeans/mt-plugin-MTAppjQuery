@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2017/06/13
+ * Update:  2018/01/31
  *
  */
 ;(function($){
@@ -667,6 +667,9 @@
                             op.cbBeforeAdd({name: 'cbBeforeAdd', type: 'row'}, $container);
                         }
                         $table.find('tbody').append(plainTr);
+                        if (op.cbAfterAddSystem !== null && typeof op.cbAfterAddSystem === 'function') {
+                            op.cbAfterAddSystem({name: 'cbAfterAddSystem', type: 'row'}, $container);
+                        }
                         if (op.cbAfterAdd !== null && typeof op.cbAfterAdd === 'function') {
                             op.cbAfterAdd({name: 'cbAfterAdd', type: 'row'}, $container);
                         }
@@ -702,6 +705,9 @@
                         });
                         itemLength++;
                         $table.data('item-length', itemLength);
+                        if (op.cbAfterAddSystem !== null && typeof op.cbAfterAddSystem === 'function') {
+                            op.cbAfterAddSystem({name: 'cbAfterAddSystem', type: 'column'}, $container);
+                        }
                         if (op.cbAfterAdd !== null && typeof op.cbAfterAdd === 'function') {
                             op.cbAfterAdd({name: 'cbAfterAdd', type: 'column'}, $container);
                         }
@@ -837,6 +843,9 @@
                     cursor: 'move'
                 });
             }
+            if (op.cbAfterBuildSystem !== null && typeof op.cbAfterBuildSystem === 'function') {
+                op.cbAfterBuildSystem({name: 'cbAfterBuildSystem'}, $container);
+            }
             if (op.cbAfterBuild !== null && typeof op.cbAfterBuild === 'function') {
                 op.cbAfterBuild({name: 'cbAfterBuild'}, $container);
             }
@@ -937,8 +946,10 @@
         listingTargetEscape: false, // Boolean: encodeURIComponent(target value)
         optionButtons: null, // [{classname:"classname", text:"button text"}]
         // Callbacks
+        cbAfterBuildSystem: null, // function({name: 'cbAfterBuild'}, $container){}
         cbAfterBuild: null, // function({name: 'cbAfterBuild'}, $container){}
         cbBeforeAdd: null, // function({name: 'cbBeforeAdd', type: 'column'}, $td){}
+        cbAfterAddSystem: null, // function({name: 'cbAfterAdd', type: 'row or column'}, $container){}
         cbAfterAdd: null, // function({name: 'cbAfterAdd', type: 'row or column'}, $container){}
         cbBeforeClear: null, // function({name: 'cbAfterAdd'}, $container){}
         cbAfterSelectRow: null, // function({name: 'cbAfterSelectRow'}, $tr, $(this).is(':checked')){}
@@ -1204,6 +1215,9 @@
                             'X-MT-Authorization': 'MTAuth accessToken=' + op.accessToken
                         }
                     }
+                    if (op.ajaxOptions) {
+                        $.extend(ajaxOptions, op.ajaxOptions);
+                    }
 
                     // Get JSON by ajax
                     $.ajax(ajaxOptions).done(function(response){
@@ -1349,6 +1363,7 @@
         dataType: 'json', // Set this value to ajax options
         cache: false,
         accessToken: null,
+        ajaxOptions: null, // Set plane object if you want to overwrite ajax options
 
         // Dialog
         dialogTitle: '', // Type the title of dialog window
@@ -4333,7 +4348,7 @@
                                 }
                             }
                             if (i == 0 && !op.selected) {
-                                _html.push('<select name="other-type-category"><option value=""' + attrDefChecked + attrDisabled + attrHiddenClass + '>未選択</option>');
+                                _html.push('<select name="other-type-category"><option value=""' + attrDefChecked + attrDisabled + attrHiddenClass + '>' + op.notSelectedText+ '</option>');
                             }
                             _html.push('<option value="' + catId + '"' + attrChecked + attrDisabled + attrHiddenClass + '>' + catLabel + '</option>');
                             break;
@@ -4749,7 +4764,7 @@
     // ---------------------------------------------------------------------
     //  $.MTAppHasCategory();
     // ---------------------------------------------------------------------
-    //                                             Latest update: 2015/11/13
+    //                                             Latest update: 2018/01/31
     //  Description:
     //
     //    必要な数のカテゴリや指定したIDのカテゴリが選択されているかチェックし、選択されていない場合はエラーダイアログを表示する。
@@ -4785,8 +4800,18 @@
             }
         };
         $form.on('submit.MTAppHasCategory', function(e){
-            delete Editor.strings.unsavedChanges;
-            $(window).off('beforeunload');
+            var isPreview = false;
+            var _params = $(this).serializeArray();
+            for (var i = 0, l = _params.length; i < l; i++) {
+                if (_params[i].name === '__mode' && _params[i].value === 'preview_entry') {
+                    isPreview = true;
+                    break;
+                }
+            }
+            if (! isPreview) {
+                delete Editor.strings.unsavedChanges;
+                $(window).off('beforeunload');
+            }
             var categoryIds = $("input[name='category_ids']").val() ? $("input[name='category_ids']").val().split(',') : [];
             var count = 0;
             if (reqCats.length) {
@@ -4805,7 +4830,14 @@
                 $.MTAppDialogMsg(dialogOptions);
                 return false;
             }
-            $(this).off('submit.MTAppHasCategory').submit();
+            if (isPreview) {
+                return true;
+            }
+            if (typeof window.indirectObjects !== 'undefined') {
+                delete window.indirectObjects;
+            }
+            $(this).find('button.primary').prop('disabled', true);
+            return true;
         });
     };
     $.MTAppHasCategory.defaults = {
@@ -5728,14 +5760,14 @@
             cellMerge: false,
             sortable: true,
             optionButtons: null,
-            cbAfterBuild: function(cb, $container){
+            cbAfterBuildSystem: function(cb, $container){
                 $container
                     .find('td.asset textarea')
                     .not('.isMTAppAssetFields')
                     .MTAppAssetFields(MTAppAssetFieldsOptions);
             },
             cbBeforeAdd: null,
-            cbAfterAdd: function(cb, $container){
+            cbAfterAddSystem: function(cb, $container){
                 $container
                     .find('td.asset textarea')
                     .not('.isMTAppAssetFields')
@@ -6026,6 +6058,157 @@
     //     limit: 10
     // };
     // end - $(foo).MTAppSortableSnippet();
+
+
+    // ---------------------------------------------------------------------
+    //  $.MTAppGoogleMapFields();
+    // ---------------------------------------------------------------------
+    //                                             Latest update: 2017/07/03
+    //                                             Author: BUN（https://github.com/dreamseeker）
+    //
+    //  表示中の Google マップから座標を取得します。
+    // ---------------------------------------------------------------------
+    $.MTAppGoogleMapFields = function(options) {
+        var op = $.extend({}, $.MTAppGoogleMapFields.defaults, options);
+        if(mtappVars.screen_id !== 'edit-entry' || op.basename === null){
+            return;
+        }
+
+        var selector      = (op.custom) ? 'customfield_' + op.basename : op.basename,
+            $mapCodeField = $('#' + selector),
+            $mapContainer = $('#' + selector + '-field');
+
+        // 地図用のコンテナをセット
+        $mapContainer
+            .after('<div id="' + selector + '_gmap"></div>');
+
+        // 地図座標のフィールドを非表示
+        $mapCodeField.hide();
+
+        // 座標関連の変数を初期化
+        var _saved_pos = $mapCodeField.val(),
+            _map_pos   = (_saved_pos !== '') ? _saved_pos.split(',') : op.mapPosition,
+            _lat       = parseFloat(_map_pos[0]),
+            _lng       = parseFloat(_map_pos[1]),
+            _zoom      = parseInt(_map_pos[2]);
+
+        var mapMarker,
+            mapCanvas,
+            mapGeocoder,
+            $map    = $('#' + selector + '_gmap'),
+            mapOpts = {
+                zoom            : _zoom,
+                center          : new google.maps.LatLng(_lat, _lng),
+                mapTypeId       : google.maps.MapTypeId.ROADMAP,
+                scrollwheel     : false,
+                zoomControl     : true,
+                disableDefaultUI: true
+            };
+
+        // マーカーのセット
+        var refreshMarker = function(){
+            mapMarker = new google.maps.Marker({
+                position: mapCanvas.getCenter(),
+                map     : mapCanvas
+            });
+        };
+
+        // フィールドに座標をセット
+        var refreshMapCode = function(){
+            var _pos   = mapCanvas.getCenter(),
+                _array = [_pos.lat(), _pos.lng(), mapCanvas.getZoom()];
+
+            $mapCodeField.val(_array.join(','));
+        };
+
+        // 住所やランドマークから座標を取得
+        var geocodeSearch = function(){
+            var address_label      = $(op.address).closest('.field').find('.field-header > label').text(),
+                $targetFieldHeader = $mapCodeField.closest('.field').find('.field-header');
+
+            $targetFieldHeader.append('<a href="#" class="button update-map">「' + address_label + '」から地図を表示</a>');
+
+            $targetFieldHeader.find('.update-map').on('click', function(e){
+                e.preventDefault();
+                var _query = $(op.address).val();
+
+                if(mapGeocoder){
+                    mapGeocoder.geocode({ 'address': _query }, function(_results, _status){
+                        if(_status == google.maps.GeocoderStatus.OK){
+                            mapCanvas.setCenter(_results[0].geometry.location);
+                            mapMarker.setPosition(_results[0].geometry.location);
+                        } else if(_status == google.maps.GeocoderStatus.ERROR){
+                            alert('サーバとの通信時に何らかのエラーが発生しました。');
+                        } else if(_status == google.maps.GeocoderStatus.INVALID_REQUEST){
+                            alert('GeocoderRequestに誤りがあります。');
+                        } else if(_status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT){
+                            alert('クエリ送信の制限回数を超えました。時間を空けて検索してください。');
+                        } else if(_status == google.maps.GeocoderStatus.REQUEST_DENIED){
+                            alert('ジオコーダの利用が許可されていません。');
+                        } else if(_status == google.maps.GeocoderStatus.UNKNOWN_ERROR){
+                            alert('未知のエラーに遭遇しました。');
+                        } else if(_status == google.maps.GeocoderStatus.ZERO_RESULTS){
+                            alert('検索結果が見つかりませんでした。キーワードを変えて検索してください。');
+                        } else {
+                            alert(_status);
+                        }
+                    });
+                }
+            });
+        };
+
+        var loadGoogleMap = function(){
+            // 地図の表示サイズをセット
+            $map.css({
+                width: op.mapWidth,
+                height: op.mapHeight,
+                marginBottom: '15px'
+            });
+
+            // 地図座標のフィールドのマージンをリセット
+            $mapContainer.css({
+                marginBottom: 0
+            });
+
+            // 地図・マーカーの表示
+            mapCanvas = new google.maps.Map($map[0], mapOpts);
+            refreshMarker();
+
+            // イベント：中心座標が変わったらマーカーを再描画
+            google.maps.event.addListener(mapCanvas, 'center_changed', function(){
+                mapMarker.setMap(null);
+                refreshMarker();
+            });
+
+            // イベント：アイドル状態になったら座標を再セット
+            google.maps.event.addListener(mapCanvas, 'idle', function(){
+                refreshMapCode();
+            });
+        };
+
+        loadGoogleMap();
+
+        // 住所欄と連携していれば、ジオコーディングを有効化
+        if(op.address !== null){
+            mapGeocoder = new google.maps.Geocoder();
+            geocodeSearch();
+        }
+
+        // デバッグモードなら、ターゲットのフィールドを表示させる
+        if(op.debug){
+            $mapCodeField.show();
+        }
+    };
+    $.MTAppGoogleMapFields.defaults = {
+        basename   : null,
+        custom     : null,
+        address    : null,
+        debug      : false,
+        mapPosition: [35.68118333426901,139.76734411475218,14],
+        mapWidth   : '100%',
+        mapHeight  : '400px'
+    };
+    // end - $.MTAppGoogleMapFields();
 
 
     // -------------------------------------------------

@@ -581,6 +581,8 @@ span.mtappmultiform-radio input {
   .mtapp-json-table .jsontable-table.ui-sortable thead td.jsontable-sort-handle,
   .mtapp-json-table .jsontable-table.ui-sortable tfoot td.jsontable-sort-handle {
     background-image: none; }
+  .mtapp-json-table .jsontable-table img {
+    max-width: 100%; }
 
 .mtapp-json-table .add-btn {
   text-align: right; }
