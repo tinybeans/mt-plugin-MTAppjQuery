@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2017/12/20
+ * Update:  2018/01/31
  *
  */
 ;(function($){
@@ -4764,7 +4764,7 @@
     // ---------------------------------------------------------------------
     //  $.MTAppHasCategory();
     // ---------------------------------------------------------------------
-    //                                             Latest update: 2015/11/13
+    //                                             Latest update: 2018/01/31
     //  Description:
     //
     //    必要な数のカテゴリや指定したIDのカテゴリが選択されているかチェックし、選択されていない場合はエラーダイアログを表示する。
@@ -4800,8 +4800,18 @@
             }
         };
         $form.on('submit.MTAppHasCategory', function(e){
-            delete Editor.strings.unsavedChanges;
-            $(window).off('beforeunload');
+            var isPreview = false;
+            var _params = $(this).serializeArray();
+            for (var i = 0, l = _params.length; i < l; i++) {
+                if (_params[i].name === '__mode' && _params[i].value === 'preview_entry') {
+                    isPreview = true;
+                    break;
+                }
+            }
+            if (! isPreview) {
+                delete Editor.strings.unsavedChanges;
+                $(window).off('beforeunload');
+            }
             var categoryIds = $("input[name='category_ids']").val() ? $("input[name='category_ids']").val().split(',') : [];
             var count = 0;
             if (reqCats.length) {
@@ -4820,7 +4830,14 @@
                 $.MTAppDialogMsg(dialogOptions);
                 return false;
             }
-            $(this).off('submit.MTAppHasCategory').submit();
+            if (isPreview) {
+                return true;
+            }
+            if (typeof window.indirectObjects !== 'undefined') {
+                delete window.indirectObjects;
+            }
+            $(this).find('button.primary').prop('disabled', true);
+            return true;
         });
     };
     $.MTAppHasCategory.defaults = {
