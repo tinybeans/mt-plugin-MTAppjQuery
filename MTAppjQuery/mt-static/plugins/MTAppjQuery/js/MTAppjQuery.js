@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2018/01/31
+ * Update:  2018/05/25
  *
  */
 ;(function($){
@@ -255,7 +255,7 @@
     // ---------------------------------------------------------------------
     //  $(foo).MTAppJSONTable();
     // ---------------------------------------------------------------------
-    //                                             Latest update: 2017/01/10
+    //                                             Latest update: 2018/05/25
     //
     //  textareaを表形式の入力欄にし、表に入力された値をJSONで元のtextareaに保存します。
     //  このメソッドで扱えるJSONのフォーマットは下記の通りです。
@@ -351,14 +351,19 @@
                     items[0][order[i]] = '';
                 }
             }
+
             // Merge headerOrder to JSON
-            for (var i = 0, l = order.length; i < l; i++) {
-                for (var x = 0, y = items.length; x < y; x++) {
-                    if (!items[x].hasOwnProperty(order[i])) {
-                        items[x][order[i]] = '';
+            if (!op.cellMerge) {
+                for (var i = 0, l = order.length; i < l; i++) {
+                    for (var x = 0, y = items.length; x < y; x++) {
+                        if (!items[x].hasOwnProperty(order[i])) {
+                            items[x][order[i]] = '';
+                        }
                     }
                 }
+
             }
+
             // XSS対策
             for (var i = 0, l = items.length; i < l; i++) {
                 for (var prop in items[i]) {
