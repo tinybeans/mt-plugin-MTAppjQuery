@@ -455,7 +455,7 @@ __MTML__
     <mt:SetVarBlock name="mtappVars" key="blog_url"><mt:if name="blog_url"><mt:var name="blog_url"><mt:else><mt:var name="site_url"></mt:if></mt:SetVarBlock>
 __MTML__
 
-    my $target = '<script type="text/javascript" src="<\$mt:var name="static_uri"\$>jquery/jquery\.(min\.)*js\?v=<mt:var name="mt_version_id" escape="URL">"></script>';
+    my $target = '<script type="text/javascript" src="<\$mt:var name="static_uri"\$>jquery/jquery\.(min\.)*js\?v=<mt:var name="mt_version_id" escape="URL">.+$';
     my $jquery_ready_url = "${static_plugin_path}user-files/jquery_ready.js";
     $jquery_ready_url =~ s/^https?://;
     if ($op_jquery_ready_url) {
@@ -463,7 +463,7 @@ __MTML__
     }
     my $jquery_ready = $op_jquery_ready ? qq(<script type="text/javascript" src="$jquery_ready_url"></script>) : '';
 
-    $$tmpl_ref =~ s!($target)!$mtapp_vars  $1\n  $jquery_ready!g;
+    $$tmpl_ref =~ s!($target)!$mtapp_vars  $1\n  $jquery_ready!gm;
 
     ### user.jsをセット
     require MT::Template;
