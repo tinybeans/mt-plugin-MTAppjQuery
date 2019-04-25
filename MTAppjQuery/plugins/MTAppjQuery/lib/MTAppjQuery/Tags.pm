@@ -185,28 +185,43 @@ sub _fltr_split_format {
 }
 
 sub _fltr_nengou {
-    my ($str, $arg, $ctx) = @_;
+    my ( $str, $arg, $ctx ) = @_;
 
-    if ($str == '' or $str !~ /^\d{8}$/) {
+    if ( $str == '' or $str !~ /^\d{8}$/ ) {
         return '';
     }
-    my ($res, $nengou, $diff);
-    if ($str >= 18680125 and $str <= 19120729) {
+    my ( $res, $nengou, $diff );
+    if ( $str >= 18680125 and $str <= 19120729 ) {
         $nengou = MT->translate('meiji');
-        $diff = 1867;
-    } elsif ($str >= 19120730 and $str <= 19261224) {
+        $diff   = 1867;
+    }
+    elsif ( $str >= 19120730 and $str <= 19261224 ) {
         $nengou = MT->translate('taisho');
-        $diff = 1911;
-    } elsif ($str >= 19261225 and $str <= 19890107) {
+        $diff   = 1911;
+    }
+    elsif ( $str >= 19261225 and $str <= 19890107 ) {
         $nengou = MT->translate('showa');
-        $diff = 1925;
-    } elsif ($str >= 19890108) {
+        $diff   = 1925;
+    }
+    elsif ( $str >= 19890108 and $str <= 20190430 ) {
         $nengou = MT->translate('heisei');
-        $diff = 1988;
+        $diff   = 1988;
+    }
+    elsif ( $str >= 20190501 ) {
+        $nengou = MT->translate('reiwa');
+        $diff   = 2018;
     }
     $str =~ s/(\d{4})(\d{2})(\d{2})/$1,$2,$3/;
-    my @date = split(/,/, $str);
-    $res = $nengou . ($date[0] - $diff) . MT->translate('nen') . $date[1] . MT->translate('gatsu') . $date[2] . MT->translate('nichi');
+    my @date = split( /,/, $str );
+    my $year = ( $date[0] - $diff ) == 1 ? MT->translate('gan') : $date[0] - $diff;
+    $res
+        = $nengou
+        . $year
+        . MT->translate('nen')
+        . $date[1]
+        . MT->translate('gatsu')
+        . $date[2]
+        . MT->translate('nichi');
     return $res;
 }
 
