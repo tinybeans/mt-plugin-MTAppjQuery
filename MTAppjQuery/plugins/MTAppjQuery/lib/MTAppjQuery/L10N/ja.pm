@@ -17,6 +17,8 @@ use vars qw ( %Lexicon );
     'taisho' => '大正',
     'showa' => '昭和',
     'heisei' => '平成',
+    'reiwa' => '令和',
+    'gan' => '元',
     'nen' => '年',
     'gatsu' => '月',
     'nichi' => '日',
