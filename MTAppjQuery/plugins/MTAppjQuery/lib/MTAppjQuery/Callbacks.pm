@@ -680,7 +680,7 @@ sub cms_post_save_template {
 sub save_config_filter {
     my ($cb, $plugin, $data, $scope) = @_;
     my $jquery_ready_all = $data->{jquery_ready_all};
-    if ($jquery_ready_all eq '1') {
+    if ($jquery_ready_all) {
         my $jquery_ready = $data->{jquery_ready};
         my $jquery_ready_url = $data->{jquery_ready_url};
 
