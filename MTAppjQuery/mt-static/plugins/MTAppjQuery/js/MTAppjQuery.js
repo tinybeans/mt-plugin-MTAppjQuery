@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2018/05/25
+ * Update:  2019/11/15
  *
  */
 ;(function($){
@@ -1067,89 +1067,88 @@
             Bind events to the dialog
         ================================================== */
         if (!$dialog.hasClass('bind-event')) {
-            $dialog
-                .addClass('bind-event')
-                // Cancel Button
-                .on('click', '#mtapplisting-dialog-cancel', function(e){
-                    $(e.delegateTarget).html('').removeClass('mt-dialog').hide();
-                    $('#mtapplisting-overlay').removeClass('mt-dialog-overlay').removeClass('overlay').hide();
-                    var triggerId = $(e.delegateTarget).data('triggerId');
-                    if (op.cbAfterCancel !== null && typeof op.cbAfterCancel === 'function') {
-                        op.cbAfterCancel({name: 'cbAfterCancel'}, $(e.delegateTarget), $('#' + triggerId));
-                    }
+            $dialog.addClass('bind-event');
+            // Cancel Button
+            $dialog.on('click', '#mtapplisting-dialog-cancel', function(e){
+                $(e.delegateTarget).html('').removeClass('mt-dialog').hide();
+                $('#mtapplisting-overlay').removeClass('mt-dialog-overlay').removeClass('overlay').hide();
+                var triggerId = $(e.delegateTarget).data('triggerId');
+                if (op.cbAfterCancel !== null && typeof op.cbAfterCancel === 'function') {
+                    op.cbAfterCancel({name: 'cbAfterCancel'}, $(e.delegateTarget), $('#' + triggerId));
+                }
+                return false;
+            });
+            // OK Button
+            $dialog.on('click', '#mtapplisting-dialog-ok', function(e){
+                var triggerId = $(e.delegateTarget).data('triggerId');
+                if (!triggerId) {
                     return false;
-                })
-                // OK Button
-                .on('click', '#mtapplisting-dialog-ok', function(e){
-                    var triggerId = $(e.delegateTarget).data('triggerId');
-                    if (!triggerId) {
-                        return false;
-                    }
+                }
 
-                    // Save selected values
-                    var values = [];
-                    var $tbody = $('#mtapplisting-tbody1');
-                    var $tr = $tbody.children('tr');
-                    if ($tr.length) {
-                        var targetKey = $tbody.data('target-key');
-                        $tr.each(function(){
-                            values.push($(this).find('td.' + targetKey + ' textarea.jsontable-input-hidden').val());
-                        });
-                    }
-                    if (values.length > 1) {
-                        $('#' + triggerId).val(',' + values.join(',') + ',').trigger('change.MTAppListing');
+                // Save selected values
+                var values = [];
+                var $tbody = $('#mtapplisting-tbody1');
+                var $tr = $tbody.children('tr');
+                if ($tr.length) {
+                    var targetKey = $tbody.data('target-key');
+                    $tr.each(function(){
+                        values.push($(this).find('td.' + targetKey + ' textarea.jsontable-input-hidden').val());
+                    });
+                }
+                if (values.length > 1) {
+                    $('#' + triggerId).val(',' + values.join(',') + ',').trigger('change.MTAppListing');
+                }
+                else {
+                    $('#' + triggerId).val(values[0]).trigger('change.MTAppListing');
+                }
+
+                if (op.cbAfterOK !== null && typeof op.cbAfterOK === 'function') {
+                    op.cbAfterOK({name: 'cbAfterOK'}, $(e.delegateTarget), $('#' + triggerId));
+                }
+
+                // Reset trigger
+                $(e.delegateTarget).data('triggerId', '');
+
+                // Close the dialog by clicking the cancel button
+                $('#mtapplisting-dialog-cancel').trigger('click');
+                return false;
+            });
+            $dialog.on('click', '#mtapplisting-text-search', function(e){
+                var v = $('#mtapplisting-text-filter').val();
+                $('#mtapplisting-tbody2 tr').each(function(){
+                    var html = this.innerHTML;
+                    var reg = new RegExp(v, 'i');
+                    if (reg.test(html)) {
+                        $(this).removeClass('hidden');
                     }
                     else {
-                        $('#' + triggerId).val(values[0]).trigger('change.MTAppListing');
+                        $(this).addClass('hidden');
                     }
-
-                    if (op.cbAfterOK !== null && typeof op.cbAfterOK === 'function') {
-                        op.cbAfterOK({name: 'cbAfterOK'}, $(e.delegateTarget), $('#' + triggerId));
-                    }
-
-                    // Reset trigger
-                    $(e.delegateTarget).data('triggerId', '');
-
-                    // Close the dialog by clicking the cancel button
-                    $('#mtapplisting-dialog-cancel').trigger('click');
-                    return false;
-                })
-                .on('click', '#mtapplisting-text-search', function(e){
-                    var v = $('#mtapplisting-text-filter').val();
-                    $('#mtapplisting-tbody2 tr').each(function(){
-                        var html = this.innerHTML;
-                        var reg = new RegExp(v, 'i');
-                        if (reg.test(html)) {
-                            $(this).removeClass('hidden');
-                        }
-                        else {
-                            $(this).addClass('hidden');
-                        }
-                    });
-                    if (op.cbAfterSearch !== null && typeof op.cbAfterSearch === 'function') {
-                        op.cbAfterSearch({name: 'cbAfterSearch'}, $(e.delegateTarget));
-                    }
-                    return false;
-                })
-                .on('keypress', '#mtapplisting-text-filter', function(e){
-                    if (e.which == 13) {
-                        $(this).next().trigger('click');
-                    }
-                })
-                .on('click', '#mtapplisting-search-reset', function(e){
-                    $('#mtapplisting-text-filter').val('');
-                    if (op.cbAfterSearchReset !== null && typeof op.cbAfterSearchReset === 'function') {
-                        op.cbAfterSearchReset({name: 'cbAfterSearchReset'}, $(e.delegateTarget));
-                    }
-                    $('#mtapplisting-text-search').trigger('click');
-                    return false;
-                })
-                .on('click', '#mtapplisting-dialog-top', function(e){
-                    $(e.delegateTarget)
-                        .find('div.mtapplisting-container')
-                        .animate({scrollTop: 0}, 600, 'swing');
-                    return false;
                 });
+                if (op.cbAfterSearch !== null && typeof op.cbAfterSearch === 'function') {
+                    op.cbAfterSearch({name: 'cbAfterSearch'}, $(e.delegateTarget));
+                }
+                return false;
+            });
+            $dialog.on('keypress', '#mtapplisting-text-filter', function(e){
+                if (e.which == 13) {
+                    $(this).next().trigger('click');
+                }
+            });
+            $dialog.on('click', '#mtapplisting-search-reset', function(e){
+                $('#mtapplisting-text-filter').val('');
+                if (op.cbAfterSearchReset !== null && typeof op.cbAfterSearchReset === 'function') {
+                    op.cbAfterSearchReset({name: 'cbAfterSearchReset'}, $(e.delegateTarget));
+                }
+                $('#mtapplisting-text-search').trigger('click');
+                return false;
+            });
+            $dialog.on('click', '#mtapplisting-dialog-top', function(e){
+                $(e.delegateTarget)
+                    .find('div.mtapplisting-container')
+                    .animate({scrollTop: 0}, 600, 'swing');
+                return false;
+            });
         }
         /*  Bind events to the dialog  */
 
@@ -2604,7 +2603,7 @@
             if (op.openSelector !== '') {
                 $(op.openSelector).find('div.widget-content').show();
             }
-            $header.click(function(){
+            $header.on('click', function(){
                 $(this)
                     .closest('div.widget-wrapper')
                         .siblings()
@@ -2614,7 +2613,7 @@
                     .find('div.widget-content').slideToggle();
             });
         } else {
-            $header.click(function(){
+            $header.on('click', function(){
                 $(this).parents('div.widget-header').next().slideToggle();
             });
         }
@@ -2776,7 +2775,7 @@
                             label = value;
                             $(this).val('')
                                 .before(makeLabel(value, label))
-                                .prev().children('input:checkbox').click();
+                                .prev().children('input:checkbox').trigger('click');
                             return false;
                         }
                         return true;
@@ -2951,7 +2950,7 @@
                     option_add,
                 '</select>'
             ];
-            var $select = $(select.join('')).change(function(){
+            var $select = $(select.join('')).on('change', function(){
                 if ($(this).val() === '_add_') {
                     var $option = $(this).find('option');
                     var size = $option.size();
@@ -3074,7 +3073,7 @@
             // $span.find('input.default-checked').prop('checked', true);
             // $span.find('option.default-selected').prop('selected', true);
             if ($span.hasClass('mtappmultiform-radio') || $span.hasClass('mtappmultiform-checkbox')) {
-                $span.find('input').click(function(){
+                $span.find('input').on('click', function(){
                     thisData = [];
                     $span.find('input:checked').each(function(){
                         thisData.push($(this).val());
@@ -3082,7 +3081,7 @@
                     $this.val(thisData.join(','));
                 });
             } else if ($span.hasClass('mtappmultiform-select') || $span.hasClass('mtappmultiform-select-multiple')) {
-                $span.find('select').change(function(){
+                $span.find('select').on('change', function(){
                     thisData = [];
                     $(this).find('option:selected').each(function(){
                         thisData.push($(this).val());
@@ -3138,15 +3137,15 @@
                 value = '';
             }
             var $span = $('<span class="mtapp-fieldsplit">' + input.join('') + '</span>').children().each(function(){
-                $(this)
-                    .blur(function(){
+                $(this).on({
+                    'blur': function(){
                         var values = [];
                         $(this).siblings('input:text').andSelf().each(function(){
                             values.push($(this).val());
                         });
                         $self.val(values.join(separator));
-                    })
-                    .keydown(function(e){
+                    },
+                    'keydown': function(e){
                         if (e.which == 13) {
                             var values = [];
                             $(this).siblings('input:text').andSelf().each(function(){
@@ -3154,7 +3153,8 @@
                             });
                             $self.val(values.join(separator));
                         }
-                    });
+                    }
+                });
             }).end();
             $self.after($span);
         });
@@ -3183,20 +3183,21 @@
     // -------------------------------------------------
     $.MTAppKeyboardShortcut = function(){
         if (mtappVars.screen_id === 'list-template') return;
-        $(window).bind('listReady', function(){
+        $(window).on('listReady', function(){
             var keyOn = true;
             var keyIdx = null;
             var tr = $('table.listing-table tbody tr');
             var trCount = tr.length;
             if (trCount < 1) return;
-            $(':text')
-                .focus(function(){
+            $(':text').on({
+                'focus': function(){
                     keyOn = false;
-                })
-                .blur(function(){
+                },
+                'blur': function(){
                     keyOn = true;
-                });
-            $(window).keyup(function(e){
+                }
+            });
+            $(window).on('keyup', function(e){
                 if (!keyOn) return;
                 var key = e.which;
                 if (keyIdx == null) {
@@ -3225,17 +3226,18 @@
                         tr.eq(keyIdx).addClass('keyboard-selected');
                         break;
                     case 88://x
-                        tr.eq(keyIdx).toggleClass('selected').find(':checkbox').click();
+                        tr.eq(keyIdx).toggleClass('selected').find(':checkbox').trigger('click');
                         break;
                 }
             });
-            $('table.listing-table tr').hover(
-                function(){
+            $('table.listing-table tr').on({
+                'mouseenter': function(){
                     $(this).addClass('hover-selected');
                 },
-                function(){
+                'mouseleave': function(){
                     $(this).removeClass('hover-selected');
-                });
+                }
+            });
 
             function autoScroll(pos, height, direction, speed) {
                 var winS = $(window).scrollTop();
@@ -3314,14 +3316,14 @@
 
             $balloon.css('margin-top', height);
 
-            $(this).hover(
-                function(){
+            $(this).on({
+                'mouseenter': function(){
                     $balloon.css('visibility','visible');
                 },
-                function(){
+                'mouseleave': function(){
                     $balloon.css('visibility','hidden');
                 }
-            );
+            });
         });
     };
     $.fn.MTAppshowHint.defaults = {
@@ -3347,7 +3349,7 @@
     $.fn.MTAppTooltip = function(options){
         var op = $.extend({}, $.fn.MTAppTooltip.defaults, options);
 
-        return this.each(function(){
+        return this.each(function() {
 
             if (op.text && op.html === "") {
                 op.html = op.text;
@@ -3360,32 +3362,36 @@
                 tipText = op.html;
             } else {
                 target = this.title ? 'title' : 'alt',
-                tipText = self.attr(target);
+                    tipText = self.attr(target);
             }
 
-            self.hover(function(e){
-                if (op.html == '') {
-                    self.attr(target,'');
-                }
-                tooltip
-                    .stop(true,true)
-                    .fadeIn('fast')
-                    .html(tipText)
-                    .css({
-                        position: 'absolute',
+            self.on({
+                'mouseenter': function (e) {
+                    if (op.html == '') {
+                        self.attr(target, '');
+                    }
+                    tooltip
+                        .stop(true, true)
+                        .fadeIn('fast')
+                        .html(tipText)
+                        .css({
+                            position: 'absolute',
+                            top: e.pageY - 20,
+                            left: e.pageX + 20
+                        });
+                },
+                'mouseleave': function () {
+                    if (op.html == '') {
+                        self.attr(target, tipText);
+                    }
+                    tooltip.fadeOut('fast');
+                },
+                'mousemove': function (e) {
+                    tooltip.css({
                         top: e.pageY - 20,
                         left: e.pageX + 20
                     });
-            },function(){
-                if (op.html == '') {
-                    self.attr(target,tipText);
                 }
-                tooltip.fadeOut('fast');
-            }).mousemove(function(e){
-                tooltip.css({
-                    top: e.pageY - 20,
-                    left: e.pageX + 20
-                });
             });
         });
     };
@@ -3428,13 +3434,13 @@
                 var v = $self.val().replace(/(, )?([^,]*)$/,'$1');
                 $self.val(v + $(this).text() + ', ');
             });
-            $self
-                .blur(function(){
+            $self.on({
+                'blur': function(){
                     setTimeout(function _hide(){
                         outerElm.style.display = 'none';
                     }, 100);
-                })
-                .keydown(function(e){
+                },
+                'keydown': function(e){
                     if (e.which == 13) { // Enter
                         var $highlight = $(innerElm).children('.complete-highlight');
                         if ($highlight.size() > 0) {
@@ -3444,8 +3450,8 @@
                         outerElm.style.display = 'none';
                         return false;
                     }
-                })
-                .keyup(function(e){
+                },
+                'keyup': function(e){
                     switch (e.which) {
                         case 40: // down
                             var $highlight = $(innerElm).children('.complete-highlight');
@@ -3484,7 +3490,8 @@
                             }
                             break;
                     } // switch
-                }); // keyup
+                }
+            });
             return false;
         }); // each
     };
@@ -3557,7 +3564,7 @@
                     'src': StaticURI + 'images/status_icons/draft.gif',
                     'alt': '編集'
                 })
-                .click(function(){
+                .on('click', function(){
                     $(this).parents('div.field-header').next('div.field-content').toggle();
                 });
 
@@ -4005,28 +4012,24 @@
             var parentId = parentHref.replace(/(.*?\?)(blog_id=\d+)(.*)/,'$2');
             parentId = parentId.replace(/=/,'_');
             self.addClass(parentId);
-            parentLi.hover(
-                function(){
+            parentLi.on({
+                'mouseenter': function(){
                     var w = $(this).width();
                     $(this).find('ul:eq(0)').css('left',w + 'px').show();
-//                    $('#field-convert_breaks').hide();
                 },
-                function(){
+                'mouseleave': function(){
                     $(this).find('ul:eq(0)').hide();
-//                    $('#field-convert_breaks').show();
                 }
-            );
-            self.find('li').hover(
-                function(){
+            });
+            self.find('li').on({
+                'mouseenter': function(){
                     var w = $(this).width();
                     $(this).find('ul:eq(0)').css('left',w + 'px').show();
-//                    $('#convert_breaks').hide();
                 },
-                function(){
+                'mouseleave': function(){
                     $(this).find('ul:eq(0)').hide();
-//                    $('#convert_breaks').show();
                 }
-            );
+            });
         });
     };
     $.MTAppSlideMenu.defaults = {
@@ -4080,7 +4083,7 @@
             }
         }
         targetSelector.sort();
-        $.unique(targetSelector);
+        $.uniqueSort(targetSelector);
 
         // 対象とするフィールドを全て取得してクラスをつける
         var $target = $( targetSelector.join(',') ).addClass('hidden cfs-hidden');
@@ -4493,12 +4496,12 @@
                 .find('div.button-actions')
                     .prepend('<button class="button mtapp-1click-rebuild" title="' + type.name + 'をすべて再構築">すべて再構築</button>')
                     .find('button.mtapp-1click-rebuild')
-                        .click(function(){
+                        .on('click', function(){
                             $(this)
                                 .closest('div.actions-bar')
                                 .siblings('table')
-                                    .find('input:checkbox').attr('checked','checked');
-                            publish.click();
+                                    .find('input:checkbox').prop('checked', true);
+                            publish.trigger('click');
                             return false;
                         });
             // 再構築アイコンをテーブルに挿入
@@ -4517,13 +4520,13 @@
                                 $(this).attr('title',tmplName + ' を再構築する');
                             })
                             //.MTAppTooltip()
-                            .click(function(){
+                            .on('click', function(){
                                 $(this)
                                     .closest('td.rebuild')
                                         .prev('td.cb')
                                             .find('input:checkbox')
-                                                .attr('checked','checked');
-                                publish.click();
+                                                .prop('checked', true);
+                                publish.trigger('click');
                                 return false;
                             });
         });
@@ -4582,10 +4585,10 @@
             type: 'info',
             parent: true
         });
-        $('#mtapp-debug-pageinfo-title').click(function(){
+        $('#mtapp-debug-pageinfo-title').on('click', function(){
             $('#mtapp-debug-pageinfo-content').slideToggle();
         });
-        $('#mtapp-show-basename').click(function(){
+        $('#mtapp-show-basename').on('click', function(){
             var fieldSort = [];
             $('#main-content')
                 .find('div.field:visible').each(function(){
@@ -4598,7 +4601,7 @@
                     label: '現在の並び順（MTAppFieldSort用）<a href="#" id="mtapp-customfield-c" class="button">「c:」に置換</a>',
                     content: '<textarea id="mtapp-fieldsort" class="text high">' + fieldSort.join(',') + '</textarea>'
                 }))
-                .find('#mtapp-customfield-c').click(function(){
+                .find('#mtapp-customfield-c').on('click', function(){
                     var v = $('#mtapp-fieldsort').val().replace(/customfield_/g,'c:');
                     $('#mtapp-fieldsort').val(v);
                     return false;
@@ -4608,7 +4611,7 @@
         // [ブログ記事の管理]
         if (mtappVars.screen_id == 'list-entry') {
             //  下書きの背景を変更
-            $(window).bind('listReady', function(){
+            $(window).on('listReady', function(){
                 $('#entry-table').find('span.draft').closest('tr').css({'background':'#FFCBD0'});
             });
         }
@@ -4616,7 +4619,7 @@
         // [カテゴリの管理] [フォルダの管理]
         if (mtappVars.template_filename == 'list_category') {
             // IDを表示
-            $(window).bind('listReady', function(){
+            $(window).on('listReady', function(){
                 $('#root').find('div').each(function(){
                     var id = $(this).attr('id');
                     $(this).MTAppshowHint({text: 'ID: ' + id});
@@ -4639,7 +4642,7 @@
         // list_common.tmplのリスト画面で表示オプションにIDがないページ
         if (op.id && mtappVars.template_filename == 'list_common' && !$('#disp_cols label:contains("ID")').length) {
             // IDを表示
-            $(window).bind('listReady', function(){
+            $(window).on('listReady', function(){
                 $('table.listing-table').find('tr').each(function(){
                     var id = $(this).attr('id');
                     $(this)
@@ -4723,8 +4726,8 @@
                 case 'focus':
                     $fancyBtn.hide();
                     $span.hide();
-                    $self.focus(function(){
-                        $fancyBtn.click();
+                    $self.on('focus', function(){
+                        $fancyBtn.trigger('click');
                     });
                     break;
             }
@@ -4745,7 +4748,7 @@
                             var $checked = $iframe.find('input:radio:checked');
                             if ($checked.size()) {
                                 var v = $checked.val();
-                                $self.focus().val(v).next().removeClass('hidden').text(v);
+                                $self.trigger('focus').val(v).next().removeClass('hidden').text(v);
                             } else {
                                 return true;
                             }
@@ -4876,7 +4879,7 @@
 
     $.fn.MTAppCheckCategoryCount = function(options){
         var op = $.extend({}, $.fn.MTAppCheckCategoryCount.defaults, options);
-        return this.click(function(){
+        return this.on('click', function(){
 
             var cat_selector = $('#category-selector'),
                 cat_selector_list = $('#category-selector-list'),
@@ -4953,7 +4956,7 @@
         return this.each(function(){
             var self = $(this),
                 val = self.val(),
-                $btn = $('<button class="mt-edit-field-button button">' + op.edit + '</button>').click(function(){
+                $btn = $('<button class="mt-edit-field-button button">' + op.edit + '</button>').on('click', function(){
                     $(this).hide()
                             .prev().show().addClass('edited')
                             .prev().hide();
@@ -4993,7 +4996,7 @@
     $.fn.MTAppTabSpace = function(options) {
         var op = $.extend({}, $.fn.MTAppTabSpace.defaults, options);
         return this.each(function(){
-            $(this).keydown(function(e){
+            $(this).on('keydown', function(e){
                 var keycode = e.which || e.keyCode;
                 if (keycode == 9) {
                     $(this).insertAtCaret(op.text);
@@ -5024,8 +5027,8 @@
             var outerH = $wrap.outerHeight(),
                 posTop = outerH / 2 - 7;
             $wrap.append('<img class="mtapp-remove-val-btn" alt="" src="' + mtappVars.static_plugin_path + 'images/cancel-gray.png" style="top: ' + posTop + 'px;" />')
-                .children('img').click(function(){
-                    $this.val('').focus();
+                .children('img').on('click', function(){
+                    $this.val('').trigger('focus');
                 });
         });
     };
@@ -5073,7 +5076,7 @@
         return this.each(function(){
             $(this)
                 .after('<span class="mun_msg" style="display:none;color:red;font-weight:bold;"></span>')
-                .blur(function(){
+                .on('blur', function(){
                     var $this = $(this);
                     var text = $this.val() + '';
                     text = $.toInt(text, true).replace(/．|。/g, '.').replace(/，|、/g, ',').replace(/ー|ｰ|−|—/g,'-');
@@ -5150,13 +5153,13 @@
             $(this)
                 .after(tax_button.join(''))
                 .next()
-                    .click(function(){
+                    .on('click', function(){
                         $(this).addClass('clicked');
                         var val = Number(self.val()) * (1 + op.rate);
                         self.val(rounding(val, roundingType));
                     })
                 .next()
-                    .click(function(){
+                    .on('click', function(){
                         $(this).addClass('clicked');
                         var val = Number(self.val()) / (1 + op.rate);
                         self.val(rounding(val, roundingType));
@@ -5212,15 +5215,15 @@
             var self = $(this);
             self.after(buttons.join(''))
                 .next()
-                    .click(function(){
+                    .on('click', function(){
                         self.val(getDateItem(ms, op.gengo));
                     })
                 .next()
-                    .click(function(){
+                    .on('click', function(){
                         self.val(getDateItem(ms + 86400000, op.gengo));
                     })
                 .next()
-                    .click(function(){
+                    .on('click', function(){
                         self.val(getDateItem(ms + 172800000, op.gengo));
                     });
         });
@@ -5367,7 +5370,7 @@
         var text = (mtappVars.screen_id == 'batch-edit-entry') ? 'カテゴリ' + op.text: 'フォルダ' + op.text;
         var $select = $('td.category').find('select');
         var $select_clone = $select.eq(0).clone().attr('id', 'mtapp_clone_select').css('margin-right','5px');
-        var $btn = $('<button class="button" title="' + text + '">' + text + '</button>').click(function(){
+        var $btn = $('<button class="button" title="' + text + '">' + text + '</button>').on('click', function(){
             var value = $('#mtapp_clone_select').val();
             $select.each(function(){
                 $(this).val(value);
@@ -5414,35 +5417,34 @@
                 input.push(item(this_value[i]));
             }
             $this.after(input.join(''));
-
-            $fieldContent
-                .on('click', 'img.mtapp-linebreak-field-add', function(){
-                    $(this).parent().parent().after(item('')).next().children().children().focus();
-                })
-                .on('blur', 'input.mtapp-linebreak-field-input', function(){
-                    var text = [];
-                    var inputs = $fieldContent.find('input.mtapp-linebreak-field-input');
-                    var inputs_count = inputs.length;
-                    inputs.each(function(){
-                        if ($(this).val() != '') {
-                            text.push($(this).val());
-                        } else if (inputs_count > 1) {
-                            $(this).parent().parent().remove();
-                        }
-                    });
-                    $this.val(text.join("\n"));
-                })
-                .on('keydown', 'input.mtapp-linebreak-field-input', function(e){
-                    var keycode = e.which || e.keyCode;
-                    if (keycode == 13) {
-                        $(this).blur().next().click();
-                        return false;
+            
+            $fieldContent.on('click', 'img.mtapp-linebreak-field-add', function(){
+                $(this).parent().parent().after(item('')).next().children().children().trigger('focus');
+            });
+            $fieldContent.on('blur', 'input.mtapp-linebreak-field-input', function(){
+                var text = [];
+                var inputs = $fieldContent.find('input.mtapp-linebreak-field-input');
+                var inputs_count = inputs.length;
+                inputs.each(function(){
+                    if ($(this).val() != '') {
+                        text.push($(this).val());
+                    } else if (inputs_count > 1) {
+                        $(this).parent().parent().remove();
                     }
                 });
+                $this.val(text.join("\n"));
+            });
+            $fieldContent.on('keydown', 'input.mtapp-linebreak-field-input', function(e){
+                var keycode = e.which || e.keyCode;
+                if (keycode == 13) {
+                    $(this).trigger('blur').next().trigger('click');
+                    return false;
+                }
+            });
             if (isSortable) {
                 $fieldContent.addClass('mtapp-sortable').sortable({
                     update: function(e, ui){
-                        $(ui.item).find('input').blur();
+                        $(ui.item).find('input').trigger('blur');
                     }
                 });
             }
@@ -5523,7 +5525,7 @@
             });
         }
 
-        $('#mtapp_duplicate_button').click(function(){
+        $('#mtapp_duplicate_button').on('click', function(){
             var $this = $(this);
             $('#main').find('form').find('input:hidden').each(function(){
                 var name = $(this).attr('name');
@@ -5545,7 +5547,7 @@
                         break;
                 }
             });
-            $this.parent().prev().find('button.primary').click();
+            $this.parent().prev().find('button.primary').trigger('click');
         });
     };
     $.MTAppDuplicate.defaults = {
@@ -5877,7 +5879,7 @@
     $.MTAppGroupFilter = function(options) {
         if (!/group$/.test(mtappVars.screen_id) || $('#filter-select').length == 0) return;
         $('#filter-select').append('<input type="search" value="" id="mtapp-group-filter" placeholder="filter...">');
-        $('#mtapp-group-filter').keyup(function(){
+        $('#mtapp-group-filter').on('keyup', function(){
             var reg = new RegExp($(this).val(), 'i');
             $('#item-left div.object-listing-content li > span').each(function(){
                 if (reg.test($(this).text())) {
@@ -5903,7 +5905,7 @@
     // -------------------------------------------------
     // $.MTAppSnippetHelper = function(options) {
     //     if (mtappVars.screen_id != 'edit_field') return;
-    //     var $helperBtn = $('<button class="button" id="mtapp-snippet-helper-action">スニペットヘルパー ON</button>').click(function(){
+    //     var $helperBtn = $('<button class="button" id="mtapp-snippet-helper-action">スニペットヘルパー ON</button>').on('click', function(){
     //         $(this).addClass('hidden');
     //         _snippetHelper();
     //         if ($('#default:visible').length > 0) {
@@ -5915,7 +5917,7 @@
     //     if (type == 'snippet') {
     //         $('#type-field div.field-content').append($helperBtn);
     //     } else {
-    //         $('#type').change(function(){
+    //         $('#type').on('change', function(){
     //             var _type = $(this).find('option:selected').val();
     //             if (_type == 'snippet') {
     //                 $('#type-field div.field-content').append($helperBtn);
@@ -5925,13 +5927,13 @@
 
     //     function _snippetHelper() {
     //         var $options = $('#options').after('<button class="button" id="mtapp-snippet-make-options">連番オプション作成</button>');
-    //         $('#mtapp-snippet-make-options').click(function(){
+    //         $('#mtapp-snippet-make-options').on('click', function(){
     //             var res = [];
     //             var optionsArry = $options.val().split(',');
     //             for (var i = 0, l = optionsArry.length; i < l; i++) {
     //                 optionsArry[i] = optionsArry[i].replace(/_[0-9]+$/, '');
     //             }
-    //             optionsArry = $.unique(optionsArry);
+    //             optionsArry = $.uniqueSort(optionsArry);
     //             var to = prompt('連番の個数はいくつですか？', 10);
     //             for (var i = 0, l = optionsArry.length; i < l; i++) {
     //                 for (var x = 0; x < to; x++) {
@@ -5945,7 +5947,7 @@
     //     function _defaultHelper() {
     //         var $options = $('#options');
     //         var $default = $('#default').after('<button class="button" id="mtapp-snippet-make-default">連番系ひな形作成</button>');
-    //         $('#mtapp-snippet-make-default').click(function(){
+    //         $('#mtapp-snippet-make-default').on('click', function(){
     //             var resHasValue = '';
     //             var optionsCount = 0;
     //             var optionsAll = $options.val().split(',');
@@ -5958,7 +5960,7 @@
     //                 }
     //                 optionsUnique[i] = optionsAll[i].replace(/_[0-9]+$/, '');
     //             }
-    //             optionsUnique = $.unique(optionsUnique);
+    //             optionsUnique = $.uniqueSort(optionsUnique);
 
     //             // for (var i = 0, l = optionsAll.length; i < l; i++) {
     //             //     res.push('<mt:SetVarBlock name="' + basename + '" key="' + optionsAll[i] + '"><mt:Var name="' + optionsAll[i] + '" /></mt:SetVarBlock>');
@@ -6036,7 +6038,7 @@
     //             });
     //         var $addBtn = $('<div style="text-align:right;"><button class="button" data-count="1">追加</button></div>')
     //             .find('button')
-    //             .click(function(){
+    //             .on('click', function(){
     //                 var $hiddenItem = $sortableItem.filter('.hidden:first').removeClass('hidden');
     //                 if ($hiddenItem.next('.mtapp-sortable-item').length == 0) {
     //                     $(this).addClass('hidden');
@@ -6317,7 +6319,7 @@
         insertAtCaret: function(text) {
             return this.each(function(){
                 var self = $(this)[0];
-                self.focus();
+                self.trigger('focus');
                 if ($.browser.msie) {
                     var range = document.selection.createRange();
                     range.text = text;
@@ -6511,12 +6513,12 @@ jQuery(function($){
         });
     }
 */
-    $('#favorite-structure').find('div.favorite-structure-container').hover(
-        function(){
+    $('#favorite-structure').find('div.favorite-structure-container').on({
+        'mouseenter': function(){
             $(this).css('backgroundColor','#C2EEB5');
         },
-        function(){
+        'mouseleave': function(){
             $(this).css('backgroundColor','#F3F3F3');
         }
-    );
+    });
 });
