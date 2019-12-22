@@ -4176,7 +4176,7 @@
             }
         }
 
-        $('#category-selector-list').find('input:checkbox').live('click', function(){
+        $('#category-selector-list').on('click', 'input:checkbox', function(){
             var cat_id = Number($(this).attr('name').replace(/add_category_id_/,''));
             if ($(this).is(':checked') && $.inArray(cat_id, cats) >= 0) {
                 op.code();
