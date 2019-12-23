@@ -4,7 +4,7 @@
  * Copyright (c) Tomohiro Okuwaki (http://bit-part/)
  *
  * Since:   2010/06/22
- * Update:  2019/11/15
+ * Update:  2019/12/23
  *
  */
 ;(function($){
@@ -1806,6 +1806,15 @@
     $.MTAppApplyTinyMCE = function(options){
         var op = $.extend({}, $.MTAppApplyTinyMCE.defaults, options);
         if (mtappVars.template_filename !== 'edit_entry') return;
+        // カスタムフィールドの場合の全画面モードのスタイルを追加
+        var head = document.getElementsByTagName('head').item(0);
+        var style = document.createElement('style');
+        var rule = document.createTextNode(
+            '[id^=customfield_] .field-content.fullscreen_editor iframe {height: ' + (jQuery(window).height() - 80) + 'px !important;}'
+        );
+        style.appendChild(rule);
+        head.appendChild(style);
+        // END カスタムフィールドの場合の全画面モードのスタイルを追加
         var target = op.target;
             // target = ['excerpt', 'customfield_document_textarea']
         var targetTrim = {};
@@ -4167,7 +4176,7 @@
             }
         }
 
-        $('#category-selector-list').find('input:checkbox').live('click', function(){
+        $('#category-selector-list').on('click', 'input:checkbox', function(){
             var cat_id = Number($(this).attr('name').replace(/add_category_id_/,''));
             if ($(this).is(':checked') && $.inArray(cat_id, cats) >= 0) {
                 op.code();
