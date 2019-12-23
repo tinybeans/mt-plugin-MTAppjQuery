@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw( MT::Plugin );
 
-our $VERSION = '1.11.6';
+our $VERSION = '1.11.7';
 
 my $plugin = MT::Plugin::MTAppjQuery->new({
     id          => 'mt_app_jquery',
